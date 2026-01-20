@@ -1,0 +1,740 @@
+/**
+ * Bob's Talking NPCs - Main Stylesheet
+ * Base styles for all module components
+ */
+
+/* Import CSS custom properties */
+@import url("./variables.css");
+
+/* ===== CSS Layer for V13 Compatibility ===== */
+@layer bobsnpc {
+
+  /* ===== Base Application Styles ===== */
+  .bobsnpc-app {
+    background: var(--bobsnpc-bg-primary);
+    color: var(--bobsnpc-text-primary);
+    font-family: var(--bobsnpc-font-primary);
+    font-size: var(--bobsnpc-font-size-base);
+    line-height: var(--bobsnpc-line-height-normal);
+    border-radius: var(--bobsnpc-border-radius-md);
+  }
+
+  .bobsnpc-app .window-content {
+    background: var(--bobsnpc-bg-surface);
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .bobsnpc-app .window-header {
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  /* ===== Scrollbars ===== */
+  .bobsnpc-app ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .bobsnpc-app ::-webkit-scrollbar-track {
+    background: var(--bobsnpc-scrollbar-track);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .bobsnpc-app ::-webkit-scrollbar-thumb {
+    background: var(--bobsnpc-scrollbar-thumb);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .bobsnpc-app ::-webkit-scrollbar-thumb:hover {
+    background: var(--bobsnpc-scrollbar-thumb-hover);
+  }
+
+  /* Firefox scrollbar */
+  .bobsnpc-app * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--bobsnpc-scrollbar-thumb) var(--bobsnpc-scrollbar-track);
+  }
+
+  /* ===== Typography ===== */
+  .bobsnpc-app h1,
+  .bobsnpc-app h2,
+  .bobsnpc-app h3,
+  .bobsnpc-app h4,
+  .bobsnpc-app h5,
+  .bobsnpc-app h6 {
+    color: var(--bobsnpc-text-primary);
+    font-family: var(--bobsnpc-font-primary);
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    margin: 0 0 var(--bobsnpc-spacing-sm) 0;
+    line-height: var(--bobsnpc-line-height-tight);
+  }
+
+  .bobsnpc-app h1 { font-size: var(--bobsnpc-font-size-2xl); }
+  .bobsnpc-app h2 { font-size: var(--bobsnpc-font-size-xl); }
+  .bobsnpc-app h3 { font-size: var(--bobsnpc-font-size-lg); }
+  .bobsnpc-app h4 { font-size: var(--bobsnpc-font-size-base); }
+  .bobsnpc-app h5 { font-size: var(--bobsnpc-font-size-sm); }
+  .bobsnpc-app h6 { font-size: var(--bobsnpc-font-size-xs); }
+
+  .bobsnpc-app p {
+    margin: 0 0 var(--bobsnpc-spacing-sm) 0;
+    line-height: var(--bobsnpc-line-height-normal);
+  }
+
+  .bobsnpc-app a {
+    color: var(--bobsnpc-text-link);
+    text-decoration: none;
+    transition: color var(--bobsnpc-transition-fast);
+  }
+
+  .bobsnpc-app a:hover {
+    color: var(--bobsnpc-text-link-hover);
+    text-decoration: underline;
+  }
+
+  .bobsnpc-text-muted {
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .bobsnpc-text-secondary {
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .bobsnpc-text-success {
+    color: var(--bobsnpc-success);
+  }
+
+  .bobsnpc-text-warning {
+    color: var(--bobsnpc-warning);
+  }
+
+  .bobsnpc-text-error {
+    color: var(--bobsnpc-error);
+  }
+
+  .bobsnpc-text-info {
+    color: var(--bobsnpc-info);
+  }
+
+  /* ===== Buttons ===== */
+  .bobsnpc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    border: var(--bobsnpc-border-width) solid transparent;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-family: var(--bobsnpc-font-secondary);
+    font-size: var(--bobsnpc-font-size-sm);
+    font-weight: var(--bobsnpc-font-weight-medium);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+    text-decoration: none;
+  }
+
+  .bobsnpc-btn:focus {
+    outline: 2px solid var(--bobsnpc-primary);
+    outline-offset: 2px;
+  }
+
+  .bobsnpc-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .bobsnpc-btn-primary {
+    background: var(--bobsnpc-primary);
+    color: white;
+    border-color: var(--bobsnpc-primary);
+  }
+
+  .bobsnpc-btn-primary:hover:not(:disabled) {
+    background: var(--bobsnpc-primary-light);
+    border-color: var(--bobsnpc-primary-light);
+  }
+
+  .bobsnpc-btn-primary:active:not(:disabled) {
+    background: var(--bobsnpc-primary-dark);
+    border-color: var(--bobsnpc-primary-dark);
+  }
+
+  .bobsnpc-btn-secondary {
+    background: var(--bobsnpc-bg-elevated);
+    border-color: var(--bobsnpc-border-color);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .bobsnpc-btn-secondary:hover:not(:disabled) {
+    background: var(--bobsnpc-bg-hover);
+    border-color: var(--bobsnpc-border-color-light);
+  }
+
+  .bobsnpc-btn-ghost {
+    background: transparent;
+    color: var(--bobsnpc-text-secondary);
+    border-color: transparent;
+  }
+
+  .bobsnpc-btn-ghost:hover:not(:disabled) {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .bobsnpc-btn-success {
+    background: var(--bobsnpc-success);
+    color: white;
+    border-color: var(--bobsnpc-success);
+  }
+
+  .bobsnpc-btn-success:hover:not(:disabled) {
+    background: var(--bobsnpc-success-light);
+    border-color: var(--bobsnpc-success-light);
+  }
+
+  .bobsnpc-btn-danger {
+    background: var(--bobsnpc-error);
+    color: white;
+    border-color: var(--bobsnpc-error);
+  }
+
+  .bobsnpc-btn-danger:hover:not(:disabled) {
+    background: var(--bobsnpc-error-light);
+    border-color: var(--bobsnpc-error-light);
+  }
+
+  .bobsnpc-btn-sm {
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    font-size: var(--bobsnpc-font-size-xs);
+  }
+
+  .bobsnpc-btn-lg {
+    padding: var(--bobsnpc-spacing-md) var(--bobsnpc-spacing-lg);
+    font-size: var(--bobsnpc-font-size-base);
+  }
+
+  .bobsnpc-btn-icon {
+    padding: var(--bobsnpc-spacing-sm);
+    width: 36px;
+    height: 36px;
+  }
+
+  /* ===== Form Controls ===== */
+  .bobsnpc-input,
+  .bobsnpc-select,
+  .bobsnpc-textarea {
+    width: 100%;
+    background: var(--bobsnpc-input-bg);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-input-border);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+    font-family: var(--bobsnpc-font-secondary);
+    font-size: var(--bobsnpc-font-size-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    transition: border-color var(--bobsnpc-transition-fast), background var(--bobsnpc-transition-fast);
+  }
+
+  .bobsnpc-input:hover,
+  .bobsnpc-select:hover,
+  .bobsnpc-textarea:hover {
+    background: var(--bobsnpc-input-bg-hover);
+  }
+
+  .bobsnpc-input:focus,
+  .bobsnpc-select:focus,
+  .bobsnpc-textarea:focus {
+    border-color: var(--bobsnpc-input-focus);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--bobsnpc-primary-rgb), 0.2);
+  }
+
+  .bobsnpc-input::placeholder,
+  .bobsnpc-textarea::placeholder {
+    color: var(--bobsnpc-input-placeholder);
+  }
+
+  .bobsnpc-input:disabled,
+  .bobsnpc-select:disabled,
+  .bobsnpc-textarea:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .bobsnpc-textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+
+  .bobsnpc-checkbox,
+  .bobsnpc-radio {
+    accent-color: var(--bobsnpc-primary);
+  }
+
+  .bobsnpc-label {
+    display: block;
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    font-weight: var(--bobsnpc-font-weight-medium);
+    color: var(--bobsnpc-text-secondary);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .bobsnpc-form-group {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .bobsnpc-form-hint {
+    margin-top: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Cards ===== */
+  .bobsnpc-card {
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    padding: var(--bobsnpc-spacing-md);
+    transition: box-shadow var(--bobsnpc-transition-fast);
+  }
+
+  .bobsnpc-card:hover {
+    box-shadow: var(--bobsnpc-shadow-md);
+  }
+
+  .bobsnpc-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-sm);
+    padding-bottom: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-divider-color);
+  }
+
+  .bobsnpc-card-title {
+    flex: 1;
+    margin: 0;
+    font-size: var(--bobsnpc-font-size-base);
+  }
+
+  .bobsnpc-card-body {
+    /* Content area */
+  }
+
+  .bobsnpc-card-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    margin-top: var(--bobsnpc-spacing-sm);
+    padding-top: var(--bobsnpc-spacing-sm);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-divider-color);
+  }
+
+  /* ===== Lists ===== */
+  .bobsnpc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .bobsnpc-list-item {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-divider-color);
+    transition: background var(--bobsnpc-transition-fast);
+  }
+
+  .bobsnpc-list-item:last-child {
+    border-bottom: none;
+  }
+
+  .bobsnpc-list-item:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .bobsnpc-list-item-clickable {
+    cursor: pointer;
+  }
+
+  .bobsnpc-list-item-active {
+    background: var(--bobsnpc-bg-active);
+  }
+
+  /* ===== Badges ===== */
+  .bobsnpc-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    border-radius: var(--bobsnpc-border-radius-full);
+    font-size: var(--bobsnpc-font-size-xs);
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .bobsnpc-badge-default {
+    background: var(--bobsnpc-bg-tertiary);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .bobsnpc-badge-primary {
+    background: rgba(var(--bobsnpc-primary-rgb), 0.2);
+    color: var(--bobsnpc-primary);
+  }
+
+  .bobsnpc-badge-success {
+    background: rgba(var(--bobsnpc-success-rgb), 0.2);
+    color: var(--bobsnpc-success);
+  }
+
+  .bobsnpc-badge-warning {
+    background: rgba(var(--bobsnpc-warning-rgb), 0.2);
+    color: var(--bobsnpc-warning);
+  }
+
+  .bobsnpc-badge-error {
+    background: rgba(var(--bobsnpc-error-rgb), 0.2);
+    color: var(--bobsnpc-error);
+  }
+
+  .bobsnpc-badge-info {
+    background: rgba(var(--bobsnpc-info-rgb), 0.2);
+    color: var(--bobsnpc-info);
+  }
+
+  /* Quest status badges */
+  .bobsnpc-badge-quest-available {
+    background: var(--bobsnpc-quest-available);
+    color: var(--bobsnpc-text-inverse);
+  }
+
+  .bobsnpc-badge-quest-accepted {
+    background: var(--bobsnpc-quest-accepted);
+    color: white;
+  }
+
+  .bobsnpc-badge-quest-active {
+    background: var(--bobsnpc-quest-active);
+    color: white;
+  }
+
+  .bobsnpc-badge-quest-complete {
+    background: var(--bobsnpc-quest-complete);
+    color: white;
+  }
+
+  .bobsnpc-badge-quest-failed {
+    background: var(--bobsnpc-quest-failed);
+    color: white;
+  }
+
+  /* ===== Token Indicators ===== */
+  .bobsnpc-token-indicator {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+    z-index: var(--bobsnpc-z-base);
+  }
+
+  .bobsnpc-indicator-quest {
+    filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.8));
+  }
+
+  .bobsnpc-indicator-merchant {
+    filter: drop-shadow(0 0 2px rgba(255, 152, 0, 0.8));
+  }
+
+  .bobsnpc-indicator-dialogue {
+    filter: drop-shadow(0 0 2px rgba(33, 150, 243, 0.8));
+  }
+
+  /* ===== Progress Bars ===== */
+  .bobsnpc-progress {
+    height: 8px;
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-full);
+    overflow: hidden;
+  }
+
+  .bobsnpc-progress-bar {
+    height: 100%;
+    background: var(--bobsnpc-primary);
+    transition: width var(--bobsnpc-transition-normal);
+  }
+
+  .bobsnpc-progress-bar-success {
+    background: var(--bobsnpc-success);
+  }
+
+  .bobsnpc-progress-bar-warning {
+    background: var(--bobsnpc-warning);
+  }
+
+  .bobsnpc-progress-bar-error {
+    background: var(--bobsnpc-error);
+  }
+
+  /* ===== Tooltips ===== */
+  .bobsnpc-tooltip {
+    position: absolute;
+    z-index: var(--bobsnpc-z-tooltip);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    box-shadow: var(--bobsnpc-shadow-lg);
+    font-size: var(--bobsnpc-font-size-sm);
+    max-width: 300px;
+    pointer-events: none;
+  }
+
+  /* ===== Tabs ===== */
+  .bobsnpc-tabs {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .bobsnpc-tab {
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    border: none;
+    background: transparent;
+    color: var(--bobsnpc-text-secondary);
+    font-family: var(--bobsnpc-font-secondary);
+    font-size: var(--bobsnpc-font-size-sm);
+    font-weight: var(--bobsnpc-font-weight-medium);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .bobsnpc-tab:hover {
+    color: var(--bobsnpc-text-primary);
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .bobsnpc-tab-active {
+    color: var(--bobsnpc-primary);
+    border-bottom-color: var(--bobsnpc-primary);
+  }
+
+  .bobsnpc-tab-content {
+    display: none;
+  }
+
+  .bobsnpc-tab-content-active {
+    display: block;
+  }
+
+  /* ===== Modals & Overlays ===== */
+  .bobsnpc-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bobsnpc-overlay-bg);
+    backdrop-filter: var(--bobsnpc-backdrop-blur);
+    z-index: var(--bobsnpc-z-overlay);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bobsnpc-modal {
+    background: var(--bobsnpc-bg-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-lg);
+    box-shadow: var(--bobsnpc-shadow-xl);
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+  }
+
+  .bobsnpc-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bobsnpc-spacing-md);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .bobsnpc-modal-body {
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .bobsnpc-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-md);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  /* ===== Empty States ===== */
+  .bobsnpc-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--bobsnpc-spacing-2xl);
+    text-align: center;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .bobsnpc-empty-icon {
+    font-size: 48px;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    opacity: 0.5;
+  }
+
+  .bobsnpc-empty-text {
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  /* ===== Loading States ===== */
+  .bobsnpc-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--bobsnpc-spacing-lg);
+  }
+
+  .bobsnpc-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--bobsnpc-border-color);
+    border-top-color: var(--bobsnpc-primary);
+    border-radius: 50%;
+    animation: bobsnpc-spin 0.8s linear infinite;
+  }
+
+  @keyframes bobsnpc-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ===== Dividers ===== */
+  .bobsnpc-divider {
+    height: 1px;
+    background: var(--bobsnpc-divider-color);
+    margin: var(--bobsnpc-spacing-md) 0;
+  }
+
+  .bobsnpc-divider-vertical {
+    width: 1px;
+    height: 100%;
+    background: var(--bobsnpc-divider-color);
+    margin: 0 var(--bobsnpc-spacing-md);
+  }
+
+  /* ===== Grid Utilities ===== */
+  .bobsnpc-grid {
+    display: grid;
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .bobsnpc-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .bobsnpc-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .bobsnpc-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* ===== Flex Utilities ===== */
+  .bobsnpc-flex {
+    display: flex;
+  }
+
+  .bobsnpc-flex-col {
+    flex-direction: column;
+  }
+
+  .bobsnpc-flex-wrap {
+    flex-wrap: wrap;
+  }
+
+  .bobsnpc-flex-1 {
+    flex: 1;
+  }
+
+  .bobsnpc-items-center {
+    align-items: center;
+  }
+
+  .bobsnpc-items-start {
+    align-items: flex-start;
+  }
+
+  .bobsnpc-items-end {
+    align-items: flex-end;
+  }
+
+  .bobsnpc-justify-center {
+    justify-content: center;
+  }
+
+  .bobsnpc-justify-between {
+    justify-content: space-between;
+  }
+
+  .bobsnpc-justify-end {
+    justify-content: flex-end;
+  }
+
+  .bobsnpc-gap-xs {
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .bobsnpc-gap-sm {
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .bobsnpc-gap-md {
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .bobsnpc-gap-lg {
+    gap: var(--bobsnpc-spacing-lg);
+  }
+
+  /* ===== Accessibility ===== */
+  .bobsnpc-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Focus visible for keyboard navigation */
+  .bobsnpc-app *:focus-visible {
+    outline: 2px solid var(--bobsnpc-primary);
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .bobsnpc-app *,
+    .bobsnpc-app *::before,
+    .bobsnpc-app *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+} /* End @layer bobsnpc */

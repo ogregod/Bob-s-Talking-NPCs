@@ -1,0 +1,372 @@
+/**
+ * Bob's Talking NPCs - CSS Custom Properties
+ * Defines all theming variables used throughout the module
+ */
+
+:root {
+  /* ===== Color Palette ===== */
+
+  /* Primary Colors - Purple accent */
+  --bobsnpc-primary: #7c4dff;
+  --bobsnpc-primary-light: #b47cff;
+  --bobsnpc-primary-dark: #3f1dcb;
+  --bobsnpc-primary-rgb: 124, 77, 255;
+
+  /* Secondary Colors - Orange accent */
+  --bobsnpc-secondary: #ff9800;
+  --bobsnpc-secondary-light: #ffc947;
+  --bobsnpc-secondary-dark: #c66900;
+  --bobsnpc-secondary-rgb: 255, 152, 0;
+
+  /* Semantic Colors */
+  --bobsnpc-success: #4caf50;
+  --bobsnpc-success-light: #80e27e;
+  --bobsnpc-success-dark: #087f23;
+  --bobsnpc-success-rgb: 76, 175, 80;
+
+  --bobsnpc-warning: #ff9800;
+  --bobsnpc-warning-light: #ffc947;
+  --bobsnpc-warning-dark: #c66900;
+  --bobsnpc-warning-rgb: 255, 152, 0;
+
+  --bobsnpc-error: #f44336;
+  --bobsnpc-error-light: #ff7961;
+  --bobsnpc-error-dark: #ba000d;
+  --bobsnpc-error-rgb: 244, 67, 54;
+
+  --bobsnpc-info: #2196f3;
+  --bobsnpc-info-light: #6ec6ff;
+  --bobsnpc-info-dark: #0069c0;
+  --bobsnpc-info-rgb: 33, 150, 243;
+
+  /* Quest Status Colors */
+  --bobsnpc-quest-available: #ffd700;
+  --bobsnpc-quest-accepted: #2196f3;
+  --bobsnpc-quest-active: #4caf50;
+  --bobsnpc-quest-complete: #8bc34a;
+  --bobsnpc-quest-failed: #f44336;
+  --bobsnpc-quest-locked: #9e9e9e;
+
+  /* Relationship Tier Colors */
+  --bobsnpc-relation-hostile: #f44336;
+  --bobsnpc-relation-hated: #e91e63;
+  --bobsnpc-relation-unfriendly: #ff5722;
+  --bobsnpc-relation-neutral: #9e9e9e;
+  --bobsnpc-relation-friendly: #8bc34a;
+  --bobsnpc-relation-trusted: #4caf50;
+  --bobsnpc-relation-allied: #00bcd4;
+
+  /* Faction Rank Colors */
+  --bobsnpc-rank-copper: #b87333;
+  --bobsnpc-rank-iron: #43464b;
+  --bobsnpc-rank-silver: #c0c0c0;
+  --bobsnpc-rank-gold: #ffd700;
+  --bobsnpc-rank-platinum: #e5e4e2;
+  --bobsnpc-rank-mythril: #4fc3f7;
+
+  /* ===== Typography ===== */
+  --bobsnpc-font-primary: "Signika", "Palatino Linotype", serif;
+  --bobsnpc-font-secondary: "Roboto", "Open Sans", sans-serif;
+  --bobsnpc-font-mono: "Roboto Mono", "Consolas", monospace;
+
+  /* Font Sizes - Base scale */
+  --bobsnpc-font-size-xs: 0.75rem;
+  --bobsnpc-font-size-sm: 0.875rem;
+  --bobsnpc-font-size-base: 1rem;
+  --bobsnpc-font-size-lg: 1.125rem;
+  --bobsnpc-font-size-xl: 1.25rem;
+  --bobsnpc-font-size-2xl: 1.5rem;
+  --bobsnpc-font-size-3xl: 2rem;
+
+  /* Line Heights */
+  --bobsnpc-line-height-tight: 1.25;
+  --bobsnpc-line-height-normal: 1.5;
+  --bobsnpc-line-height-relaxed: 1.75;
+
+  /* Font Weights */
+  --bobsnpc-font-weight-normal: 400;
+  --bobsnpc-font-weight-medium: 500;
+  --bobsnpc-font-weight-semibold: 600;
+  --bobsnpc-font-weight-bold: 700;
+
+  /* ===== Spacing ===== */
+  --bobsnpc-spacing-xs: 0.25rem;
+  --bobsnpc-spacing-sm: 0.5rem;
+  --bobsnpc-spacing-md: 1rem;
+  --bobsnpc-spacing-lg: 1.5rem;
+  --bobsnpc-spacing-xl: 2rem;
+  --bobsnpc-spacing-2xl: 3rem;
+
+  /* ===== Borders ===== */
+  --bobsnpc-border-radius-sm: 4px;
+  --bobsnpc-border-radius-md: 8px;
+  --bobsnpc-border-radius-lg: 12px;
+  --bobsnpc-border-radius-xl: 16px;
+  --bobsnpc-border-radius-full: 9999px;
+
+  --bobsnpc-border-width: 1px;
+  --bobsnpc-border-width-thick: 2px;
+
+  /* ===== Shadows ===== */
+  --bobsnpc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --bobsnpc-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --bobsnpc-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --bobsnpc-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  --bobsnpc-shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  --bobsnpc-shadow-glow: 0 0 10px rgba(124, 77, 255, 0.3);
+
+  /* ===== Transitions ===== */
+  --bobsnpc-transition-fast: 150ms ease;
+  --bobsnpc-transition-normal: 300ms ease;
+  --bobsnpc-transition-slow: 500ms ease;
+  --bobsnpc-transition-bounce: 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* ===== Z-Index Scale ===== */
+  --bobsnpc-z-base: 0;
+  --bobsnpc-z-dropdown: 100;
+  --bobsnpc-z-sticky: 150;
+  --bobsnpc-z-modal: 200;
+  --bobsnpc-z-overlay: 300;
+  --bobsnpc-z-tooltip: 400;
+  --bobsnpc-z-notification: 500;
+
+  /* ===== Sizing ===== */
+  --bobsnpc-icon-sm: 16px;
+  --bobsnpc-icon-md: 24px;
+  --bobsnpc-icon-lg: 32px;
+  --bobsnpc-icon-xl: 48px;
+
+  --bobsnpc-avatar-sm: 32px;
+  --bobsnpc-avatar-md: 48px;
+  --bobsnpc-avatar-lg: 64px;
+  --bobsnpc-avatar-xl: 96px;
+
+  /* ===== Animation ===== */
+  --bobsnpc-typewriter-speed: 30ms;
+}
+
+/* ===== Dark Theme (Default) ===== */
+.bobsnpc-theme-dark,
+:root {
+  --bobsnpc-bg-primary: #1a1a2e;
+  --bobsnpc-bg-secondary: #16213e;
+  --bobsnpc-bg-tertiary: #0f3460;
+  --bobsnpc-bg-surface: #1f1f3d;
+  --bobsnpc-bg-elevated: #2a2a4a;
+  --bobsnpc-bg-hover: #3a3a5a;
+  --bobsnpc-bg-active: #4a4a6a;
+
+  --bobsnpc-text-primary: #e8e8e8;
+  --bobsnpc-text-secondary: #b0b0b0;
+  --bobsnpc-text-muted: #707070;
+  --bobsnpc-text-inverse: #1a1a2e;
+  --bobsnpc-text-link: #7c9dff;
+  --bobsnpc-text-link-hover: #a0bdff;
+
+  --bobsnpc-border-color: #3a3a5a;
+  --bobsnpc-border-color-light: #4a4a6a;
+  --bobsnpc-border-color-dark: #2a2a3a;
+  --bobsnpc-divider-color: #2a2a4a;
+
+  --bobsnpc-input-bg: #2a2a4a;
+  --bobsnpc-input-bg-hover: #3a3a5a;
+  --bobsnpc-input-border: #3a3a5a;
+  --bobsnpc-input-focus: var(--bobsnpc-primary);
+  --bobsnpc-input-placeholder: #606060;
+
+  --bobsnpc-scrollbar-track: #1a1a2e;
+  --bobsnpc-scrollbar-thumb: #3a3a5a;
+  --bobsnpc-scrollbar-thumb-hover: #4a4a6a;
+
+  --bobsnpc-overlay-bg: rgba(0, 0, 0, 0.7);
+  --bobsnpc-backdrop-blur: blur(4px);
+}
+
+/* ===== Light Theme ===== */
+.bobsnpc-theme-light {
+  --bobsnpc-bg-primary: #ffffff;
+  --bobsnpc-bg-secondary: #f5f5f5;
+  --bobsnpc-bg-tertiary: #e8e8e8;
+  --bobsnpc-bg-surface: #fafafa;
+  --bobsnpc-bg-elevated: #ffffff;
+  --bobsnpc-bg-hover: #f0f0f0;
+  --bobsnpc-bg-active: #e0e0e0;
+
+  --bobsnpc-text-primary: #212121;
+  --bobsnpc-text-secondary: #616161;
+  --bobsnpc-text-muted: #9e9e9e;
+  --bobsnpc-text-inverse: #ffffff;
+  --bobsnpc-text-link: #5c3dcc;
+  --bobsnpc-text-link-hover: #7c4dff;
+
+  --bobsnpc-border-color: #e0e0e0;
+  --bobsnpc-border-color-light: #f0f0f0;
+  --bobsnpc-border-color-dark: #bdbdbd;
+  --bobsnpc-divider-color: #eeeeee;
+
+  --bobsnpc-input-bg: #ffffff;
+  --bobsnpc-input-bg-hover: #f5f5f5;
+  --bobsnpc-input-border: #bdbdbd;
+  --bobsnpc-input-focus: var(--bobsnpc-primary);
+  --bobsnpc-input-placeholder: #9e9e9e;
+
+  --bobsnpc-scrollbar-track: #f5f5f5;
+  --bobsnpc-scrollbar-thumb: #bdbdbd;
+  --bobsnpc-scrollbar-thumb-hover: #9e9e9e;
+
+  --bobsnpc-overlay-bg: rgba(0, 0, 0, 0.5);
+  --bobsnpc-backdrop-blur: blur(4px);
+
+  /* Adjust shadows for light theme */
+  --bobsnpc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --bobsnpc-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --bobsnpc-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Parchment Theme ===== */
+.bobsnpc-theme-parchment {
+  --bobsnpc-bg-primary: #f4e4bc;
+  --bobsnpc-bg-secondary: #e8d4a8;
+  --bobsnpc-bg-tertiary: #d4c090;
+  --bobsnpc-bg-surface: #f8f0d8;
+  --bobsnpc-bg-elevated: #fff8e8;
+  --bobsnpc-bg-hover: #efe0b8;
+  --bobsnpc-bg-active: #e0d0a0;
+
+  --bobsnpc-text-primary: #3d2914;
+  --bobsnpc-text-secondary: #5c4a32;
+  --bobsnpc-text-muted: #8b7355;
+  --bobsnpc-text-inverse: #f4e4bc;
+  --bobsnpc-text-link: #6b3a10;
+  --bobsnpc-text-link-hover: #8b4513;
+
+  --bobsnpc-border-color: #c4a060;
+  --bobsnpc-border-color-light: #d4b070;
+  --bobsnpc-border-color-dark: #a08040;
+  --bobsnpc-divider-color: #d4c090;
+
+  --bobsnpc-input-bg: #fff8e8;
+  --bobsnpc-input-bg-hover: #f8f0d8;
+  --bobsnpc-input-border: #c4a060;
+  --bobsnpc-input-focus: #8b4513;
+  --bobsnpc-input-placeholder: #a09070;
+
+  --bobsnpc-scrollbar-track: #e8d4a8;
+  --bobsnpc-scrollbar-thumb: #c4a060;
+  --bobsnpc-scrollbar-thumb-hover: #a08040;
+
+  --bobsnpc-overlay-bg: rgba(61, 41, 20, 0.6);
+  --bobsnpc-backdrop-blur: blur(4px);
+
+  /* Override accent colors for parchment theme */
+  --bobsnpc-primary: #8b4513;
+  --bobsnpc-primary-light: #a0522d;
+  --bobsnpc-primary-dark: #6b3a10;
+  --bobsnpc-secondary: #d4a060;
+  --bobsnpc-secondary-light: #e0b070;
+  --bobsnpc-secondary-dark: #b08040;
+}
+
+/* ===== High Contrast Theme ===== */
+.bobsnpc-theme-high-contrast {
+  --bobsnpc-bg-primary: #000000;
+  --bobsnpc-bg-secondary: #0a0a0a;
+  --bobsnpc-bg-tertiary: #1a1a1a;
+  --bobsnpc-bg-surface: #0f0f0f;
+  --bobsnpc-bg-elevated: #1f1f1f;
+  --bobsnpc-bg-hover: #2a2a2a;
+  --bobsnpc-bg-active: #3a3a3a;
+
+  --bobsnpc-text-primary: #ffffff;
+  --bobsnpc-text-secondary: #e0e0e0;
+  --bobsnpc-text-muted: #a0a0a0;
+  --bobsnpc-text-inverse: #000000;
+  --bobsnpc-text-link: #00ffff;
+  --bobsnpc-text-link-hover: #80ffff;
+
+  --bobsnpc-border-color: #ffffff;
+  --bobsnpc-border-color-light: #e0e0e0;
+  --bobsnpc-border-color-dark: #808080;
+  --bobsnpc-divider-color: #404040;
+
+  --bobsnpc-input-bg: #1a1a1a;
+  --bobsnpc-input-bg-hover: #2a2a2a;
+  --bobsnpc-input-border: #ffffff;
+  --bobsnpc-input-focus: #ffff00;
+  --bobsnpc-input-placeholder: #808080;
+
+  --bobsnpc-scrollbar-track: #000000;
+  --bobsnpc-scrollbar-thumb: #ffffff;
+  --bobsnpc-scrollbar-thumb-hover: #e0e0e0;
+
+  --bobsnpc-overlay-bg: rgba(0, 0, 0, 0.9);
+  --bobsnpc-backdrop-blur: none;
+
+  /* High contrast accent colors */
+  --bobsnpc-primary: #ffff00;
+  --bobsnpc-primary-light: #ffff80;
+  --bobsnpc-primary-dark: #cccc00;
+  --bobsnpc-secondary: #00ffff;
+  --bobsnpc-secondary-light: #80ffff;
+  --bobsnpc-secondary-dark: #00cccc;
+  --bobsnpc-success: #00ff00;
+  --bobsnpc-warning: #ffff00;
+  --bobsnpc-error: #ff0000;
+  --bobsnpc-info: #00ffff;
+
+  /* Stronger borders for high contrast */
+  --bobsnpc-border-width: 2px;
+  --bobsnpc-border-width-thick: 3px;
+}
+
+/* ===== Font Size Modifiers ===== */
+.bobsnpc-font-small {
+  --bobsnpc-font-size-xs: 0.6875rem;
+  --bobsnpc-font-size-sm: 0.75rem;
+  --bobsnpc-font-size-base: 0.875rem;
+  --bobsnpc-font-size-lg: 1rem;
+  --bobsnpc-font-size-xl: 1.125rem;
+  --bobsnpc-font-size-2xl: 1.25rem;
+  --bobsnpc-font-size-3xl: 1.5rem;
+}
+
+.bobsnpc-font-medium {
+  /* Default sizes - already defined in :root */
+}
+
+.bobsnpc-font-large {
+  --bobsnpc-font-size-xs: 0.875rem;
+  --bobsnpc-font-size-sm: 1rem;
+  --bobsnpc-font-size-base: 1.125rem;
+  --bobsnpc-font-size-lg: 1.25rem;
+  --bobsnpc-font-size-xl: 1.5rem;
+  --bobsnpc-font-size-2xl: 1.75rem;
+  --bobsnpc-font-size-3xl: 2.25rem;
+}
+
+.bobsnpc-font-xlarge {
+  --bobsnpc-font-size-xs: 1rem;
+  --bobsnpc-font-size-sm: 1.125rem;
+  --bobsnpc-font-size-base: 1.25rem;
+  --bobsnpc-font-size-lg: 1.5rem;
+  --bobsnpc-font-size-xl: 1.75rem;
+  --bobsnpc-font-size-2xl: 2rem;
+  --bobsnpc-font-size-3xl: 2.5rem;
+}
+
+/* ===== Typewriter Speed Modifiers ===== */
+.bobsnpc-typewriter-slow {
+  --bobsnpc-typewriter-speed: 60ms;
+}
+
+.bobsnpc-typewriter-normal {
+  --bobsnpc-typewriter-speed: 30ms;
+}
+
+.bobsnpc-typewriter-fast {
+  --bobsnpc-typewriter-speed: 15ms;
+}
+
+.bobsnpc-typewriter-instant {
+  --bobsnpc-typewriter-speed: 0ms;
+}

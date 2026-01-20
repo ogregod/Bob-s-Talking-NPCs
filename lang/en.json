@@ -1,0 +1,834 @@
+{
+  "BOBSNPC": {
+    "ModuleName": "Bob's Talking NPCs",
+    "ModuleTagline": "The complete NPC interaction system",
+
+    "Settings": {
+      "PartyDefinition": {
+        "Name": "Party Definition Method",
+        "Hint": "How to determine which actors are party members",
+        "PrimaryParty": "D&D 5e Primary Party",
+        "Folder": "Designated Folder",
+        "Manual": "Manual Selection"
+      },
+      "PartyFolder": {
+        "Name": "Party Folder",
+        "Hint": "Select the folder containing party member actors"
+      },
+      "QuestDistribution": {
+        "Name": "Quest Reward Distribution",
+        "Hint": "How rewards are distributed among party members",
+        "Split": "Split Evenly",
+        "FullEach": "Full Amount to Each",
+        "GMChoice": "GM Chooses"
+      },
+      "AllowQuestAbandonment": {
+        "Name": "Allow Quest Abandonment",
+        "Hint": "Whether players can abandon accepted quests"
+      },
+      "ShowLockedQuests": {
+        "Name": "Show Locked Quests",
+        "Hint": "Display quests that don't meet prerequisites as locked"
+      },
+      "QuestMarkers": {
+        "Name": "Quest Markers",
+        "Hint": "Show quest indicators on NPC tokens"
+      },
+      "NPCIndicators": {
+        "Name": "NPC Role Indicators",
+        "Hint": "Show role icons on NPC tokens (merchant, quest giver, etc.)"
+      },
+      "CurrencyDisplay": {
+        "Name": "Currency Display Format",
+        "Hint": "How currency values are shown",
+        "GoldDown": "Gold and below (11gp 7sp 4cp)",
+        "All": "All denominations (1pp 1gp 7sp 4cp)"
+      },
+      "HagglingEnabled": {
+        "Name": "Enable Haggling",
+        "Hint": "Allow players to haggle with merchants"
+      },
+      "CharismaAffectsPrices": {
+        "Name": "Charisma Affects Prices",
+        "Hint": "Apply Charisma modifier to shop prices"
+      },
+      "CrimeEnabled": {
+        "Name": "Enable Crime System",
+        "Hint": "Enable stealing, bounties, and crime consequences"
+      },
+      "StealingEnabled": {
+        "Name": "Enable Stealing",
+        "Hint": "Allow players to attempt stealing from NPCs"
+      },
+      "BountyEnabled": {
+        "Name": "Enable Bounty System",
+        "Hint": "Track bounties for crimes committed"
+      },
+      "SharedDialogues": {
+        "Name": "Shared Dialogues",
+        "Hint": "Allow nearby players to see and join conversations"
+      },
+      "DialogueVoting": {
+        "Name": "Dialogue Voting",
+        "Hint": "Allow non-leading players to vote on dialogue choices"
+      },
+      "SoundEffectsEnabled": {
+        "Name": "Sound Effects",
+        "Hint": "Play sound effects for module events"
+      },
+      "LootDistribution": {
+        "Name": "Loot Distribution Method",
+        "Hint": "How loot is distributed from containers",
+        "Free": "Free For All",
+        "NeedGreed": "Need/Greed",
+        "RoundRobin": "Round Robin",
+        "PartyVault": "Party Vault",
+        "GM": "GM Distributes"
+      },
+      "CorpseConsolidation": {
+        "Name": "Corpse Loot Consolidation",
+        "Hint": "Combine loot from dead enemies into a single chest"
+      },
+      "SkillCheckVisibility": {
+        "Name": "Skill Check Visibility",
+        "Hint": "Who can see dialogue skill check rolls",
+        "Public": "Everyone",
+        "Private": "Only Player and GM",
+        "GMChoice": "GM Decides"
+      },
+      "ScheduleEnabled": {
+        "Name": "NPC Schedules",
+        "Hint": "Enable time-based NPC availability"
+      },
+      "QuestTracker": {
+        "Name": "Quest Tracker",
+        "Hint": "Show the quest tracker HUD"
+      },
+      "QuestTrackerPosition": {
+        "Name": "Quest Tracker Position",
+        "Hint": "Position of the quest tracker on screen"
+      },
+      "NotificationLevel": {
+        "Name": "Notification Level",
+        "Hint": "How many notifications to display",
+        "Minimal": "Minimal",
+        "Normal": "Normal",
+        "Verbose": "Verbose"
+      },
+      "ToastEnabled": {
+        "Name": "Toast Notifications",
+        "Hint": "Show toast popup notifications"
+      },
+      "SoundEnabled": {
+        "Name": "Sound Notifications",
+        "Hint": "Play sounds for notifications"
+      },
+      "HotkeyQuestLog": {
+        "Name": "Quest Log Hotkey",
+        "Hint": "Keyboard shortcut to open the quest log"
+      },
+      "HotkeyFactions": {
+        "Name": "Factions Hotkey",
+        "Hint": "Keyboard shortcut to open faction overview"
+      },
+      "HotkeyTracker": {
+        "Name": "Quest Tracker Hotkey",
+        "Hint": "Keyboard shortcut to toggle quest tracker"
+      },
+      "TypewriterSpeed": {
+        "Name": "Typewriter Speed",
+        "Hint": "Speed of dialogue text animation",
+        "Slow": "Slow",
+        "Normal": "Normal",
+        "Fast": "Fast",
+        "Instant": "Instant"
+      },
+      "Theme": {
+        "Name": "Theme",
+        "Hint": "Visual theme for module windows",
+        "Dark": "Dark",
+        "Light": "Light",
+        "Parchment": "Parchment",
+        "HighContrast": "High Contrast"
+      },
+      "FontSize": {
+        "Name": "Font Size",
+        "Hint": "Base font size for module interfaces",
+        "Small": "Small",
+        "Medium": "Medium",
+        "Large": "Large",
+        "XLarge": "Extra Large"
+      },
+      "CustomCSS": {
+        "Name": "Custom CSS",
+        "Hint": "Advanced: Add custom CSS to module interfaces"
+      }
+    },
+
+    "Common": {
+      "Accept": "Accept",
+      "Decline": "Decline",
+      "Cancel": "Cancel",
+      "Close": "Close",
+      "Confirm": "Confirm",
+      "Save": "Save",
+      "Delete": "Delete",
+      "Edit": "Edit",
+      "Create": "Create",
+      "Search": "Search",
+      "Filter": "Filter",
+      "Sort": "Sort",
+      "Name": "Name",
+      "Description": "Description",
+      "Status": "Status",
+      "Actions": "Actions",
+      "Loading": "Loading...",
+      "NoResults": "No results found",
+      "Error": "Error",
+      "Success": "Success",
+      "Warning": "Warning",
+      "Info": "Info",
+      "Yes": "Yes",
+      "No": "No",
+      "All": "All",
+      "None": "None",
+      "Unknown": "Unknown",
+      "Default": "Default",
+      "Custom": "Custom",
+      "Enabled": "Enabled",
+      "Disabled": "Disabled",
+      "Add": "Add",
+      "Remove": "Remove",
+      "Clear": "Clear",
+      "Reset": "Reset",
+      "Copy": "Copy",
+      "Paste": "Paste",
+      "Duplicate": "Duplicate",
+      "Preview": "Preview",
+      "Test": "Test",
+      "Export": "Export",
+      "Import": "Import"
+    },
+
+    "Quest": {
+      "Title": "Quest",
+      "TitlePlural": "Quests",
+      "Log": "Quest Log",
+      "Tracker": "Quest Tracker",
+      "Editor": "Quest Editor",
+      "Available": "Available",
+      "Accepted": "Accepted",
+      "InProgress": "In Progress",
+      "Completed": "Completed",
+      "Failed": "Failed",
+      "Locked": "Locked",
+      "Hidden": "Hidden",
+      "Repeatable": "Repeatable",
+      "Objectives": "Objectives",
+      "Rewards": "Rewards",
+      "Prerequisites": "Prerequisites",
+      "Giver": "Quest Giver",
+      "TurnIn": "Turn In",
+      "Branch": "Branch",
+      "Conflict": "Conflict",
+      "Category": {
+        "Label": "Category",
+        "MainStory": "Main Story",
+        "SideQuest": "Side Quest",
+        "Bounty": "Bounty",
+        "Daily": "Daily",
+        "GuildContract": "Guild Contract",
+        "Custom": "Custom"
+      },
+      "ObjectiveTypes": {
+        "Manual": "Manual",
+        "KillCount": "Kill Count",
+        "ItemCollect": "Collect Items",
+        "Location": "Reach Location"
+      },
+      "RewardTypes": {
+        "Gold": "Gold",
+        "XP": "Experience",
+        "Items": "Items",
+        "Reputation": "Reputation",
+        "Relationship": "Relationship",
+        "Title": "Title",
+        "Property": "Property",
+        "Companion": "Companion",
+        "Custom": "Custom"
+      },
+      "Actions": {
+        "Accept": "Accept Quest",
+        "Abandon": "Abandon Quest",
+        "TurnIn": "Turn In Quest",
+        "Track": "Track Quest",
+        "Untrack": "Stop Tracking",
+        "Share": "Share Quest",
+        "Pin": "Pin Quest",
+        "Unpin": "Unpin Quest"
+      },
+      "Messages": {
+        "Accepted": "{player} accepted quest: {quest}",
+        "Completed": "Quest completed: {quest}",
+        "Failed": "Quest failed: {quest}",
+        "Abandoned": "{player} abandoned quest: {quest}",
+        "ObjectiveComplete": "Objective complete: {objective}",
+        "RewardsClaimed": "Rewards claimed for: {quest}",
+        "NotEligible": "You don't meet the requirements for this quest",
+        "AlreadyAccepted": "Quest already accepted",
+        "CannotAbandon": "This quest cannot be abandoned"
+      },
+      "Handouts": "Handouts",
+      "Notes": "Notes",
+      "PartyNotes": "Party Notes",
+      "PersonalNotes": "Personal Notes"
+    },
+
+    "Dialogue": {
+      "Title": "Dialogue",
+      "Editor": "Dialogue Editor",
+      "Continue": "Continue",
+      "End": "End Conversation",
+      "Leave": "Leave",
+      "Back": "Back",
+      "SkillCheck": "Skill Check",
+      "Success": "Success!",
+      "Failure": "Failed",
+      "CriticalSuccess": "Critical Success!",
+      "CriticalFailure": "Critical Failure!",
+      "NodeTypes": {
+        "NPCSpeech": "NPC Speech",
+        "PlayerChoice": "Player Choice",
+        "SkillCheck": "Skill Check",
+        "Shop": "Open Shop",
+        "QuestOffer": "Offer Quest",
+        "QuestTurnIn": "Quest Turn In",
+        "Reward": "Give Reward",
+        "Service": "Service",
+        "Bank": "Banking",
+        "Hire": "Hire",
+        "Stable": "Stable",
+        "Branch": "Branch",
+        "End": "End"
+      },
+      "Voting": {
+        "Title": "Player Votes",
+        "Cast": "Cast Vote",
+        "Waiting": "Waiting for votes...",
+        "Results": "Vote Results"
+      },
+      "Editor": {
+        "AddNode": "Add Node",
+        "DeleteNode": "Delete Node",
+        "Connect": "Connect Nodes",
+        "Disconnect": "Disconnect",
+        "Preview": "Preview Dialogue",
+        "Validate": "Validate",
+        "ZoomIn": "Zoom In",
+        "ZoomOut": "Zoom Out",
+        "FitView": "Fit to View",
+        "Undo": "Undo",
+        "Redo": "Redo"
+      }
+    },
+
+    "Faction": {
+      "Title": "Faction",
+      "TitlePlural": "Factions",
+      "Overview": "Faction Overview",
+      "Editor": "Faction Editor",
+      "Reputation": "Reputation",
+      "Rank": "Rank",
+      "Members": "Members",
+      "Benefits": "Benefits",
+      "Requirements": "Requirements",
+      "Headquarters": "Headquarters",
+      "Relationships": "Faction Relationships",
+      "Standing": {
+        "Hostile": "Hostile",
+        "Hated": "Hated",
+        "Unfriendly": "Unfriendly",
+        "Neutral": "Neutral",
+        "Friendly": "Friendly",
+        "Trusted": "Trusted",
+        "Allied": "Allied",
+        "Exalted": "Exalted"
+      },
+      "RelationshipTypes": {
+        "Allied": "Allied",
+        "Neutral": "Neutral",
+        "Rival": "Rival",
+        "Enemy": "Enemy"
+      },
+      "DefaultRanks": {
+        "Copper": "Copper",
+        "Iron": "Iron",
+        "Silver": "Silver",
+        "Gold": "Gold",
+        "Platinum": "Platinum",
+        "Mythril": "Mythril"
+      },
+      "Messages": {
+        "RankUp": "{player} reached {rank} rank in {faction}!",
+        "RankDown": "{player} was demoted to {rank} in {faction}",
+        "ReputationGained": "Reputation gained with {faction}: +{amount}",
+        "ReputationLost": "Reputation lost with {faction}: {amount}",
+        "Joined": "{player} joined {faction}",
+        "Expelled": "{player} was expelled from {faction}",
+        "BenefitUnlocked": "New benefit unlocked: {benefit}"
+      }
+    },
+
+    "Relationship": {
+      "Title": "Relationship",
+      "With": "Relationship with {npc}",
+      "History": "Relationship History",
+      "Tier": {
+        "Hostile": "Hostile",
+        "Hated": "Hated",
+        "Unfriendly": "Unfriendly",
+        "Neutral": "Neutral",
+        "Friendly": "Friendly",
+        "Trusted": "Trusted",
+        "Allied": "Allied"
+      },
+      "TierDescriptions": {
+        "Hostile": "Attacks on sight",
+        "Hated": "Refuses all interaction",
+        "Unfriendly": "Limited interaction, high prices",
+        "Neutral": "Standard interaction",
+        "Friendly": "Better prices, more dialogue",
+        "Trusted": "Discounts, special quests",
+        "Allied": "Best prices, unique content"
+      },
+      "Messages": {
+        "Increased": "Relationship with {npc} improved",
+        "Decreased": "Relationship with {npc} worsened"
+      }
+    },
+
+    "Shop": {
+      "Title": "Shop",
+      "Buy": "Buy",
+      "Sell": "Sell",
+      "Inventory": "Inventory",
+      "PlayerInventory": "Your Items",
+      "Cart": "Cart",
+      "Total": "Total",
+      "Checkout": "Checkout",
+      "EmptyCart": "Your cart is empty",
+      "Haggle": "Haggle",
+      "Price": "Price",
+      "BasePrice": "Base Price",
+      "FinalPrice": "Final Price",
+      "Quantity": "Quantity",
+      "Stock": "Stock",
+      "OutOfStock": "Out of Stock",
+      "InfiniteStock": "Always Available",
+      "Discount": "Discount",
+      "Markup": "Markup",
+      "StolenGoods": "Stolen Goods",
+      "RefusingService": "Refusing Service",
+      "ViewMode": {
+        "Grid": "Grid View",
+        "List": "List View"
+      },
+      "SortBy": {
+        "Name": "Name",
+        "Price": "Price",
+        "Type": "Type",
+        "Quantity": "Quantity"
+      },
+      "Messages": {
+        "Purchased": "Purchased {item} for {price}",
+        "Sold": "Sold {item} for {price}",
+        "NotEnoughGold": "Not enough gold",
+        "NotEnoughStock": "Not enough in stock",
+        "HaggleSuccess": "Haggling successful! {discount}% discount",
+        "HaggleFailed": "Haggling failed",
+        "ServiceRefused": "{npc} refuses to do business with you"
+      }
+    },
+
+    "Bank": {
+      "Title": "Bank",
+      "Balance": "Balance",
+      "Deposit": "Deposit",
+      "Withdraw": "Withdraw",
+      "Transfer": "Transfer",
+      "TransferTo": "Transfer To",
+      "Loan": "Loan",
+      "TakeLoan": "Take Loan",
+      "Repay": "Repay Loan",
+      "LoanAmount": "Loan Amount",
+      "LoanOwed": "Amount Owed",
+      "Interest": "Interest",
+      "InterestRate": "Interest Rate",
+      "Vault": "Item Vault",
+      "VaultSlots": "Vault Slots",
+      "TransactionHistory": "Transaction History",
+      "Fee": "Fee",
+      "Messages": {
+        "Deposited": "Deposited {amount}",
+        "Withdrawn": "Withdrew {amount}",
+        "Transferred": "Transferred {amount} to {recipient}",
+        "LoanTaken": "Loan of {amount} taken",
+        "LoanRepaid": "Loan payment of {amount} made",
+        "LoanPaidOff": "Loan fully repaid!",
+        "InsufficientFunds": "Insufficient funds",
+        "LoanDenied": "Loan denied - insufficient reputation"
+      }
+    },
+
+    "Crime": {
+      "Title": "Crime",
+      "Bounty": "Bounty",
+      "Wanted": "Wanted",
+      "WantedLevel": "Wanted Level",
+      "Steal": "Steal",
+      "AttemptSteal": "Attempt to Steal",
+      "PayFine": "Pay Fine",
+      "ServeSentence": "Serve Sentence",
+      "Bribe": "Bribe",
+      "Flee": "Flee",
+      "Region": "Region",
+      "Witnesses": "Witnesses",
+      "Crimes": {
+        "Pickpocketing": "Pickpocketing",
+        "Theft": "Theft",
+        "Assault": "Assault",
+        "Murder": "Murder",
+        "Trespassing": "Trespassing"
+      },
+      "Messages": {
+        "BountyAdded": "Bounty of {amount} added in {region}",
+        "BountyCleared": "Bounty cleared in {region}",
+        "Caught": "You were caught!",
+        "StealSuccess": "Successfully stole {item}",
+        "StealFailed": "Failed to steal - you were spotted!",
+        "GuardsCalled": "Guards have been called!",
+        "Arrested": "You have been arrested"
+      }
+    },
+
+    "Hireling": {
+      "Title": "Hireling",
+      "TitlePlural": "Hirelings",
+      "Companion": "Companion",
+      "CompanionPlural": "Companions",
+      "Hire": "Hire",
+      "Dismiss": "Dismiss",
+      "Pay": "Pay Wages",
+      "Loyalty": "Loyalty",
+      "Wage": "Wage",
+      "Contract": "Contract",
+      "Duration": "Duration",
+      "DurationTypes": {
+        "Daily": "Daily",
+        "Weekly": "Weekly",
+        "PerJob": "Per Job",
+        "Retainer": "Retainer",
+        "Permanent": "Permanent"
+      },
+      "Categories": {
+        "Combat": "Combat",
+        "Utility": "Utility",
+        "Labor": "Labor",
+        "Specialist": "Specialist"
+      },
+      "Messages": {
+        "Hired": "{hireling} has been hired",
+        "Dismissed": "{hireling} has been dismissed",
+        "Paid": "Paid {amount} to {hireling}",
+        "LoyaltyLow": "{hireling}'s loyalty is dangerously low!",
+        "Betrayed": "{hireling} has betrayed you!",
+        "Fled": "{hireling} has fled!"
+      }
+    },
+
+    "Mount": {
+      "Title": "Mount",
+      "TitlePlural": "Mounts",
+      "Stable": "Stable",
+      "Purchase": "Purchase",
+      "Sell": "Sell",
+      "Retrieve": "Retrieve",
+      "Summon": "Summon",
+      "Store": "Store Mount",
+      "Equipment": "Mount Equipment",
+      "Saddle": "Saddle",
+      "Barding": "Barding",
+      "Saddlebags": "Saddlebags",
+      "Speed": "Speed",
+      "CarryCapacity": "Carry Capacity",
+      "StablingCost": "Stabling Cost",
+      "Messages": {
+        "Purchased": "Purchased {mount}",
+        "Stabled": "{mount} has been stabled",
+        "Retrieved": "{mount} has been retrieved",
+        "Summoned": "{mount} has been summoned"
+      }
+    },
+
+    "Trade": {
+      "Title": "Trade",
+      "Initiate": "Initiate Trade",
+      "YourOffer": "Your Offer",
+      "TheirOffer": "Their Offer",
+      "Confirm": "Confirm Trade",
+      "Waiting": "Waiting for confirmation...",
+      "Complete": "Trade Complete",
+      "Cancelled": "Trade Cancelled",
+      "AddItem": "Add Item",
+      "RemoveItem": "Remove Item",
+      "SetGold": "Set Gold Amount",
+      "QuickSend": "Quick Send",
+      "Messages": {
+        "Initiated": "Trade initiated with {player}",
+        "Received": "{player} wants to trade with you",
+        "Completed": "Trade completed with {player}",
+        "Cancelled": "Trade cancelled",
+        "Declined": "{player} declined the trade"
+      }
+    },
+
+    "Service": {
+      "Title": "Services",
+      "Repair": "Repair",
+      "Training": "Training",
+      "Enchanting": "Enchanting",
+      "Transportation": "Transportation",
+      "Information": "Information",
+      "Inn": "Inn & Lodging",
+      "RepairAll": "Repair All",
+      "TimeRequired": "Time Required",
+      "Skill": "Skill",
+      "Tool": "Tool",
+      "Language": "Language",
+      "Destination": "Destination",
+      "TravelTime": "Travel Time",
+      "Rumor": "Rumor",
+      "Room": "Room",
+      "RoomQuality": {
+        "Poor": "Poor",
+        "Modest": "Modest",
+        "Comfortable": "Comfortable",
+        "Wealthy": "Wealthy",
+        "Luxurious": "Luxurious"
+      },
+      "Messages": {
+        "Repaired": "Items repaired",
+        "TrainingComplete": "Training complete! Learned {skill}",
+        "EnchantmentComplete": "Enchantment complete!",
+        "Traveled": "Traveled to {destination}",
+        "RumorPurchased": "Rumor acquired",
+        "RoomRented": "Room rented for {duration}"
+      }
+    },
+
+    "Property": {
+      "Title": "Property",
+      "TitlePlural": "Properties",
+      "Management": "Property Management",
+      "Owner": "Owner",
+      "Staff": "Staff",
+      "Income": "Income",
+      "Upkeep": "Upkeep",
+      "NetProfit": "Net Profit",
+      "Upgrades": "Upgrades",
+      "Events": "Events",
+      "Types": {
+        "House": "House",
+        "Shop": "Shop",
+        "Tavern": "Tavern",
+        "Warehouse": "Warehouse",
+        "Other": "Other"
+      },
+      "Messages": {
+        "Acquired": "Property acquired: {property}",
+        "IncomeReceived": "Received {amount} from {property}",
+        "UpkeepPaid": "Paid {amount} upkeep for {property}",
+        "UpgradePurchased": "Upgrade purchased: {upgrade}",
+        "EventOccurred": "Event at {property}: {event}"
+      }
+    },
+
+    "Storage": {
+      "Title": "Storage",
+      "Vault": "Vault",
+      "Chest": "Chest",
+      "Capacity": "Capacity",
+      "Used": "Used",
+      "Available": "Available",
+      "Personal": "Personal Storage",
+      "Party": "Party Storage",
+      "Deposit": "Deposit Item",
+      "Withdraw": "Withdraw Item"
+    },
+
+    "Loot": {
+      "Title": "Loot",
+      "Container": "Loot Container",
+      "CorpsePile": "Corpse Pile",
+      "TakeAll": "Take All",
+      "Take": "Take",
+      "Distribution": {
+        "FreeForAll": "Free For All",
+        "NeedGreed": "Need/Greed",
+        "RoundRobin": "Round Robin",
+        "PartyVault": "Party Vault",
+        "GMDistributes": "GM Distributes"
+      },
+      "Need": "Need",
+      "Greed": "Greed",
+      "Pass": "Pass",
+      "Locked": "Locked",
+      "Trapped": "Trapped",
+      "Unlock": "Unlock",
+      "DisarmTrap": "Disarm Trap",
+      "Messages": {
+        "Looted": "{player} looted {item}",
+        "LootedAll": "{player} took all loot",
+        "Unlocked": "Container unlocked",
+        "TrapDisarmed": "Trap disarmed",
+        "TrapTriggered": "Trap triggered!"
+      }
+    },
+
+    "GM": {
+      "Dashboard": "GM Dashboard",
+      "NPCEditor": "NPC Editor",
+      "QuestEditor": "Quest Editor",
+      "FactionEditor": "Faction Editor",
+      "DialogueEditor": "Dialogue Editor",
+      "Statistics": "Statistics",
+      "ImportExport": "Import/Export",
+      "Backup": "Backup",
+      "Restore": "Restore",
+      "Templates": "Templates",
+      "Presets": "Presets",
+      "BulkOperations": "Bulk Operations",
+      "Validation": "Validation",
+      "DebugMode": "Debug Mode",
+      "ManualAdjust": "Manual Adjustment",
+      "Messages": {
+        "BackupCreated": "Backup created successfully",
+        "BackupRestored": "Backup restored successfully",
+        "ImportSuccess": "Import successful",
+        "ExportSuccess": "Export successful",
+        "ValidationPassed": "Validation passed",
+        "ValidationFailed": "Validation failed: {errors}"
+      }
+    },
+
+    "NPC": {
+      "Title": "NPC",
+      "TitlePlural": "NPCs",
+      "Editor": "NPC Editor",
+      "Roles": {
+        "QuestGiver": "Quest Giver",
+        "QuestTurnIn": "Quest Turn-In",
+        "Merchant": "Merchant",
+        "Banker": "Banker",
+        "StableMaster": "Stable Master",
+        "Innkeeper": "Innkeeper",
+        "Trainer": "Trainer",
+        "Enchanter": "Enchanter",
+        "Transporter": "Transporter",
+        "Informant": "Informant",
+        "HirelingRecruiter": "Hireling Recruiter",
+        "Fence": "Fence",
+        "FactionRepresentative": "Faction Representative"
+      },
+      "Schedule": "Schedule",
+      "Availability": "Availability",
+      "Closed": "Closed",
+      "WrongLocation": "Wrong Location"
+    },
+
+    "WorldState": {
+      "Title": "World State",
+      "Events": "World Events",
+      "Flags": "Flags",
+      "Active": "Active",
+      "Inactive": "Inactive",
+      "Trigger": "Trigger",
+      "Duration": "Duration"
+    },
+
+    "Conditions": {
+      "Title": "Conditions",
+      "QuestStatus": "Quest Status",
+      "QuestObjective": "Quest Objective",
+      "FactionRank": "Faction Rank",
+      "FactionReputation": "Faction Reputation",
+      "Relationship": "Relationship",
+      "PlayerLevel": "Player Level",
+      "PlayerClass": "Player Class",
+      "PlayerRace": "Player Race",
+      "HasItem": "Has Item",
+      "HasGold": "Has Gold",
+      "Flag": "Flag",
+      "Time": "Time of Day",
+      "PreviousChoice": "Previous Choice"
+    },
+
+    "Effects": {
+      "Title": "Effects",
+      "ModifyRelationship": "Modify Relationship",
+      "ModifyFactionRep": "Modify Faction Reputation",
+      "SetFlag": "Set Flag",
+      "GiveItem": "Give Item",
+      "TakeItem": "Take Item",
+      "GiveGold": "Give Gold",
+      "TakeGold": "Take Gold",
+      "StartQuest": "Start Quest",
+      "CompleteObjective": "Complete Objective",
+      "AddBounty": "Add Bounty",
+      "ChatMessage": "Chat Message",
+      "UnlockArea": "Unlock Area"
+    },
+
+    "Notifications": {
+      "QuestAvailable": "New quest available: {quest}",
+      "QuestAccepted": "Quest accepted: {quest}",
+      "QuestCompleted": "Quest completed: {quest}",
+      "QuestFailed": "Quest failed: {quest}",
+      "ObjectiveComplete": "Objective complete",
+      "LevelUp": "Level Up!",
+      "ItemReceived": "Received: {item}",
+      "GoldReceived": "Received: {amount}",
+      "ReputationGained": "+{amount} reputation with {faction}",
+      "ReputationLost": "-{amount} reputation with {faction}",
+      "RelationshipUp": "Relationship improved with {npc}",
+      "RelationshipDown": "Relationship worsened with {npc}",
+      "RankUp": "Rank up in {faction}!",
+      "BountyAdded": "Bounty added: {amount}",
+      "TradeRequest": "Trade request from {player}"
+    },
+
+    "Errors": {
+      "NotEnoughGold": "Not enough gold",
+      "ItemNotFound": "Item not found",
+      "NPCNotFound": "NPC not found",
+      "QuestNotFound": "Quest not found",
+      "FactionNotFound": "Faction not found",
+      "DialogueNotFound": "Dialogue not found",
+      "PermissionDenied": "Permission denied",
+      "InvalidData": "Invalid data",
+      "SocketError": "Communication error",
+      "NotInParty": "Not in the party",
+      "AlreadyOwned": "Already owned",
+      "RequirementsNotMet": "Requirements not met",
+      "ServiceUnavailable": "Service unavailable",
+      "InvalidTarget": "Invalid target",
+      "ActionFailed": "Action failed"
+    },
+
+    "Keybindings": {
+      "OpenQuestLog": "Open Quest Log",
+      "OpenFactions": "Open Faction Overview",
+      "ToggleTracker": "Toggle Quest Tracker"
+    }
+  }
+}

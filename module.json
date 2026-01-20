@@ -1,0 +1,50 @@
+{
+  "id": "bobs-talking-npcs",
+  "title": "Bob's Talking NPCs",
+  "description": "The complete NPC interaction system - quests, dialogue, merchants, factions, relationships, banking, hirelings, mounts, crime, services, properties, and more.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": 13,
+    "verified": 13,
+    "maximum": 13
+  },
+  "authors": [
+    {
+      "name": "Arcana5e",
+      "discord": "",
+      "url": ""
+    }
+  ],
+  "license": "GPL-3.0-or-later",
+  "esmodules": [
+    "scripts/module.mjs"
+  ],
+  "styles": [
+    "styles/module.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "socket": true,
+  "relationships": {
+    "systems": [
+      {
+        "id": "dnd5e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "5.2.0",
+          "verified": "5.2.4"
+        }
+      }
+    ]
+  },
+  "url": "",
+  "manifest": "",
+  "download": "",
+  "bugs": "",
+  "changelog": ""
+}
