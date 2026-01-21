@@ -1,0 +1,90 @@
+{{!-- GM Dashboard - Quests Tab --}}
+<div class="tab-content quests-tab {{theme}}" {{#unless (eq activeTab 'quests')}}hidden{{/unless}}>
+  {{#with quests}}
+    <header class="tab-header">
+      <h3>{{localize "BOBSNPC.GMDashboard.QuestManagement"}}</h3>
+      <button type="button" class="create-btn" data-action="createQuest">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.GMDashboard.CreateQuest"}}
+      </button>
+    </header>
+
+    {{!-- Filters --}}
+    <div class="filter-bar">
+      <select name="statusFilter" class="filter-select">
+        <option value="">{{localize "BOBSNPC.GMDashboard.AllStatuses"}}</option>
+        {{#each statuses}}
+          <option value="{{this}}">{{localize (concat "BOBSNPC.Quest.Status." (capitalize this))}}</option>
+        {{/each}}
+      </select>
+
+      <select name="categoryFilter" class="filter-select">
+        <option value="">{{localize "BOBSNPC.GMDashboard.AllCategories"}}</option>
+        {{#each categories}}
+          <option value="{{this}}">{{localize (concat "BOBSNPC.Quest.Category." (capitalize this))}}</option>
+        {{/each}}
+      </select>
+
+      <input type="text" name="searchQuests" class="search-input" placeholder="{{localize 'BOBSNPC.GMDashboard.SearchQuests'}}" />
+    </div>
+
+    {{!-- Quest List --}}
+    {{#if quests.length}}
+      <table class="quests-table">
+        <thead>
+          <tr>
+            <th>{{localize "BOBSNPC.Quest.Name"}}</th>
+            <th>{{localize "BOBSNPC.Quest.Category"}}</th>
+            <th>{{localize "BOBSNPC.Quest.Status"}}</th>
+            <th>{{localize "BOBSNPC.Quest.Giver"}}</th>
+            <th>{{localize "BOBSNPC.Quest.Progress"}}</th>
+            <th>{{localize "BOBSNPC.GMDashboard.Actions"}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each quests}}
+            <tr class="quest-row status-{{this.status}}">
+              <td class="quest-name">{{this.name}}</td>
+              <td>
+                <span class="category-badge {{this.category}}">
+                  {{localize (concat "BOBSNPC.Quest.Category." (capitalize this.category))}}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge {{this.status}}">
+                  {{localize (concat "BOBSNPC.Quest.Status." (capitalize this.status))}}
+                </span>
+              </td>
+              <td>{{this.giver}}</td>
+              <td>
+                <div class="progress-cell">
+                  <span class="progress-text">{{this.objectivesComplete}}/{{this.objectivesTotal}}</span>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{percent this.objectivesComplete this.objectivesTotal}}%"></div>
+                  </div>
+                </div>
+              </td>
+              <td class="actions-cell">
+                <button type="button" class="icon-btn" data-action="editQuest" data-quest-id="{{this.id}}" title="{{localize 'BOBSNPC.Common.Edit'}}">
+                  <i class="fa-solid fa-edit"></i>
+                </button>
+                <button type="button" class="icon-btn danger" data-action="deleteQuest" data-quest-id="{{this.id}}" title="{{localize 'BOBSNPC.Common.Delete'}}">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    {{else}}
+      <div class="empty-state">
+        <i class="fa-solid fa-scroll"></i>
+        <p>{{localize "BOBSNPC.GMDashboard.NoQuests"}}</p>
+        <button type="button" class="create-btn" data-action="createQuest">
+          <i class="fa-solid fa-plus"></i>
+          {{localize "BOBSNPC.GMDashboard.CreateFirstQuest"}}
+        </button>
+      </div>
+    {{/if}}
+  {{/with}}
+</div>

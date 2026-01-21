@@ -1,0 +1,206 @@
+{{!-- NPC Config - Services Tab --}}
+<div class="tab-content services-tab {{theme}}" {{#unless (eq activeTab 'services')}}hidden{{/unless}}>
+  {{!-- Merchant Service --}}
+  {{#if servicesDisplay.merchant.hasRole}}
+    <section class="config-section service-section">
+      <h3>
+        <i class="fa-solid fa-store"></i>
+        {{localize "BOBSNPC.NPCConfig.MerchantService"}}
+      </h3>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="config.services.merchant.enabled"
+                 {{#if config.services.merchant.enabled}}checked{{/if}} />
+          {{localize "BOBSNPC.NPCConfig.EnableService"}}
+        </label>
+      </div>
+
+      {{#if config.services.merchant.enabled}}
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.NPCConfig.Shop"}}</label>
+          <select name="config.services.merchant.shopId">
+            <option value="">{{localize "BOBSNPC.NPCConfig.SelectShop"}}</option>
+            {{#each availableShops}}
+              <option value="{{this.id}}" {{#if (eq this.id ../config.services.merchant.shopId)}}selected{{/if}}>
+                {{this.name}}
+              </option>
+            {{/each}}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.NPCConfig.PriceMarkup"}}</label>
+          <div class="input-with-unit">
+            <input type="number" name="config.services.merchant.markup"
+                   value="{{config.services.merchant.markup}}" min="0.1" max="5" step="0.1" />
+            <span class="unit">x</span>
+          </div>
+          <p class="hint">{{localize "BOBSNPC.NPCConfig.MarkupHint"}}</p>
+        </div>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  {{!-- Quest Giver Service --}}
+  {{#if servicesDisplay.questGiver.hasRole}}
+    <section class="config-section service-section">
+      <h3>
+        <i class="fa-solid fa-scroll"></i>
+        {{localize "BOBSNPC.NPCConfig.QuestGiverService"}}
+      </h3>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="config.services.questGiver.enabled"
+                 {{#if config.services.questGiver.enabled}}checked{{/if}} />
+          {{localize "BOBSNPC.NPCConfig.EnableService"}}
+        </label>
+      </div>
+
+      {{#if config.services.questGiver.enabled}}
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.NPCConfig.AvailableQuests"}}</label>
+          <p class="hint">{{localize "BOBSNPC.NPCConfig.QuestsHint"}}</p>
+          <div class="quests-selector">
+            {{!-- Quest selection interface --}}
+            <p class="placeholder">{{localize "BOBSNPC.NPCConfig.QuestSelectorPlaceholder"}}</p>
+          </div>
+        </div>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  {{!-- Banker Service --}}
+  {{#if servicesDisplay.banker.hasRole}}
+    <section class="config-section service-section">
+      <h3>
+        <i class="fa-solid fa-landmark"></i>
+        {{localize "BOBSNPC.NPCConfig.BankerService"}}
+      </h3>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="config.services.banker.enabled"
+                 {{#if config.services.banker.enabled}}checked{{/if}} />
+          {{localize "BOBSNPC.NPCConfig.EnableService"}}
+        </label>
+      </div>
+
+      {{#if config.services.banker.enabled}}
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.NPCConfig.Bank"}}</label>
+          <select name="config.services.banker.bankId">
+            <option value="">{{localize "BOBSNPC.NPCConfig.SelectBank"}}</option>
+            {{#each availableBanks}}
+              <option value="{{this.id}}" {{#if (eq this.id ../config.services.banker.bankId)}}selected{{/if}}>
+                {{this.name}}
+              </option>
+            {{/each}}
+          </select>
+        </div>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  {{!-- Trainer Service --}}
+  {{#if servicesDisplay.trainer.hasRole}}
+    <section class="config-section service-section">
+      <h3>
+        <i class="fa-solid fa-graduation-cap"></i>
+        {{localize "BOBSNPC.NPCConfig.TrainerService"}}
+      </h3>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="config.services.trainer.enabled"
+                 {{#if config.services.trainer.enabled}}checked{{/if}} />
+          {{localize "BOBSNPC.NPCConfig.EnableService"}}
+        </label>
+      </div>
+
+      {{#if config.services.trainer.enabled}}
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.NPCConfig.TrainableSkills"}}</label>
+          <input type="text" name="config.services.trainer.skills"
+                 value="{{servicesDisplay.trainer.skillsDisplay}}"
+                 placeholder="{{localize 'BOBSNPC.NPCConfig.SkillsPlaceholder'}}" />
+        </div>
+
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.NPCConfig.MaxTrainingLevel"}}</label>
+          <input type="number" name="config.services.trainer.maxLevel"
+                 value="{{config.services.trainer.maxLevel}}" min="1" max="20" />
+        </div>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  {{!-- Innkeeper Service --}}
+  {{#if servicesDisplay.innkeeper.hasRole}}
+    <section class="config-section service-section">
+      <h3>
+        <i class="fa-solid fa-bed"></i>
+        {{localize "BOBSNPC.NPCConfig.InnkeeperService"}}
+      </h3>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="config.services.innkeeper.enabled"
+                 {{#if config.services.innkeeper.enabled}}checked{{/if}} />
+          {{localize "BOBSNPC.NPCConfig.EnableService"}}
+        </label>
+      </div>
+
+      {{#if config.services.innkeeper.enabled}}
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.NPCConfig.RoomPrice"}}</label>
+          <div class="input-with-unit">
+            <input type="number" name="config.services.innkeeper.roomPrice"
+                   value="{{config.services.innkeeper.roomPrice}}" min="1" />
+            <span class="unit">gp/night</span>
+          </div>
+        </div>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  {{!-- Fence Service --}}
+  {{#if servicesDisplay.fence.hasRole}}
+    <section class="config-section service-section">
+      <h3>
+        <i class="fa-solid fa-mask"></i>
+        {{localize "BOBSNPC.NPCConfig.FenceService"}}
+      </h3>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="config.services.fence.enabled"
+                 {{#if config.services.fence.enabled}}checked{{/if}} />
+          {{localize "BOBSNPC.NPCConfig.EnableService"}}
+        </label>
+      </div>
+
+      {{#if config.services.fence.enabled}}
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.NPCConfig.FenceMarkup"}}</label>
+          <div class="input-with-unit">
+            <input type="number" name="config.services.fence.markup"
+                   value="{{config.services.fence.markup}}" min="0.1" max="1" step="0.1" />
+            <span class="unit">x</span>
+          </div>
+          <p class="hint">{{localize "BOBSNPC.NPCConfig.FenceMarkupHint"}}</p>
+        </div>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  {{!-- No Services Message --}}
+  {{#unless (or servicesDisplay.merchant.hasRole servicesDisplay.questGiver.hasRole servicesDisplay.banker.hasRole servicesDisplay.trainer.hasRole servicesDisplay.innkeeper.hasRole servicesDisplay.fence.hasRole)}}
+    <div class="empty-state">
+      <i class="fa-solid fa-concierge-bell"></i>
+      <p>{{localize "BOBSNPC.NPCConfig.NoServicesAvailable"}}</p>
+      <p class="hint">{{localize "BOBSNPC.NPCConfig.AddRolesForServices"}}</p>
+    </div>
+  {{/unless}}
+</div>

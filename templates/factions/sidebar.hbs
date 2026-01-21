@@ -1,0 +1,62 @@
+{{!-- Faction Window Sidebar --}}
+<aside class="faction-sidebar {{theme}}">
+  {{!-- Filter Tabs --}}
+  <nav class="faction-filters">
+    <button type="button" class="filter-btn {{#if (eq filter 'all')}}active{{/if}}"
+            data-action="setFilter" data-filter="all">
+      {{localize "BOBSNPC.Factions.All"}}
+      <span class="count">{{counts.all}}</span>
+    </button>
+    <button type="button" class="filter-btn allied {{#if (eq filter 'allied')}}active{{/if}}"
+            data-action="setFilter" data-filter="allied">
+      {{localize "BOBSNPC.Factions.Allied"}}
+      <span class="count">{{counts.allied}}</span>
+    </button>
+    <button type="button" class="filter-btn neutral {{#if (eq filter 'neutral')}}active{{/if}}"
+            data-action="setFilter" data-filter="neutral">
+      {{localize "BOBSNPC.Factions.Neutral"}}
+      <span class="count">{{counts.neutral}}</span>
+    </button>
+    <button type="button" class="filter-btn hostile {{#if (eq filter 'hostile')}}active{{/if}}"
+            data-action="setFilter" data-filter="hostile">
+      {{localize "BOBSNPC.Factions.Hostile"}}
+      <span class="count">{{counts.hostile}}</span>
+    </button>
+  </nav>
+
+  {{!-- Faction List --}}
+  <div class="faction-list">
+    {{#if hasFactions}}
+      {{#each factions}}
+        <div class="faction-entry {{this.standingClass}} {{#if this.isSelected}}selected{{/if}}"
+             data-action="selectFaction" data-faction-id="{{this.id}}">
+
+          <div class="faction-icon" style="background-color: {{this.color}}">
+            <i class="fa-solid {{this.icon}}"></i>
+          </div>
+
+          <div class="faction-info">
+            <span class="faction-name">{{this.name}}</span>
+            <span class="faction-level">{{this.levelLabel}}</span>
+          </div>
+
+          <div class="faction-rep-bar">
+            <div class="rep-progress" style="width: {{this.progress.percent}}%"></div>
+            <span class="rep-value">{{this.reputation}}</span>
+          </div>
+
+          {{#if this.rank}}
+            <div class="faction-rank" data-tooltip="{{this.rank}}">
+              <i class="fa-solid {{this.rankIcon}}"></i>
+            </div>
+          {{/if}}
+        </div>
+      {{/each}}
+    {{else}}
+      <div class="no-factions">
+        <i class="fa-solid fa-flag"></i>
+        <p>{{localize "BOBSNPC.Factions.NoFactions"}}</p>
+      </div>
+    {{/if}}
+  </div>
+</aside>

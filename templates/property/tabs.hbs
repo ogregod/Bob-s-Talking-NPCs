@@ -1,0 +1,42 @@
+{{!-- Property Manager Tabs --}}
+<nav class="property-tabs {{theme}}">
+  <button type="button" class="property-tab {{#if (eq activeTab 'owned')}}active{{/if}}"
+          data-action="setTab" data-tab="owned">
+    <i class="fa-solid fa-house-user"></i>
+    <span>{{localize "BOBSNPC.Property.Owned"}}</span>
+    {{#if ownedCount}}
+      <span class="tab-count">{{ownedCount}}</span>
+    {{/if}}
+  </button>
+
+  <button type="button" class="property-tab {{#if (eq activeTab 'browse')}}active{{/if}}"
+          data-action="setTab" data-tab="browse">
+    <i class="fa-solid fa-sign-hanging"></i>
+    <span>{{localize "BOBSNPC.Property.Browse"}}</span>
+    {{#if availableCount}}
+      <span class="tab-count">{{availableCount}}</span>
+    {{/if}}
+  </button>
+
+  {{!-- Financial Summary --}}
+  <div class="tab-summary">
+    {{#if monthlyIncome}}
+      <span class="income-stat" data-tooltip="{{localize 'BOBSNPC.Property.MonthlyIncome'}}">
+        <i class="fa-solid fa-arrow-trend-up"></i>
+        +{{monthlyIncome}} gp
+      </span>
+    {{/if}}
+    {{#if monthlyExpenses}}
+      <span class="expense-stat" data-tooltip="{{localize 'BOBSNPC.Property.MonthlyExpenses'}}">
+        <i class="fa-solid fa-arrow-trend-down"></i>
+        -{{monthlyExpenses}} gp
+      </span>
+    {{/if}}
+    {{#if totalMortgage}}
+      <span class="mortgage-stat" data-tooltip="{{localize 'BOBSNPC.Property.TotalMortgage'}}">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        {{totalMortgage}} gp
+      </span>
+    {{/if}}
+  </div>
+</nav>

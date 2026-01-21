@@ -1,0 +1,52 @@
+{{!-- Shop Window Header --}}
+<header class="shop-header {{theme}}">
+  <div class="shop-info">
+    {{#if shopIcon}}
+      <div class="shop-icon">
+        <i class="fa-solid {{shopIcon}}" style="color: {{shopColor}}"></i>
+      </div>
+    {{/if}}
+    <div class="shop-details">
+      <h2 class="shop-name">{{shopName}}</h2>
+      {{#if merchantName}}
+        <span class="merchant-name">
+          <i class="fa-solid fa-user"></i>
+          {{merchantName}}
+        </span>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="shop-meta">
+    {{#if priceModifier}}
+      <span class="price-modifier {{#if (gt priceModifier 1)}}markup{{else}}discount{{/if}}"
+            data-tooltip="{{localize 'BOBSNPC.Shop.PriceModifier'}}">
+        {{#if (gt priceModifier 1)}}
+          <i class="fa-solid fa-arrow-up"></i>
+        {{else}}
+          <i class="fa-solid fa-arrow-down"></i>
+        {{/if}}
+        {{priceModifierPercent}}%
+      </span>
+    {{/if}}
+
+    {{#if reputationDiscount}}
+      <span class="reputation-discount" data-tooltip="{{localize 'BOBSNPC.Shop.ReputationDiscount'}}">
+        <i class="fa-solid fa-flag"></i>
+        -{{reputationDiscount}}%
+      </span>
+    {{/if}}
+
+    {{#if hagglingEnabled}}
+      <span class="haggling-indicator" data-tooltip="{{localize 'BOBSNPC.Shop.HagglingAvailable'}}">
+        <i class="fa-solid fa-handshake"></i>
+      </span>
+    {{/if}}
+  </div>
+
+  <div class="player-gold">
+    <i class="fa-solid fa-coins"></i>
+    <span class="gold-amount">{{playerGold}}</span>
+    <span class="gold-label">gp</span>
+  </div>
+</header>

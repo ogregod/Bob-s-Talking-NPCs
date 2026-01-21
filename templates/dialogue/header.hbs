@@ -1,0 +1,39 @@
+{{!-- Dialogue Window Header --}}
+<header class="dialogue-header {{theme}}">
+  <div class="npc-portrait-container">
+    {{#if npcPortrait}}
+      <img src="{{npcPortrait}}" alt="{{npcName}}" class="npc-portrait" />
+    {{else}}
+      <div class="npc-portrait-placeholder">
+        <i class="fa-solid fa-user"></i>
+      </div>
+    {{/if}}
+    {{#if mood}}
+      <div class="mood-indicator mood-{{mood}}" data-tooltip="{{localize (concat 'BOBSNPC.Mood.' mood)}}">
+        <i class="fa-solid {{moodIcon}}"></i>
+      </div>
+    {{/if}}
+  </div>
+
+  <div class="npc-info">
+    <h2 class="npc-name">{{npcName}}</h2>
+    {{#if npcTitle}}
+      <span class="npc-title">{{npcTitle}}</span>
+    {{/if}}
+    {{#if npcFaction}}
+      <span class="npc-faction">
+        <i class="fa-solid fa-flag" style="color: {{npcFactionColor}}"></i>
+        {{npcFaction}}
+      </span>
+    {{/if}}
+  </div>
+
+  {{#if isMultiplayer}}
+    <div class="dialogue-participants">
+      <span class="participant-count" data-tooltip="{{localize 'BOBSNPC.Dialogue.Participants'}}">
+        <i class="fa-solid fa-users"></i>
+        {{participantCount}}
+      </span>
+    </div>
+  {{/if}}
+</header>

@@ -1,0 +1,106 @@
+{{!-- Quest Log Sidebar --}}
+<aside class="quest-sidebar {{theme}}">
+  {{!-- Filter Tabs --}}
+  <nav class="quest-filters">
+    <button type="button" class="filter-btn {{#if (eq filter 'all')}}active{{/if}}"
+            data-action="setFilter" data-filter="all">
+      {{localize "BOBSNPC.Quests.All"}}
+      <span class="count">{{counts.all}}</span>
+    </button>
+    <button type="button" class="filter-btn {{#if (eq filter 'active')}}active{{/if}}"
+            data-action="setFilter" data-filter="active">
+      {{localize "BOBSNPC.Quests.Active"}}
+      <span class="count">{{counts.active}}</span>
+    </button>
+    <button type="button" class="filter-btn {{#if (eq filter 'completed')}}active{{/if}}"
+            data-action="setFilter" data-filter="completed">
+      {{localize "BOBSNPC.Quests.Completed"}}
+      <span class="count">{{counts.completed}}</span>
+    </button>
+    <button type="button" class="filter-btn {{#if (eq filter 'failed')}}active{{/if}}"
+            data-action="setFilter" data-filter="failed">
+      {{localize "BOBSNPC.Quests.Failed"}}
+      <span class="count">{{counts.failed}}</span>
+    </button>
+  </nav>
+
+  {{!-- Search Box --}}
+  <div class="quest-search">
+    <i class="fa-solid fa-search"></i>
+    <input type="text" name="search" placeholder="{{localize 'BOBSNPC.Quests.SearchPlaceholder'}}"
+           value="{{searchTerm}}" data-action="search" />
+    {{#if searchTerm}}
+      <button type="button" class="clear-search" data-action="clearSearch">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    {{/if}}
+  </div>
+
+  {{!-- Sort Options --}}
+  <div class="quest-sort">
+    <label>{{localize "BOBSNPC.Quests.SortBy"}}:</label>
+    <select name="sort" data-action="setSort">
+      <option value="recent" {{#if (eq sort 'recent')}}selected{{/if}}>{{localize "BOBSNPC.Quests.SortRecent"}}</option>
+      <option value="name" {{#if (eq sort 'name')}}selected{{/if}}>{{localize "BOBSNPC.Quests.SortName"}}</option>
+      <option value="level" {{#if (eq sort 'level')}}selected{{/if}}>{{localize "BOBSNPC.Quests.SortLevel"}}</option>
+      <option value="progress" {{#if (eq sort 'progress')}}selected{{/if}}>{{localize "BOBSNPC.Quests.SortProgress"}}</option>
+    </select>
+  </div>
+
+  {{!-- Quest List --}}
+  <div class="quest-list">
+    {{#if hasQuests}}
+      {{#each quests}}
+        <div class="quest-entry {{this.statusClass}} {{#if this.isSelected}}selected{{/if}} {{#if this.isTracked}}tracked{{/if}}"
+             data-action="selectQuest" data-quest-id="{{this.id}}">
+
+          <div class="quest-icon">
+            <i class="fa-solid {{this.icon}}" style="color: {{this.color}}"></i>
+            {{#if this.isTracked}}
+              <i class="fa-solid fa-location-dot tracking-indicator"></i>
+            {{/if}}
+          </div>
+
+          <div class="quest-info">
+            <span class="quest-name">{{this.name}}</span>
+            <span class="quest-type">{{this.typeLabel}}</span>
+          </div>
+
+          <div class="quest-progress-mini">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: {{this.progressPercent}}%"></div>
+            </div>
+            <span class="progress-text">{{this.completedObjectives}}/{{this.totalObjectives}}</span>
+          </div>
+
+          {{#if this.isNew}}
+            <span class="quest-badge new">{{localize "BOBSNPC.Quests.New"}}</span>
+          {{/if}}
+
+          {{#if this.hasUpdate}}
+            <span class="quest-badge update">!</span>
+          {{/if}}
+        </div>
+      {{/each}}
+    {{else}}
+      <div class="no-quests">
+        <i class="fa-solid fa-scroll"></i>
+        <p>{{localize "BOBSNPC.Quests.NoQuests"}}</p>
+      </div>
+    {{/if}}
+  </div>
+
+  {{!-- Category Breakdown --}}
+  {{#if showCategories}}
+    <div class="quest-categories">
+      <h4>{{localize "BOBSNPC.Quests.Categories"}}</h4>
+      {{#each categories}}
+        <div class="category-entry" data-action="filterCategory" data-category="{{this.id}}">
+          <i class="fa-solid {{this.icon}}"></i>
+          <span>{{this.label}}</span>
+          <span class="count">{{this.count}}</span>
+        </div>
+      {{/each}}
+    </div>
+  {{/if}}
+</aside>

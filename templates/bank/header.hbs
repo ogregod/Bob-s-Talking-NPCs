@@ -1,0 +1,35 @@
+{{!-- Bank Window Header --}}
+<header class="bank-header {{theme}}">
+  <div class="bank-info">
+    <div class="bank-icon">
+      <i class="fa-solid fa-landmark"></i>
+    </div>
+    <div class="bank-details">
+      <h2 class="bank-name">{{bankName}}</h2>
+      {{#if bankerName}}
+        <span class="banker-name">
+          <i class="fa-solid fa-user-tie"></i>
+          {{bankerName}}
+        </span>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="bank-summary">
+    <div class="summary-item">
+      <span class="summary-label">{{localize "BOBSNPC.Bank.TotalBalance"}}</span>
+      <span class="summary-value gold">{{totalBalance}} gp</span>
+    </div>
+    {{#if hasLoans}}
+      <div class="summary-item debt">
+        <span class="summary-label">{{localize "BOBSNPC.Bank.TotalDebt"}}</span>
+        <span class="summary-value">{{totalDebt}} gp</span>
+      </div>
+    {{/if}}
+  </div>
+
+  <div class="player-wallet">
+    <span class="wallet-label">{{localize "BOBSNPC.Bank.OnHand"}}:</span>
+    <span class="wallet-amount">{{playerGold}} gp</span>
+  </div>
+</header>

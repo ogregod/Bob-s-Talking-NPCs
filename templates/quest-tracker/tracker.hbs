@@ -1,0 +1,91 @@
+{{!-- Quest Tracker HUD Widget --}}
+<div class="quest-tracker-widget {{theme}} {{#if minimized}}minimized{{/if}}" data-position-x="{{position.x}}" data-position-y="{{position.y}}">
+  {{!-- Header / Drag Handle --}}
+  <header class="tracker-header" data-drag-handle>
+    <div class="tracker-title">
+      <i class="fa-solid fa-location-dot"></i>
+      <span>{{localize "BOBSNPC.QuestTracker.Title"}}</span>
+    </div>
+
+    <div class="tracker-controls">
+      <button type="button" class="tracker-btn" data-action="openQuestLog" data-tooltip="{{localize 'BOBSNPC.QuestTracker.OpenLog'}}">
+        <i class="fa-solid fa-book"></i>
+      </button>
+      <button type="button" class="tracker-btn" data-action="toggleMinimize" data-tooltip="{{#if minimized}}{{localize 'BOBSNPC.QuestTracker.Expand'}}{{else}}{{localize 'BOBSNPC.QuestTracker.Minimize'}}{{/if}}">
+        <i class="fa-solid {{#if minimized}}fa-chevron-down{{else}}fa-chevron-up{{/if}}"></i>
+      </button>
+    </div>
+  </header>
+
+  {{!-- Tracked Quests --}}
+  {{#unless minimized}}
+    <div class="tracker-content">
+      {{#if hasTrackedQuests}}
+        <ul class="tracked-quest-list">
+          {{#each trackedQuests}}
+            <li class="tracked-quest {{#if this.isExpanded}}expanded{{/if}}">
+              {{!-- Quest Title Row --}}
+              <div class="quest-row" data-action="toggleQuestExpand" data-quest-id="{{this.id}}">
+                <i class="fa-solid {{this.icon}} quest-icon" style="color: {{this.color}}"></i>
+                <span class="quest-name">{{this.name}}</span>
+                <span class="quest-progress-mini">{{this.completedObjectives}}/{{this.totalObjectives}}</span>
+                <button type="button" class="untrack-btn" data-action="untrackQuest" data-quest-id="{{this.id}}" data-tooltip="{{localize 'BOBSNPC.QuestTracker.Untrack'}}">
+                  <i class="fa-solid fa-times"></i>
+                </button>
+              </div>
+
+              {{!-- Expanded Objectives --}}
+              {{#if this.isExpanded}}
+                <ul class="objective-list">
+                  {{#each this.activeObjectives}}
+                    <li class="objective {{#if this.completed}}completed{{/if}}">
+                      <i class="fa-solid {{#if this.completed}}fa-check{{else}}fa-circle{{/if}} objective-marker"></i>
+                      <span class="objective-text">
+                        {{this.shortDescription}}
+                        {{#if this.hasProgress}}
+                          <span class="objective-counter">({{this.current}}/{{this.target}})</span>
+                        {{/if}}
+                      </span>
+                      {{#if this.location}}
+                        <button type="button" class="location-btn" data-action="showObjectiveLocation"
+                                data-scene="{{this.location.sceneId}}" data-x="{{this.location.x}}" data-y="{{this.location.y}}"
+                                data-tooltip="{{localize 'BOBSNPC.QuestTracker.ShowOnMap'}}">
+                          <i class="fa-solid fa-map-marker-alt"></i>
+                        </button>
+                      {{/if}}
+                    </li>
+                  {{/each}}
+                </ul>
+              {{/if}}
+
+              {{!-- Time Limit Warning --}}
+              {{#if this.hasTimeLimit}}
+                <div class="time-warning {{#if this.isUrgent}}urgent{{/if}}">
+                  <i class="fa-solid fa-clock"></i>
+                  <span>{{this.timeRemaining}}</span>
+                </div>
+              {{/if}}
+            </li>
+          {{/each}}
+        </ul>
+
+        {{!-- Quick Stats --}}
+        <div class="tracker-stats">
+          <span data-tooltip="{{localize 'BOBSNPC.QuestTracker.ActiveQuests'}}">
+            <i class="fa-solid fa-scroll"></i> {{activeQuestCount}}
+          </span>
+          <span data-tooltip="{{localize 'BOBSNPC.QuestTracker.ObjectivesRemaining'}}">
+            <i class="fa-solid fa-bullseye"></i> {{remainingObjectives}}
+          </span>
+        </div>
+      {{else}}
+        <div class="no-tracked-quests">
+          <p>{{localize "BOBSNPC.QuestTracker.NoTrackedQuests"}}</p>
+          <button type="button" class="track-btn" data-action="openQuestLog">
+            {{localize "BOBSNPC.QuestTracker.TrackAQuest"}}
+          </button>
+        </div>
+      {{/if}}
+    </div>
+  {{/unless}}
+</div>

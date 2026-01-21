@@ -1,0 +1,45 @@
+{{!-- Dialogue Window Content --}}
+<section class="dialogue-content {{theme}}">
+  <div class="dialogue-text-container">
+    {{#if speakerName}}
+      <div class="speaker-name">{{speakerName}}</div>
+    {{/if}}
+
+    <div class="dialogue-text {{#if isTypewriting}}typewriting{{/if}}" data-action="skipTypewriter">
+      {{{dialogueText}}}
+    </div>
+
+    {{#if isTypewriting}}
+      <div class="typewriter-hint">
+        <i class="fa-solid fa-forward"></i>
+        {{localize "BOBSNPC.Dialogue.ClickToSkip"}}
+      </div>
+    {{/if}}
+  </div>
+
+  {{#if hasItems}}
+    <div class="dialogue-items">
+      <h4>{{localize "BOBSNPC.Dialogue.ItemsReceived"}}</h4>
+      <ul class="item-list">
+        {{#each items}}
+          <li class="item-entry">
+            <img src="{{this.img}}" alt="{{this.name}}" class="item-img" />
+            <span class="item-name">{{this.name}}</span>
+            {{#if this.quantity}}
+              <span class="item-quantity">x{{this.quantity}}</span>
+            {{/if}}
+          </li>
+        {{/each}}
+      </ul>
+    </div>
+  {{/if}}
+
+  {{#if hasQuest}}
+    <div class="dialogue-quest">
+      <div class="quest-offer">
+        <i class="fa-solid fa-scroll"></i>
+        <span>{{localize "BOBSNPC.Dialogue.QuestOffered"}}: <strong>{{questName}}</strong></span>
+      </div>
+    </div>
+  {{/if}}
+</section>

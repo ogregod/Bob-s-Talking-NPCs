@@ -1,0 +1,45 @@
+{{!-- Dialogue Window Footer --}}
+<footer class="dialogue-footer {{theme}}">
+  <div class="dialogue-actions">
+    {{#if hasServices}}
+      <div class="service-buttons">
+        {{#each services}}
+          <button type="button" class="service-btn" data-action="openService" data-service="{{this.type}}" data-tooltip="{{this.tooltip}}">
+            <i class="fa-solid {{this.icon}}"></i>
+            <span>{{this.label}}</span>
+          </button>
+        {{/each}}
+      </div>
+    {{/if}}
+
+    <div class="dialogue-controls">
+      {{#if canGoBack}}
+        <button type="button" class="dialogue-btn back-btn" data-action="goBack" data-tooltip="{{localize 'BOBSNPC.Dialogue.GoBack'}}">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+      {{/if}}
+
+      {{#if showHistory}}
+        <button type="button" class="dialogue-btn history-btn" data-action="showHistory" data-tooltip="{{localize 'BOBSNPC.Dialogue.ShowHistory'}}">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </button>
+      {{/if}}
+
+      <button type="button" class="dialogue-btn end-btn" data-action="endDialogue" data-tooltip="{{localize 'BOBSNPC.Dialogue.End'}}">
+        <i class="fa-solid fa-door-open"></i>
+        <span>{{localize "BOBSNPC.Dialogue.Goodbye"}}</span>
+      </button>
+    </div>
+  </div>
+
+  {{#if isGM}}
+    <div class="gm-controls">
+      <button type="button" class="gm-btn" data-action="editDialogue" data-tooltip="{{localize 'BOBSNPC.Dialogue.EditDialogue'}}">
+        <i class="fa-solid fa-edit"></i>
+      </button>
+      <button type="button" class="gm-btn" data-action="jumpToNode" data-tooltip="{{localize 'BOBSNPC.Dialogue.JumpToNode'}}">
+        <i class="fa-solid fa-diagram-project"></i>
+      </button>
+    </div>
+  {{/if}}
+</footer>

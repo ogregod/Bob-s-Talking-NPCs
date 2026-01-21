@@ -1,0 +1,98 @@
+{{!-- GM Dashboard - NPCs Tab --}}
+<div class="tab-content npcs-tab {{theme}}" {{#unless (eq activeTab 'npcs')}}hidden{{/unless}}>
+  {{#with npcs}}
+    <header class="tab-header">
+      <h3>{{localize "BOBSNPC.GMDashboard.NPCManagement"}}</h3>
+      <div class="header-stats">
+        <span class="stat configured">
+          <i class="fa-solid fa-check-circle"></i>
+          {{totalConfigured}} {{localize "BOBSNPC.GMDashboard.Configured"}}
+        </span>
+        <span class="stat unconfigured">
+          <i class="fa-solid fa-circle"></i>
+          {{totalUnconfigured}} {{localize "BOBSNPC.GMDashboard.Unconfigured"}}
+        </span>
+      </div>
+    </header>
+
+    {{!-- Filters --}}
+    <div class="filter-bar">
+      <select name="configFilter" class="filter-select">
+        <option value="">{{localize "BOBSNPC.GMDashboard.AllNPCs"}}</option>
+        <option value="configured">{{localize "BOBSNPC.GMDashboard.ConfiguredOnly"}}</option>
+        <option value="unconfigured">{{localize "BOBSNPC.GMDashboard.UnconfiguredOnly"}}</option>
+      </select>
+
+      <input type="text" name="searchNPCs" class="search-input" placeholder="{{localize 'BOBSNPC.GMDashboard.SearchNPCs'}}" />
+    </div>
+
+    {{!-- NPC Grid --}}
+    {{#if npcs.length}}
+      <div class="npc-grid">
+        {{#each npcs}}
+          <div class="npc-card {{#if this.configured}}configured{{/if}}">
+            <div class="npc-portrait">
+              {{#if this.img}}
+                <img src="{{this.img}}" alt="{{this.name}}" />
+              {{else}}
+                <div class="portrait-placeholder">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+              {{/if}}
+              {{#if this.configured}}
+                <div class="configured-badge" title="{{localize 'BOBSNPC.GMDashboard.Configured'}}">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+              {{/if}}
+            </div>
+
+            <div class="npc-info">
+              <h4 class="npc-name">{{this.name}}</h4>
+
+              {{#if this.roles.length}}
+                <div class="npc-roles">
+                  {{#each this.roles}}
+                    <span class="role-icon" style="color: {{this.color}}" title="{{this.label}}">
+                      <i class="fa-solid {{this.icon}}"></i>
+                    </span>
+                  {{/each}}
+                </div>
+              {{/if}}
+
+              <div class="npc-meta">
+                {{#if this.hasDialogue}}
+                  <span class="meta-tag dialogue">
+                    <i class="fa-solid fa-comments"></i>
+                    {{localize "BOBSNPC.GMDashboard.HasDialogue"}}
+                  </span>
+                {{/if}}
+                {{#if this.location}}
+                  <span class="meta-tag location">
+                    <i class="fa-solid fa-map-marker-alt"></i>
+                    {{this.location}}
+                  </span>
+                {{/if}}
+              </div>
+            </div>
+
+            <div class="npc-actions">
+              <button type="button" class="configure-btn" data-action="configureNPC" data-npc-id="{{this.id}}">
+                <i class="fa-solid fa-gear"></i>
+                {{#if this.configured}}
+                  {{localize "BOBSNPC.GMDashboard.EditConfig"}}
+                {{else}}
+                  {{localize "BOBSNPC.GMDashboard.Configure"}}
+                {{/if}}
+              </button>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="empty-state">
+        <i class="fa-solid fa-users"></i>
+        <p>{{localize "BOBSNPC.GMDashboard.NoNPCs"}}</p>
+      </div>
+    {{/if}}
+  {{/with}}
+</div>

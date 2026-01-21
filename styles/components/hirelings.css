@@ -1,0 +1,592 @@
+/**
+ * Bob's Talking NPCs - Hireling Manager Styles
+ */
+
+@layer bobsnpc {
+  /* ===== Hireling Window Layout ===== */
+  .hireling-manager {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* ===== Tabs ===== */
+  .hireling-tabs {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .hireling-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .hireling-tab:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .hireling-tab.active {
+    background: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .hireling-tab .tab-count {
+    padding: 0 var(--bobsnpc-spacing-xs);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--bobsnpc-border-radius-full);
+    font-size: var(--bobsnpc-font-size-xs);
+  }
+
+  .tab-summary {
+    display: flex;
+    gap: var(--bobsnpc-spacing-md);
+    margin-left: auto;
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .daily-wages {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    color: var(--bobsnpc-warning);
+  }
+
+  .unpaid-warning {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    color: var(--bobsnpc-error);
+  }
+
+  /* ===== Content ===== */
+  .hireling-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  /* ===== Hireling Grid ===== */
+  .hireling-grid,
+  .mount-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .hireling-card,
+  .mount-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    overflow: hidden;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .hireling-card:hover,
+  .mount-card:hover {
+    border-color: var(--bobsnpc-primary);
+    box-shadow: var(--bobsnpc-shadow-md);
+  }
+
+  .hireling-card.selected,
+  .mount-card.selected {
+    border-color: var(--bobsnpc-primary);
+    background: var(--bobsnpc-bg-active);
+  }
+
+  .hireling-card.low-loyalty {
+    border-color: var(--bobsnpc-warning);
+  }
+
+  .hireling-portrait,
+  .mount-portrait {
+    position: relative;
+    height: 120px;
+    background: var(--bobsnpc-bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hireling-portrait img,
+  .mount-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .status-indicator {
+    position: absolute;
+    bottom: var(--bobsnpc-spacing-xs);
+    right: var(--bobsnpc-spacing-xs);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-full);
+    font-size: 12px;
+  }
+
+  .status-indicator.available { color: var(--bobsnpc-success); }
+  .status-indicator.busy { color: var(--bobsnpc-warning); }
+  .status-indicator.injured { color: var(--bobsnpc-error); }
+
+  .rental-badge {
+    position: absolute;
+    top: var(--bobsnpc-spacing-xs);
+    left: var(--bobsnpc-spacing-xs);
+    padding: 2px var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-info);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: 10px;
+    color: white;
+    text-transform: uppercase;
+  }
+
+  .hireling-info,
+  .mount-info {
+    padding: var(--bobsnpc-spacing-sm);
+  }
+
+  .hireling-name,
+  .mount-name {
+    display: block;
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    margin-bottom: 2px;
+  }
+
+  .hireling-role,
+  .mount-type {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .hireling-stats,
+  .mount-stats {
+    display: flex;
+    gap: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+  }
+
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .stat i {
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .stat.loyalty {
+    flex: 1;
+  }
+
+  .stat-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--bobsnpc-bg-elevated);
+    border-radius: var(--bobsnpc-border-radius-full);
+    overflow: hidden;
+    margin: 0 var(--bobsnpc-spacing-xs);
+  }
+
+  .stat-fill {
+    height: 100%;
+    transition: width var(--bobsnpc-transition-normal);
+  }
+
+  .stat-fill.high { background: var(--bobsnpc-success); }
+  .stat-fill.medium { background: var(--bobsnpc-warning); }
+  .stat-fill.low { background: var(--bobsnpc-error); }
+
+  .hireling-wage {
+    padding: var(--bobsnpc-spacing-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .wage-amount {
+    color: var(--bobsnpc-warning);
+  }
+
+  .wage-due {
+    color: var(--bobsnpc-error);
+    font-size: var(--bobsnpc-font-size-xs);
+  }
+
+  .rental-info {
+    padding: var(--bobsnpc-spacing-sm);
+    background: rgba(var(--bobsnpc-info-rgb), 0.1);
+    font-size: var(--bobsnpc-font-size-sm);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .contract-warning {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    background: rgba(var(--bobsnpc-warning-rgb), 0.1);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-warning);
+  }
+
+  .hireling-actions,
+  .mount-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-secondary);
+  }
+
+  .action-btn {
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .action-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .action-btn.danger:hover {
+    background: var(--bobsnpc-error);
+    border-color: var(--bobsnpc-error);
+    color: white;
+  }
+
+  /* ===== Hireling Details Sidebar ===== */
+  .hireling-details {
+    background: var(--bobsnpc-bg-secondary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    padding: var(--bobsnpc-spacing-md);
+    margin-top: var(--bobsnpc-spacing-md);
+  }
+
+  .hireling-details h3 {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .details-section {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .details-section h4 {
+    font-size: var(--bobsnpc-font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--bobsnpc-text-secondary);
+    margin-bottom: var(--bobsnpc-spacing-sm);
+  }
+
+  .skills-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .skills-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--bobsnpc-spacing-xs) 0;
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .skills-list li:last-child {
+    border-bottom: none;
+  }
+
+  .skill-bonus {
+    color: var(--bobsnpc-success);
+    font-weight: var(--bobsnpc-font-weight-semibold);
+  }
+
+  /* ===== Empty States ===== */
+  .no-hirelings,
+  .no-mounts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--bobsnpc-spacing-2xl);
+    color: var(--bobsnpc-text-muted);
+    text-align: center;
+  }
+
+  .no-hirelings i,
+  .no-mounts i {
+    font-size: 48px;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    opacity: 0.5;
+  }
+
+  .no-hirelings button,
+  .no-mounts button {
+    margin-top: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-primary);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: white;
+    cursor: pointer;
+  }
+
+  /* ===== Recruit Section ===== */
+  .recruit-filters {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .recruit-filters .filter-btn {
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+  }
+
+  .recruit-filters .filter-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .recruit-filters .filter-btn.active {
+    background: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .available-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .recruit-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    overflow: hidden;
+  }
+
+  .recruit-portrait {
+    height: 100px;
+    background: var(--bobsnpc-bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .recruit-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .recruit-info {
+    padding: var(--bobsnpc-spacing-sm);
+  }
+
+  .recruit-info h4 {
+    margin: 0 0 2px 0;
+  }
+
+  .recruit-type {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .recruit-desc {
+    margin: var(--bobsnpc-spacing-xs) 0 0 0;
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+    line-height: var(--bobsnpc-line-height-normal);
+  }
+
+  .recruit-cost {
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+  }
+
+  .cost-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--bobsnpc-font-size-sm);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  .cost-line:last-child {
+    margin-bottom: 0;
+  }
+
+  .recruit-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+  }
+
+  .recruit-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-primary);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: white;
+    cursor: pointer;
+    transition: background var(--bobsnpc-transition-fast);
+  }
+
+  .recruit-btn:hover:not(:disabled) {
+    background: var(--bobsnpc-primary-light);
+  }
+
+  .recruit-btn:disabled {
+    background: var(--bobsnpc-bg-tertiary);
+    color: var(--bobsnpc-text-muted);
+    cursor: not-allowed;
+  }
+
+  .recruit-btn.secondary {
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .recruit-btn.secondary:hover:not(:disabled) {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .no-recruits {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--bobsnpc-spacing-2xl);
+    color: var(--bobsnpc-text-muted);
+    text-align: center;
+    grid-column: 1 / -1;
+  }
+
+  .no-recruits i {
+    font-size: 48px;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    opacity: 0.5;
+  }
+
+  /* ===== Footer ===== */
+  .hireling-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-primary);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .footer-summary {
+    display: flex;
+    gap: var(--bobsnpc-spacing-lg);
+  }
+
+  .summary-stat {
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .stat-value {
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    margin-left: var(--bobsnpc-spacing-xs);
+  }
+
+  .footer-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .hireling-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .hireling-btn.warning {
+    background: var(--bobsnpc-warning);
+    color: white;
+  }
+
+  .hireling-btn.warning:hover {
+    background: var(--bobsnpc-warning-light);
+  }
+
+  .hireling-btn.secondary {
+    background: var(--bobsnpc-bg-elevated);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .hireling-btn.secondary:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .gm-controls {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+    margin-left: var(--bobsnpc-spacing-md);
+  }
+
+  .gm-btn {
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+  }
+
+  .gm-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+}

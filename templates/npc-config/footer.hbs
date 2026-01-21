@@ -1,0 +1,40 @@
+{{!-- NPC Config Footer --}}
+<footer class="npc-config-footer {{theme}}">
+  <div class="footer-info">
+    {{#if config.metadata.lastModified}}
+      <span class="last-modified">
+        {{localize "BOBSNPC.NPCConfig.LastModified"}}: {{formatDate config.metadata.lastModified}}
+      </span>
+    {{/if}}
+    {{#if unsavedChanges}}
+      <span class="unsaved-indicator">
+        <i class="fa-solid fa-circle"></i>
+        {{localize "BOBSNPC.NPCConfig.UnsavedChanges"}}
+      </span>
+    {{/if}}
+  </div>
+
+  <div class="footer-actions">
+    <div class="secondary-actions">
+      <button type="button" class="config-btn" data-action="importConfig" data-tooltip="{{localize 'BOBSNPC.NPCConfig.Import'}}">
+        <i class="fa-solid fa-file-import"></i>
+      </button>
+      <button type="button" class="config-btn" data-action="exportConfig" data-tooltip="{{localize 'BOBSNPC.NPCConfig.Export'}}">
+        <i class="fa-solid fa-file-export"></i>
+      </button>
+      <button type="button" class="config-btn danger" data-action="resetConfig" data-tooltip="{{localize 'BOBSNPC.NPCConfig.Reset'}}">
+        <i class="fa-solid fa-undo"></i>
+      </button>
+    </div>
+
+    <div class="primary-actions">
+      <button type="button" class="config-btn secondary" data-action="closeConfig">
+        {{localize "BOBSNPC.NPCConfig.Cancel"}}
+      </button>
+      <button type="button" class="config-btn primary" data-action="saveConfig">
+        <i class="fa-solid fa-save"></i>
+        {{localize "BOBSNPC.NPCConfig.Save"}}
+      </button>
+    </div>
+  </div>
+</footer>

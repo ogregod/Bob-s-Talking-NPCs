@@ -1,0 +1,88 @@
+{{!-- NPC Config - Appearance Tab --}}
+<div class="tab-content appearance-tab {{theme}}" {{#unless (eq activeTab 'appearance')}}hidden{{/unless}}>
+  <section class="config-section">
+    <h3>{{localize "BOBSNPC.NPCConfig.PortraitSettings"}}</h3>
+
+    <div class="form-group">
+      <label>{{localize "BOBSNPC.NPCConfig.DialoguePortrait"}}</label>
+      <div class="portrait-picker">
+        {{#if config.appearance.portrait}}
+          <img src="{{config.appearance.portrait}}" alt="{{localize 'BOBSNPC.NPCConfig.Portrait'}}" class="portrait-preview" />
+        {{else}}
+          <div class="portrait-placeholder">
+            <i class="fa-solid fa-user"></i>
+          </div>
+        {{/if}}
+        <div class="portrait-actions">
+          <button type="button" class="portrait-btn" data-action="selectPortrait">
+            <i class="fa-solid fa-image"></i>
+            {{localize "BOBSNPC.NPCConfig.SelectImage"}}
+          </button>
+          {{#if config.appearance.portrait}}
+            <button type="button" class="portrait-btn danger" data-action="clearPortrait">
+              <i class="fa-solid fa-times"></i>
+              {{localize "BOBSNPC.NPCConfig.Clear"}}
+            </button>
+          {{/if}}
+        </div>
+      </div>
+      <p class="hint">{{localize "BOBSNPC.NPCConfig.PortraitHint"}}</p>
+    </div>
+  </section>
+
+  <section class="config-section">
+    <h3>{{localize "BOBSNPC.NPCConfig.TokenIndicator"}}</h3>
+
+    <div class="form-group">
+      <label>{{localize "BOBSNPC.NPCConfig.IndicatorType"}}</label>
+      <select name="config.appearance.indicator">
+        {{#each availableIndicators}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>
+            {{this.label}}
+          </option>
+        {{/each}}
+      </select>
+      <p class="hint">{{localize "BOBSNPC.NPCConfig.IndicatorHint"}}</p>
+    </div>
+
+    {{#if (eq config.appearance.indicator 'custom')}}
+      <div class="form-group">
+        <label>{{localize "BOBSNPC.NPCConfig.CustomIndicator"}}</label>
+        <input type="text" name="config.appearance.customIndicator"
+               value="{{config.appearance.customIndicator}}"
+               placeholder="{{localize 'BOBSNPC.NPCConfig.CustomIndicatorPlaceholder'}}" />
+      </div>
+    {{/if}}
+
+    <div class="indicator-preview">
+      <button type="button" class="preview-btn" data-action="testIndicator">
+        <i class="fa-solid fa-eye"></i>
+        {{localize "BOBSNPC.NPCConfig.PreviewIndicator"}}
+      </button>
+    </div>
+  </section>
+
+  <section class="config-section">
+    <h3>{{localize "BOBSNPC.NPCConfig.NameDisplay"}}</h3>
+
+    <div class="form-group">
+      <label>{{localize "BOBSNPC.NPCConfig.NameDisplayMode"}}</label>
+      <select name="config.appearance.nameDisplay">
+        {{#each availableNameDisplays}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>
+            {{this.label}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <input type="checkbox" name="config.appearance.titleDisplay"
+               {{#if config.appearance.titleDisplay}}checked{{/if}} />
+        {{localize "BOBSNPC.NPCConfig.ShowTitle"}}
+      </label>
+      <p class="hint">{{localize "BOBSNPC.NPCConfig.ShowTitleHint"}}</p>
+    </div>
+  </section>
+</div>

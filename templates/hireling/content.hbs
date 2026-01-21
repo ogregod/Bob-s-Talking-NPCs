@@ -1,0 +1,289 @@
+{{!-- Hireling Manager Content --}}
+<main class="hireling-content {{theme}}">
+  {{#if (eq activeTab 'hirelings')}}
+    {{!-- Hirelings Tab --}}
+    <section class="hirelings-section">
+      {{#if hasHirelings}}
+        <div class="hireling-grid">
+          {{#each hirelings}}
+            <div class="hireling-card {{#if this.isSelected}}selected{{/if}} {{#if this.loyaltyLow}}low-loyalty{{/if}}"
+                 data-action="selectHireling" data-hireling-id="{{this.id}}">
+
+              <div class="hireling-portrait">
+                <img src="{{this.img}}" alt="{{this.name}}" />
+                {{#if this.statusIcon}}
+                  <span class="status-indicator {{this.status}}" data-tooltip="{{this.statusLabel}}">
+                    <i class="fa-solid {{this.statusIcon}}"></i>
+                  </span>
+                {{/if}}
+              </div>
+
+              <div class="hireling-info">
+                <h4 class="hireling-name">{{this.name}}</h4>
+                <span class="hireling-role">{{this.roleLabel}}</span>
+              </div>
+
+              <div class="hireling-stats">
+                <div class="stat loyalty" data-tooltip="{{localize 'BOBSNPC.Hirelings.Loyalty'}}">
+                  <i class="fa-solid fa-heart"></i>
+                  <div class="stat-bar">
+                    <div class="stat-fill {{this.loyaltyClass}}" style="width: {{this.loyalty}}%"></div>
+                  </div>
+                  <span>{{this.loyalty}}%</span>
+                </div>
+
+                {{#if this.morale}}
+                  <div class="stat morale" data-tooltip="{{localize 'BOBSNPC.Hirelings.Morale'}}">
+                    <i class="fa-solid fa-face-smile"></i>
+                    <span>{{this.morale}}</span>
+                  </div>
+                {{/if}}
+              </div>
+
+              <div class="hireling-wage">
+                <span class="wage-amount">{{this.dailyWage}} gp/day</span>
+                {{#if this.wageDue}}
+                  <span class="wage-due">{{localize "BOBSNPC.Hirelings.WageDue"}}: {{this.wageDue}} gp</span>
+                {{/if}}
+              </div>
+
+              <div class="hireling-actions">
+                <button type="button" class="action-btn" data-action="viewHirelingSheet" data-hireling-id="{{this.id}}"
+                        data-tooltip="{{localize 'BOBSNPC.Hirelings.ViewSheet'}}">
+                  <i class="fa-solid fa-user"></i>
+                </button>
+                <button type="button" class="action-btn" data-action="accessInventory" data-hireling-id="{{this.id}}"
+                        data-tooltip="{{localize 'BOBSNPC.Hirelings.Inventory'}}">
+                  <i class="fa-solid fa-backpack"></i>
+                </button>
+                <button type="button" class="action-btn" data-action="payWages" data-hireling-id="{{this.id}}"
+                        data-tooltip="{{localize 'BOBSNPC.Hirelings.PayWages'}}">
+                  <i class="fa-solid fa-coins"></i>
+                </button>
+                <button type="button" class="action-btn danger" data-action="dismissHireling" data-hireling-id="{{this.id}}"
+                        data-tooltip="{{localize 'BOBSNPC.Hirelings.Dismiss'}}">
+                  <i class="fa-solid fa-user-minus"></i>
+                </button>
+              </div>
+
+              {{#if this.contractExpiring}}
+                <div class="contract-warning">
+                  <i class="fa-solid fa-file-contract"></i>
+                  {{localize "BOBSNPC.Hirelings.ContractExpires"}}: {{this.contractExpiresIn}}
+                </div>
+              {{/if}}
+            </div>
+          {{/each}}
+        </div>
+
+        {{!-- Selected Hireling Details --}}
+        {{#if selectedHireling}}
+          <aside class="hireling-details">
+            <h3>{{selectedHireling.name}}</h3>
+
+            <div class="details-section">
+              <h4>{{localize "BOBSNPC.Hirelings.Skills"}}</h4>
+              <ul class="skills-list">
+                {{#each selectedHireling.skills}}
+                  <li>
+                    <span class="skill-name">{{this.name}}</span>
+                    <span class="skill-bonus">+{{this.bonus}}</span>
+                  </li>
+                {{/each}}
+              </ul>
+            </div>
+
+            <div class="details-section">
+              <h4>{{localize "BOBSNPC.Hirelings.Contract"}}</h4>
+              <p>{{localize "BOBSNPC.Hirelings.HiredOn"}}: {{selectedHireling.hiredDate}}</p>
+              <p>{{localize "BOBSNPC.Hirelings.TotalPaid"}}: {{selectedHireling.totalPaid}} gp</p>
+            </div>
+
+            {{#if selectedHireling.specialAbilities}}
+              <div class="details-section">
+                <h4>{{localize "BOBSNPC.Hirelings.SpecialAbilities"}}</h4>
+                <ul>
+                  {{#each selectedHireling.specialAbilities}}
+                    <li>{{this}}</li>
+                  {{/each}}
+                </ul>
+              </div>
+            {{/if}}
+          </aside>
+        {{/if}}
+      {{else}}
+        <div class="no-hirelings">
+          <i class="fa-solid fa-person-military-pointing"></i>
+          <p>{{localize "BOBSNPC.Hirelings.NoHirelings"}}</p>
+          <button type="button" data-action="setTab" data-tab="recruit">
+            {{localize "BOBSNPC.Hirelings.RecruitSome"}}
+          </button>
+        </div>
+      {{/if}}
+    </section>
+
+  {{else if (eq activeTab 'mounts')}}
+    {{!-- Mounts Tab --}}
+    <section class="mounts-section">
+      {{#if hasMounts}}
+        <div class="mount-grid">
+          {{#each mounts}}
+            <div class="mount-card {{#if this.isSelected}}selected{{/if}}" data-action="selectMount" data-mount-id="{{this.id}}">
+              <div class="mount-portrait">
+                <img src="{{this.img}}" alt="{{this.name}}" />
+                {{#if this.isRented}}
+                  <span class="rental-badge">{{localize "BOBSNPC.Hirelings.Rented"}}</span>
+                {{/if}}
+              </div>
+
+              <div class="mount-info">
+                <h4 class="mount-name">{{this.name}}</h4>
+                <span class="mount-type">{{this.typeLabel}}</span>
+              </div>
+
+              <div class="mount-stats">
+                <div class="stat speed" data-tooltip="{{localize 'BOBSNPC.Hirelings.Speed'}}">
+                  <i class="fa-solid fa-wind"></i>
+                  <span>{{this.speed}} ft</span>
+                </div>
+                <div class="stat capacity" data-tooltip="{{localize 'BOBSNPC.Hirelings.CarryingCapacity'}}">
+                  <i class="fa-solid fa-weight-hanging"></i>
+                  <span>{{this.capacity}} lbs</span>
+                </div>
+              </div>
+
+              {{#if this.isRented}}
+                <div class="rental-info">
+                  <span>{{localize "BOBSNPC.Hirelings.RentalExpires"}}: {{this.rentalExpires}}</span>
+                  <span>{{this.rentalCost}} gp/day</span>
+                </div>
+              {{/if}}
+
+              <div class="mount-actions">
+                <button type="button" class="action-btn" data-action="viewMountSheet" data-mount-id="{{this.id}}"
+                        data-tooltip="{{localize 'BOBSNPC.Hirelings.ViewSheet'}}">
+                  <i class="fa-solid fa-horse"></i>
+                </button>
+                <button type="button" class="action-btn" data-action="accessSaddlebags" data-mount-id="{{this.id}}"
+                        data-tooltip="{{localize 'BOBSNPC.Hirelings.Saddlebags'}}">
+                  <i class="fa-solid fa-suitcase"></i>
+                </button>
+                {{#if this.isRented}}
+                  <button type="button" class="action-btn" data-action="returnMount" data-mount-id="{{this.id}}"
+                          data-tooltip="{{localize 'BOBSNPC.Hirelings.Return'}}">
+                    <i class="fa-solid fa-undo"></i>
+                  </button>
+                {{else}}
+                  <button type="button" class="action-btn danger" data-action="sellMount" data-mount-id="{{this.id}}"
+                          data-tooltip="{{localize 'BOBSNPC.Hirelings.Sell'}}">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                  </button>
+                {{/if}}
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="no-mounts">
+          <i class="fa-solid fa-horse"></i>
+          <p>{{localize "BOBSNPC.Hirelings.NoMounts"}}</p>
+          <button type="button" data-action="setTab" data-tab="recruit">
+            {{localize "BOBSNPC.Hirelings.GetMount"}}
+          </button>
+        </div>
+      {{/if}}
+    </section>
+
+  {{else if (eq activeTab 'recruit')}}
+    {{!-- Recruit Tab --}}
+    <section class="recruit-section">
+      <div class="recruit-filters">
+        <button type="button" class="filter-btn {{#if (eq recruitFilter 'all')}}active{{/if}}"
+                data-action="setRecruitFilter" data-filter="all">
+          {{localize "BOBSNPC.Hirelings.All"}}
+        </button>
+        <button type="button" class="filter-btn {{#if (eq recruitFilter 'hirelings')}}active{{/if}}"
+                data-action="setRecruitFilter" data-filter="hirelings">
+          {{localize "BOBSNPC.Hirelings.Hirelings"}}
+        </button>
+        <button type="button" class="filter-btn {{#if (eq recruitFilter 'mounts')}}active{{/if}}"
+                data-action="setRecruitFilter" data-filter="mounts">
+          {{localize "BOBSNPC.Hirelings.Mounts"}}
+        </button>
+      </div>
+
+      <div class="available-grid">
+        {{#each availableForHire}}
+          <div class="recruit-card {{this.type}}">
+            <div class="recruit-portrait">
+              <img src="{{this.img}}" alt="{{this.name}}" />
+            </div>
+
+            <div class="recruit-info">
+              <h4>{{this.name}}</h4>
+              <span class="recruit-type">{{this.typeLabel}}</span>
+              {{#if this.description}}
+                <p class="recruit-desc">{{this.description}}</p>
+              {{/if}}
+            </div>
+
+            <div class="recruit-cost">
+              {{#if this.hireCost}}
+                <div class="cost-line">
+                  <span>{{localize "BOBSNPC.Hirelings.HireCost"}}:</span>
+                  <span>{{this.hireCost}} gp</span>
+                </div>
+              {{/if}}
+              {{#if this.dailyWage}}
+                <div class="cost-line">
+                  <span>{{localize "BOBSNPC.Hirelings.DailyWage"}}:</span>
+                  <span>{{this.dailyWage}} gp/day</span>
+                </div>
+              {{/if}}
+              {{#if this.purchasePrice}}
+                <div class="cost-line">
+                  <span>{{localize "BOBSNPC.Hirelings.Purchase"}}:</span>
+                  <span>{{this.purchasePrice}} gp</span>
+                </div>
+              {{/if}}
+              {{#if this.rentalPrice}}
+                <div class="cost-line">
+                  <span>{{localize "BOBSNPC.Hirelings.Rental"}}:</span>
+                  <span>{{this.rentalPrice}} gp/day</span>
+                </div>
+              {{/if}}
+            </div>
+
+            <div class="recruit-actions">
+              {{#if this.isHireling}}
+                <button type="button" class="recruit-btn" data-action="hireHireling" data-hireling-id="{{this.id}}"
+                        {{#unless this.canAfford}}disabled{{/unless}}>
+                  <i class="fa-solid fa-handshake"></i>
+                  {{localize "BOBSNPC.Hirelings.Hire"}}
+                </button>
+              {{else}}
+                <button type="button" class="recruit-btn" data-action="purchaseMount" data-mount-id="{{this.id}}"
+                        {{#unless this.canAffordPurchase}}disabled{{/unless}}>
+                  <i class="fa-solid fa-coins"></i>
+                  {{localize "BOBSNPC.Hirelings.Buy"}}
+                </button>
+                {{#if this.rentalPrice}}
+                  <button type="button" class="recruit-btn secondary" data-action="rentMount" data-mount-id="{{this.id}}"
+                          {{#unless this.canAffordRental}}disabled{{/unless}}>
+                    <i class="fa-solid fa-clock"></i>
+                    {{localize "BOBSNPC.Hirelings.Rent"}}
+                  </button>
+                {{/if}}
+              {{/if}}
+            </div>
+          </div>
+        {{else}}
+          <div class="no-recruits">
+            <i class="fa-solid fa-user-slash"></i>
+            <p>{{localize "BOBSNPC.Hirelings.NoneAvailable"}}</p>
+          </div>
+        {{/each}}
+      </div>
+    </section>
+  {{/if}}
+</main>

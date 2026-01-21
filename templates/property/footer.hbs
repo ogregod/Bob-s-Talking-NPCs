@@ -1,0 +1,51 @@
+{{!-- Property Manager Footer --}}
+<footer class="property-footer {{theme}}">
+  <div class="footer-summary">
+    <div class="summary-stat">
+      <span class="stat-label">{{localize "BOBSNPC.Property.TotalOwned"}}:</span>
+      <span class="stat-value">{{ownedCount}}</span>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-label">{{localize "BOBSNPC.Property.TotalValue"}}:</span>
+      <span class="stat-value">{{totalPropertyValue}} gp</span>
+    </div>
+    <div class="summary-stat {{#if (gt netMonthlyIncome 0)}}positive{{else}}negative{{/if}}">
+      <span class="stat-label">{{localize "BOBSNPC.Property.NetMonthly"}}:</span>
+      <span class="stat-value">{{#if (gt netMonthlyIncome 0)}}+{{/if}}{{netMonthlyIncome}} gp</span>
+    </div>
+  </div>
+
+  <div class="footer-actions">
+    {{#if hasUnclaimedIncome}}
+      <button type="button" class="property-btn primary" data-action="collectAllIncome">
+        <i class="fa-solid fa-hand-holding-dollar"></i>
+        {{localize "BOBSNPC.Property.CollectAll"}} ({{totalUnclaimedIncome}} gp)
+      </button>
+    {{/if}}
+
+    {{#if hasMortgagePaymentsDue}}
+      <button type="button" class="property-btn warning" data-action="payMortgages">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        {{localize "BOBSNPC.Property.PayMortgages"}} ({{mortgagePaymentsDue}} gp)
+      </button>
+    {{/if}}
+
+    <button type="button" class="property-btn secondary" data-action="closeManager">
+      {{localize "BOBSNPC.Property.Close"}}
+    </button>
+  </div>
+
+  {{#if isGM}}
+    <div class="gm-controls">
+      <button type="button" class="gm-btn" data-action="addProperty" data-tooltip="{{localize 'BOBSNPC.Property.AddProperty'}}">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+      <button type="button" class="gm-btn" data-action="processMonth" data-tooltip="{{localize 'BOBSNPC.Property.ProcessMonth'}}">
+        <i class="fa-solid fa-calendar-check"></i>
+      </button>
+      <button type="button" class="gm-btn" data-action="viewAllProperties" data-tooltip="{{localize 'BOBSNPC.Property.ViewAll'}}">
+        <i class="fa-solid fa-list"></i>
+      </button>
+    </div>
+  {{/if}}
+</footer>

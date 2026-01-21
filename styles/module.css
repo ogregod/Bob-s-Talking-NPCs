@@ -6,6 +6,17 @@
 /* Import CSS custom properties */
 @import url("./variables.css");
 
+/* Import component styles */
+@import url("./components/dialogue.css");
+@import url("./components/quests.css");
+@import url("./components/shop.css");
+@import url("./components/bank.css");
+@import url("./components/factions.css");
+@import url("./components/hirelings.css");
+@import url("./components/property.css");
+@import url("./components/npc-config.css");
+@import url("./components/gm-dashboard.css");
+
 /* ===== CSS Layer for V13 Compatibility ===== */
 @layer bobsnpc {
 

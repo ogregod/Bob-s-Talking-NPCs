@@ -1,0 +1,62 @@
+{{!-- GM Dashboard - Factions Tab --}}
+<div class="tab-content factions-tab {{theme}}" {{#unless (eq activeTab 'factions')}}hidden{{/unless}}>
+  {{#with factions}}
+    <header class="tab-header">
+      <h3>{{localize "BOBSNPC.GMDashboard.FactionManagement"}}</h3>
+      <button type="button" class="create-btn" data-action="createFaction">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.GMDashboard.CreateFaction"}}
+      </button>
+    </header>
+
+    {{!-- Faction List --}}
+    {{#if factions.length}}
+      <div class="faction-list">
+        {{#each factions}}
+          <div class="faction-card">
+            <div class="faction-header" style="border-left-color: {{this.color}}">
+              <div class="faction-icon" style="background-color: {{this.color}}20; color: {{this.color}}">
+                <i class="fa-solid {{this.icon}}"></i>
+              </div>
+              <div class="faction-info">
+                <h4 class="faction-name">{{this.name}}</h4>
+                {{#if this.description}}
+                  <p class="faction-description">{{this.description}}</p>
+                {{/if}}
+              </div>
+            </div>
+
+            <div class="faction-stats">
+              <div class="faction-stat">
+                <span class="stat-value">{{this.memberCount}}</span>
+                <span class="stat-label">{{localize "BOBSNPC.GMDashboard.Members"}}</span>
+              </div>
+              <div class="faction-stat">
+                <span class="stat-value">{{this.rankCount}}</span>
+                <span class="stat-label">{{localize "BOBSNPC.GMDashboard.Ranks"}}</span>
+              </div>
+            </div>
+
+            <div class="faction-actions">
+              <button type="button" class="icon-btn" data-action="editFaction" data-faction-id="{{this.id}}" title="{{localize 'BOBSNPC.Common.Edit'}}">
+                <i class="fa-solid fa-edit"></i>
+              </button>
+              <button type="button" class="icon-btn danger" data-action="deleteFaction" data-faction-id="{{this.id}}" title="{{localize 'BOBSNPC.Common.Delete'}}">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="empty-state">
+        <i class="fa-solid fa-flag"></i>
+        <p>{{localize "BOBSNPC.GMDashboard.NoFactions"}}</p>
+        <button type="button" class="create-btn" data-action="createFaction">
+          <i class="fa-solid fa-plus"></i>
+          {{localize "BOBSNPC.GMDashboard.CreateFirstFaction"}}
+        </button>
+      </div>
+    {{/if}}
+  {{/with}}
+</div>

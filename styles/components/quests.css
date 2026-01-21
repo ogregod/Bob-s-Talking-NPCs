@@ -1,0 +1,737 @@
+/**
+ * Bob's Talking NPCs - Quest System Styles
+ * Includes Quest Log, Quest Tracker
+ */
+
+@layer bobsnpc {
+  /* ===== Quest Log Layout ===== */
+  .quest-log {
+    display: flex;
+    height: 100%;
+  }
+
+  /* ===== Quest Sidebar ===== */
+  .quest-sidebar {
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    background: var(--bobsnpc-bg-secondary);
+    border-right: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .quest-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .filter-btn {
+    flex: 1;
+    min-width: calc(50% - var(--bobsnpc-spacing-xs));
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .filter-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .filter-btn.active {
+    background: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .filter-btn .count {
+    margin-left: var(--bobsnpc-spacing-xs);
+    padding: 0 var(--bobsnpc-spacing-xs);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--bobsnpc-border-radius-full);
+    font-size: var(--bobsnpc-font-size-xs);
+  }
+
+  .quest-search {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .quest-search input {
+    flex: 1;
+    background: var(--bobsnpc-input-bg);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-input-border);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    color: var(--bobsnpc-text-primary);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .quest-sort {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .quest-sort select {
+    flex: 1;
+    background: var(--bobsnpc-input-bg);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-input-border);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    padding: var(--bobsnpc-spacing-xs);
+    color: var(--bobsnpc-text-primary);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .quest-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-sm);
+  }
+
+  .quest-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .quest-entry:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .quest-entry.selected {
+    border-color: var(--bobsnpc-primary);
+    background: var(--bobsnpc-bg-active);
+  }
+
+  .quest-entry.tracked {
+    border-left: 3px solid var(--bobsnpc-success);
+  }
+
+  .quest-entry .quest-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-lg);
+  }
+
+  .quest-entry .quest-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .quest-entry .quest-name {
+    display: block;
+    font-weight: var(--bobsnpc-font-weight-medium);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .quest-entry .quest-type {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .quest-progress-mini {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+
+  .quest-progress-mini .progress-bar {
+    width: 40px;
+    height: 4px;
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-full);
+    overflow: hidden;
+  }
+
+  .quest-progress-mini .progress-fill {
+    height: 100%;
+    background: var(--bobsnpc-success);
+  }
+
+  .quest-progress-mini .progress-text {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .quest-badge {
+    padding: 2px var(--bobsnpc-spacing-xs);
+    font-size: 10px;
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    text-transform: uppercase;
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .quest-badge.new {
+    background: var(--bobsnpc-quest-available);
+    color: var(--bobsnpc-text-inverse);
+  }
+
+  .quest-badge.update {
+    background: var(--bobsnpc-info);
+    color: white;
+  }
+
+  .no-quests {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--bobsnpc-spacing-xl);
+    color: var(--bobsnpc-text-muted);
+    text-align: center;
+  }
+
+  .no-quests i {
+    font-size: 48px;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    opacity: 0.5;
+  }
+
+  /* ===== Quest Details Panel ===== */
+  .quest-details {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .quest-detail-view {
+    max-width: 600px;
+  }
+
+  .quest-header {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .quest-title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-sm);
+  }
+
+  .quest-title-row .quest-icon {
+    font-size: var(--bobsnpc-font-size-xl);
+  }
+
+  .quest-title {
+    flex: 1;
+    margin: 0;
+    font-size: var(--bobsnpc-font-size-xl);
+  }
+
+  .quest-level {
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    font-weight: var(--bobsnpc-font-weight-semibold);
+  }
+
+  .quest-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--bobsnpc-spacing-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .quest-type,
+  .quest-status,
+  .quest-timer {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .quest-status.status-active { color: var(--bobsnpc-quest-active); }
+  .quest-status.status-completed { color: var(--bobsnpc-quest-complete); }
+  .quest-status.status-failed { color: var(--bobsnpc-quest-failed); }
+
+  .quest-timer.urgent {
+    background: var(--bobsnpc-error);
+    color: white;
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .quest-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+    margin-top: var(--bobsnpc-spacing-sm);
+  }
+
+  .quest-action-btn {
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .quest-action-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .quest-action-btn.active {
+    background: var(--bobsnpc-success);
+    border-color: var(--bobsnpc-success);
+    color: white;
+  }
+
+  .quest-action-btn.danger:hover {
+    background: var(--bobsnpc-error);
+    border-color: var(--bobsnpc-error);
+    color: white;
+  }
+
+  .quest-description,
+  .quest-giver,
+  .quest-objectives,
+  .quest-rewards,
+  .quest-chain {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .quest-description p {
+    line-height: var(--bobsnpc-line-height-relaxed);
+  }
+
+  .quest-giver h4,
+  .quest-objectives h4,
+  .quest-rewards h4,
+  .quest-chain h4 {
+    margin-bottom: var(--bobsnpc-spacing-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .giver-info {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .giver-portrait {
+    width: var(--bobsnpc-avatar-md);
+    height: var(--bobsnpc-avatar-md);
+    border-radius: var(--bobsnpc-border-radius-md);
+    object-fit: cover;
+  }
+
+  .giver-name {
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .giver-location {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Objectives ===== */
+  .objective-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .objective-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-bg-elevated);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .objective-entry.completed {
+    opacity: 0.7;
+  }
+
+  .objective-entry.completed .objective-text {
+    text-decoration: line-through;
+  }
+
+  .objective-entry.failed .objective-checkbox {
+    color: var(--bobsnpc-error);
+  }
+
+  .objective-entry.hidden {
+    opacity: 0.5;
+  }
+
+  .objective-checkbox {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .objective-entry.completed .objective-checkbox {
+    color: var(--bobsnpc-success);
+  }
+
+  .objective-content {
+    flex: 1;
+  }
+
+  .objective-progress-bar {
+    height: 6px;
+    margin-top: var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-full);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .objective-progress-bar .progress-fill {
+    height: 100%;
+    background: var(--bobsnpc-primary);
+  }
+
+  .objective-progress-bar .progress-label {
+    position: absolute;
+    right: var(--bobsnpc-spacing-xs);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .optional-badge {
+    margin-left: var(--bobsnpc-spacing-sm);
+    padding: 2px var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .objective-location-btn {
+    padding: var(--bobsnpc-spacing-xs);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    transition: color var(--bobsnpc-transition-fast);
+  }
+
+  .objective-location-btn:hover {
+    color: var(--bobsnpc-primary);
+  }
+
+  /* ===== Rewards ===== */
+  .rewards-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .reward-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-elevated);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .reward-entry.xp { color: var(--bobsnpc-info); }
+  .reward-entry.gold { color: var(--bobsnpc-warning); }
+  .reward-entry.reputation.positive { color: var(--bobsnpc-success); }
+  .reward-entry.reputation.negative { color: var(--bobsnpc-error); }
+
+  .reward-img {
+    width: 24px;
+    height: 24px;
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .quest-progress-section {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .progress-bar.large {
+    height: 12px;
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-full);
+    overflow: hidden;
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  .progress-bar.large .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--bobsnpc-primary), var(--bobsnpc-success));
+  }
+
+  .no-quest-selected {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--bobsnpc-text-muted);
+    text-align: center;
+  }
+
+  .no-quest-selected i {
+    font-size: 48px;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    opacity: 0.5;
+  }
+
+  .gm-notes {
+    background: var(--bobsnpc-bg-tertiary);
+    border-left: 3px solid var(--bobsnpc-warning);
+    padding: var(--bobsnpc-spacing-sm);
+    margin-top: var(--bobsnpc-spacing-md);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .gm-notes h4 {
+    color: var(--bobsnpc-warning);
+  }
+
+  /* ===== Quest Tracker Widget ===== */
+  .quest-tracker-widget {
+    position: fixed;
+    width: 280px;
+    background: var(--bobsnpc-bg-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    box-shadow: var(--bobsnpc-shadow-lg);
+    overflow: hidden;
+    z-index: var(--bobsnpc-z-sticky);
+  }
+
+  .quest-tracker-widget.minimized {
+    width: auto;
+    min-width: 160px;
+  }
+
+  .tracker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-secondary);
+    cursor: move;
+  }
+
+  .tracker-title {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .tracker-controls {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .tracker-btn {
+    padding: var(--bobsnpc-spacing-xs);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    transition: color var(--bobsnpc-transition-fast);
+  }
+
+  .tracker-btn:hover {
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .tracker-content {
+    padding: var(--bobsnpc-spacing-sm);
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .tracked-quest-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tracked-quest {
+    margin-bottom: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-elevated);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    overflow: hidden;
+  }
+
+  .tracked-quest .quest-row {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    cursor: pointer;
+  }
+
+  .tracked-quest .quest-row:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .tracked-quest .quest-icon {
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .tracked-quest .quest-name {
+    flex: 1;
+    font-size: var(--bobsnpc-font-size-sm);
+    font-weight: var(--bobsnpc-font-weight-medium);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tracked-quest .quest-progress-mini {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .tracked-quest .untrack-btn {
+    padding: 2px;
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .tracked-quest:hover .untrack-btn {
+    opacity: 1;
+  }
+
+  .tracked-quest .untrack-btn:hover {
+    color: var(--bobsnpc-error);
+  }
+
+  .tracked-quest .objective-list {
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+  }
+
+  .tracked-quest .objective {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-xs);
+    padding: 2px 0;
+  }
+
+  .tracked-quest .objective.completed {
+    opacity: 0.6;
+    text-decoration: line-through;
+  }
+
+  .tracked-quest .objective-marker {
+    font-size: 8px;
+  }
+
+  .tracked-quest .objective.completed .objective-marker {
+    color: var(--bobsnpc-success);
+  }
+
+  .tracked-quest .objective-counter {
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .tracked-quest .location-btn {
+    padding: 2px;
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    font-size: 10px;
+  }
+
+  .tracked-quest .location-btn:hover {
+    color: var(--bobsnpc-primary);
+  }
+
+  .tracked-quest .time-warning {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-warning);
+    background: rgba(var(--bobsnpc-warning-rgb), 0.1);
+  }
+
+  .tracked-quest .time-warning.urgent {
+    color: var(--bobsnpc-error);
+    background: rgba(var(--bobsnpc-error-rgb), 0.1);
+  }
+
+  .tracker-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: var(--bobsnpc-spacing-sm);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .no-tracked-quests {
+    text-align: center;
+    padding: var(--bobsnpc-spacing-md);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .no-tracked-quests .track-btn {
+    margin-top: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-primary);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: white;
+    cursor: pointer;
+  }
+}

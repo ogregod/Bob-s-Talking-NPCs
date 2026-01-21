@@ -1,0 +1,31 @@
+{{!-- Faction Members Dialog --}}
+<div class="faction-members-dialog">
+  {{#if npcs.length}}
+    <ul class="members-list">
+      {{#each npcs}}
+        <li class="member-entry">
+          <img src="{{this.img}}" alt="{{this.name}}" class="member-portrait" />
+          <div class="member-info">
+            <span class="member-name">{{this.name}}</span>
+            {{#if this.rank}}
+              <span class="member-rank">{{this.rank}}</span>
+            {{/if}}
+            {{#if this.location}}
+              <span class="member-location">
+                <i class="fa-solid fa-map-marker-alt"></i>
+                {{this.location}}
+              </span>
+            {{/if}}
+          </div>
+          {{#if this.tokenId}}
+            <button type="button" class="pan-btn" onclick="canvas.tokens.get('{{this.tokenId}}')?.control({releaseOthers: true})">
+              <i class="fa-solid fa-crosshairs"></i>
+            </button>
+          {{/if}}
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p class="no-members">{{localize "BOBSNPC.Factions.NoKnownMembers"}}</p>
+  {{/if}}
+</div>

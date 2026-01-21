@@ -1,0 +1,45 @@
+{{!-- Bank Window Footer --}}
+<footer class="bank-footer {{theme}}">
+  <div class="footer-info">
+    {{#if bankHours}}
+      <span class="bank-hours">
+        <i class="fa-solid fa-clock"></i>
+        {{bankHours}}
+      </span>
+    {{/if}}
+
+    {{#if interestPayoutDate}}
+      <span class="interest-payout" data-tooltip="{{localize 'BOBSNPC.Bank.NextInterestPayout'}}">
+        <i class="fa-solid fa-calendar"></i>
+        {{interestPayoutDate}}
+      </span>
+    {{/if}}
+  </div>
+
+  <div class="footer-actions">
+    {{#unless hasAccounts}}
+      <button type="button" class="bank-btn primary" data-action="openAccount">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.Bank.OpenAccount"}}
+      </button>
+    {{/unless}}
+
+    <button type="button" class="bank-btn secondary" data-action="closeBank">
+      {{localize "BOBSNPC.Bank.Leave"}}
+    </button>
+  </div>
+
+  {{#if isGM}}
+    <div class="gm-controls">
+      <button type="button" class="gm-btn" data-action="editBank" data-tooltip="{{localize 'BOBSNPC.Bank.EditBank'}}">
+        <i class="fa-solid fa-edit"></i>
+      </button>
+      <button type="button" class="gm-btn" data-action="viewAllAccounts" data-tooltip="{{localize 'BOBSNPC.Bank.ViewAllAccounts'}}">
+        <i class="fa-solid fa-users"></i>
+      </button>
+      <button type="button" class="gm-btn" data-action="processInterest" data-tooltip="{{localize 'BOBSNPC.Bank.ProcessInterest'}}">
+        <i class="fa-solid fa-percentage"></i>
+      </button>
+    </div>
+  {{/if}}
+</footer>

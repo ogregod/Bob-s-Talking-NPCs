@@ -1,0 +1,63 @@
+{{!-- Shop Window Tabs --}}
+<nav class="shop-tabs {{theme}}">
+  <button type="button" class="shop-tab {{#if (eq activeTab 'buy')}}active{{/if}}"
+          data-action="setTab" data-tab="buy">
+    <i class="fa-solid fa-shopping-cart"></i>
+    <span>{{localize "BOBSNPC.Shop.Buy"}}</span>
+    {{#if buyItemCount}}
+      <span class="tab-count">{{buyItemCount}}</span>
+    {{/if}}
+  </button>
+
+  <button type="button" class="shop-tab {{#if (eq activeTab 'sell')}}active{{/if}}"
+          data-action="setTab" data-tab="sell">
+    <i class="fa-solid fa-hand-holding-dollar"></i>
+    <span>{{localize "BOBSNPC.Shop.Sell"}}</span>
+    {{#if sellItemCount}}
+      <span class="tab-count">{{sellItemCount}}</span>
+    {{/if}}
+  </button>
+
+  {{#if hasServices}}
+    <button type="button" class="shop-tab {{#if (eq activeTab 'services')}}active{{/if}}"
+            data-action="setTab" data-tab="services">
+      <i class="fa-solid fa-concierge-bell"></i>
+      <span>{{localize "BOBSNPC.Shop.Services"}}</span>
+    </button>
+  {{/if}}
+
+  {{#if hasBuyback}}
+    <button type="button" class="shop-tab {{#if (eq activeTab 'buyback')}}active{{/if}}"
+            data-action="setTab" data-tab="buyback">
+      <i class="fa-solid fa-rotate-left"></i>
+      <span>{{localize "BOBSNPC.Shop.Buyback"}}</span>
+      {{#if buybackCount}}
+        <span class="tab-count">{{buybackCount}}</span>
+      {{/if}}
+    </button>
+  {{/if}}
+
+  {{!-- Category Filters (shown when on buy tab) --}}
+  {{#if (eq activeTab 'buy')}}
+    <div class="category-filters">
+      <button type="button" class="category-btn {{#if (eq categoryFilter 'all')}}active{{/if}}"
+              data-action="setCategory" data-category="all">
+        {{localize "BOBSNPC.Shop.AllItems"}}
+      </button>
+      {{#each categories}}
+        <button type="button" class="category-btn {{#if this.active}}active{{/if}}"
+                data-action="setCategory" data-category="{{this.id}}">
+          <i class="fa-solid {{this.icon}}"></i>
+          {{this.label}}
+        </button>
+      {{/each}}
+    </div>
+  {{/if}}
+
+  {{!-- Search --}}
+  <div class="shop-search">
+    <i class="fa-solid fa-search"></i>
+    <input type="text" name="search" placeholder="{{localize 'BOBSNPC.Shop.SearchItems'}}"
+           value="{{searchTerm}}" data-action="search" />
+  </div>
+</nav>

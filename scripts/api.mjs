@@ -7,6 +7,24 @@ import { MODULE_ID } from "./module.mjs";
 import { emit, SocketEvents, getActiveDialogue } from "./socket.mjs";
 import { getSetting } from "./settings.mjs";
 
+// Import UI applications
+import { DialogueWindow } from "./apps/dialogue-window.mjs";
+import { QuestLog } from "./apps/quest-log.mjs";
+import { QuestTracker } from "./apps/quest-tracker.mjs";
+import { ShopWindow } from "./apps/shop-window.mjs";
+import { BankWindow } from "./apps/bank-window.mjs";
+import { FactionWindow } from "./apps/faction-window.mjs";
+import { HirelingManager } from "./apps/hireling-manager.mjs";
+import { PropertyManager } from "./apps/property-manager.mjs";
+import { NPCConfig } from "./apps/npc-config.mjs";
+import { GMDashboard } from "./apps/gm-dashboard.mjs";
+
+/**
+ * Singleton instances of UI applications
+ * @type {Map<string, ApplicationV2>}
+ */
+const appInstances = new Map();
+
 /**
  * Main API class exposed at game.bobsnpc
  */
@@ -641,26 +659,187 @@ class EventsAPI {
  * UI API
  */
 class UIAPI {
+  /**
+   * Open the quest log window
+   * @param {string} playerUuid - Optional player UUID to show quests for
+   */
   openQuestLog(playerUuid = null) {
     Hooks.call(`${MODULE_ID}.openQuestLog`, { playerUuid });
-    // Implementation: open QuestLogApp
+
+    let questLog = appInstances.get("questLog");
+    if (!questLog) {
+      questLog = new QuestLog({ playerUuid });
+      appInstances.set("questLog", questLog);
+    }
+    questLog.render(true);
     console.log(`${MODULE_ID} | Opening quest log`);
   }
 
+  /**
+   * Open the quest tracker HUD
+   */
+  openQuestTracker() {
+    let tracker = appInstances.get("questTracker");
+    if (!tracker) {
+      tracker = new QuestTracker();
+      appInstances.set("questTracker", tracker);
+    }
+    tracker.render(true);
+    console.log(`${MODULE_ID} | Opening quest tracker`);
+  }
+
+  /**
+   * Close the quest tracker HUD
+   */
+  closeQuestTracker() {
+    const tracker = appInstances.get("questTracker");
+    if (tracker) {
+      tracker.close();
+    }
+  }
+
+  /**
+   * Open the faction window
+   * @param {string} playerUuid - Optional player UUID to show factions for
+   */
   openFactionOverview(playerUuid = null) {
     Hooks.call(`${MODULE_ID}.openFactionOverview`, { playerUuid });
-    // Implementation: open FactionOverviewApp
+
+    let factionWindow = appInstances.get("factionWindow");
+    if (!factionWindow) {
+      factionWindow = new FactionWindow({ playerUuid });
+      appInstances.set("factionWindow", factionWindow);
+    }
+    factionWindow.render(true);
     console.log(`${MODULE_ID} | Opening faction overview`);
   }
 
+  /**
+   * Open dialogue window with an NPC
+   * @param {Actor} npc - The NPC actor
+   * @param {object} options - Dialogue options
+   */
+  async openDialogue(npc, options = {}) {
+    Hooks.call(`${MODULE_ID}.openDialogueWindow`, { npc, options });
+
+    // Create new dialogue window for each conversation
+    const dialogueWindow = new DialogueWindow({ npc, ...options });
+    dialogueWindow.render(true);
+    console.log(`${MODULE_ID} | Opening dialogue with ${npc.name}`);
+    return dialogueWindow;
+  }
+
+  /**
+   * Open shop window
+   * @param {Actor} merchant - The merchant NPC
+   * @param {Actor} customer - The customer actor
+   */
+  async openShop(merchant, customer = null) {
+    Hooks.call(`${MODULE_ID}.openShop`, { merchant, customer });
+
+    const shopWindow = new ShopWindow({ merchant, customer });
+    shopWindow.render(true);
+    console.log(`${MODULE_ID} | Opening shop for ${merchant.name}`);
+    return shopWindow;
+  }
+
+  /**
+   * Open bank window
+   * @param {Actor} banker - The banker NPC
+   * @param {Actor} customer - The customer actor
+   */
+  async openBank(banker, customer = null) {
+    Hooks.call(`${MODULE_ID}.openBank`, { banker, customer });
+
+    const bankWindow = new BankWindow({ banker, customer });
+    bankWindow.render(true);
+    console.log(`${MODULE_ID} | Opening bank for ${banker.name}`);
+    return bankWindow;
+  }
+
+  /**
+   * Open the hireling manager
+   * @param {Actor} employer - The employer actor
+   */
+  openHirelingManager(employer = null) {
+    let hirelingManager = appInstances.get("hirelingManager");
+    if (!hirelingManager) {
+      hirelingManager = new HirelingManager({ employer });
+      appInstances.set("hirelingManager", hirelingManager);
+    }
+    hirelingManager.render(true);
+    console.log(`${MODULE_ID} | Opening hireling manager`);
+  }
+
+  /**
+   * Open the property manager
+   * @param {Actor} owner - The property owner
+   */
+  openPropertyManager(owner = null) {
+    let propertyManager = appInstances.get("propertyManager");
+    if (!propertyManager) {
+      propertyManager = new PropertyManager({ owner });
+      appInstances.set("propertyManager", propertyManager);
+    }
+    propertyManager.render(true);
+    console.log(`${MODULE_ID} | Opening property manager`);
+  }
+
+  /**
+   * Open NPC configuration window (GM only)
+   * @param {Actor} npc - The NPC to configure
+   */
+  openNPCConfig(npc) {
+    if (!game.user.isGM) {
+      ui.notifications.warn(game.i18n.localize("BOBSNPC.Errors.GMOnly"));
+      return;
+    }
+
+    // Create new config window for each NPC
+    const npcConfig = new NPCConfig({ npc });
+    npcConfig.render(true);
+    console.log(`${MODULE_ID} | Opening NPC config for ${npc.name}`);
+    return npcConfig;
+  }
+
+  /**
+   * Open GM Dashboard (GM only)
+   */
   openGmDashboard() {
     if (!game.user.isGM) {
-      ui.notifications.warn("Only GMs can access the dashboard");
+      ui.notifications.warn(game.i18n.localize("BOBSNPC.Errors.GMOnly"));
       return;
     }
     Hooks.call(`${MODULE_ID}.openGmDashboard`);
-    // Implementation: open GMDashboardApp
+
+    let dashboard = appInstances.get("gmDashboard");
+    if (!dashboard) {
+      dashboard = new GMDashboard();
+      appInstances.set("gmDashboard", dashboard);
+    }
+    dashboard.render(true);
     console.log(`${MODULE_ID} | Opening GM dashboard`);
+  }
+
+  /**
+   * Close all open module windows
+   */
+  closeAll() {
+    for (const [key, app] of appInstances) {
+      if (app?.rendered) {
+        app.close();
+      }
+    }
+    console.log(`${MODULE_ID} | All windows closed`);
+  }
+
+  /**
+   * Get a specific app instance
+   * @param {string} appId - The app identifier
+   * @returns {ApplicationV2|null}
+   */
+  getApp(appId) {
+    return appInstances.get(appId) || null;
   }
 
   /**

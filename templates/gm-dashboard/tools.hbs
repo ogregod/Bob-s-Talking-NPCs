@@ -1,0 +1,88 @@
+{{!-- GM Dashboard - Tools Tab --}}
+<div class="tab-content tools-tab {{theme}}" {{#unless (eq activeTab 'tools')}}hidden{{/unless}}>
+  {{#with tools}}
+    {{!-- Module Info --}}
+    <section class="tools-section">
+      <h3>{{localize "BOBSNPC.GMDashboard.ModuleInfo"}}</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">{{localize "BOBSNPC.GMDashboard.ModuleVersion"}}</span>
+          <span class="info-value">{{moduleVersion}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{{localize "BOBSNPC.GMDashboard.FoundryVersion"}}</span>
+          <span class="info-value">{{foundryVersion}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{{localize "BOBSNPC.GMDashboard.SystemVersion"}}</span>
+          <span class="info-value">{{systemVersion}}</span>
+        </div>
+      </div>
+    </section>
+
+    {{!-- Backup & Restore --}}
+    <section class="tools-section">
+      <h3>{{localize "BOBSNPC.GMDashboard.BackupRestore"}}</h3>
+      <p class="section-hint">{{localize "BOBSNPC.GMDashboard.BackupHint"}}</p>
+      <div class="button-group">
+        <button type="button" class="tool-btn" data-action="createBackup">
+          <i class="fa-solid fa-download"></i>
+          {{localize "BOBSNPC.GMDashboard.CreateBackup"}}
+        </button>
+        <button type="button" class="tool-btn" data-action="restoreBackup">
+          <i class="fa-solid fa-upload"></i>
+          {{localize "BOBSNPC.GMDashboard.RestoreBackup"}}
+        </button>
+      </div>
+    </section>
+
+    {{!-- Import & Export --}}
+    <section class="tools-section">
+      <h3>{{localize "BOBSNPC.GMDashboard.ImportExport"}}</h3>
+      <p class="section-hint">{{localize "BOBSNPC.GMDashboard.ImportExportHint"}}</p>
+
+      <div class="export-options">
+        <h4>{{localize "BOBSNPC.GMDashboard.Export"}}</h4>
+        <div class="button-group">
+          <button type="button" class="tool-btn" data-action="exportData" data-export-type="world">
+            <i class="fa-solid fa-globe"></i>
+            {{localize "BOBSNPC.GMDashboard.ExportWorld"}}
+          </button>
+          <button type="button" class="tool-btn" data-action="exportData" data-export-type="pack">
+            <i class="fa-solid fa-box"></i>
+            {{localize "BOBSNPC.GMDashboard.ExportPack"}}
+          </button>
+        </div>
+      </div>
+
+      <div class="import-options">
+        <h4>{{localize "BOBSNPC.GMDashboard.Import"}}</h4>
+        <div class="button-group">
+          <button type="button" class="tool-btn" data-action="importData">
+            <i class="fa-solid fa-file-import"></i>
+            {{localize "BOBSNPC.GMDashboard.ImportData"}}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    {{!-- Documentation Links --}}
+    <section class="tools-section">
+      <h3>{{localize "BOBSNPC.GMDashboard.Documentation"}}</h3>
+      <div class="link-list">
+        <a href="https://github.com/your-repo/bobs-talking-npcs/wiki" target="_blank" class="doc-link">
+          <i class="fa-solid fa-book"></i>
+          {{localize "BOBSNPC.GMDashboard.UserGuide"}}
+        </a>
+        <a href="https://github.com/your-repo/bobs-talking-npcs/wiki/API" target="_blank" class="doc-link">
+          <i class="fa-solid fa-code"></i>
+          {{localize "BOBSNPC.GMDashboard.APIReference"}}
+        </a>
+        <a href="https://github.com/your-repo/bobs-talking-npcs/issues" target="_blank" class="doc-link">
+          <i class="fa-solid fa-bug"></i>
+          {{localize "BOBSNPC.GMDashboard.ReportIssue"}}
+        </a>
+      </div>
+    </section>
+  {{/with}}
+</div>

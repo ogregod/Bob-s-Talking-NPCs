@@ -1,0 +1,111 @@
+{{!-- Shop Cart Panel --}}
+<aside class="shop-cart {{theme}} {{#if cartEmpty}}empty{{/if}}">
+  <header class="cart-header">
+    <h3>
+      <i class="fa-solid fa-shopping-cart"></i>
+      {{#if (eq activeTab 'sell')}}
+        {{localize "BOBSNPC.Shop.SellCart"}}
+      {{else}}
+        {{localize "BOBSNPC.Shop.Cart"}}
+      {{/if}}
+    </h3>
+    {{#unless cartEmpty}}
+      <button type="button" class="clear-cart-btn" data-action="clearCart" data-tooltip="{{localize 'BOBSNPC.Shop.ClearCart'}}">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    {{/unless}}
+  </header>
+
+  <div class="cart-items">
+    {{#if cartEmpty}}
+      <div class="cart-empty">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <p>{{localize "BOBSNPC.Shop.CartEmpty"}}</p>
+      </div>
+    {{else}}
+      <ul class="cart-list">
+        {{#each cartItems}}
+          <li class="cart-item" data-item-id="{{this.id}}">
+            <img src="{{this.img}}" alt="{{this.name}}" class="cart-item-img" />
+
+            <div class="cart-item-info">
+              <span class="cart-item-name">{{this.name}}</span>
+              <span class="cart-item-price">{{this.unitPrice}} gp each</span>
+            </div>
+
+            <div class="cart-item-quantity">
+              <button type="button" class="qty-btn" data-action="decrementQuantity" data-item-id="{{this.id}}">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+              <input type="number" class="qty-input" value="{{this.quantity}}" min="1" max="{{this.maxQuantity}}"
+                     data-action="setQuantity" data-item-id="{{this.id}}" />
+              <button type="button" class="qty-btn" data-action="incrementQuantity" data-item-id="{{this.id}}"
+                      {{#if this.atMax}}disabled{{/if}}>
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+
+            <div class="cart-item-total">
+              {{this.totalPrice}} gp
+            </div>
+
+            <button type="button" class="remove-btn" data-action="removeFromCart" data-item-id="{{this.id}}">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </li>
+        {{/each}}
+      </ul>
+    {{/if}}
+  </div>
+
+  {{#unless cartEmpty}}
+    <div class="cart-summary">
+      {{#if hasDiscount}}
+        <div class="summary-row discount">
+          <span>{{localize "BOBSNPC.Shop.Discount"}}</span>
+          <span class="discount-amount">-{{discountAmount}} gp</span>
+        </div>
+      {{/if}}
+
+      <div class="summary-row subtotal">
+        <span>{{localize "BOBSNPC.Shop.Subtotal"}}</span>
+        <span>{{subtotal}} gp</span>
+      </div>
+
+      {{#if hasTax}}
+        <div class="summary-row tax">
+          <span>{{localize "BOBSNPC.Shop.Tax"}} ({{taxRate}}%)</span>
+          <span>{{taxAmount}} gp</span>
+        </div>
+      {{/if}}
+
+      <div class="summary-row total">
+        <span>{{localize "BOBSNPC.Shop.Total"}}</span>
+        <span class="total-amount {{#unless canAfford}}insufficient{{/unless}}">{{total}} gp</span>
+      </div>
+
+      {{#unless canAfford}}
+        <div class="insufficient-funds">
+          <i class="fa-solid fa-exclamation-triangle"></i>
+          <span>{{localize "BOBSNPC.Shop.InsufficientFunds"}}</span>
+        </div>
+      {{/unless}}
+    </div>
+
+    {{!-- Haggling Section --}}
+    {{#if hagglingEnabled}}
+      <div class="haggling-section">
+        <button type="button" class="haggle-btn" data-action="attemptHaggle"
+                {{#if hagglingOnCooldown}}disabled data-tooltip="{{localize 'BOBSNPC.Shop.HagglingCooldown'}}"{{/if}}>
+          <i class="fa-solid fa-handshake"></i>
+          {{localize "BOBSNPC.Shop.Haggle"}}
+        </button>
+        {{#if lastHaggleResult}}
+          <span class="haggle-result {{lastHaggleResult.success}}">
+            {{lastHaggleResult.message}}
+          </span>
+        {{/if}}
+      </div>
+    {{/if}}
+  {{/unless}}
+</aside>

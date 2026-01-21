@@ -1,0 +1,70 @@
+{{!-- Shop Window Footer --}}
+<footer class="shop-footer {{theme}}">
+  <div class="footer-info">
+    {{#if shopHours}}
+      <span class="shop-hours" data-tooltip="{{localize 'BOBSNPC.Shop.Hours'}}">
+        <i class="fa-solid fa-clock"></i>
+        {{shopHours}}
+      </span>
+    {{/if}}
+
+    {{#if restockInfo}}
+      <span class="restock-info" data-tooltip="{{localize 'BOBSNPC.Shop.NextRestock'}}">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        {{restockInfo}}
+      </span>
+    {{/if}}
+  </div>
+
+  <div class="footer-actions">
+    {{#if (eq activeTab 'buy')}}
+      <button type="button" class="shop-btn secondary" data-action="closeShop">
+        {{localize "BOBSNPC.Shop.Leave"}}
+      </button>
+      <button type="button" class="shop-btn primary" data-action="checkout"
+              {{#unless canCheckout}}disabled{{/unless}}>
+        <i class="fa-solid fa-cash-register"></i>
+        {{#if cartEmpty}}
+          {{localize "BOBSNPC.Shop.CartEmpty"}}
+        {{else if canAfford}}
+          {{localize "BOBSNPC.Shop.Purchase"}} ({{total}} gp)
+        {{else}}
+          {{localize "BOBSNPC.Shop.InsufficientFunds"}}
+        {{/if}}
+      </button>
+
+    {{else if (eq activeTab 'sell')}}
+      <button type="button" class="shop-btn secondary" data-action="closeShop">
+        {{localize "BOBSNPC.Shop.Leave"}}
+      </button>
+      <button type="button" class="shop-btn primary" data-action="sellItems"
+              {{#if cartEmpty}}disabled{{/if}}>
+        <i class="fa-solid fa-hand-holding-dollar"></i>
+        {{#if cartEmpty}}
+          {{localize "BOBSNPC.Shop.SelectItemsToSell"}}
+        {{else}}
+          {{localize "BOBSNPC.Shop.Sell"}} (+{{total}} gp)
+        {{/if}}
+      </button>
+
+    {{else}}
+      <button type="button" class="shop-btn secondary" data-action="closeShop">
+        {{localize "BOBSNPC.Shop.Leave"}}
+      </button>
+    {{/if}}
+  </div>
+
+  {{#if isGM}}
+    <div class="gm-controls">
+      <button type="button" class="gm-btn" data-action="editShop" data-tooltip="{{localize 'BOBSNPC.Shop.EditShop'}}">
+        <i class="fa-solid fa-edit"></i>
+      </button>
+      <button type="button" class="gm-btn" data-action="restockShop" data-tooltip="{{localize 'BOBSNPC.Shop.Restock'}}">
+        <i class="fa-solid fa-boxes-stacked"></i>
+      </button>
+      <button type="button" class="gm-btn" data-action="viewTransactions" data-tooltip="{{localize 'BOBSNPC.Shop.ViewTransactions'}}">
+        <i class="fa-solid fa-receipt"></i>
+      </button>
+    </div>
+  {{/if}}
+</footer>

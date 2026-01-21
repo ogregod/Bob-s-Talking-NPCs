@@ -1,0 +1,215 @@
+{{!-- Quest Log Details Panel --}}
+<main class="quest-details {{theme}}">
+  {{#if selectedQuest}}
+    <article class="quest-detail-view">
+      {{!-- Quest Header --}}
+      <header class="quest-header">
+        <div class="quest-title-row">
+          <i class="fa-solid {{selectedQuest.icon}} quest-icon" style="color: {{selectedQuest.color}}"></i>
+          <h2 class="quest-title">{{selectedQuest.name}}</h2>
+          {{#if selectedQuest.level}}
+            <span class="quest-level" data-tooltip="{{localize 'BOBSNPC.Quests.RecommendedLevel'}}">
+              Lv. {{selectedQuest.level}}
+            </span>
+          {{/if}}
+        </div>
+
+        <div class="quest-meta">
+          <span class="quest-type">
+            <i class="fa-solid {{selectedQuest.typeIcon}}"></i>
+            {{selectedQuest.typeLabel}}
+          </span>
+          <span class="quest-status status-{{selectedQuest.status}}">
+            {{selectedQuest.statusLabel}}
+          </span>
+          {{#if selectedQuest.timeLimit}}
+            <span class="quest-timer {{#if selectedQuest.isUrgent}}urgent{{/if}}">
+              <i class="fa-solid fa-clock"></i>
+              {{selectedQuest.timeRemaining}}
+            </span>
+          {{/if}}
+        </div>
+
+        <div class="quest-actions">
+          <button type="button" class="quest-action-btn {{#if selectedQuest.isTracked}}active{{/if}}"
+                  data-action="trackQuest" data-quest-id="{{selectedQuest.id}}"
+                  data-tooltip="{{#if selectedQuest.isTracked}}{{localize 'BOBSNPC.Quests.Untrack'}}{{else}}{{localize 'BOBSNPC.Quests.Track'}}{{/if}}">
+            <i class="fa-solid fa-location-dot"></i>
+          </button>
+          {{#if selectedQuest.canShare}}
+            <button type="button" class="quest-action-btn" data-action="shareQuest" data-quest-id="{{selectedQuest.id}}"
+                    data-tooltip="{{localize 'BOBSNPC.Quests.Share'}}">
+              <i class="fa-solid fa-share-nodes"></i>
+            </button>
+          {{/if}}
+          {{#if selectedQuest.canAbandon}}
+            <button type="button" class="quest-action-btn danger" data-action="abandonQuest" data-quest-id="{{selectedQuest.id}}"
+                    data-tooltip="{{localize 'BOBSNPC.Quests.Abandon'}}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          {{/if}}
+        </div>
+      </header>
+
+      {{!-- Quest Description --}}
+      <section class="quest-description">
+        <p>{{{selectedQuest.description}}}</p>
+      </section>
+
+      {{!-- Quest Giver --}}
+      {{#if selectedQuest.giver}}
+        <section class="quest-giver">
+          <h4>{{localize "BOBSNPC.Quests.QuestGiver"}}</h4>
+          <div class="giver-info">
+            {{#if selectedQuest.giver.portrait}}
+              <img src="{{selectedQuest.giver.portrait}}" alt="{{selectedQuest.giver.name}}" class="giver-portrait" />
+            {{/if}}
+            <div class="giver-details">
+              <span class="giver-name">{{selectedQuest.giver.name}}</span>
+              {{#if selectedQuest.giver.location}}
+                <span class="giver-location">
+                  <i class="fa-solid fa-map-marker-alt"></i>
+                  {{selectedQuest.giver.location}}
+                </span>
+              {{/if}}
+            </div>
+          </div>
+        </section>
+      {{/if}}
+
+      {{!-- Objectives --}}
+      <section class="quest-objectives">
+        <h4>
+          {{localize "BOBSNPC.Quests.Objectives"}}
+          <span class="objective-progress">{{selectedQuest.completedObjectives}}/{{selectedQuest.totalObjectives}}</span>
+        </h4>
+
+        <ul class="objective-list">
+          {{#each selectedQuest.objectives}}
+            <li class="objective-entry {{#if this.completed}}completed{{/if}} {{#if this.failed}}failed{{/if}} {{#if this.optional}}optional{{/if}} {{#unless this.revealed}}hidden{{/unless}}">
+              <div class="objective-checkbox">
+                {{#if this.completed}}
+                  <i class="fa-solid fa-check"></i>
+                {{else if this.failed}}
+                  <i class="fa-solid fa-times"></i>
+                {{else}}
+                  <i class="fa-regular fa-square"></i>
+                {{/if}}
+              </div>
+
+              <div class="objective-content">
+                {{#if this.revealed}}
+                  <span class="objective-text">{{this.description}}</span>
+                  {{#if this.hasProgress}}
+                    <div class="objective-progress-bar">
+                      <div class="progress-fill" style="width: {{this.progressPercent}}%"></div>
+                      <span class="progress-label">{{this.current}}/{{this.target}}</span>
+                    </div>
+                  {{/if}}
+                {{else}}
+                  <span class="objective-text hidden-text">{{localize "BOBSNPC.Quests.HiddenObjective"}}</span>
+                {{/if}}
+
+                {{#if this.optional}}
+                  <span class="optional-badge">{{localize "BOBSNPC.Quests.Optional"}}</span>
+                {{/if}}
+              </div>
+
+              {{#if this.location}}
+                <button type="button" class="objective-location-btn" data-action="showLocation"
+                        data-scene="{{this.location.sceneId}}" data-x="{{this.location.x}}" data-y="{{this.location.y}}"
+                        data-tooltip="{{localize 'BOBSNPC.Quests.ShowOnMap'}}">
+                  <i class="fa-solid fa-map-marker-alt"></i>
+                </button>
+              {{/if}}
+            </li>
+          {{/each}}
+        </ul>
+      </section>
+
+      {{!-- Overall Progress --}}
+      <section class="quest-progress-section">
+        <div class="progress-bar large">
+          <div class="progress-fill" style="width: {{selectedQuest.progressPercent}}%"></div>
+        </div>
+        <span class="progress-label">{{selectedQuest.progressPercent}}% {{localize "BOBSNPC.Quests.Complete"}}</span>
+      </section>
+
+      {{!-- Rewards --}}
+      {{#if selectedQuest.hasRewards}}
+        <section class="quest-rewards">
+          <h4>{{localize "BOBSNPC.Quests.Rewards"}}</h4>
+
+          <div class="rewards-grid">
+            {{#if selectedQuest.rewards.experience}}
+              <div class="reward-entry xp">
+                <i class="fa-solid fa-star"></i>
+                <span>{{selectedQuest.rewards.experience}} XP</span>
+              </div>
+            {{/if}}
+
+            {{#if selectedQuest.rewards.gold}}
+              <div class="reward-entry gold">
+                <i class="fa-solid fa-coins"></i>
+                <span>{{selectedQuest.rewards.gold}} gp</span>
+              </div>
+            {{/if}}
+
+            {{#if selectedQuest.rewards.reputation}}
+              {{#each selectedQuest.rewards.reputation}}
+                <div class="reward-entry reputation {{#if (gt this.amount 0)}}positive{{else}}negative{{/if}}">
+                  <i class="fa-solid fa-flag"></i>
+                  <span>{{this.factionName}}: {{#if (gt this.amount 0)}}+{{/if}}{{this.amount}}</span>
+                </div>
+              {{/each}}
+            {{/if}}
+
+            {{#each selectedQuest.rewards.items}}
+              <div class="reward-entry item">
+                <img src="{{this.img}}" alt="{{this.name}}" class="reward-img" />
+                <span>{{this.name}}{{#if this.quantity}} x{{this.quantity}}{{/if}}</span>
+              </div>
+            {{/each}}
+          </div>
+
+          {{#if selectedQuest.rewards.choices}}
+            <div class="reward-choices">
+              <p>{{localize "BOBSNPC.Quests.ChooseReward"}}:</p>
+              {{#each selectedQuest.rewards.choices}}
+                <div class="reward-choice">
+                  <img src="{{this.img}}" alt="{{this.name}}" class="reward-img" />
+                  <span>{{this.name}}</span>
+                </div>
+              {{/each}}
+            </div>
+          {{/if}}
+        </section>
+      {{/if}}
+
+      {{!-- Quest Chain Info --}}
+      {{#if selectedQuest.isChainQuest}}
+        <section class="quest-chain">
+          <h4>{{localize "BOBSNPC.Quests.QuestChain"}}: {{selectedQuest.chainName}}</h4>
+          <div class="chain-progress">
+            <span>{{localize "BOBSNPC.Quests.Part"}} {{selectedQuest.chainIndex}} {{localize "BOBSNPC.Quests.Of"}} {{selectedQuest.chainTotal}}</span>
+          </div>
+        </section>
+      {{/if}}
+
+      {{!-- GM Notes --}}
+      {{#if isGM}}
+        {{#if selectedQuest.gmNotes}}
+          <section class="gm-notes">
+            <h4><i class="fa-solid fa-eye-slash"></i> {{localize "BOBSNPC.Quests.GMNotes"}}</h4>
+            <p>{{{selectedQuest.gmNotes}}}</p>
+          </section>
+        {{/if}}
+      {{/if}}
+    </article>
+  {{else}}
+    <div class="no-quest-selected">
+      <i class="fa-solid fa-hand-pointer"></i>
+      <p>{{localize "BOBSNPC.Quests.SelectQuest"}}</p>
+    </div>
+  {{/if}}
+</main>

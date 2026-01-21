@@ -1,0 +1,634 @@
+/**
+ * Bob's Talking NPCs - Faction Window Styles
+ */
+
+@layer bobsnpc {
+  /* ===== Faction Window Layout ===== */
+  .faction-window {
+    display: flex;
+    height: 100%;
+  }
+
+  /* ===== Sidebar ===== */
+  .faction-sidebar {
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    background: var(--bobsnpc-bg-secondary);
+    border-right: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .faction-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .faction-filters .filter-btn {
+    flex: 1;
+    min-width: calc(50% - var(--bobsnpc-spacing-xs));
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .faction-filters .filter-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .faction-filters .filter-btn.active {
+    background: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .faction-filters .filter-btn.allied.active {
+    background: var(--bobsnpc-relation-allied);
+    border-color: var(--bobsnpc-relation-allied);
+  }
+
+  .faction-filters .filter-btn.neutral.active {
+    background: var(--bobsnpc-relation-neutral);
+    border-color: var(--bobsnpc-relation-neutral);
+  }
+
+  .faction-filters .filter-btn.hostile.active {
+    background: var(--bobsnpc-relation-hostile);
+    border-color: var(--bobsnpc-relation-hostile);
+  }
+
+  .faction-filters .count {
+    margin-left: var(--bobsnpc-spacing-xs);
+    padding: 0 var(--bobsnpc-spacing-xs);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--bobsnpc-border-radius-full);
+    font-size: 10px;
+  }
+
+  /* ===== Faction List ===== */
+  .faction-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-sm);
+  }
+
+  .faction-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .faction-entry:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .faction-entry.selected {
+    border-color: var(--bobsnpc-primary);
+    background: var(--bobsnpc-bg-active);
+  }
+
+  .faction-entry .faction-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-base);
+    color: white;
+  }
+
+  .faction-entry .faction-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .faction-entry .faction-name {
+    display: block;
+    font-weight: var(--bobsnpc-font-weight-medium);
+    font-size: var(--bobsnpc-font-size-sm);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .faction-entry .faction-level {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .faction-entry.standing-allied .faction-level { color: var(--bobsnpc-relation-allied); }
+  .faction-entry.standing-neutral .faction-level { color: var(--bobsnpc-relation-neutral); }
+  .faction-entry.standing-hostile .faction-level { color: var(--bobsnpc-relation-hostile); }
+
+  .faction-entry .faction-rep-bar {
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+
+  .rep-progress {
+    width: 100%;
+    height: 4px;
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-full);
+    overflow: hidden;
+  }
+
+  .faction-entry.standing-allied .rep-progress { background: rgba(0, 188, 212, 0.2); }
+  .faction-entry.standing-allied .rep-progress > div { background: var(--bobsnpc-relation-allied); }
+  .faction-entry.standing-neutral .rep-progress > div { background: var(--bobsnpc-relation-neutral); }
+  .faction-entry.standing-hostile .rep-progress { background: rgba(244, 67, 54, 0.2); }
+  .faction-entry.standing-hostile .rep-progress > div { background: var(--bobsnpc-relation-hostile); }
+
+  .faction-entry .rep-value {
+    font-size: 10px;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .faction-entry .faction-rank {
+    padding: var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-secondary);
+  }
+
+  .no-factions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--bobsnpc-spacing-xl);
+    color: var(--bobsnpc-text-muted);
+    text-align: center;
+  }
+
+  .no-factions i {
+    font-size: 48px;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    opacity: 0.5;
+  }
+
+  /* ===== Details Panel ===== */
+  .faction-details {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .faction-detail-view {
+    max-width: 600px;
+  }
+
+  .faction-header {
+    margin-bottom: var(--bobsnpc-spacing-lg);
+  }
+
+  .faction-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    border-radius: var(--bobsnpc-border-radius-md);
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .faction-emblem {
+    font-size: 48px;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .faction-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--bobsnpc-spacing-sm);
+  }
+
+  .faction-title h2 {
+    margin: 0;
+    font-size: var(--bobsnpc-font-size-xl);
+  }
+
+  .faction-leader {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .faction-leader i {
+    color: var(--bobsnpc-warning);
+  }
+
+  .faction-standing {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .standing-level {
+    font-weight: var(--bobsnpc-font-weight-semibold);
+  }
+
+  .faction-standing.standing-allied .standing-level { color: var(--bobsnpc-relation-allied); }
+  .faction-standing.standing-neutral .standing-level { color: var(--bobsnpc-relation-neutral); }
+  .faction-standing.standing-hostile .standing-level { color: var(--bobsnpc-relation-hostile); }
+
+  .standing-value {
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Reputation Section ===== */
+  .reputation-section {
+    margin-bottom: var(--bobsnpc-spacing-lg);
+  }
+
+  .reputation-section h4 {
+    margin-bottom: var(--bobsnpc-spacing-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .reputation-bar {
+    background: var(--bobsnpc-bg-elevated);
+    border-radius: var(--bobsnpc-border-radius-md);
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .rep-track {
+    height: 16px;
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-full);
+    overflow: hidden;
+    margin-bottom: var(--bobsnpc-spacing-sm);
+  }
+
+  .rep-fill {
+    height: 100%;
+    transition: width var(--bobsnpc-transition-normal);
+  }
+
+  .rep-fill.standing-allied { background: linear-gradient(90deg, var(--bobsnpc-relation-friendly), var(--bobsnpc-relation-allied)); }
+  .rep-fill.standing-neutral { background: var(--bobsnpc-relation-neutral); }
+  .rep-fill.standing-hostile { background: linear-gradient(90deg, var(--bobsnpc-relation-hostile), var(--bobsnpc-relation-hated)); }
+
+  .rep-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .current-rep {
+    font-weight: var(--bobsnpc-font-weight-semibold);
+  }
+
+  .next-level,
+  .max-level {
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Section Styles ===== */
+  .faction-description,
+  .faction-headquarters,
+  .current-rank,
+  .faction-ranks,
+  .faction-benefits,
+  .faction-penalties,
+  .faction-relations {
+    margin-bottom: var(--bobsnpc-spacing-lg);
+  }
+
+  .faction-description p,
+  .faction-headquarters,
+  .current-rank,
+  .faction-benefits,
+  .faction-penalties,
+  .faction-relations {
+    background: var(--bobsnpc-bg-elevated);
+    border-radius: var(--bobsnpc-border-radius-md);
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .faction-description p {
+    margin: 0;
+    line-height: var(--bobsnpc-line-height-relaxed);
+  }
+
+  .headquarters-info {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .headquarters-info i {
+    color: var(--bobsnpc-primary);
+  }
+
+  .current-rank h4,
+  .faction-ranks h4,
+  .faction-benefits h4,
+  .faction-penalties h4,
+  .faction-relations h4 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--bobsnpc-spacing-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .section-action {
+    padding: var(--bobsnpc-spacing-xs);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+  }
+
+  .section-action:hover {
+    color: var(--bobsnpc-primary);
+  }
+
+  .rank-display {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    font-size: var(--bobsnpc-font-size-lg);
+  }
+
+  .rank-display i {
+    color: var(--bobsnpc-secondary);
+  }
+
+  .rank-name {
+    font-weight: var(--bobsnpc-font-weight-semibold);
+  }
+
+  /* ===== Ranks Track ===== */
+  .ranks-track {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+    overflow-x: auto;
+    padding: var(--bobsnpc-spacing-sm) 0;
+  }
+
+  .rank-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    min-width: 80px;
+    text-align: center;
+    opacity: 0.5;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .rank-marker.achieved {
+    opacity: 1;
+    border-color: var(--bobsnpc-success);
+  }
+
+  .rank-marker.current {
+    opacity: 1;
+    background: var(--bobsnpc-secondary);
+    border-color: var(--bobsnpc-secondary);
+    color: white;
+  }
+
+  .rank-marker.locked {
+    opacity: 0.3;
+  }
+
+  .rank-marker i {
+    font-size: var(--bobsnpc-font-size-lg);
+  }
+
+  .rank-marker .rank-name {
+    font-size: var(--bobsnpc-font-size-xs);
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  /* ===== Benefits & Penalties ===== */
+  .benefits-list,
+  .penalties-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .benefit-entry,
+  .penalty-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm) 0;
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .benefit-entry:last-child,
+  .penalty-entry:last-child {
+    border-bottom: none;
+  }
+
+  .benefit-entry i {
+    color: var(--bobsnpc-success);
+  }
+
+  .penalty-entry i {
+    color: var(--bobsnpc-error);
+  }
+
+  /* ===== Relations ===== */
+  .relations-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .relation-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .related-faction {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    flex: 1;
+  }
+
+  .relation-type {
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-xs);
+  }
+
+  .relation-entry.relation-allied .relation-type {
+    background: rgba(0, 188, 212, 0.2);
+    color: var(--bobsnpc-relation-allied);
+  }
+
+  .relation-entry.relation-friendly .relation-type {
+    background: rgba(76, 175, 80, 0.2);
+    color: var(--bobsnpc-relation-friendly);
+  }
+
+  .relation-entry.relation-hostile .relation-type {
+    background: rgba(244, 67, 54, 0.2);
+    color: var(--bobsnpc-relation-hostile);
+  }
+
+  .relation-effect {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Actions ===== */
+  .faction-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--bobsnpc-spacing-sm);
+    margin-top: var(--bobsnpc-spacing-lg);
+  }
+
+  .faction-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .faction-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .faction-btn.gm {
+    background: var(--bobsnpc-bg-tertiary);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .faction-btn.gm:hover {
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .no-faction-selected {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--bobsnpc-text-muted);
+    text-align: center;
+  }
+
+  .no-faction-selected i {
+    font-size: 48px;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    opacity: 0.5;
+  }
+
+  /* ===== Members Dialog ===== */
+  .faction-members-dialog {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .members-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .member-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .member-entry:last-child {
+    border-bottom: none;
+  }
+
+  .member-portrait {
+    width: var(--bobsnpc-avatar-sm);
+    height: var(--bobsnpc-avatar-sm);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    object-fit: cover;
+  }
+
+  .member-info {
+    flex: 1;
+  }
+
+  .member-name {
+    display: block;
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .member-rank,
+  .member-location {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .pan-btn {
+    padding: var(--bobsnpc-spacing-xs);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+  }
+
+  .pan-btn:hover {
+    color: var(--bobsnpc-primary);
+  }
+
+  .no-members {
+    text-align: center;
+    padding: var(--bobsnpc-spacing-lg);
+    color: var(--bobsnpc-text-muted);
+  }
+}

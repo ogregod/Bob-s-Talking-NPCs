@@ -1,0 +1,73 @@
+{{!-- NPC Config - Dialogue Tab --}}
+<div class="tab-content dialogue-tab {{theme}}" {{#unless (eq activeTab 'dialogue')}}hidden{{/unless}}>
+  <section class="config-section">
+    <h3>{{localize "BOBSNPC.NPCConfig.AssignedDialogues"}}</h3>
+    <p class="section-hint">{{localize "BOBSNPC.NPCConfig.DialoguesHint"}}</p>
+
+    {{#if dialoguesDisplay.length}}
+      <ul class="dialogues-list">
+        {{#each dialoguesDisplay}}
+          <li class="dialogue-entry {{#if this.isDefault}}default{{/if}}">
+            <div class="dialogue-info">
+              <i class="fa-solid fa-comments"></i>
+              <div class="dialogue-text">
+                <span class="dialogue-name">{{this.name}}</span>
+                {{#if this.description}}
+                  <span class="dialogue-description">{{this.description}}</span>
+                {{/if}}
+              </div>
+              {{#if this.isDefault}}
+                <span class="default-badge">{{localize "BOBSNPC.NPCConfig.Default"}}</span>
+              {{/if}}
+            </div>
+            <div class="dialogue-actions">
+              {{#unless this.isDefault}}
+                <button type="button" class="dialogue-btn" data-action="setDefaultDialogue" data-dialogue-id="{{this.id}}"
+                        data-tooltip="{{localize 'BOBSNPC.NPCConfig.SetDefault'}}">
+                  <i class="fa-solid fa-star"></i>
+                </button>
+              {{/unless}}
+              <button type="button" class="dialogue-btn" data-action="editDialogue" data-dialogue-id="{{this.id}}"
+                      data-tooltip="{{localize 'BOBSNPC.NPCConfig.Edit'}}">
+                <i class="fa-solid fa-edit"></i>
+              </button>
+              <button type="button" class="dialogue-btn danger" data-action="removeDialogue" data-index="{{this.index}}"
+                      data-tooltip="{{localize 'BOBSNPC.NPCConfig.Remove'}}">
+                <i class="fa-solid fa-times"></i>
+              </button>
+            </div>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <div class="empty-state">
+        <i class="fa-solid fa-comments"></i>
+        <p>{{localize "BOBSNPC.NPCConfig.NoDialogues"}}</p>
+      </div>
+    {{/if}}
+  </section>
+
+  <section class="config-section">
+    <h3>{{localize "BOBSNPC.NPCConfig.AddDialogue"}}</h3>
+
+    <div class="add-dialogue-form">
+      <select name="newDialogue">
+        <option value="">{{localize "BOBSNPC.NPCConfig.SelectDialogue"}}</option>
+        {{#each availableDialogues}}
+          <option value="{{this.id}}">{{this.name}}</option>
+        {{/each}}
+      </select>
+      <button type="button" class="add-btn" data-action="addDialogue">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.NPCConfig.Add"}}
+      </button>
+    </div>
+
+    <div class="create-dialogue-action">
+      <button type="button" class="create-btn" data-action="createDialogue">
+        <i class="fa-solid fa-plus-circle"></i>
+        {{localize "BOBSNPC.NPCConfig.CreateNewDialogue"}}
+      </button>
+    </div>
+  </section>
+</div>

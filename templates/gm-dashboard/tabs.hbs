@@ -1,0 +1,18 @@
+{{!-- GM Dashboard - Tabs Navigation --}}
+<nav class="dashboard-tabs {{theme}}">
+  {{#each tabs}}
+    <button type="button"
+            class="dashboard-tab {{#if (eq this.id ../activeTab)}}active{{/if}}"
+            data-action="changeTab"
+            data-tab="{{this.id}}">
+      <i class="fa-solid {{this.icon}}"></i>
+      <span>{{localize this.label}}</span>
+    </button>
+  {{/each}}
+
+  <div class="tab-actions">
+    <button type="button" class="refresh-btn" data-action="refreshData" title="{{localize 'BOBSNPC.GMDashboard.Refresh'}}">
+      <i class="fa-solid fa-sync"></i>
+    </button>
+  </div>
+</nav>

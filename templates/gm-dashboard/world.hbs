@@ -1,0 +1,96 @@
+{{!-- GM Dashboard - World Tab --}}
+<div class="tab-content world-tab {{theme}}" {{#unless (eq activeTab 'world')}}hidden{{/unless}}>
+  {{#with world}}
+    {{!-- World State Section --}}
+    <section class="world-section">
+      <header class="section-header">
+        <h3>{{localize "BOBSNPC.GMDashboard.WorldState"}}</h3>
+        <button type="button" class="add-btn" data-action="setWorldState">
+          <i class="fa-solid fa-plus"></i>
+          {{localize "BOBSNPC.GMDashboard.AddVariable"}}
+        </button>
+      </header>
+
+      {{#if worldState.length}}
+        <table class="state-table">
+          <thead>
+            <tr>
+              <th>{{localize "BOBSNPC.GMDashboard.Key"}}</th>
+              <th>{{localize "BOBSNPC.GMDashboard.Value"}}</th>
+              <th>{{localize "BOBSNPC.GMDashboard.Type"}}</th>
+              <th>{{localize "BOBSNPC.GMDashboard.Actions"}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each worldState}}
+              <tr>
+                <td class="key-cell">
+                  <code>{{this.key}}</code>
+                </td>
+                <td class="value-cell">
+                  <span class="value-text" title="{{this.value}}">{{this.value}}</span>
+                </td>
+                <td>
+                  <span class="type-badge {{this.type}}">{{this.type}}</span>
+                </td>
+                <td class="actions-cell">
+                  <button type="button" class="icon-btn" data-action="setWorldState" data-key="{{this.key}}" title="{{localize 'BOBSNPC.Common.Edit'}}">
+                    <i class="fa-solid fa-edit"></i>
+                  </button>
+                  <button type="button" class="icon-btn danger" data-action="deleteWorldState" data-key="{{this.key}}" title="{{localize 'BOBSNPC.Common.Delete'}}">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      {{else}}
+        <div class="empty-state small">
+          <p>{{localize "BOBSNPC.GMDashboard.NoWorldState"}}</p>
+        </div>
+      {{/if}}
+    </section>
+
+    {{!-- Active Events Section --}}
+    <section class="world-section">
+      <header class="section-header">
+        <h3>{{localize "BOBSNPC.GMDashboard.ActiveEvents"}}</h3>
+        <button type="button" class="add-btn" data-action="triggerEvent">
+          <i class="fa-solid fa-bolt"></i>
+          {{localize "BOBSNPC.GMDashboard.TriggerEvent"}}
+        </button>
+      </header>
+
+      {{#if activeEvents.length}}
+        <div class="events-list">
+          {{#each activeEvents}}
+            <div class="event-card">
+              <div class="event-info">
+                <h4 class="event-name">{{this.name}}</h4>
+                <div class="event-meta">
+                  <span class="meta-item">
+                    <i class="fa-solid fa-clock"></i>
+                    {{localize "BOBSNPC.GMDashboard.StartedAt"}}: {{this.startedAt}}
+                  </span>
+                  <span class="meta-item">
+                    <i class="fa-solid fa-hourglass"></i>
+                    {{localize "BOBSNPC.GMDashboard.Duration"}}: {{this.duration}}
+                  </span>
+                </div>
+              </div>
+              <button type="button" class="end-event-btn" data-action="endEvent" data-event-id="{{this.id}}">
+                <i class="fa-solid fa-stop"></i>
+                {{localize "BOBSNPC.GMDashboard.EndEvent"}}
+              </button>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="empty-state small">
+          <p>{{localize "BOBSNPC.GMDashboard.NoActiveEvents"}}</p>
+        </div>
+      {{/if}}
+    </section>
+  {{/with}}
+</div>

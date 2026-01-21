@@ -1,0 +1,170 @@
+{{!-- Shop Inventory Grid --}}
+<section class="shop-inventory {{theme}}">
+  {{#if (eq activeTab 'buy')}}
+    {{!-- Buy Tab --}}
+    {{#if hasItems}}
+      <div class="inventory-grid">
+        {{#each items}}
+          <div class="shop-item {{#if this.soldOut}}sold-out{{/if}} {{#if this.inCart}}in-cart{{/if}}"
+               data-item-id="{{this.id}}" data-item-uuid="{{this.uuid}}">
+
+            <div class="item-image">
+              <img src="{{this.img}}" alt="{{this.name}}" />
+              {{#if this.quantity}}
+                <span class="item-stock">{{this.quantity}}</span>
+              {{/if}}
+              {{#if this.soldOut}}
+                <div class="sold-out-overlay">
+                  <span>{{localize "BOBSNPC.Shop.SoldOut"}}</span>
+                </div>
+              {{/if}}
+            </div>
+
+            <div class="item-info">
+              <span class="item-name" data-tooltip="{{this.description}}">{{this.name}}</span>
+              <span class="item-type">{{this.typeLabel}}</span>
+            </div>
+
+            <div class="item-price">
+              {{#if this.originalPrice}}
+                <span class="original-price">{{this.originalPrice}} gp</span>
+              {{/if}}
+              <span class="current-price {{#if this.discounted}}discounted{{/if}}">
+                {{this.price}} gp
+              </span>
+            </div>
+
+            <div class="item-actions">
+              <button type="button" class="item-btn view-btn" data-action="viewItem" data-item-id="{{this.id}}"
+                      data-tooltip="{{localize 'BOBSNPC.Shop.ViewDetails'}}">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              {{#unless this.soldOut}}
+                <button type="button" class="item-btn add-btn" data-action="addToCart" data-item-id="{{this.id}}"
+                        data-tooltip="{{localize 'BOBSNPC.Shop.AddToCart'}}">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              {{/unless}}
+            </div>
+
+            {{#if this.rarity}}
+              <span class="item-rarity rarity-{{this.rarity}}">{{this.rarityLabel}}</span>
+            {{/if}}
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="empty-inventory">
+        <i class="fa-solid fa-box-open"></i>
+        <p>{{localize "BOBSNPC.Shop.NoItemsAvailable"}}</p>
+      </div>
+    {{/if}}
+
+  {{else if (eq activeTab 'sell')}}
+    {{!-- Sell Tab --}}
+    {{#if hasPlayerItems}}
+      <div class="inventory-grid">
+        {{#each playerItems}}
+          <div class="shop-item player-item {{#if this.inCart}}in-cart{{/if}} {{#unless this.sellable}}not-sellable{{/unless}}"
+               data-item-id="{{this.id}}" data-item-uuid="{{this.uuid}}">
+
+            <div class="item-image">
+              <img src="{{this.img}}" alt="{{this.name}}" />
+              {{#if this.quantity}}
+                <span class="item-stock">{{this.quantity}}</span>
+              {{/if}}
+            </div>
+
+            <div class="item-info">
+              <span class="item-name">{{this.name}}</span>
+              <span class="item-type">{{this.typeLabel}}</span>
+            </div>
+
+            <div class="item-price sell-price">
+              <span class="current-price">{{this.sellPrice}} gp</span>
+              {{#if this.originalSellPrice}}
+                <span class="sell-modifier">({{this.sellModifier}}%)</span>
+              {{/if}}
+            </div>
+
+            <div class="item-actions">
+              {{#if this.sellable}}
+                <button type="button" class="item-btn add-btn" data-action="addToSellCart" data-item-id="{{this.id}}"
+                        data-tooltip="{{localize 'BOBSNPC.Shop.SellItem'}}">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              {{else}}
+                <span class="not-accepted" data-tooltip="{{localize 'BOBSNPC.Shop.NotAccepted'}}">
+                  <i class="fa-solid fa-ban"></i>
+                </span>
+              {{/if}}
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="empty-inventory">
+        <i class="fa-solid fa-backpack"></i>
+        <p>{{localize "BOBSNPC.Shop.NoItemsToSell"}}</p>
+      </div>
+    {{/if}}
+
+  {{else if (eq activeTab 'services')}}
+    {{!-- Services Tab --}}
+    <div class="services-list">
+      {{#each services}}
+        <div class="service-entry">
+          <div class="service-icon">
+            <i class="fa-solid {{this.icon}}"></i>
+          </div>
+          <div class="service-info">
+            <h4 class="service-name">{{this.name}}</h4>
+            <p class="service-description">{{this.description}}</p>
+          </div>
+          <div class="service-price">
+            {{this.price}} gp
+          </div>
+          <button type="button" class="service-btn" data-action="useService" data-service-id="{{this.id}}"
+                  {{#unless this.available}}disabled{{/unless}}>
+            {{#if this.available}}
+              {{localize "BOBSNPC.Shop.UseService"}}
+            {{else}}
+              {{this.unavailableReason}}
+            {{/if}}
+          </button>
+        </div>
+      {{/each}}
+    </div>
+
+  {{else if (eq activeTab 'buyback')}}
+    {{!-- Buyback Tab --}}
+    {{#if hasBuybackItems}}
+      <div class="inventory-grid">
+        {{#each buybackItems}}
+          <div class="shop-item buyback-item" data-item-id="{{this.id}}">
+            <div class="item-image">
+              <img src="{{this.img}}" alt="{{this.name}}" />
+            </div>
+            <div class="item-info">
+              <span class="item-name">{{this.name}}</span>
+              <span class="sold-time">{{this.timeAgo}}</span>
+            </div>
+            <div class="item-price">
+              <span class="current-price">{{this.buybackPrice}} gp</span>
+            </div>
+            <div class="item-actions">
+              <button type="button" class="item-btn" data-action="buyback" data-item-id="{{this.id}}">
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="empty-inventory">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <p>{{localize "BOBSNPC.Shop.NoBuybackItems"}}</p>
+      </div>
+    {{/if}}
+  {{/if}}
+</section>

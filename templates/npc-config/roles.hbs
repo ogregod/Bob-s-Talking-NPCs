@@ -1,0 +1,71 @@
+{{!-- NPC Config - Roles Tab --}}
+<div class="tab-content roles-tab {{theme}}" {{#unless (eq activeTab 'roles')}}hidden{{/unless}}>
+  <section class="config-section">
+    <h3>{{localize "BOBSNPC.NPCConfig.AssignedRoles"}}</h3>
+    <p class="section-hint">{{localize "BOBSNPC.NPCConfig.RolesHint"}}</p>
+
+    {{#if rolesDisplay.length}}
+      <ul class="roles-list">
+        {{#each rolesDisplay}}
+          <li class="role-entry {{#if this.isPrimary}}primary{{/if}}">
+            <div class="role-info">
+              <i class="fa-solid {{this.icon}}"></i>
+              <span class="role-name">{{this.label}}</span>
+              {{#if this.isPrimary}}
+                <span class="primary-badge">{{localize "BOBSNPC.NPCConfig.Primary"}}</span>
+              {{/if}}
+            </div>
+            <div class="role-actions">
+              {{#unless this.isPrimary}}
+                <button type="button" class="role-btn" data-action="setPrimaryRole" data-role="{{this.role}}"
+                        data-tooltip="{{localize 'BOBSNPC.NPCConfig.SetPrimary'}}">
+                  <i class="fa-solid fa-star"></i>
+                </button>
+              {{/unless}}
+              <button type="button" class="role-btn danger" data-action="removeRole" data-index="{{this.index}}"
+                      data-tooltip="{{localize 'BOBSNPC.NPCConfig.Remove'}}">
+                <i class="fa-solid fa-times"></i>
+              </button>
+            </div>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <div class="empty-state">
+        <i class="fa-solid fa-user-tag"></i>
+        <p>{{localize "BOBSNPC.NPCConfig.NoRoles"}}</p>
+      </div>
+    {{/if}}
+  </section>
+
+  <section class="config-section">
+    <h3>{{localize "BOBSNPC.NPCConfig.AddRole"}}</h3>
+
+    <div class="add-role-form">
+      <select name="newRole">
+        <option value="">{{localize "BOBSNPC.NPCConfig.SelectRole"}}</option>
+        {{#each availableRoles}}
+          {{#unless this.selected}}
+            <option value="{{this.value}}">{{this.label}}</option>
+          {{/unless}}
+        {{/each}}
+      </select>
+      <button type="button" class="add-btn" data-action="addRole">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.NPCConfig.Add"}}
+      </button>
+    </div>
+  </section>
+
+  <section class="config-section">
+    <h3>{{localize "BOBSNPC.NPCConfig.RoleDescriptions"}}</h3>
+    <div class="role-descriptions">
+      {{#each availableRoles}}
+        <div class="role-description">
+          <strong>{{this.label}}:</strong>
+          {{localize (concat "BOBSNPC.NPCRole." this.value ".Description")}}
+        </div>
+      {{/each}}
+    </div>
+  </section>
+</div>

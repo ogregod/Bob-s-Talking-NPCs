@@ -1,0 +1,40 @@
+{{!-- Hireling Manager Tabs --}}
+<nav class="hireling-tabs {{theme}}">
+  <button type="button" class="hireling-tab {{#if (eq activeTab 'hirelings')}}active{{/if}}"
+          data-action="setTab" data-tab="hirelings">
+    <i class="fa-solid fa-person-military-pointing"></i>
+    <span>{{localize "BOBSNPC.Hirelings.Hirelings"}}</span>
+    {{#if hirelingCount}}
+      <span class="tab-count">{{hirelingCount}}</span>
+    {{/if}}
+  </button>
+
+  <button type="button" class="hireling-tab {{#if (eq activeTab 'mounts')}}active{{/if}}"
+          data-action="setTab" data-tab="mounts">
+    <i class="fa-solid fa-horse"></i>
+    <span>{{localize "BOBSNPC.Hirelings.Mounts"}}</span>
+    {{#if mountCount}}
+      <span class="tab-count">{{mountCount}}</span>
+    {{/if}}
+  </button>
+
+  <button type="button" class="hireling-tab {{#if (eq activeTab 'recruit')}}active{{/if}}"
+          data-action="setTab" data-tab="recruit">
+    <i class="fa-solid fa-user-plus"></i>
+    <span>{{localize "BOBSNPC.Hirelings.Recruit"}}</span>
+  </button>
+
+  {{!-- Summary Stats --}}
+  <div class="tab-summary">
+    <span class="daily-wages" data-tooltip="{{localize 'BOBSNPC.Hirelings.DailyWages'}}">
+      <i class="fa-solid fa-coins"></i>
+      {{dailyWageCost}} gp/day
+    </span>
+    {{#if hasUnpaidWages}}
+      <span class="unpaid-warning" data-tooltip="{{localize 'BOBSNPC.Hirelings.UnpaidWages'}}">
+        <i class="fa-solid fa-exclamation-triangle"></i>
+        {{unpaidWages}} gp
+      </span>
+    {{/if}}
+  </div>
+</nav>

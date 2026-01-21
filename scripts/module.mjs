@@ -17,6 +17,32 @@ import { initializeHooks, registerReadyHooks } from "./init.mjs";
 import { registerSocket } from "./socket.mjs";
 import { BobsNPCAPI } from "./api.mjs";
 
+// Import UI applications
+import { DialogueWindow } from "./apps/dialogue-window.mjs";
+import { QuestLog } from "./apps/quest-log.mjs";
+import { QuestTracker } from "./apps/quest-tracker.mjs";
+import { ShopWindow } from "./apps/shop-window.mjs";
+import { BankWindow } from "./apps/bank-window.mjs";
+import { FactionWindow } from "./apps/faction-window.mjs";
+import { HirelingManager } from "./apps/hireling-manager.mjs";
+import { PropertyManager } from "./apps/property-manager.mjs";
+import { NPCConfig } from "./apps/npc-config.mjs";
+import { GMDashboard } from "./apps/gm-dashboard.mjs";
+
+// Export UI applications for external use
+export {
+  DialogueWindow,
+  QuestLog,
+  QuestTracker,
+  ShopWindow,
+  BankWindow,
+  FactionWindow,
+  HirelingManager,
+  PropertyManager,
+  NPCConfig,
+  GMDashboard
+};
+
 /**
  * Initialize the module during Foundry's init hook
  * This runs before the game is fully ready

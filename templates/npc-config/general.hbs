@@ -1,0 +1,93 @@
+{{!-- NPC Config - General Tab --}}
+<div class="tab-content general-tab {{theme}}" {{#unless (eq activeTab 'general')}}hidden{{/unless}}>
+  <section class="config-section">
+    <h3>{{localize "BOBSNPC.NPCConfig.BasicSettings"}}</h3>
+
+    <div class="form-group">
+      <label for="config-enabled">
+        <input type="checkbox" id="config-enabled" name="config.enabled" {{#if config.enabled}}checked{{/if}} />
+        {{localize "BOBSNPC.NPCConfig.EnableModule"}}
+      </label>
+      <p class="hint">{{localize "BOBSNPC.NPCConfig.EnableModuleHint"}}</p>
+    </div>
+
+    <div class="form-group">
+      <label for="config-primaryRole">{{localize "BOBSNPC.NPCConfig.PrimaryRole"}}</label>
+      <select id="config-primaryRole" name="config.primaryRole">
+        <option value="">{{localize "BOBSNPC.NPCConfig.None"}}</option>
+        {{#each rolesDisplay}}
+          <option value="{{this.role}}" {{#if this.isPrimary}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+      <p class="hint">{{localize "BOBSNPC.NPCConfig.PrimaryRoleHint"}}</p>
+    </div>
+  </section>
+
+  <section class="config-section">
+    <h3>{{localize "BOBSNPC.NPCConfig.Behavior"}}</h3>
+
+    <div class="form-group">
+      <label for="config-interactionRange">{{localize "BOBSNPC.NPCConfig.InteractionRange"}}</label>
+      <div class="input-with-unit">
+        <input type="number" id="config-interactionRange" name="config.behavior.interactionRange"
+               value="{{config.behavior.interactionRange}}" min="1" max="10" />
+        <span class="unit">{{localize "BOBSNPC.NPCConfig.Squares"}}</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="config-greetOnApproach">
+        <input type="checkbox" id="config-greetOnApproach" name="config.behavior.greetOnApproach"
+               {{#if config.behavior.greetOnApproach}}checked{{/if}} />
+        {{localize "BOBSNPC.NPCConfig.GreetOnApproach"}}
+      </label>
+    </div>
+
+    {{#if config.behavior.greetOnApproach}}
+      <div class="form-group indented">
+        <label for="config-greetingDialogue">{{localize "BOBSNPC.NPCConfig.GreetingDialogue"}}</label>
+        <select id="config-greetingDialogue" name="config.behavior.greetingDialogue">
+          <option value="">{{localize "BOBSNPC.NPCConfig.SelectDialogue"}}</option>
+          {{#each availableDialogues}}
+            <option value="{{this.id}}" {{#if (eq this.id ../config.behavior.greetingDialogue)}}selected{{/if}}>
+              {{this.name}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+    {{/if}}
+
+    <div class="form-group">
+      <label for="config-requireLineOfSight">
+        <input type="checkbox" id="config-requireLineOfSight" name="config.behavior.requireLineOfSight"
+               {{#if config.behavior.requireLineOfSight}}checked{{/if}} />
+        {{localize "BOBSNPC.NPCConfig.RequireLineOfSight"}}
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="config-cooldown">{{localize "BOBSNPC.NPCConfig.InteractionCooldown"}}</label>
+      <div class="input-with-unit">
+        <input type="number" id="config-cooldown" name="config.behavior.cooldownBetweenInteractions"
+               value="{{config.behavior.cooldownBetweenInteractions}}" min="0" max="3600" />
+        <span class="unit">{{localize "BOBSNPC.NPCConfig.Seconds"}}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="config-section">
+    <h3>{{localize "BOBSNPC.NPCConfig.Metadata"}}</h3>
+
+    <div class="form-group">
+      <label for="config-notes">{{localize "BOBSNPC.NPCConfig.GMNotes"}}</label>
+      <textarea id="config-notes" name="config.metadata.notes" rows="4">{{config.metadata.notes}}</textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="config-tags">{{localize "BOBSNPC.NPCConfig.Tags"}}</label>
+      <input type="text" id="config-tags" name="config.metadata.tags" value="{{join config.metadata.tags ', '}}"
+             placeholder="{{localize 'BOBSNPC.NPCConfig.TagsPlaceholder'}}" />
+      <p class="hint">{{localize "BOBSNPC.NPCConfig.TagsHint"}}</p>
+    </div>
+  </section>
+</div>

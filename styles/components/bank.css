@@ -1,0 +1,686 @@
+/**
+ * Bob's Talking NPCs - Bank Window Styles
+ */
+
+@layer bobsnpc {
+  /* ===== Bank Window Layout ===== */
+  .bank-window {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* ===== Header ===== */
+  .bank-header {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .bank-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
+    border-radius: var(--bobsnpc-border-radius-md);
+    font-size: var(--bobsnpc-font-size-xl);
+    color: white;
+  }
+
+  .bank-details {
+    flex: 1;
+  }
+
+  .bank-name {
+    margin: 0;
+    font-size: var(--bobsnpc-font-size-lg);
+  }
+
+  .banker-name {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .bank-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .summary-item {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .summary-label {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .summary-value {
+    font-size: var(--bobsnpc-font-size-lg);
+    font-weight: var(--bobsnpc-font-weight-semibold);
+  }
+
+  .summary-value.gold {
+    color: var(--bobsnpc-warning);
+  }
+
+  .summary-item.debt .summary-value {
+    color: var(--bobsnpc-error);
+  }
+
+  .player-wallet {
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .wallet-amount {
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    color: var(--bobsnpc-warning);
+  }
+
+  /* ===== Tabs ===== */
+  .bank-tabs {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .bank-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .bank-tab:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .bank-tab.active {
+    background: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .bank-tab .tab-badge {
+    padding: 2px var(--bobsnpc-spacing-xs);
+    border-radius: var(--bobsnpc-border-radius-full);
+    font-size: 10px;
+    font-weight: var(--bobsnpc-font-weight-semibold);
+  }
+
+  .bank-tab .tab-badge.warning {
+    background: var(--bobsnpc-warning);
+    color: white;
+  }
+
+  /* ===== Content ===== */
+  .bank-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .bank-content section {
+    margin-bottom: var(--bobsnpc-spacing-lg);
+  }
+
+  .bank-content h3 {
+    margin-bottom: var(--bobsnpc-spacing-md);
+    padding-bottom: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .bank-content h4 {
+    margin-bottom: var(--bobsnpc-spacing-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  /* ===== Accounts Section ===== */
+  .accounts-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .account-card {
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    padding: var(--bobsnpc-spacing-md);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .account-card:hover {
+    border-color: var(--bobsnpc-primary);
+    box-shadow: var(--bobsnpc-shadow-md);
+  }
+
+  .account-card.selected {
+    border-color: var(--bobsnpc-primary);
+    background: var(--bobsnpc-bg-active);
+  }
+
+  .account-header {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-sm);
+  }
+
+  .account-header i {
+    font-size: var(--bobsnpc-font-size-lg);
+    color: var(--bobsnpc-primary);
+  }
+
+  .account-name {
+    font-weight: var(--bobsnpc-font-weight-semibold);
+  }
+
+  .account-type {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+    margin-left: auto;
+  }
+
+  .account-balance {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--bobsnpc-spacing-sm);
+  }
+
+  .balance-amount {
+    font-size: var(--bobsnpc-font-size-xl);
+    font-weight: var(--bobsnpc-font-weight-bold);
+    color: var(--bobsnpc-warning);
+  }
+
+  .interest-rate {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-success);
+  }
+
+  .last-transaction {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+    padding-top: var(--bobsnpc-spacing-sm);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .transaction-type.deposit { color: var(--bobsnpc-success); }
+  .transaction-type.withdrawal { color: var(--bobsnpc-error); }
+
+  .no-accounts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--bobsnpc-spacing-2xl);
+    color: var(--bobsnpc-text-muted);
+    text-align: center;
+  }
+
+  .no-accounts i {
+    font-size: 48px;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    opacity: 0.5;
+  }
+
+  .open-account-btn {
+    margin-top: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-primary);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: white;
+    cursor: pointer;
+  }
+
+  /* ===== Transaction History ===== */
+  .transaction-history {
+    margin-top: var(--bobsnpc-spacing-lg);
+  }
+
+  .transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .transactions-table th,
+  .transactions-table td {
+    padding: var(--bobsnpc-spacing-sm);
+    text-align: left;
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .transactions-table th {
+    background: var(--bobsnpc-bg-tertiary);
+    font-weight: var(--bobsnpc-font-weight-medium);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .transaction-row.deposit td:nth-child(3) { color: var(--bobsnpc-success); }
+  .transaction-row.withdrawal td:nth-child(3) { color: var(--bobsnpc-error); }
+
+  .transaction-row .credit { color: var(--bobsnpc-success); }
+  .transaction-row .debit { color: var(--bobsnpc-error); }
+
+  /* ===== Transaction Forms ===== */
+  .transaction-form {
+    max-width: 400px;
+  }
+
+  .transaction-form .form-group {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .transaction-form label {
+    display: block;
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    font-weight: var(--bobsnpc-font-weight-medium);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .transaction-form select,
+  .transaction-form input {
+    width: 100%;
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-input-bg);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-input-border);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .amount-input-group {
+    display: flex;
+    align-items: center;
+  }
+
+  .amount-input-group input {
+    flex: 1;
+    border-radius: var(--bobsnpc-border-radius-sm) 0 0 var(--bobsnpc-border-radius-sm);
+  }
+
+  .amount-input-group .currency-label {
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-input-border);
+    border-left: none;
+    border-radius: 0 var(--bobsnpc-border-radius-sm) var(--bobsnpc-border-radius-sm) 0;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .available-funds {
+    display: block;
+    margin-top: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .quick-amounts {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .quick-amounts button {
+    flex: 1;
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .quick-amounts button:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .primary-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-primary);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: white;
+    cursor: pointer;
+    transition: background var(--bobsnpc-transition-fast);
+  }
+
+  .primary-btn:hover {
+    background: var(--bobsnpc-primary-light);
+  }
+
+  .fee-notice {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-md);
+    background: rgba(var(--bobsnpc-warning-rgb), 0.1);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-warning);
+  }
+
+  /* ===== Transfer Section ===== */
+  .form-row {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .form-row .form-group {
+    flex: 1;
+  }
+
+  .transfer-arrow {
+    padding-top: 24px;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Loans Section ===== */
+  .active-loans {
+    margin-bottom: var(--bobsnpc-spacing-lg);
+  }
+
+  .loan-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-md);
+    margin-bottom: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+  }
+
+  .loan-card.overdue {
+    border-color: var(--bobsnpc-error);
+    background: rgba(var(--bobsnpc-error-rgb), 0.05);
+  }
+
+  .loan-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .loan-amount {
+    font-size: var(--bobsnpc-font-size-lg);
+    font-weight: var(--bobsnpc-font-weight-semibold);
+  }
+
+  .loan-status {
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-xs);
+    text-transform: uppercase;
+  }
+
+  .loan-status.active {
+    background: var(--bobsnpc-info);
+    color: white;
+  }
+
+  .loan-status.overdue {
+    background: var(--bobsnpc-error);
+    color: white;
+  }
+
+  .loan-details {
+    display: flex;
+    gap: var(--bobsnpc-spacing-lg);
+  }
+
+  .loan-stat {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-label {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .stat-value {
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .stat-value.overdue {
+    color: var(--bobsnpc-error);
+  }
+
+  .repay-btn {
+    align-self: flex-end;
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-success);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: white;
+    cursor: pointer;
+  }
+
+  .repay-btn:hover {
+    background: var(--bobsnpc-success-light);
+  }
+
+  .loan-limits {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .loan-terms {
+    padding: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .loan-terms p {
+    margin: var(--bobsnpc-spacing-xs) 0;
+  }
+
+  /* ===== Storage Section ===== */
+  .storage-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .storage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .storage-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    text-align: center;
+  }
+
+  .storage-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  .storage-item .item-name {
+    font-size: var(--bobsnpc-font-size-xs);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+
+  .storage-item .item-qty {
+    position: absolute;
+    bottom: var(--bobsnpc-spacing-xs);
+    right: var(--bobsnpc-spacing-xs);
+    font-size: 10px;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .storage-item .retrieve-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    padding: 2px;
+    background: var(--bobsnpc-bg-tertiary);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--bobsnpc-transition-fast);
+  }
+
+  .storage-item:hover .retrieve-btn {
+    opacity: 1;
+  }
+
+  .storage-item .retrieve-btn:hover {
+    color: var(--bobsnpc-primary);
+  }
+
+  .storage-slot.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    border-style: dashed;
+    cursor: pointer;
+    color: var(--bobsnpc-text-muted);
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .storage-slot.empty:hover {
+    border-color: var(--bobsnpc-primary);
+    color: var(--bobsnpc-primary);
+  }
+
+  .no-storage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--bobsnpc-spacing-xl);
+    color: var(--bobsnpc-text-muted);
+    text-align: center;
+  }
+
+  .no-storage i {
+    font-size: 48px;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    opacity: 0.5;
+  }
+
+  .rent-storage-btn {
+    margin-top: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-primary);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: white;
+    cursor: pointer;
+  }
+
+  /* ===== Footer ===== */
+  .bank-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-primary);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .footer-info {
+    display: flex;
+    gap: var(--bobsnpc-spacing-md);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .footer-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .bank-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .bank-btn.primary {
+    background: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .bank-btn.primary:hover {
+    background: var(--bobsnpc-primary-light);
+  }
+
+  .bank-btn.secondary {
+    background: var(--bobsnpc-bg-elevated);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .bank-btn.secondary:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+}

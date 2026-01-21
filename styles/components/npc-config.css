@@ -1,0 +1,742 @@
+/**
+ * Bob's Talking NPCs - NPC Configuration Styles
+ */
+
+@layer bobsnpc {
+  /* ===== NPC Config Layout ===== */
+  .npc-config {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* ===== Tabs ===== */
+  .npc-config-tabs {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    overflow-x: auto;
+  }
+
+  .config-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+    white-space: nowrap;
+  }
+
+  .config-tab:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .config-tab.active {
+    background: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  /* ===== Tab Content ===== */
+  .tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .tab-content[hidden] {
+    display: none;
+  }
+
+  /* ===== Config Sections ===== */
+  .config-section {
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    padding: var(--bobsnpc-spacing-md);
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .config-section h3 {
+    margin: 0 0 var(--bobsnpc-spacing-md) 0;
+    padding-bottom: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    font-size: var(--bobsnpc-font-size-base);
+  }
+
+  .section-hint {
+    margin-top: calc(var(--bobsnpc-spacing-md) * -1);
+    margin-bottom: var(--bobsnpc-spacing-md);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Form Groups ===== */
+  .form-group {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .form-group > label {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    font-weight: var(--bobsnpc-font-weight-medium);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    cursor: pointer;
+  }
+
+  .form-group > label:has(input[type="checkbox"]) {
+    margin-bottom: 0;
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-input-bg);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-input-border);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--bobsnpc-input-focus);
+    outline: none;
+  }
+
+  .form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+
+  .form-group .hint {
+    margin-top: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .form-group.indented {
+    margin-left: var(--bobsnpc-spacing-lg);
+    padding-left: var(--bobsnpc-spacing-md);
+    border-left: 2px solid var(--bobsnpc-border-color);
+  }
+
+  .input-with-unit {
+    display: flex;
+    align-items: center;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+    border-radius: var(--bobsnpc-border-radius-sm) 0 0 var(--bobsnpc-border-radius-sm);
+  }
+
+  .input-with-unit .unit {
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-input-border);
+    border-left: none;
+    border-radius: 0 var(--bobsnpc-border-radius-sm) var(--bobsnpc-border-radius-sm) 0;
+    color: var(--bobsnpc-text-muted);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .form-group.inline {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-sm);
+  }
+
+  .form-group.inline label {
+    margin-bottom: 0;
+    white-space: nowrap;
+  }
+
+  .form-group.inline select,
+  .form-group.inline input {
+    flex: 1;
+  }
+
+  .form-row {
+    display: flex;
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .form-row .form-group {
+    flex: 1;
+  }
+
+  /* ===== Checkboxes ===== */
+  .form-group input[type="checkbox"] {
+    width: auto;
+    accent-color: var(--bobsnpc-primary);
+  }
+
+  .days-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm) 0;
+  }
+
+  .day-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    cursor: pointer;
+  }
+
+  .day-checkbox:has(input:checked) {
+    background: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .day-checkbox input {
+    display: none;
+  }
+
+  /* ===== Roles Tab ===== */
+  .roles-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .role-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .role-entry.primary {
+    background: rgba(var(--bobsnpc-primary-rgb), 0.15);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-primary);
+  }
+
+  .role-info {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    flex: 1;
+  }
+
+  .role-info i {
+    font-size: var(--bobsnpc-font-size-lg);
+    color: var(--bobsnpc-primary);
+  }
+
+  .role-name {
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .primary-badge {
+    padding: 2px var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-primary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: 10px;
+    color: white;
+    text-transform: uppercase;
+  }
+
+  .role-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .role-btn {
+    padding: var(--bobsnpc-spacing-xs);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    transition: color var(--bobsnpc-transition-fast);
+  }
+
+  .role-btn:hover {
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .role-btn.danger:hover {
+    color: var(--bobsnpc-error);
+  }
+
+  .add-role-form,
+  .add-dialogue-form,
+  .add-faction-form {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .add-role-form select,
+  .add-dialogue-form select,
+  .add-faction-form select {
+    flex: 1;
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-input-bg);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-input-border);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .add-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-primary);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: white;
+    cursor: pointer;
+    transition: background var(--bobsnpc-transition-fast);
+  }
+
+  .add-btn:hover {
+    background: var(--bobsnpc-primary-light);
+  }
+
+  .role-descriptions {
+    margin-top: var(--bobsnpc-spacing-md);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .role-description {
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  /* ===== Dialogues Tab ===== */
+  .dialogues-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .dialogue-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .dialogue-entry.default {
+    background: rgba(var(--bobsnpc-primary-rgb), 0.15);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-primary);
+  }
+
+  .dialogue-info {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    flex: 1;
+  }
+
+  .dialogue-info i {
+    font-size: var(--bobsnpc-font-size-lg);
+    color: var(--bobsnpc-info);
+  }
+
+  .dialogue-text {
+    flex: 1;
+  }
+
+  .dialogue-name {
+    display: block;
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .dialogue-description {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .default-badge {
+    padding: 2px var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-primary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: 10px;
+    color: white;
+    text-transform: uppercase;
+  }
+
+  .dialogue-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .dialogue-btn {
+    padding: var(--bobsnpc-spacing-xs);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    transition: color var(--bobsnpc-transition-fast);
+  }
+
+  .dialogue-btn:hover {
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .dialogue-btn.danger:hover {
+    color: var(--bobsnpc-error);
+  }
+
+  .create-dialogue-action {
+    margin-top: var(--bobsnpc-spacing-md);
+  }
+
+  .create-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) dashed var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .create-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    border-color: var(--bobsnpc-primary);
+    color: var(--bobsnpc-primary);
+  }
+
+  /* ===== Schedule Tab ===== */
+  .schedule-entries {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .schedule-entry {
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .entry-header {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-md);
+    margin-bottom: var(--bobsnpc-spacing-md);
+    padding-bottom: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .entry-time {
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    color: var(--bobsnpc-primary);
+  }
+
+  .entry-days {
+    flex: 1;
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .entry-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .remove-btn {
+    padding: var(--bobsnpc-spacing-xs);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+  }
+
+  .remove-btn:hover {
+    color: var(--bobsnpc-error);
+  }
+
+  .add-entry-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) dashed var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    width: 100%;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .add-entry-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    border-color: var(--bobsnpc-primary);
+    color: var(--bobsnpc-primary);
+  }
+
+  /* ===== Services Tab ===== */
+  .service-section {
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    padding: var(--bobsnpc-spacing-md);
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .service-section h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    margin: 0 0 var(--bobsnpc-spacing-md) 0;
+    padding-bottom: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    font-size: var(--bobsnpc-font-size-base);
+  }
+
+  .service-section h3 i {
+    color: var(--bobsnpc-primary);
+  }
+
+  /* ===== Factions Tab ===== */
+  .factions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .faction-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .faction-entry .faction-info {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .faction-entry .faction-name {
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .faction-details {
+    flex: 1;
+    display: flex;
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  /* ===== Appearance Tab ===== */
+  .portrait-picker {
+    display: flex;
+    gap: var(--bobsnpc-spacing-md);
+    align-items: flex-start;
+  }
+
+  .portrait-preview {
+    width: 128px;
+    height: 128px;
+    border-radius: var(--bobsnpc-border-radius-md);
+    object-fit: cover;
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .portrait-placeholder {
+    width: 128px;
+    height: 128px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) dashed var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    font-size: 48px;
+    color: var(--bobsnpc-text-muted);
+    opacity: 0.5;
+  }
+
+  .portrait-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .portrait-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .portrait-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .portrait-btn.danger {
+    color: var(--bobsnpc-error);
+  }
+
+  .indicator-preview {
+    margin-top: var(--bobsnpc-spacing-md);
+  }
+
+  .preview-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+  }
+
+  .preview-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  /* ===== Empty States ===== */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--bobsnpc-spacing-xl);
+    color: var(--bobsnpc-text-muted);
+    text-align: center;
+  }
+
+  .empty-state i {
+    font-size: 32px;
+    margin-bottom: var(--bobsnpc-spacing-sm);
+    opacity: 0.5;
+  }
+
+  /* ===== Footer ===== */
+  .npc-config-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-secondary);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .footer-info {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-md);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .unsaved-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    color: var(--bobsnpc-warning);
+  }
+
+  .unsaved-indicator i {
+    font-size: 8px;
+  }
+
+  .footer-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .secondary-actions,
+  .primary-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .config-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .secondary-actions .config-btn {
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .secondary-actions .config-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .secondary-actions .config-btn.danger:hover {
+    color: var(--bobsnpc-error);
+  }
+
+  .config-btn.secondary {
+    background: var(--bobsnpc-bg-elevated);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .config-btn.secondary:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .config-btn.primary {
+    background: var(--bobsnpc-success);
+    color: white;
+  }
+
+  .config-btn.primary:hover {
+    background: var(--bobsnpc-success-light);
+  }
+}

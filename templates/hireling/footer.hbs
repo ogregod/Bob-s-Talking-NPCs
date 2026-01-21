@@ -1,0 +1,41 @@
+{{!-- Hireling Manager Footer --}}
+<footer class="hireling-footer {{theme}}">
+  <div class="footer-summary">
+    <div class="summary-stat">
+      <span class="stat-label">{{localize "BOBSNPC.Hirelings.TotalHirelings"}}:</span>
+      <span class="stat-value">{{hirelingCount}}</span>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-label">{{localize "BOBSNPC.Hirelings.TotalMounts"}}:</span>
+      <span class="stat-value">{{mountCount}}</span>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-label">{{localize "BOBSNPC.Hirelings.DailyCost"}}:</span>
+      <span class="stat-value">{{dailyWageCost}} gp</span>
+    </div>
+  </div>
+
+  <div class="footer-actions">
+    {{#if hasUnpaidWages}}
+      <button type="button" class="hireling-btn warning" data-action="payAllWages">
+        <i class="fa-solid fa-coins"></i>
+        {{localize "BOBSNPC.Hirelings.PayAllWages"}} ({{unpaidWages}} gp)
+      </button>
+    {{/if}}
+
+    <button type="button" class="hireling-btn secondary" data-action="closeManager">
+      {{localize "BOBSNPC.Hirelings.Close"}}
+    </button>
+  </div>
+
+  {{#if isGM}}
+    <div class="gm-controls">
+      <button type="button" class="gm-btn" data-action="editAvailable" data-tooltip="{{localize 'BOBSNPC.Hirelings.EditAvailable'}}">
+        <i class="fa-solid fa-edit"></i>
+      </button>
+      <button type="button" class="gm-btn" data-action="processWages" data-tooltip="{{localize 'BOBSNPC.Hirelings.ProcessWages'}}">
+        <i class="fa-solid fa-calendar-check"></i>
+      </button>
+    </div>
+  {{/if}}
+</footer>

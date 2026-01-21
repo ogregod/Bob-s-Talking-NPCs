@@ -1,0 +1,102 @@
+{{!-- NPC Config - Schedule Tab --}}
+<div class="tab-content schedule-tab {{theme}}" {{#unless (eq activeTab 'schedule')}}hidden{{/unless}}>
+  <section class="config-section">
+    <h3>{{localize "BOBSNPC.NPCConfig.ScheduleSettings"}}</h3>
+
+    <div class="form-group">
+      <label for="schedule-enabled">
+        <input type="checkbox" id="schedule-enabled" name="config.schedule.enabled"
+               {{#if config.schedule.enabled}}checked{{/if}} />
+        {{localize "BOBSNPC.NPCConfig.EnableSchedule"}}
+      </label>
+      <p class="hint">{{localize "BOBSNPC.NPCConfig.EnableScheduleHint"}}</p>
+    </div>
+  </section>
+
+  {{#if config.schedule.enabled}}
+    <section class="config-section">
+      <h3>{{localize "BOBSNPC.NPCConfig.ScheduleEntries"}}</h3>
+
+      {{#if scheduleDisplay.entries.length}}
+        <div class="schedule-entries">
+          {{#each scheduleDisplay.entries}}
+            <div class="schedule-entry">
+              <div class="entry-header">
+                <span class="entry-time">{{this.timeDisplay}}</span>
+                <span class="entry-days">{{this.daysDisplay}}</span>
+                <button type="button" class="remove-btn" data-action="removeScheduleEntry" data-index="{{this.index}}">
+                  <i class="fa-solid fa-times"></i>
+                </button>
+              </div>
+
+              <div class="entry-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>{{localize "BOBSNPC.NPCConfig.StartTime"}}</label>
+                    <input type="number" name="config.schedule.entries.{{this.index}}.startTime"
+                           value="{{this.startTime}}" min="0" max="23" />
+                  </div>
+                  <div class="form-group">
+                    <label>{{localize "BOBSNPC.NPCConfig.EndTime"}}</label>
+                    <input type="number" name="config.schedule.entries.{{this.index}}.endTime"
+                           value="{{this.endTime}}" min="0" max="23" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>{{localize "BOBSNPC.NPCConfig.Days"}}</label>
+                  <div class="days-checkboxes">
+                    {{#each ../daysOfWeek}}
+                      <label class="day-checkbox">
+                        <input type="checkbox" name="config.schedule.entries.{{../index}}.days"
+                               value="{{this.id}}" {{#if (includes ../this.days this.id)}}checked{{/if}} />
+                        {{this.abbr}}
+                      </label>
+                    {{/each}}
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>{{localize "BOBSNPC.NPCConfig.Location"}}</label>
+                  <input type="text" name="config.schedule.entries.{{this.index}}.locationName"
+                         value="{{this.locationName}}" placeholder="{{localize 'BOBSNPC.NPCConfig.LocationPlaceholder'}}" />
+                </div>
+
+                <div class="form-group">
+                  <label>{{localize "BOBSNPC.NPCConfig.Activity"}}</label>
+                  <select name="config.schedule.entries.{{this.index}}.activity">
+                    <option value="working" {{#if (eq this.activity 'working')}}selected{{/if}}>
+                      {{localize "BOBSNPC.NPCConfig.Activity.Working"}}
+                    </option>
+                    <option value="sleeping" {{#if (eq this.activity 'sleeping')}}selected{{/if}}>
+                      {{localize "BOBSNPC.NPCConfig.Activity.Sleeping"}}
+                    </option>
+                    <option value="traveling" {{#if (eq this.activity 'traveling')}}selected{{/if}}>
+                      {{localize "BOBSNPC.NPCConfig.Activity.Traveling"}}
+                    </option>
+                    <option value="socializing" {{#if (eq this.activity 'socializing')}}selected{{/if}}>
+                      {{localize "BOBSNPC.NPCConfig.Activity.Socializing"}}
+                    </option>
+                    <option value="unavailable" {{#if (eq this.activity 'unavailable')}}selected{{/if}}>
+                      {{localize "BOBSNPC.NPCConfig.Activity.Unavailable"}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="empty-state">
+          <i class="fa-solid fa-clock"></i>
+          <p>{{localize "BOBSNPC.NPCConfig.NoScheduleEntries"}}</p>
+        </div>
+      {{/if}}
+
+      <button type="button" class="add-entry-btn" data-action="addScheduleEntry">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.NPCConfig.AddScheduleEntry"}}
+      </button>
+    </section>
+  {{/if}}
+</div>

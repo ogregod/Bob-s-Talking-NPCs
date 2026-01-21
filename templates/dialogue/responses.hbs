@@ -1,0 +1,65 @@
+{{!-- Dialogue Response Options --}}
+<section class="dialogue-responses {{theme}}">
+  {{#if hasResponses}}
+    <ul class="response-list">
+      {{#each responses}}
+        <li class="response-entry {{#unless this.available}}unavailable{{/unless}} {{#if this.isSelected}}selected{{/if}}"
+            {{#if this.available}}
+              data-action="selectResponse"
+              data-response-id="{{this.id}}"
+            {{/if}}
+            data-tooltip="{{#unless this.available}}{{this.unavailableReason}}{{/unless}}">
+
+          {{#if this.icon}}
+            <i class="response-icon fa-solid {{this.icon}}"></i>
+          {{else}}
+            <span class="response-number">{{math @index "+" 1}}</span>
+          {{/if}}
+
+          <span class="response-text">{{this.text}}</span>
+
+          {{#if this.skillCheck}}
+            <span class="response-skill-check" data-tooltip="{{this.skillCheck.tooltip}}">
+              [{{this.skillCheck.skill}} DC {{this.skillCheck.dc}}]
+            </span>
+          {{/if}}
+
+          {{#if this.cost}}
+            <span class="response-cost">
+              <i class="fa-solid fa-coins"></i>
+              {{this.cost}}
+            </span>
+          {{/if}}
+
+          {{#if this.consequence}}
+            <span class="response-consequence {{this.consequence.type}}">
+              <i class="fa-solid {{this.consequence.icon}}"></i>
+            </span>
+          {{/if}}
+
+          {{#unless this.available}}
+            <i class="fa-solid fa-lock unavailable-icon"></i>
+          {{/unless}}
+        </li>
+      {{/each}}
+    </ul>
+
+    {{#if isMultiplayer}}
+      {{#if votingEnabled}}
+        <div class="voting-status">
+          <span>{{localize "BOBSNPC.Dialogue.VotesCollected"}}: {{votesCollected}}/{{participantCount}}</span>
+          {{#if hasVoted}}
+            <span class="voted-indicator">
+              <i class="fa-solid fa-check"></i>
+              {{localize "BOBSNPC.Dialogue.YouVoted"}}
+            </span>
+          {{/if}}
+        </div>
+      {{/if}}
+    {{/if}}
+  {{else}}
+    <div class="no-responses">
+      <p>{{localize "BOBSNPC.Dialogue.NoResponses"}}</p>
+    </div>
+  {{/if}}
+</section>

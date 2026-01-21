@@ -1,0 +1,10 @@
+{{!-- NPC Config Tabs --}}
+<nav class="npc-config-tabs {{theme}}">
+  {{#each tabs}}
+    <button type="button" class="config-tab {{this.cssClass}}"
+            data-action="changeTab" data-tab="{{this.id}}">
+      <i class="fa-solid {{this.icon}}"></i>
+      <span>{{this.label}}</span>
+    </button>
+  {{/each}}
+</nav>

@@ -1,0 +1,181 @@
+{{!-- Faction Details Panel --}}
+<main class="faction-details {{theme}}">
+  {{#if selectedFaction}}
+    <article class="faction-detail-view">
+      {{!-- Faction Header --}}
+      <header class="faction-header">
+        <div class="faction-banner" style="background-color: {{selectedFaction.color}}">
+          <i class="fa-solid {{selectedFaction.icon}} faction-emblem"></i>
+        </div>
+
+        <div class="faction-title">
+          <h2>{{selectedFaction.name}}</h2>
+          {{#if selectedFaction.leader}}
+            <span class="faction-leader">
+              <i class="fa-solid fa-crown"></i>
+              {{selectedFaction.leader}}
+            </span>
+          {{/if}}
+        </div>
+
+        <div class="faction-standing {{selectedFaction.standingClass}}">
+          <span class="standing-level">{{selectedFaction.levelLabel}}</span>
+          <span class="standing-value">({{selectedFaction.reputation}})</span>
+        </div>
+      </header>
+
+      {{!-- Reputation Progress --}}
+      <section class="reputation-section">
+        <h4>{{localize "BOBSNPC.Factions.Reputation"}}</h4>
+        <div class="reputation-bar">
+          <div class="rep-track">
+            <div class="rep-fill {{selectedFaction.standingClass}}" style="width: {{selectedFaction.progress.percent}}%"></div>
+          </div>
+          <div class="rep-labels">
+            <span class="current-rep">{{selectedFaction.reputation}}</span>
+            {{#if selectedFaction.nextLevel}}
+              <span class="next-level">
+                {{selectedFaction.nextLevelLabel}} @ {{selectedFaction.progress.max}}
+                ({{selectedFaction.reputationNeeded}} {{localize "BOBSNPC.Factions.ToGo"}})
+              </span>
+            {{else}}
+              <span class="max-level">{{localize "BOBSNPC.Factions.MaxReputation"}}</span>
+            {{/if}}
+          </div>
+        </div>
+      </section>
+
+      {{!-- Description --}}
+      {{#if selectedFaction.description}}
+        <section class="faction-description">
+          <p>{{{selectedFaction.description}}}</p>
+        </section>
+      {{/if}}
+
+      {{!-- Headquarters --}}
+      {{#if selectedFaction.headquarters}}
+        <section class="faction-headquarters">
+          <h4>{{localize "BOBSNPC.Factions.Headquarters"}}</h4>
+          <div class="headquarters-info">
+            <i class="fa-solid fa-map-marker-alt"></i>
+            <span>{{selectedFaction.headquarters}}</span>
+          </div>
+        </section>
+      {{/if}}
+
+      {{!-- Current Rank --}}
+      {{#if selectedFaction.currentRank}}
+        <section class="current-rank">
+          <h4>{{localize "BOBSNPC.Factions.YourRank"}}</h4>
+          <div class="rank-display">
+            <i class="fa-solid {{selectedFaction.currentRank.icon}}"></i>
+            <span class="rank-name">{{selectedFaction.currentRank.name}}</span>
+          </div>
+        </section>
+      {{/if}}
+
+      {{!-- Ranks --}}
+      {{#if selectedFaction.ranks.length}}
+        <section class="faction-ranks">
+          <h4>
+            {{localize "BOBSNPC.Factions.Ranks"}}
+            <button type="button" class="section-action" data-action="viewRanks">
+              <i class="fa-solid fa-expand"></i>
+            </button>
+          </h4>
+          <div class="ranks-track">
+            {{#each selectedFaction.ranks}}
+              <div class="rank-marker {{#if this.isCurrentRank}}current{{/if}} {{#if this.isAchieved}}achieved{{/if}} {{#unless this.requirementsMet}}locked{{/unless}}"
+                   data-tooltip="{{this.name}} - {{this.requiredReputation}} rep">
+                <i class="fa-solid {{this.icon}}"></i>
+                <span class="rank-name">{{this.name}}</span>
+              </div>
+            {{/each}}
+          </div>
+        </section>
+      {{/if}}
+
+      {{!-- Benefits --}}
+      {{#if selectedFaction.benefits.length}}
+        <section class="faction-benefits">
+          <h4>{{localize "BOBSNPC.Factions.Benefits"}}</h4>
+          <ul class="benefits-list">
+            {{#each selectedFaction.benefits}}
+              <li class="benefit-entry {{this.type}}">
+                <i class="fa-solid {{this.icon}}"></i>
+                <span>{{this.description}}</span>
+              </li>
+            {{/each}}
+          </ul>
+        </section>
+      {{/if}}
+
+      {{!-- Penalties --}}
+      {{#if selectedFaction.penalties.length}}
+        <section class="faction-penalties">
+          <h4>{{localize "BOBSNPC.Factions.Penalties"}}</h4>
+          <ul class="penalties-list">
+            {{#each selectedFaction.penalties}}
+              <li class="penalty-entry">
+                <i class="fa-solid {{this.icon}}"></i>
+                <span>{{this.description}}</span>
+              </li>
+            {{/each}}
+          </ul>
+        </section>
+      {{/if}}
+
+      {{!-- Relations --}}
+      {{#if selectedFaction.hasRelations}}
+        <section class="faction-relations">
+          <h4>
+            {{localize "BOBSNPC.Factions.Relations"}}
+            <button type="button" class="section-action" data-action="viewRelations">
+              <i class="fa-solid fa-expand"></i>
+            </button>
+          </h4>
+          <div class="relations-list">
+            {{#each selectedFaction.relations}}
+              <div class="relation-entry {{this.typeClass}}">
+                <div class="related-faction">
+                  <i class="fa-solid {{this.factionIcon}}" style="color: {{this.factionColor}}"></i>
+                  <span>{{this.factionName}}</span>
+                </div>
+                <span class="relation-type">{{this.typeLabel}}</span>
+                {{#if this.effect}}
+                  <span class="relation-effect" data-tooltip="{{localize 'BOBSNPC.Factions.ReputationEffect'}}">
+                    {{#if (gt this.effect 0)}}+{{/if}}{{this.effect}}%
+                  </span>
+                {{/if}}
+              </div>
+            {{/each}}
+          </div>
+        </section>
+      {{/if}}
+
+      {{!-- Actions --}}
+      <section class="faction-actions">
+        <button type="button" class="faction-btn" data-action="viewMembers" data-faction-id="{{selectedFaction.id}}">
+          <i class="fa-solid fa-users"></i>
+          {{localize "BOBSNPC.Factions.ViewMembers"}}
+        </button>
+
+        {{#if isGM}}
+          <button type="button" class="faction-btn gm" data-action="editFaction" data-faction-id="{{selectedFaction.id}}">
+            <i class="fa-solid fa-edit"></i>
+            {{localize "BOBSNPC.Factions.Edit"}}
+          </button>
+          <button type="button" class="faction-btn gm" data-action="modifyReputation" data-faction-id="{{selectedFaction.id}}">
+            <i class="fa-solid fa-sliders"></i>
+            {{localize "BOBSNPC.Factions.ModifyRep"}}
+          </button>
+        {{/if}}
+      </section>
+    </article>
+  {{else}}
+    <div class="no-faction-selected">
+      <i class="fa-solid fa-flag"></i>
+      <p>{{localize "BOBSNPC.Factions.SelectFaction"}}</p>
+    </div>
+  {{/if}}
+</main>

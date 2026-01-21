@@ -1,0 +1,45 @@
+{{!-- Bank Window Tabs --}}
+<nav class="bank-tabs {{theme}}">
+  <button type="button" class="bank-tab {{#if (eq activeTab 'accounts')}}active{{/if}}"
+          data-action="setTab" data-tab="accounts">
+    <i class="fa-solid fa-piggy-bank"></i>
+    <span>{{localize "BOBSNPC.Bank.Accounts"}}</span>
+  </button>
+
+  <button type="button" class="bank-tab {{#if (eq activeTab 'deposit')}}active{{/if}}"
+          data-action="setTab" data-tab="deposit">
+    <i class="fa-solid fa-arrow-down"></i>
+    <span>{{localize "BOBSNPC.Bank.Deposit"}}</span>
+  </button>
+
+  <button type="button" class="bank-tab {{#if (eq activeTab 'withdraw')}}active{{/if}}"
+          data-action="setTab" data-tab="withdraw">
+    <i class="fa-solid fa-arrow-up"></i>
+    <span>{{localize "BOBSNPC.Bank.Withdraw"}}</span>
+  </button>
+
+  <button type="button" class="bank-tab {{#if (eq activeTab 'transfer')}}active{{/if}}"
+          data-action="setTab" data-tab="transfer">
+    <i class="fa-solid fa-exchange-alt"></i>
+    <span>{{localize "BOBSNPC.Bank.Transfer"}}</span>
+  </button>
+
+  {{#if loansEnabled}}
+    <button type="button" class="bank-tab {{#if (eq activeTab 'loans')}}active{{/if}}"
+            data-action="setTab" data-tab="loans">
+      <i class="fa-solid fa-file-invoice-dollar"></i>
+      <span>{{localize "BOBSNPC.Bank.Loans"}}</span>
+      {{#if hasActiveLoans}}
+        <span class="tab-badge warning">!</span>
+      {{/if}}
+    </button>
+  {{/if}}
+
+  {{#if storageEnabled}}
+    <button type="button" class="bank-tab {{#if (eq activeTab 'storage')}}active{{/if}}"
+            data-action="setTab" data-tab="storage">
+      <i class="fa-solid fa-vault"></i>
+      <span>{{localize "BOBSNPC.Bank.Storage"}}</span>
+    </button>
+  {{/if}}
+</nav>

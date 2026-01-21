@@ -1,0 +1,132 @@
+{{!-- GM Dashboard - Overview Tab --}}
+<div class="tab-content overview-tab {{theme}}" {{#unless (eq activeTab 'overview')}}hidden{{/unless}}>
+  {{#with overview}}
+    {{!-- Statistics Cards --}}
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{stats.totalNPCs}}</span>
+          <span class="stat-label">{{localize "BOBSNPC.GMDashboard.ConfiguredNPCs"}}</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa-solid fa-scroll"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{stats.totalQuests}}</span>
+          <span class="stat-label">{{localize "BOBSNPC.GMDashboard.TotalQuests"}}</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa-solid fa-flag"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{stats.totalFactions}}</span>
+          <span class="stat-label">{{localize "BOBSNPC.GMDashboard.TotalFactions"}}</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{stats.activeEvents}}</span>
+          <span class="stat-label">{{localize "BOBSNPC.GMDashboard.ActiveEvents"}}</span>
+        </div>
+      </div>
+    </section>
+
+    {{!-- NPCs by Role --}}
+    <section class="overview-section">
+      <h3>{{localize "BOBSNPC.GMDashboard.NPCsByRole"}}</h3>
+      <div class="role-breakdown">
+        {{#with stats.npcsByRole}}
+          <div class="role-bar">
+            <span class="role-label"><i class="fa-solid fa-exclamation"></i> {{localize "BOBSNPC.NPC.Roles.QuestGiver"}}</span>
+            <span class="role-count">{{this.questGiver}}</span>
+          </div>
+          <div class="role-bar">
+            <span class="role-label"><i class="fa-solid fa-coins"></i> {{localize "BOBSNPC.NPC.Roles.Merchant"}}</span>
+            <span class="role-count">{{this.merchant}}</span>
+          </div>
+          <div class="role-bar">
+            <span class="role-label"><i class="fa-solid fa-landmark"></i> {{localize "BOBSNPC.NPC.Roles.Banker"}}</span>
+            <span class="role-count">{{this.banker}}</span>
+          </div>
+          <div class="role-bar">
+            <span class="role-label"><i class="fa-solid fa-graduation-cap"></i> {{localize "BOBSNPC.NPC.Roles.Trainer"}}</span>
+            <span class="role-count">{{this.trainer}}</span>
+          </div>
+          <div class="role-bar">
+            <span class="role-label"><i class="fa-solid fa-bed"></i> {{localize "BOBSNPC.NPC.Roles.Innkeeper"}}</span>
+            <span class="role-count">{{this.innkeeper}}</span>
+          </div>
+          <div class="role-bar">
+            <span class="role-label"><i class="fa-solid fa-shield-halved"></i> {{localize "BOBSNPC.NPC.Roles.Guard"}}</span>
+            <span class="role-count">{{this.guard}}</span>
+          </div>
+        {{/with}}
+      </div>
+    </section>
+
+    {{!-- Quest Status Breakdown --}}
+    <section class="overview-section">
+      <h3>{{localize "BOBSNPC.GMDashboard.QuestStatus"}}</h3>
+      <div class="quest-breakdown">
+        {{#with stats.questsByStatus}}
+          <div class="status-pill available">
+            <span class="status-count">{{this.available}}</span>
+            <span class="status-label">{{localize "BOBSNPC.Quest.Status.Available"}}</span>
+          </div>
+          <div class="status-pill accepted">
+            <span class="status-count">{{this.accepted}}</span>
+            <span class="status-label">{{localize "BOBSNPC.Quest.Status.Accepted"}}</span>
+          </div>
+          <div class="status-pill active">
+            <span class="status-count">{{this.active}}</span>
+            <span class="status-label">{{localize "BOBSNPC.Quest.Status.Active"}}</span>
+          </div>
+          <div class="status-pill complete">
+            <span class="status-count">{{this.complete}}</span>
+            <span class="status-label">{{localize "BOBSNPC.Quest.Status.Complete"}}</span>
+          </div>
+          <div class="status-pill failed">
+            <span class="status-count">{{this.failed}}</span>
+            <span class="status-label">{{localize "BOBSNPC.Quest.Status.Failed"}}</span>
+          </div>
+        {{/with}}
+      </div>
+    </section>
+
+    {{!-- Quick Actions --}}
+    <section class="overview-section">
+      <h3>{{localize "BOBSNPC.GMDashboard.QuickActions"}}</h3>
+      <div class="quick-actions">
+        <button type="button" class="action-btn" data-action="createQuest">
+          <i class="fa-solid fa-plus"></i>
+          {{localize "BOBSNPC.GMDashboard.CreateQuest"}}
+        </button>
+        <button type="button" class="action-btn" data-action="createFaction">
+          <i class="fa-solid fa-plus"></i>
+          {{localize "BOBSNPC.GMDashboard.CreateFaction"}}
+        </button>
+        <button type="button" class="action-btn" data-action="triggerEvent">
+          <i class="fa-solid fa-bolt"></i>
+          {{localize "BOBSNPC.GMDashboard.TriggerEvent"}}
+        </button>
+        <button type="button" class="action-btn" data-action="createBackup">
+          <i class="fa-solid fa-download"></i>
+          {{localize "BOBSNPC.GMDashboard.CreateBackup"}}
+        </button>
+      </div>
+    </section>
+  {{/with}}
+</div>

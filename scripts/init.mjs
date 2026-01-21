@@ -34,37 +34,66 @@ export function initializeHooks() {
  */
 async function loadTemplates() {
   const templatePaths = [
-    // Quest templates
-    `modules/${MODULE_ID}/templates/quest-log.hbs`,
-    `modules/${MODULE_ID}/templates/quest-tracker.hbs`,
-    `modules/${MODULE_ID}/templates/quest-card.hbs`,
-    `modules/${MODULE_ID}/templates/quest-editor.hbs`,
+    // Dialogue window templates
+    `modules/${MODULE_ID}/templates/dialogue/header.hbs`,
+    `modules/${MODULE_ID}/templates/dialogue/content.hbs`,
+    `modules/${MODULE_ID}/templates/dialogue/responses.hbs`,
+    `modules/${MODULE_ID}/templates/dialogue/footer.hbs`,
 
-    // Dialogue templates
-    `modules/${MODULE_ID}/templates/dialogue-window.hbs`,
-    `modules/${MODULE_ID}/templates/dialogue-editor.hbs`,
-    `modules/${MODULE_ID}/templates/dialogue-node.hbs`,
+    // Quest log templates
+    `modules/${MODULE_ID}/templates/quest-log/sidebar.hbs`,
+    `modules/${MODULE_ID}/templates/quest-log/details.hbs`,
+
+    // Quest tracker template
+    `modules/${MODULE_ID}/templates/quest-tracker/tracker.hbs`,
 
     // Shop templates
-    `modules/${MODULE_ID}/templates/shop-window.hbs`,
-    `modules/${MODULE_ID}/templates/shop-item.hbs`,
+    `modules/${MODULE_ID}/templates/shop/header.hbs`,
+    `modules/${MODULE_ID}/templates/shop/tabs.hbs`,
+    `modules/${MODULE_ID}/templates/shop/inventory.hbs`,
+    `modules/${MODULE_ID}/templates/shop/cart.hbs`,
+    `modules/${MODULE_ID}/templates/shop/footer.hbs`,
 
-    // Other templates
-    `modules/${MODULE_ID}/templates/faction-overview.hbs`,
-    `modules/${MODULE_ID}/templates/faction-card.hbs`,
-    `modules/${MODULE_ID}/templates/bank-window.hbs`,
-    `modules/${MODULE_ID}/templates/trade-window.hbs`,
-    `modules/${MODULE_ID}/templates/loot-window.hbs`,
-    `modules/${MODULE_ID}/templates/storage-window.hbs`,
-    `modules/${MODULE_ID}/templates/gm-dashboard.hbs`,
-    `modules/${MODULE_ID}/templates/npc-editor.hbs`,
+    // Bank templates
+    `modules/${MODULE_ID}/templates/bank/header.hbs`,
+    `modules/${MODULE_ID}/templates/bank/tabs.hbs`,
+    `modules/${MODULE_ID}/templates/bank/content.hbs`,
+    `modules/${MODULE_ID}/templates/bank/footer.hbs`,
 
-    // Partials
-    `modules/${MODULE_ID}/templates/partials/objective-list.hbs`,
-    `modules/${MODULE_ID}/templates/partials/reward-list.hbs`,
-    `modules/${MODULE_ID}/templates/partials/condition-builder.hbs`,
-    `modules/${MODULE_ID}/templates/partials/effect-builder.hbs`,
-    `modules/${MODULE_ID}/templates/partials/relationship-display.hbs`
+    // Faction templates
+    `modules/${MODULE_ID}/templates/factions/sidebar.hbs`,
+    `modules/${MODULE_ID}/templates/factions/details.hbs`,
+    `modules/${MODULE_ID}/templates/factions/members-dialog.hbs`,
+
+    // Hireling templates
+    `modules/${MODULE_ID}/templates/hireling/tabs.hbs`,
+    `modules/${MODULE_ID}/templates/hireling/content.hbs`,
+    `modules/${MODULE_ID}/templates/hireling/footer.hbs`,
+
+    // Property templates
+    `modules/${MODULE_ID}/templates/property/tabs.hbs`,
+    `modules/${MODULE_ID}/templates/property/content.hbs`,
+    `modules/${MODULE_ID}/templates/property/footer.hbs`,
+
+    // NPC Config templates
+    `modules/${MODULE_ID}/templates/npc-config/tabs.hbs`,
+    `modules/${MODULE_ID}/templates/npc-config/general.hbs`,
+    `modules/${MODULE_ID}/templates/npc-config/roles.hbs`,
+    `modules/${MODULE_ID}/templates/npc-config/dialogue.hbs`,
+    `modules/${MODULE_ID}/templates/npc-config/schedule.hbs`,
+    `modules/${MODULE_ID}/templates/npc-config/services.hbs`,
+    `modules/${MODULE_ID}/templates/npc-config/factions.hbs`,
+    `modules/${MODULE_ID}/templates/npc-config/appearance.hbs`,
+    `modules/${MODULE_ID}/templates/npc-config/footer.hbs`,
+
+    // GM Dashboard templates
+    `modules/${MODULE_ID}/templates/gm-dashboard/tabs.hbs`,
+    `modules/${MODULE_ID}/templates/gm-dashboard/overview.hbs`,
+    `modules/${MODULE_ID}/templates/gm-dashboard/quests.hbs`,
+    `modules/${MODULE_ID}/templates/gm-dashboard/npcs.hbs`,
+    `modules/${MODULE_ID}/templates/gm-dashboard/factions.hbs`,
+    `modules/${MODULE_ID}/templates/gm-dashboard/world.hbs`,
+    `modules/${MODULE_ID}/templates/gm-dashboard/tools.hbs`
   ];
 
   try {
