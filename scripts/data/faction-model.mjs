@@ -29,6 +29,20 @@ export const DefaultRanks = Object.freeze({
 });
 
 /**
+ * Reputation level enum
+ */
+export const ReputationLevel = Object.freeze({
+  HATED: "hated",
+  HOSTILE: "hostile",
+  UNFRIENDLY: "unfriendly",
+  NEUTRAL: "neutral",
+  FRIENDLY: "friendly",
+  HONORED: "honored",
+  REVERED: "revered",
+  EXALTED: "exalted"
+});
+
+/**
  * Create a faction rank
  * @param {object} data - Rank data
  * @returns {object}

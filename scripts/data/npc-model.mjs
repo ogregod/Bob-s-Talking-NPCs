@@ -26,6 +26,20 @@ export const NPCRole = Object.freeze({
 });
 
 /**
+ * NPC indicator types for visual markers
+ */
+export const IndicatorType = Object.freeze({
+  NONE: "none",
+  QUEST_AVAILABLE: "questAvailable",
+  QUEST_TURNIN: "questTurnIn",
+  QUEST_PROGRESS: "questProgress",
+  MERCHANT: "merchant",
+  TRAINER: "trainer",
+  SERVICE: "service",
+  DIALOGUE: "dialogue"
+});
+
+/**
  * Portrait source types
  */
 export const PortraitSource = Object.freeze({

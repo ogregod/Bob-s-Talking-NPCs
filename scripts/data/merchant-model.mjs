@@ -72,6 +72,21 @@ export const Currency = Object.freeze({
 });
 
 /**
+ * Item category enum for shop filtering
+ */
+export const ItemCategory = Object.freeze({
+  WEAPONS: "weapons",
+  ARMOR: "armor",
+  GEAR: "gear",
+  POTIONS: "potions",
+  SCROLLS: "scrolls",
+  CONSUMABLES: "consumables",
+  TOOLS: "tools",
+  MISC: "misc",
+  ALL: "all"
+});
+
+/**
  * Create a shop inventory item
  * @param {object} data - Item data
  * @returns {object}
