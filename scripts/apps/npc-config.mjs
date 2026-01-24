@@ -7,10 +7,22 @@
 const MODULE_ID = "bobs-talking-npcs";
 
 import { localize } from "../utils/helpers.mjs";
-import { npcHandler } from "../handlers/npc-handler.mjs";
-import { dialogueHandler } from "../handlers/dialogue-handler.mjs";
-import { factionHandler } from "../handlers/faction-handler.mjs";
 import { NPCRole, IndicatorType } from "../data/npc-model.mjs";
+
+/** Get NPC handler instance from API */
+function getNpcHandler() {
+  return game.bobsnpc?.handlers?.npc;
+}
+
+/** Get dialogue handler instance from API */
+function getDialogueHandler() {
+  return game.bobsnpc?.handlers?.dialogue;
+}
+
+/** Get faction handler instance from API */
+function getFactionHandler() {
+  return game.bobsnpc?.handlers?.faction;
+}
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -32,7 +44,7 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Working copy of NPC config
     this._config = foundry.utils.deepClone(
-      npcHandler.getNPCConfig(npc) || this._getDefaultConfig()
+      getNpcHandler().getNPCConfig(npc) || this._getDefaultConfig()
     );
   }
 
@@ -177,8 +189,8 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     const context = await super._prepareContext(options);
 
     // Get available data for dropdowns
-    const allDialogues = dialogueHandler.getAllDialogues();
-    const allFactions = factionHandler.getAllFactions();
+    const allDialogues = getDialogueHandler().getAllDialogues();
+    const allFactions = getFactionHandler().getAllFactions();
     const allShops = await this._getAvailableShops();
     const allBanks = await this._getAvailableBanks();
 
@@ -656,7 +668,7 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     // Show indicator on token
     const token = this.npc.getActiveTokens()[0];
     if (token) {
-      await npcHandler.showIndicator(token, indicator);
+      await getNpcHandler().showIndicator(token, indicator);
       ui.notifications.info(localize("NPCConfig.IndicatorTestShown"));
     } else {
       ui.notifications.warn(localize("NPCConfig.NoActiveToken"));
@@ -670,7 +682,7 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       this._config.metadata.modifiedBy = game.user.id;
 
       // Save to NPC
-      await npcHandler.configureNPC(this.npc, this._config);
+      await getNpcHandler().configureNPC(this.npc, this._config);
 
       this._unsavedChanges = false;
       ui.notifications.info(localize("NPCConfig.Saved"));

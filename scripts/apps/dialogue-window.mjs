@@ -7,8 +7,16 @@
 const MODULE_ID = "bobs-talking-npcs";
 
 import { localize } from "../utils/helpers.mjs";
-import { dialogueHandler } from "../handlers/dialogue-handler.mjs";
-import { npcHandler } from "../handlers/npc-handler.mjs";
+
+/** Get dialogue handler instance from API */
+function getDialogueHandler() {
+  return game.bobsnpc?.handlers?.dialogue;
+}
+
+/** Get NPC handler instance from API */
+function getNpcHandler() {
+  return game.bobsnpc?.handlers?.npc;
+}
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -103,11 +111,11 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Start or resume dialogue session
     if (this.sessionId) {
-      this._session = dialogueHandler.getSession(this.sessionId);
+      this._session = getDialogueHandler().getSession(this.sessionId);
     }
 
     if (!this._session) {
-      const result = await dialogueHandler.startDialogue(
+      const result = await getDialogueHandler().startDialogue(
         this.dialogueId,
         this.npcActorUuid,
         this.playerActorUuid
@@ -127,7 +135,7 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
-    const npcConfig = npcHandler.getConfig(this.npcActorUuid);
+    const npcConfig = getNpcHandler().getConfig(this.npcActorUuid);
     const portrait = this._getPortrait(npcConfig);
     const theme = game.settings.get(MODULE_ID, "theme") || "dark";
 
@@ -221,7 +229,7 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // End session if owner
     if (this._session && game.user.isGM) {
-      await dialogueHandler.endDialogue(this.sessionId);
+      await getDialogueHandler().endDialogue(this.sessionId);
     }
   }
 
@@ -299,7 +307,7 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
     for (const response of responses) {
       if (response.conditions?.length > 0) {
-        const conditionsMet = await dialogueHandler.evaluateConditions(
+        const conditionsMet = await getDialogueHandler().evaluateConditions(
           response.conditions,
           {
             npcActorUuid: this.npcActorUuid,
@@ -327,7 +335,7 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     try {
-      const result = await dialogueHandler.selectResponse(
+      const result = await getDialogueHandler().selectResponse(
         this.sessionId,
         responseId,
         rollResult
@@ -428,7 +436,7 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const serviceType = target.dataset.serviceType;
 
     // Route to appropriate service window
-    const result = await npcHandler.accessService(
+    const result = await getNpcHandler().accessService(
       this.npcActorUuid,
       this.playerActorUuid,
       serviceType
@@ -621,14 +629,14 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   static async open(npcActorUuid, playerActorUuid, options = {}) {
     // Check NPC configuration
-    const npcConfig = npcHandler.getConfig(npcActorUuid);
+    const npcConfig = getNpcHandler().getConfig(npcActorUuid);
     if (!npcConfig?.enabled) {
       ui.notifications.warn(localize("Errors.NPCNotConfigured"));
       return null;
     }
 
     // Start interaction
-    const interaction = await npcHandler.startInteraction(npcActorUuid, playerActorUuid);
+    const interaction = await getNpcHandler().startInteraction(npcActorUuid, playerActorUuid);
     if (!interaction.available) {
       if (interaction.unavailable) {
         ui.notifications.info(interaction.message || localize("NPC.Unavailable"));

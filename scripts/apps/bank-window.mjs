@@ -7,8 +7,12 @@
 const MODULE_ID = "bobs-talking-npcs";
 
 import { localize, formatCurrency } from "../utils/helpers.mjs";
-import { bankHandler } from "../handlers/bank-handler.mjs";
 import { AccountType, TransactionType } from "../data/bank-model.mjs";
+
+/** Get bank handler instance from API */
+function getBankHandler() {
+  return game.bobsnpc?.handlers?.bank;
+}
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -108,7 +112,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     // Open bank session
-    const result = await bankHandler.openBank(this.bankId, this.playerActorUuid);
+    const result = await getBankHandler().openBank(this.bankId, this.playerActorUuid);
     this._session = result.session;
     this._sessionId = result.sessionId;
   }
@@ -117,8 +121,8 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
-    const bank = bankHandler.getBank(this.bankId);
-    const playerAccounts = await bankHandler.getPlayerAccounts(this.playerActorUuid, this.bankId);
+    const bank = getBankHandler().getBank(this.bankId);
+    const playerAccounts = await getBankHandler().getPlayerAccounts(this.playerActorUuid, this.bankId);
     const playerGold = this._getPlayerGold();
 
     // Select first account if none selected
@@ -129,10 +133,10 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const selectedAccount = playerAccounts.find(a => a.id === this._selectedAccountId);
 
     // Get loans if any
-    const loans = await bankHandler.getPlayerLoans(this.playerActorUuid, this.bankId);
+    const loans = await getBankHandler().getPlayerLoans(this.playerActorUuid, this.bankId);
 
     // Get safe deposit boxes
-    const boxes = await bankHandler.getPlayerBoxes(this.playerActorUuid, this.bankId);
+    const boxes = await getBankHandler().getPlayerBoxes(this.playerActorUuid, this.bankId);
 
     // Prepare context based on tab
     let tabContent = {};
@@ -360,7 +364,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   _prepareLoansTab(loans, bank) {
     const playerGold = this._getPlayerGold();
-    const accounts = bankHandler.getPlayerAccounts(this.playerActorUuid, this.bankId);
+    const accounts = getBankHandler().getPlayerAccounts(this.playerActorUuid, this.bankId);
     const totalAssets = playerGold + accounts.reduce((sum, a) => sum + a.balance, 0);
 
     // Calculate max loan amount (typically based on assets or fixed limit)
@@ -453,7 +457,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const accountType = target.dataset.accountType;
 
     try {
-      const result = await bankHandler.openAccount(
+      const result = await getBankHandler().openAccount(
         this.bankId,
         this.playerActorUuid,
         { type: accountType }
@@ -475,7 +479,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     if (this._amount <= 0 || !this._selectedAccountId) return;
 
     try {
-      const result = await bankHandler.depositFunds(
+      const result = await getBankHandler().depositFunds(
         this._selectedAccountId,
         this._amount,
         this.playerActorUuid
@@ -499,7 +503,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     if (this._amount <= 0 || !this._selectedAccountId) return;
 
     try {
-      const result = await bankHandler.withdrawFunds(
+      const result = await getBankHandler().withdrawFunds(
         this._selectedAccountId,
         this._amount,
         this.playerActorUuid
@@ -523,7 +527,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     if (this._amount <= 0 || !this._selectedAccountId || !this._transferTargetId) return;
 
     try {
-      const result = await bankHandler.transferFunds(
+      const result = await getBankHandler().transferFunds(
         this._selectedAccountId,
         this._transferTargetId,
         this._amount
@@ -548,7 +552,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     if (this._amount <= 0) return;
 
     try {
-      const result = await bankHandler.requestLoan(
+      const result = await getBankHandler().requestLoan(
         this.bankId,
         this.playerActorUuid,
         this._amount
@@ -574,7 +578,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!loanId) return;
 
     try {
-      const result = await bankHandler.repayLoan(
+      const result = await getBankHandler().repayLoan(
         loanId,
         this.playerActorUuid,
         this._amount > 0 ? this._amount : null
@@ -599,7 +603,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!size) return;
 
     try {
-      const result = await bankHandler.rentSafeDepositBox(
+      const result = await getBankHandler().rentSafeDepositBox(
         this.bankId,
         this.playerActorUuid,
         size
@@ -645,7 +649,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Close bank session
     if (this._sessionId) {
-      await bankHandler.closeBank(this._sessionId);
+      await getBankHandler().closeBank(this._sessionId);
     }
   }
 

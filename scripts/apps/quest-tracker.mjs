@@ -7,8 +7,12 @@
 const MODULE_ID = "bobs-talking-npcs";
 
 import { localize, getFlag } from "../utils/helpers.mjs";
-import { questHandler } from "../handlers/quest-handler.mjs";
 import { QuestStatus, ObjectiveType } from "../data/quest-model.mjs";
+
+/** Get quest handler instance from API */
+function getQuestHandler() {
+  return game.bobsnpc?.handlers?.quest;
+}
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -169,7 +173,7 @@ export class QuestTracker extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!trackedId) return null;
 
     this._trackedQuestId = trackedId;
-    return questHandler.getQuest(trackedId);
+    return getQuestHandler().getQuest(trackedId);
   }
 
   /**
@@ -181,7 +185,7 @@ export class QuestTracker extends HandlebarsApplicationMixin(ApplicationV2) {
     const actor = game.user.character;
     if (!actor) return false;
 
-    const quests = questHandler.getPlayerQuests(actor.uuid);
+    const quests = getQuestHandler().getPlayerQuests(actor.uuid);
     const activeQuests = quests.filter(q =>
       q.status === QuestStatus.ACTIVE ||
       q.status === QuestStatus.IN_PROGRESS
@@ -253,7 +257,7 @@ export class QuestTracker extends HandlebarsApplicationMixin(ApplicationV2) {
     const actor = game.user.character;
     if (!actor) return;
 
-    const quests = questHandler.getPlayerQuests(actor.uuid);
+    const quests = getQuestHandler().getPlayerQuests(actor.uuid);
     const activeQuests = quests.filter(q =>
       q.status === QuestStatus.ACTIVE ||
       q.status === QuestStatus.IN_PROGRESS
@@ -283,13 +287,13 @@ export class QuestTracker extends HandlebarsApplicationMixin(ApplicationV2) {
 
     if (!questId || !objectiveId) return;
 
-    const quest = questHandler.getQuest(questId);
+    const quest = getQuestHandler().getQuest(questId);
     const objective = quest?.objectives?.find(o => o.id === objectiveId);
 
     if (!objective) return;
 
     // Toggle completion
-    await questHandler.updateObjective(questId, objectiveId, {
+    await getQuestHandler().updateObjective(questId, objectiveId, {
       completed: !objective.completed,
       current: objective.completed ? 0 : objective.target
     });

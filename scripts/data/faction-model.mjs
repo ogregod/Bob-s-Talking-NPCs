@@ -3,7 +3,8 @@
  * Defines the structure for factions, ranks, and reputation
  */
 
-import { MODULE_ID } from "../module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
 import { generateId } from "../utils/helpers.mjs";
 
 /**

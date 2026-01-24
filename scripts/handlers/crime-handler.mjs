@@ -3,7 +3,8 @@
  * Business logic for crime tracking, bounties, witnesses, and law enforcement
  */
 
-import { MODULE_ID } from "../module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
 import { localize, getFlag, setFlag, generateId } from "../utils/helpers.mjs";
 import {
   CrimeType,

@@ -3,7 +3,8 @@
  * Manages factions, reputation, ranks, and faction relationships
  */
 
-import { MODULE_ID } from "../module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
 import {
   createFaction,
   createRank,

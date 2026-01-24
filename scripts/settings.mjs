@@ -275,6 +275,50 @@ function registerWorldSettings() {
     default: true,
     requiresReload: false
   });
+
+  // ===== Data Storage Settings (Hidden) =====
+
+  // World data storage for quests, factions, dialogue states, etc.
+  game.settings.register(MODULE_ID, "worldData", {
+    name: "World Data",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {
+      quests: {},
+      factions: {},
+      dialogues: {},
+      merchants: {},
+      banks: {}
+    }
+  });
+
+  // Crime jurisdictions configuration
+  game.settings.register(MODULE_ID, "jurisdictions", {
+    name: "Jurisdictions",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {}
+  });
+
+  // Hireling data storage
+  game.settings.register(MODULE_ID, "hirelings", {
+    name: "Hirelings",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {}
+  });
+
+  // Property data storage
+  game.settings.register(MODULE_ID, "properties", {
+    name: "Properties",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {}
+  });
 }
 
 /**

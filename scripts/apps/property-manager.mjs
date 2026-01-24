@@ -7,8 +7,12 @@
 const MODULE_ID = "bobs-talking-npcs";
 
 import { localize, formatCurrency } from "../utils/helpers.mjs";
-import { propertyHandler } from "../handlers/property-handler.mjs";
 import { PropertyStatus, PropertyType, UpgradeType } from "../data/property-model.mjs";
+
+/** Get property handler instance from API */
+function getPropertyHandler() {
+  return game.bobsnpc?.handlers?.property;
+}
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -102,10 +106,10 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
     let properties = [];
     switch (this._tab) {
       case "owned":
-        properties = propertyHandler.getPlayerProperties(this.actorUuid);
+        properties = getPropertyHandler().getPlayerProperties(this.actorUuid);
         break;
       case "browse":
-        properties = propertyHandler.getAvailableProperties({});
+        properties = getPropertyHandler().getAvailableProperties({});
         break;
     }
 
@@ -122,10 +126,10 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const selectedProperty = properties.find(p => p.id === this._selectedPropertyId);
 
     // Get counts
-    const ownedProperties = propertyHandler.getPlayerProperties(this.actorUuid);
+    const ownedProperties = getPropertyHandler().getPlayerProperties(this.actorUuid);
     const counts = {
       owned: ownedProperties.length,
-      available: propertyHandler.getAvailableProperties({}).length,
+      available: getPropertyHandler().getAvailableProperties({}).length,
       totalValue: ownedProperties.reduce((sum, p) =>
         sum + (p.pricing?.appraisedValue || p.pricing?.purchasePrice || 0), 0)
     };
@@ -201,10 +205,10 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
       property.ownership?.ownerUuid === this.actorUuid;
 
     // Prepare storage
-    const storage = propertyHandler.getStorageSummary(property.id);
+    const storage = getPropertyHandler().getStorageSummary(property.id);
 
     // Prepare upgrades
-    const upgrades = await propertyHandler.getAvailableUpgrades(
+    const upgrades = await getPropertyHandler().getAvailableUpgrades(
       property.id, this.actorUuid
     );
 
@@ -523,7 +527,7 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const propertyId = target.dataset.propertyId;
     const useMortgage = target.dataset.mortgage === "true";
 
-    const result = await propertyHandler.purchaseProperty(
+    const result = await getPropertyHandler().purchaseProperty(
       propertyId, this.actorUuid, { useMortgage }
     );
 
@@ -561,7 +565,7 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
           callback: async (html) => {
             const weeks = parseInt(html.find("[name=weeks]").val()) || 4;
 
-            const result = await propertyHandler.rentProperty(
+            const result = await getPropertyHandler().rentProperty(
               propertyId, this.actorUuid, weeks
             );
 
@@ -583,7 +587,7 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static async #onSell(event, target) {
     const propertyId = target.dataset.propertyId;
-    const property = propertyHandler.getProperty(propertyId);
+    const property = getPropertyHandler().getProperty(propertyId);
 
     const confirmed = await Dialog.confirm({
       title: localize("Properties.SellTitle"),
@@ -592,7 +596,7 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
     if (!confirmed) return;
 
-    const result = await propertyHandler.sellProperty(propertyId, this.actorUuid);
+    const result = await getPropertyHandler().sellProperty(propertyId, this.actorUuid);
 
     if (result.success) {
       ui.notifications.info(localize("Properties.Sold", {
@@ -609,7 +613,7 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onEndLease(event, target) {
     const propertyId = target.dataset.propertyId;
 
-    const result = await propertyHandler.endLease(propertyId, this.actorUuid);
+    const result = await getPropertyHandler().endLease(propertyId, this.actorUuid);
 
     if (result.success) {
       ui.notifications.info(localize("Properties.LeaseEnded"));
@@ -624,7 +628,7 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const propertyId = target.dataset.propertyId;
     const upgradeId = target.dataset.upgradeId;
 
-    const result = await propertyHandler.installUpgrade(
+    const result = await getPropertyHandler().installUpgrade(
       propertyId, upgradeId, this.actorUuid
     );
 
@@ -649,7 +653,7 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const propertyId = target.dataset.propertyId;
     const staffId = target.dataset.staffId;
 
-    const result = await propertyHandler.fireStaff(
+    const result = await getPropertyHandler().fireStaff(
       propertyId, staffId, this.actorUuid
     );
 
@@ -664,7 +668,7 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onCollectIncome(event, target) {
     const propertyId = target.dataset.propertyId;
 
-    const result = await propertyHandler.collectIncome(propertyId, this.actorUuid);
+    const result = await getPropertyHandler().collectIncome(propertyId, this.actorUuid);
 
     if (result.success) {
       ui.notifications.info(localize("Properties.IncomeCollected", {
@@ -679,7 +683,7 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onPayExpenses(event, target) {
     const propertyId = target.dataset.propertyId;
 
-    const result = await propertyHandler.payExpenses(propertyId, this.actorUuid);
+    const result = await getPropertyHandler().payExpenses(propertyId, this.actorUuid);
 
     if (result.success) {
       ui.notifications.info(localize("Properties.ExpensesPaid", {
@@ -694,7 +698,7 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onPayMortgage(event, target) {
     const propertyId = target.dataset.propertyId;
 
-    const result = await propertyHandler.makeMortgagePayment(
+    const result = await getPropertyHandler().makeMortgagePayment(
       propertyId, this.actorUuid
     );
 
@@ -711,7 +715,7 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onMaintenance(event, target) {
     const propertyId = target.dataset.propertyId;
 
-    const result = await propertyHandler.performMaintenance(
+    const result = await getPropertyHandler().performMaintenance(
       propertyId, this.actorUuid
     );
 
@@ -726,7 +730,7 @@ export class PropertyManager extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onRepair(event, target) {
     const propertyId = target.dataset.propertyId;
 
-    const result = await propertyHandler.repairDamage(propertyId, this.actorUuid);
+    const result = await getPropertyHandler().repairDamage(propertyId, this.actorUuid);
 
     if (result.success) {
       ui.notifications.info(localize("Properties.Repaired"));

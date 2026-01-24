@@ -7,8 +7,12 @@
 const MODULE_ID = "bobs-talking-npcs";
 
 import { localize, formatCurrency } from "../utils/helpers.mjs";
-import { hirelingHandler } from "../handlers/hireling-handler.mjs";
 import { HirelingStatus, LoyaltyLevel, ContractType } from "../data/hireling-model.mjs";
+
+/** Get hireling handler instance from API */
+function getHirelingHandler() {
+  return game.bobsnpc?.handlers?.hireling;
+}
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -125,8 +129,8 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Count items
     const counts = {
-      hirelings: hirelingHandler.getPlayerHirelings(this.actorUuid).length,
-      mounts: hirelingHandler.getPlayerMounts(this.actorUuid).length
+      hirelings: getHirelingHandler().getPlayerHirelings(this.actorUuid).length,
+      mounts: getHirelingHandler().getPlayerMounts(this.actorUuid).length
     };
 
     return {
@@ -155,7 +159,7 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
    * @private
    */
   _prepareHirelings() {
-    const hirelings = hirelingHandler.getPlayerHirelings(this.actorUuid);
+    const hirelings = getHirelingHandler().getPlayerHirelings(this.actorUuid);
     return hirelings.map(h => ({
       ...h,
       itemType: "hireling"
@@ -168,7 +172,7 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
    * @private
    */
   _prepareMounts() {
-    const mounts = hirelingHandler.getPlayerMounts(this.actorUuid);
+    const mounts = getHirelingHandler().getPlayerMounts(this.actorUuid);
     return mounts.map(m => ({
       ...m,
       itemType: "mount"
@@ -184,7 +188,7 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const available = [];
 
     // Get available hirelings
-    const hirelings = await hirelingHandler.getAvailableHirelings(this.actorUuid);
+    const hirelings = await getHirelingHandler().getAvailableHirelings(this.actorUuid);
     available.push(...hirelings.map(h => ({
       ...h,
       itemType: "hireling"
@@ -192,16 +196,16 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Get available mounts (if at stable)
     if (this.recruiterId) {
-      const stable = hirelingHandler.getStable(this.recruiterId);
+      const stable = getHirelingHandler().getStable(this.recruiterId);
       if (stable) {
         for (const mountId of stable.mountsForSale || []) {
-          const mount = hirelingHandler.getMount(mountId);
+          const mount = getHirelingHandler().getMount(mountId);
           if (mount && mount.status === HirelingStatus.AVAILABLE) {
             available.push({ ...mount, itemType: "mount", forSale: true });
           }
         }
         for (const mountId of stable.mountsForRent || []) {
-          const mount = hirelingHandler.getMount(mountId);
+          const mount = getHirelingHandler().getMount(mountId);
           if (mount && mount.status === HirelingStatus.AVAILABLE) {
             available.push({ ...mount, itemType: "mount", forRent: true });
           }
@@ -470,7 +474,7 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
     if (type === "hireling") {
       // Show hire dialog for contract options
-      const hireling = hirelingHandler.getHireling(id);
+      const hireling = getHirelingHandler().getHireling(id);
       if (!hireling) return;
 
       const content = await renderTemplate(
@@ -489,7 +493,7 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
               const contractType = html.find("[name=contractType]").val();
               const days = parseInt(html.find("[name=days]").val()) || 1;
 
-              const result = await hirelingHandler.hireHireling(
+              const result = await getHirelingHandler().hireHireling(
                 id, this.actorUuid, { type: contractType, days }
               );
 
@@ -520,7 +524,7 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
     if (!confirmed) return;
 
-    const result = await hirelingHandler.dismissHireling(id, this.actorUuid);
+    const result = await getHirelingHandler().dismissHireling(id, this.actorUuid);
     if (result.success) {
       ui.notifications.info(localize("Hirelings.Dismissed", { name: result.hireling.name }));
       this._selectedId = null;
@@ -533,7 +537,7 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onPayWages(event, target) {
     const id = target.dataset.id;
 
-    const result = await hirelingHandler.payWages(id, this.actorUuid);
+    const result = await getHirelingHandler().payWages(id, this.actorUuid);
     if (result.success) {
       ui.notifications.info(localize("Hirelings.WagesPaid", {
         amount: formatCurrency(result.paid)
@@ -553,7 +557,7 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onPurchaseMount(event, target) {
     const id = target.dataset.id;
 
-    const result = await hirelingHandler.purchaseMount(id, this.actorUuid);
+    const result = await getHirelingHandler().purchaseMount(id, this.actorUuid);
     if (result.success) {
       ui.notifications.info(localize("Mounts.Purchased", { name: result.mount.name }));
       this._tab = "mounts";
@@ -586,7 +590,7 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
           callback: async (html) => {
             const days = parseInt(html.find("[name=days]").val()) || 1;
 
-            const result = await hirelingHandler.rentMount(id, this.actorUuid, days);
+            const result = await getHirelingHandler().rentMount(id, this.actorUuid, days);
             if (result.success) {
               ui.notifications.info(localize("Mounts.Rented", {
                 name: result.mount.name, days
@@ -606,7 +610,7 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onReturnMount(event, target) {
     const id = target.dataset.id;
 
-    const result = await hirelingHandler.returnMount(id, this.actorUuid);
+    const result = await getHirelingHandler().returnMount(id, this.actorUuid);
     if (result.success) {
       ui.notifications.info(localize("Mounts.Returned", { name: result.mount.name }));
       this._selectedId = null;
@@ -624,7 +628,7 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
       return;
     }
 
-    const result = await hirelingHandler.stableMount(
+    const result = await getHirelingHandler().stableMount(
       this.recruiterId, id, this.actorUuid, 7
     );
 
@@ -644,7 +648,7 @@ export class HirelingManager extends HandlebarsApplicationMixin(ApplicationV2) {
       return;
     }
 
-    const result = await hirelingHandler.retrieveMount(
+    const result = await getHirelingHandler().retrieveMount(
       this.recruiterId, id, this.actorUuid
     );
 

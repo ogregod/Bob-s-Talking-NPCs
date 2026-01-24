@@ -496,8 +496,8 @@ function registerRenderHooks() {
       class: "bobsnpc-config",
       icon: "fas fa-comments",
       onclick: () => {
-        // Open NPC configuration - implementation pending
-        Hooks.call(`${MODULE_ID}.openNPCConfig`, actor);
+        // Open NPC configuration via the UI API
+        game.bobsnpc?.ui?.openNPCConfig(actor);
       }
     });
   });

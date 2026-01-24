@@ -7,8 +7,12 @@
 const MODULE_ID = "bobs-talking-npcs";
 
 import { localize, formatCurrency } from "../utils/helpers.mjs";
-import { merchantHandler } from "../handlers/merchant-handler.mjs";
 import { ItemCategory } from "../data/merchant-model.mjs";
+
+/** Get merchant handler instance from API */
+function getMerchantHandler() {
+  return game.bobsnpc?.handlers?.merchant;
+}
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -117,7 +121,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     // Open shop session
-    const result = await merchantHandler.openShop(this.merchantId, this.playerActorUuid);
+    const result = await getMerchantHandler().openShop(this.merchantId, this.playerActorUuid);
     this._session = result.session;
     this._sessionId = result.sessionId;
   }
@@ -126,7 +130,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
-    const merchant = merchantHandler.getMerchant(this.merchantId);
+    const merchant = getMerchantHandler().getMerchant(this.merchantId);
     const playerGold = this._getPlayerGold();
 
     // Get inventory based on tab
@@ -241,7 +245,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       return ["weapon", "equipment", "consumable", "tool", "loot"].includes(type);
     });
 
-    const merchant = merchantHandler.getMerchant(this.merchantId);
+    const merchant = getMerchantHandler().getMerchant(this.merchantId);
     const buyMultiplier = merchant?.buyMultiplier ?? 0.5;
 
     return items.map(item => {
@@ -641,7 +645,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     try {
-      const result = await merchantHandler.purchaseItems(this._sessionId, purchases);
+      const result = await getMerchantHandler().purchaseItems(this._sessionId, purchases);
 
       if (result.success) {
         ui.notifications.info(localize("Shop.PurchaseComplete", {
@@ -667,7 +671,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     try {
-      const result = await merchantHandler.sellItems(this._sessionId, sales);
+      const result = await getMerchantHandler().sellItems(this._sessionId, sales);
 
       if (result.success) {
         ui.notifications.info(localize("Shop.SaleComplete", {
@@ -692,7 +696,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const roll = await this._playerActor.rollSkill(skill, { chatMessage: true });
 
     try {
-      const result = await merchantHandler.attemptHaggle(
+      const result = await getMerchantHandler().attemptHaggle(
         this._sessionId,
         itemId,
         skill,
@@ -729,7 +733,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Close shop session
     if (this._sessionId) {
-      await merchantHandler.closeShop(this._sessionId);
+      await getMerchantHandler().closeShop(this._sessionId);
     }
   }
 

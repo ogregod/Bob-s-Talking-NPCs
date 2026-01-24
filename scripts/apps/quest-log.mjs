@@ -7,8 +7,15 @@
 const MODULE_ID = "bobs-talking-npcs";
 
 import { localize } from "../utils/helpers.mjs";
-import { questHandler } from "../handlers/quest-handler.mjs";
 import { QuestStatus, ObjectiveType } from "../data/quest-model.mjs";
+
+/**
+ * Get quest handler instance from API
+ * @returns {object}
+ */
+function getQuestHandler() {
+  return game.bobsnpc?.handlers?.quest;
+}
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -139,9 +146,9 @@ export class QuestLog extends HandlebarsApplicationMixin(ApplicationV2) {
   async _getPlayerQuests() {
     if (!this.actorUuid) {
       // Get quests for all party members if no specific actor
-      return questHandler.getPartyQuests();
+      return getQuestHandler().getPartyQuests();
     }
-    return questHandler.getPlayerQuests(this.actorUuid);
+    return getQuestHandler().getPlayerQuests(this.actorUuid);
   }
 
   /**
@@ -513,7 +520,7 @@ export class QuestLog extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!confirmed) return;
 
     try {
-      await questHandler.abandonQuest(questId, this.actorUuid);
+      await getQuestHandler().abandonQuest(questId, this.actorUuid);
       ui.notifications.info(localize("QuestLog.QuestAbandoned"));
       this.render();
     } catch (error) {
@@ -523,7 +530,7 @@ export class QuestLog extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static async #onShareQuest(event, target) {
     const questId = target.dataset.questId;
-    const quest = questHandler.getQuest(questId);
+    const quest = getQuestHandler().getQuest(questId);
 
     if (!quest) return;
 
@@ -541,7 +548,7 @@ export class QuestLog extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static #onShowOnMap(event, target) {
     const questId = target.dataset.questId;
-    const quest = questHandler.getQuest(questId);
+    const quest = getQuestHandler().getQuest(questId);
 
     if (!quest?.location?.sceneId) {
       ui.notifications.warn(localize("QuestLog.NoLocation"));

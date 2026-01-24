@@ -105,6 +105,76 @@ Hooks.once("ready", () => {
 });
 
 /**
+ * Handle /bobsnpc chat command
+ */
+Hooks.on("chatMessage", (chatLog, message, chatData) => {
+  if (!message.startsWith("/bobsnpc")) return true;
+
+  const args = message.slice(9).trim().split(/\s+/);
+  const command = args[0]?.toLowerCase() || "help";
+
+  switch (command) {
+    case "quest":
+    case "quests":
+    case "log":
+      game.bobsnpc?.ui?.openQuestLog();
+      break;
+
+    case "faction":
+    case "factions":
+    case "rep":
+      game.bobsnpc?.ui?.openFactionOverview();
+      break;
+
+    case "tracker":
+      game.bobsnpc?.ui?.openQuestTracker();
+      break;
+
+    case "dashboard":
+    case "gm":
+      game.bobsnpc?.ui?.openGmDashboard();
+      break;
+
+    case "npc":
+      // Configure selected token's NPC
+      const selectedToken = canvas.tokens?.controlled?.[0];
+      if (selectedToken?.actor?.type === "npc") {
+        game.bobsnpc?.ui?.openNPCConfig(selectedToken.actor);
+      } else {
+        ui.notifications.warn("Select an NPC token first");
+      }
+      break;
+
+    case "help":
+    default:
+      // Show help message
+      ChatMessage.create({
+        content: `<div style="border: 2px solid #7b68ee; border-radius: 8px; padding: 10px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+          <h3 style="margin: 0 0 10px 0; color: #7b68ee;">
+            <i class="fas fa-comments"></i> Bob's Talking NPCs Commands
+          </h3>
+          <table style="width: 100%; color: #e0e0e0; font-size: 0.85em;">
+            <tr><td><code>/bobsnpc quest</code></td><td>Open Quest Log</td></tr>
+            <tr><td><code>/bobsnpc faction</code></td><td>Open Faction Overview</td></tr>
+            <tr><td><code>/bobsnpc tracker</code></td><td>Open Quest Tracker</td></tr>
+            <tr><td><code>/bobsnpc npc</code></td><td>Configure selected NPC</td></tr>
+            ${game.user.isGM ? '<tr><td><code>/bobsnpc dashboard</code></td><td>Open GM Dashboard</td></tr>' : ''}
+          </table>
+          <p style="margin: 10px 0 0 0; color: #a0a0a0; font-size: 0.8em;">
+            <strong>Keybindings:</strong> J = Quest Log, Shift+J = Factions, Shift+T = Toggle Tracker
+          </p>
+        </div>`,
+        whisper: [game.user.id],
+        speaker: { alias: "Bob's Talking NPCs" }
+      });
+      break;
+  }
+
+  // Prevent the message from being posted
+  return false;
+});
+
+/**
  * Handle module setup errors gracefully
  */
 Hooks.once("error", (location, error) => {

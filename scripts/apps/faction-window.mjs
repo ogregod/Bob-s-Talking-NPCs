@@ -7,8 +7,12 @@
 const MODULE_ID = "bobs-talking-npcs";
 
 import { localize } from "../utils/helpers.mjs";
-import { factionHandler } from "../handlers/faction-handler.mjs";
 import { ReputationLevel } from "../data/faction-model.mjs";
+
+/** Get faction handler instance from API */
+function getFactionHandler() {
+  return game.bobsnpc?.handlers?.faction;
+}
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -80,7 +84,7 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const context = await super._prepareContext(options);
 
     // Get all factions
-    const allFactions = factionHandler.getAllFactions();
+    const allFactions = getFactionHandler().getAllFactions();
 
     // Get player's standings
     const playerStandings = await this._getPlayerStandings(allFactions);
@@ -128,9 +132,9 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const standings = [];
 
     for (const faction of factions) {
-      const reputation = await factionHandler.getReputation(this.actorUuid, faction.id);
-      const rank = await factionHandler.getRank(this.actorUuid, faction.id);
-      const level = factionHandler.getReputationLevel(reputation);
+      const reputation = await getFactionHandler().getReputation(this.actorUuid, faction.id);
+      const rank = await getFactionHandler().getRank(this.actorUuid, faction.id);
+      const level = getFactionHandler().getReputationLevel(reputation);
 
       standings.push({
         ...faction,
@@ -321,7 +325,7 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   _prepareFactionRelations(faction) {
     if (!faction.relations) return [];
 
-    const allFactions = factionHandler.getAllFactions();
+    const allFactions = getFactionHandler().getAllFactions();
 
     return Object.entries(faction.relations).map(([factionId, relation]) => {
       const relatedFaction = allFactions.find(f => f.id === factionId);
@@ -448,7 +452,7 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const factionId = target.dataset.factionId;
 
     // Get NPCs belonging to this faction
-    const npcs = await factionHandler.getFactionNPCs(factionId);
+    const npcs = await getFactionHandler().getFactionNPCs(factionId);
 
     // Show in a dialog
     const content = await renderTemplate(
