@@ -6,6 +6,23 @@
 import { MODULE_ID } from "./module.mjs";
 import { initializeAppearance, getSetting } from "./settings.mjs";
 
+// Import handlers for initialization
+import { QuestHandler } from "./handlers/quest-handler.mjs";
+import { DialogueHandler } from "./handlers/dialogue-handler.mjs";
+import { FactionHandler } from "./handlers/faction-handler.mjs";
+import { RelationshipHandler } from "./handlers/relationship-handler.mjs";
+import { MerchantHandler } from "./handlers/merchant-handler.mjs";
+import { BankHandler } from "./handlers/bank-handler.mjs";
+import { CrimeHandler } from "./handlers/crime-handler.mjs";
+import { HirelingHandler } from "./handlers/hireling-handler.mjs";
+import { PropertyHandler } from "./handlers/property-handler.mjs";
+import { NPCHandler } from "./handlers/npc-handler.mjs";
+
+/**
+ * Handler instances
+ */
+const handlers = {};
+
 /**
  * State for double-click detection on tokens
  */
@@ -93,7 +110,13 @@ async function loadTemplates() {
     `modules/${MODULE_ID}/templates/gm-dashboard/npcs.hbs`,
     `modules/${MODULE_ID}/templates/gm-dashboard/factions.hbs`,
     `modules/${MODULE_ID}/templates/gm-dashboard/world.hbs`,
-    `modules/${MODULE_ID}/templates/gm-dashboard/tools.hbs`
+    `modules/${MODULE_ID}/templates/gm-dashboard/tools.hbs`,
+
+    // Trade Window templates
+    `modules/${MODULE_ID}/templates/trade/header.hbs`,
+    `modules/${MODULE_ID}/templates/trade/your-offer.hbs`,
+    `modules/${MODULE_ID}/templates/trade/their-offer.hbs`,
+    `modules/${MODULE_ID}/templates/trade/footer.hbs`
   ];
 
   try {
@@ -167,6 +190,9 @@ export function registerReadyHooks() {
   // Initialize appearance settings
   initializeAppearance();
 
+  // Initialize all handlers
+  initializeHandlers();
+
   // Register token interaction hooks
   registerTokenHooks();
 
@@ -183,6 +209,50 @@ export function registerReadyHooks() {
   registerRenderHooks();
 
   console.log(`${MODULE_ID} | Ready hooks registered`);
+}
+
+/**
+ * Initialize all module handlers
+ */
+function initializeHandlers() {
+  try {
+    // Create handler instances
+    handlers.quest = new QuestHandler();
+    handlers.dialogue = new DialogueHandler();
+    handlers.faction = new FactionHandler();
+    handlers.relationship = new RelationshipHandler();
+    handlers.merchant = new MerchantHandler();
+    handlers.bank = new BankHandler();
+    handlers.crime = new CrimeHandler();
+    handlers.hireling = new HirelingHandler();
+    handlers.property = new PropertyHandler();
+    handlers.npc = new NPCHandler();
+
+    // Initialize each handler
+    for (const [name, handler] of Object.entries(handlers)) {
+      if (typeof handler.initialize === "function") {
+        handler.initialize();
+      }
+    }
+
+    // Expose handlers at game.bobsnpc.handlers for debugging
+    if (game.bobsnpc) {
+      game.bobsnpc.handlers = handlers;
+    }
+
+    console.log(`${MODULE_ID} | Handlers initialized`);
+  } catch (error) {
+    console.error(`${MODULE_ID} | Failed to initialize handlers:`, error);
+  }
+}
+
+/**
+ * Get a handler instance by name
+ * @param {string} name - Handler name
+ * @returns {object|null}
+ */
+export function getHandler(name) {
+  return handlers[name] || null;
 }
 
 /**

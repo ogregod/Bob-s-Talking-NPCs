@@ -1,0 +1,54 @@
+{{!-- Trade Window Footer --}}
+<footer class="trade-footer {{theme}}">
+  <div class="trade-summary">
+    <div class="summary-item">
+      <span class="label">{{localize "BOBSNPC.Trade.YouGive"}}:</span>
+      <span class="value">{{yourOfferValue}} gp</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">{{localize "BOBSNPC.Trade.YouReceive"}}:</span>
+      <span class="value">{{theirOfferValue}} gp</span>
+    </div>
+    {{#if (gt theirOfferValue yourOfferValue)}}
+      <div class="summary-item profit">
+        <span class="label">{{localize "BOBSNPC.Trade.NetGain"}}:</span>
+        <span class="value">+{{subtract theirOfferValue yourOfferValue}} gp</span>
+      </div>
+    {{else if (gt yourOfferValue theirOfferValue)}}
+      <div class="summary-item loss">
+        <span class="label">{{localize "BOBSNPC.Trade.NetLoss"}}:</span>
+        <span class="value">-{{subtract yourOfferValue theirOfferValue}} gp</span>
+      </div>
+    {{else}}
+      <div class="summary-item even">
+        <span class="label">{{localize "BOBSNPC.Trade.EvenTrade"}}</span>
+      </div>
+    {{/if}}
+  </div>
+
+  <div class="trade-actions">
+    <button type="button" class="cancel-btn" data-action="cancelTrade">
+      <i class="fa-solid fa-times"></i>
+      {{localize "BOBSNPC.Trade.Cancel"}}
+    </button>
+
+    {{#if canConfirm}}
+      {{#if yourOffer.confirmed}}
+        <button type="button" class="confirm-btn confirmed" disabled>
+          <i class="fa-solid fa-check"></i>
+          {{localize "BOBSNPC.Trade.Confirmed"}}
+        </button>
+      {{else}}
+        <button type="button" class="confirm-btn" data-action="confirmTrade">
+          <i class="fa-solid fa-handshake"></i>
+          {{localize "BOBSNPC.Trade.ConfirmTrade"}}
+        </button>
+      {{/if}}
+    {{else}}
+      <button type="button" class="confirm-btn" disabled title="{{localize 'BOBSNPC.Trade.BothMustLock'}}">
+        <i class="fa-solid fa-handshake"></i>
+        {{localize "BOBSNPC.Trade.ConfirmTrade"}}
+      </button>
+    {{/if}}
+  </div>
+</footer>

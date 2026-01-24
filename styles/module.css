@@ -16,6 +16,7 @@
 @import url("./components/property.css");
 @import url("./components/npc-config.css");
 @import url("./components/gm-dashboard.css");
+@import url("./components/trade.css");
 
 /* ===== CSS Layer for V13 Compatibility ===== */
 @layer bobsnpc {

@@ -28,6 +28,7 @@ import { HirelingManager } from "./apps/hireling-manager.mjs";
 import { PropertyManager } from "./apps/property-manager.mjs";
 import { NPCConfig } from "./apps/npc-config.mjs";
 import { GMDashboard } from "./apps/gm-dashboard.mjs";
+import { TradeWindow } from "./apps/trade-window.mjs";
 
 // Export UI applications for external use
 export {
@@ -40,7 +41,8 @@ export {
   HirelingManager,
   PropertyManager,
   NPCConfig,
-  GMDashboard
+  GMDashboard,
+  TradeWindow
 };
 
 /**

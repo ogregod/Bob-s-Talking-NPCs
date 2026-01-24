@@ -1,0 +1,90 @@
+{{!-- Trade Window - Your Offer --}}
+<section class="trade-panel your-offer {{theme}}">
+  <div class="panel-header">
+    <h3>{{localize "BOBSNPC.Trade.YourOffer"}}</h3>
+    <span class="offer-value">{{localize "BOBSNPC.Trade.Value"}}: {{yourOfferValue}} gp</span>
+  </div>
+
+  {{!-- Your inventory to select from --}}
+  <div class="inventory-section">
+    <h4>{{localize "BOBSNPC.Trade.YourInventory"}}</h4>
+    <div class="inventory-grid">
+      {{#each yourInventory}}
+        <div class="inventory-item {{#if inOffer}}in-offer{{/if}}"
+             data-item-id="{{id}}"
+             data-action="addItem"
+             data-tooltip="{{name}}">
+          <img src="{{img}}" alt="{{name}}"/>
+          {{#if (gt quantity 1)}}
+            <span class="item-quantity">{{quantity}}</span>
+          {{/if}}
+          {{#if inOffer}}
+            <span class="in-offer-badge"><i class="fa-solid fa-check"></i></span>
+          {{/if}}
+        </div>
+      {{else}}
+        <p class="empty-inventory">{{localize "BOBSNPC.Trade.NoItems"}}</p>
+      {{/each}}
+    </div>
+  </div>
+
+  {{!-- Items you're offering --}}
+  <div class="offer-section">
+    <h4>{{localize "BOBSNPC.Trade.Offering"}}</h4>
+    <div class="offer-items">
+      {{#each yourOffer.items}}
+        <div class="offer-item" data-item-id="{{id}}">
+          <img src="{{img}}" alt="{{name}}"/>
+          <div class="item-info">
+            <span class="item-name">{{name}}</span>
+            {{#if (gt quantity 1)}}
+              <span class="item-quantity">x{{quantity}}</span>
+            {{/if}}
+          </div>
+          {{#unless ../yourOffer.locked}}
+            <button type="button" class="remove-item" data-action="removeItem" data-item-id="{{id}}">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          {{/unless}}
+        </div>
+      {{else}}
+        <p class="no-items">{{localize "BOBSNPC.Trade.NoItemsOffered"}}</p>
+      {{/each}}
+    </div>
+  </div>
+
+  {{!-- Gold offering --}}
+  <div class="gold-section">
+    <div class="gold-display">
+      <i class="fa-solid fa-coins"></i>
+      <span class="gold-amount">{{yourOffer.gold}} gp</span>
+      <span class="gold-available">({{localize "BOBSNPC.Trade.Available"}}: {{yourGold}} gp)</span>
+    </div>
+    {{#unless yourOffer.locked}}
+      <button type="button" class="set-gold-btn" data-action="setGold">
+        {{localize "BOBSNPC.Trade.SetGold"}}
+      </button>
+    {{/unless}}
+  </div>
+
+  {{!-- Lock/Unlock controls --}}
+  <div class="offer-controls">
+    {{#if yourOffer.locked}}
+      <div class="locked-status">
+        <i class="fa-solid fa-lock"></i>
+        {{localize "BOBSNPC.Trade.OfferLocked"}}
+      </div>
+      {{#unless yourOffer.confirmed}}
+        <button type="button" class="unlock-btn" data-action="unlockOffer">
+          <i class="fa-solid fa-lock-open"></i>
+          {{localize "BOBSNPC.Trade.Unlock"}}
+        </button>
+      {{/unless}}
+    {{else}}
+      <button type="button" class="lock-btn" data-action="lockOffer">
+        <i class="fa-solid fa-lock"></i>
+        {{localize "BOBSNPC.Trade.LockOffer"}}
+      </button>
+    {{/if}}
+  </div>
+</section>

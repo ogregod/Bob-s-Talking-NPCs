@@ -1,0 +1,494 @@
+/**
+ * Bob's Talking NPCs - Trade Window Styles
+ */
+
+@layer bobsnpc {
+  /* ===== Trade Window Layout ===== */
+  .trade-window {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* ===== Header ===== */
+  .trade-header {
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .trade-parties {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bobsnpc-spacing-lg);
+  }
+
+  .party {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .party-portrait {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--bobsnpc-border-radius-full);
+    border: 2px solid var(--bobsnpc-border-color);
+    object-fit: cover;
+  }
+
+  .your-party .party-portrait {
+    border-color: var(--bobsnpc-primary);
+  }
+
+  .party-name {
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .party-label {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .trade-icon {
+    font-size: var(--bobsnpc-font-size-xl);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .trade-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bobsnpc-spacing-xs);
+    margin-top: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-md);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .trade-status.waiting {
+    background: rgba(var(--bobsnpc-warning-rgb), 0.2);
+    color: var(--bobsnpc-warning);
+  }
+
+  .trade-status.action-needed {
+    background: rgba(var(--bobsnpc-primary-rgb), 0.2);
+    color: var(--bobsnpc-primary);
+  }
+
+  /* ===== Trade Panels ===== */
+  .trade-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--bobsnpc-spacing-md);
+    flex: 1;
+    overflow: hidden;
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .trade-panel {
+    display: flex;
+    flex-direction: column;
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    overflow: hidden;
+  }
+
+  .your-offer {
+    border-color: var(--bobsnpc-primary);
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .panel-header h3 {
+    margin: 0;
+    font-size: var(--bobsnpc-font-size-base);
+  }
+
+  .offer-value {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  /* ===== Inventory Section ===== */
+  .inventory-section {
+    padding: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .inventory-section h4 {
+    margin: 0 0 var(--bobsnpc-spacing-xs) 0;
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    gap: var(--bobsnpc-spacing-xs);
+    max-height: 120px;
+    overflow-y: auto;
+  }
+
+  .inventory-item {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .inventory-item:hover {
+    border-color: var(--bobsnpc-primary);
+    transform: scale(1.05);
+  }
+
+  .inventory-item.in-offer {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .inventory-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .inventory-item .item-quantity {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 0 var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-bg-overlay);
+    border-radius: var(--bobsnpc-border-radius-sm) 0 var(--bobsnpc-border-radius-sm) 0;
+    font-size: var(--bobsnpc-font-size-xs);
+    color: white;
+  }
+
+  .inventory-item .in-offer-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bobsnpc-success);
+    border-radius: var(--bobsnpc-border-radius-full);
+    font-size: 10px;
+    color: white;
+  }
+
+  .empty-inventory {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--bobsnpc-text-muted);
+    font-size: var(--bobsnpc-font-size-sm);
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  /* ===== Offer Section ===== */
+  .offer-section {
+    flex: 1;
+    padding: var(--bobsnpc-spacing-sm);
+    overflow-y: auto;
+  }
+
+  .offer-section h4 {
+    margin: 0 0 var(--bobsnpc-spacing-xs) 0;
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .offer-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .offer-item {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .offer-item img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .offer-item .item-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .offer-item .item-name {
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .offer-item .item-quantity {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .offer-item .remove-item {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    transition: color var(--bobsnpc-transition-fast);
+  }
+
+  .offer-item .remove-item:hover {
+    color: var(--bobsnpc-error);
+  }
+
+  .no-items {
+    text-align: center;
+    color: var(--bobsnpc-text-muted);
+    font-size: var(--bobsnpc-font-size-sm);
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  /* ===== Gold Section ===== */
+  .gold-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .gold-display {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .gold-display i {
+    color: #ffd700;
+  }
+
+  .gold-amount {
+    font-weight: var(--bobsnpc-font-weight-semibold);
+  }
+
+  .gold-available {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .set-gold-btn {
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+    font-size: var(--bobsnpc-font-size-sm);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .set-gold-btn:hover {
+    border-color: var(--bobsnpc-primary);
+  }
+
+  /* ===== Offer Controls ===== */
+  .offer-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bobsnpc-spacing-sm);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .locked-status {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    color: var(--bobsnpc-success);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .lock-btn,
+  .unlock-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-md);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .lock-btn {
+    background: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .lock-btn:hover {
+    background: var(--bobsnpc-primary-light);
+  }
+
+  .unlock-btn {
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .unlock-btn:hover {
+    border-color: var(--bobsnpc-warning);
+    color: var(--bobsnpc-warning);
+  }
+
+  /* ===== Offer Status ===== */
+  .offer-status {
+    padding: var(--bobsnpc-spacing-sm);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .status-badge.confirmed {
+    background: rgba(var(--bobsnpc-success-rgb), 0.2);
+    color: var(--bobsnpc-success);
+  }
+
+  .status-badge.locked {
+    background: rgba(var(--bobsnpc-primary-rgb), 0.2);
+    color: var(--bobsnpc-primary);
+  }
+
+  .status-badge.editing {
+    background: rgba(var(--bobsnpc-warning-rgb), 0.2);
+    color: var(--bobsnpc-warning);
+  }
+
+  /* ===== Footer ===== */
+  .trade-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-secondary);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .trade-summary {
+    display: flex;
+    gap: var(--bobsnpc-spacing-lg);
+  }
+
+  .summary-item {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .summary-item .label {
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .summary-item .value {
+    font-weight: var(--bobsnpc-font-weight-semibold);
+  }
+
+  .summary-item.profit .value {
+    color: var(--bobsnpc-success);
+  }
+
+  .summary-item.loss .value {
+    color: var(--bobsnpc-error);
+  }
+
+  .summary-item.even .label {
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .trade-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .cancel-btn,
+  .confirm-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .cancel-btn {
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .cancel-btn:hover {
+    border-color: var(--bobsnpc-error);
+    color: var(--bobsnpc-error);
+  }
+
+  .confirm-btn {
+    background: var(--bobsnpc-success);
+    color: white;
+  }
+
+  .confirm-btn:hover:not(:disabled) {
+    background: var(--bobsnpc-success-light);
+  }
+
+  .confirm-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .confirm-btn.confirmed {
+    background: var(--bobsnpc-bg-tertiary);
+    color: var(--bobsnpc-success);
+  }
+}

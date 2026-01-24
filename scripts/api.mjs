@@ -18,6 +18,7 @@ import { HirelingManager } from "./apps/hireling-manager.mjs";
 import { PropertyManager } from "./apps/property-manager.mjs";
 import { NPCConfig } from "./apps/npc-config.mjs";
 import { GMDashboard } from "./apps/gm-dashboard.mjs";
+import { TradeWindow } from "./apps/trade-window.mjs";
 
 /**
  * Singleton instances of UI applications
@@ -819,6 +820,26 @@ class UIAPI {
     }
     dashboard.render(true);
     console.log(`${MODULE_ID} | Opening GM dashboard`);
+  }
+
+  /**
+   * Open trade window with another player
+   * @param {Actor} yourActor - Your actor
+   * @param {Actor} theirActor - The other player's actor
+   * @param {string} tradeId - Optional trade session ID
+   * @returns {TradeWindow}
+   */
+  openTrade(yourActor, theirActor, tradeId = null) {
+    Hooks.call(`${MODULE_ID}.openTrade`, { yourActor, theirActor });
+
+    const tradeWindow = new TradeWindow({
+      yourActor,
+      theirActor,
+      tradeId: tradeId || foundry.utils.randomID()
+    });
+    tradeWindow.render(true);
+    console.log(`${MODULE_ID} | Opening trade with ${theirActor.name}`);
+    return tradeWindow;
   }
 
   /**

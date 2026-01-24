@@ -1,0 +1,32 @@
+{{!-- Trade Window Header --}}
+<header class="trade-header {{theme}}">
+  <div class="trade-parties">
+    <div class="party your-party">
+      <img src="{{yourActor.img}}" alt="{{yourActor.name}}" class="party-portrait"/>
+      <span class="party-name">{{yourActor.name}}</span>
+      <span class="party-label">{{localize "BOBSNPC.Trade.You"}}</span>
+    </div>
+
+    <div class="trade-icon">
+      <i class="fa-solid fa-arrows-left-right"></i>
+    </div>
+
+    <div class="party their-party">
+      <img src="{{theirActor.img}}" alt="{{theirActor.name}}" class="party-portrait"/>
+      <span class="party-name">{{theirActor.name}}</span>
+      <span class="party-label">{{localize "BOBSNPC.Trade.Them"}}</span>
+    </div>
+  </div>
+
+  {{#if waitingForThem}}
+    <div class="trade-status waiting">
+      <i class="fa-solid fa-hourglass-half"></i>
+      {{localize "BOBSNPC.Trade.WaitingForThem"}}
+    </div>
+  {{else if waitingForYou}}
+    <div class="trade-status action-needed">
+      <i class="fa-solid fa-exclamation-circle"></i>
+      {{localize "BOBSNPC.Trade.WaitingForYou"}}
+    </div>
+  {{/if}}
+</header>

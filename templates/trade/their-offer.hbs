@@ -1,0 +1,55 @@
+{{!-- Trade Window - Their Offer --}}
+<section class="trade-panel their-offer {{theme}}">
+  <div class="panel-header">
+    <h3>{{theirActor.name}}'s {{localize "BOBSNPC.Trade.Offer"}}</h3>
+    <span class="offer-value">{{localize "BOBSNPC.Trade.Value"}}: {{theirOfferValue}} gp</span>
+  </div>
+
+  {{!-- Items they're offering --}}
+  <div class="offer-section">
+    <h4>{{localize "BOBSNPC.Trade.TheirItems"}}</h4>
+    <div class="offer-items">
+      {{#each theirOffer.items}}
+        <div class="offer-item" data-item-id="{{id}}">
+          <img src="{{img}}" alt="{{name}}"/>
+          <div class="item-info">
+            <span class="item-name">{{name}}</span>
+            {{#if (gt quantity 1)}}
+              <span class="item-quantity">x{{quantity}}</span>
+            {{/if}}
+          </div>
+        </div>
+      {{else}}
+        <p class="no-items">{{localize "BOBSNPC.Trade.NoItemsOffered"}}</p>
+      {{/each}}
+    </div>
+  </div>
+
+  {{!-- Gold they're offering --}}
+  <div class="gold-section">
+    <div class="gold-display">
+      <i class="fa-solid fa-coins"></i>
+      <span class="gold-amount">{{theirOffer.gold}} gp</span>
+    </div>
+  </div>
+
+  {{!-- Their offer status --}}
+  <div class="offer-status">
+    {{#if theirOffer.confirmed}}
+      <div class="status-badge confirmed">
+        <i class="fa-solid fa-check-circle"></i>
+        {{localize "BOBSNPC.Trade.Confirmed"}}
+      </div>
+    {{else if theirOffer.locked}}
+      <div class="status-badge locked">
+        <i class="fa-solid fa-lock"></i>
+        {{localize "BOBSNPC.Trade.Locked"}}
+      </div>
+    {{else}}
+      <div class="status-badge editing">
+        <i class="fa-solid fa-pen"></i>
+        {{localize "BOBSNPC.Trade.Editing"}}
+      </div>
+    {{/if}}
+  </div>
+</section>
