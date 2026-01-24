@@ -3,7 +3,9 @@
  * Property management interface using Foundry V13 ApplicationV2
  */
 
-import { MODULE_ID } from "../module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
+
 import { localize, formatCurrency } from "../utils/helpers.mjs";
 import { propertyHandler } from "../handlers/property-handler.mjs";
 import { PropertyStatus, PropertyType, UpgradeType } from "../data/property-model.mjs";

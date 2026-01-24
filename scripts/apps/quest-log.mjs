@@ -3,7 +3,9 @@
  * Player quest management interface using Foundry V13 ApplicationV2
  */
 
-import { MODULE_ID } from "../module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
+
 import { localize } from "../utils/helpers.mjs";
 import { questHandler } from "../handlers/quest-handler.mjs";
 import { QuestStatus, ObjectiveType } from "../data/quest-model.mjs";

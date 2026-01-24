@@ -3,7 +3,9 @@
  * Main NPC conversation interface using Foundry V13 ApplicationV2
  */
 
-import { MODULE_ID } from "../module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
+
 import { localize } from "../utils/helpers.mjs";
 import { dialogueHandler } from "../handlers/dialogue-handler.mjs";
 import { npcHandler } from "../handlers/npc-handler.mjs";

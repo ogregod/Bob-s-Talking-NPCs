@@ -3,7 +3,9 @@
  * Merchant interface for buying/selling items using Foundry V13 ApplicationV2
  */
 
-import { MODULE_ID } from "../module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
+
 import { localize, formatCurrency } from "../utils/helpers.mjs";
 import { merchantHandler } from "../handlers/merchant-handler.mjs";
 import { ItemCategory } from "../data/merchant-model.mjs";

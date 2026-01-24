@@ -3,7 +3,9 @@
  * Player-to-player trading interface
  */
 
-import { MODULE_ID } from "../module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
+
 import { emit, SocketEvents } from "../socket.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;

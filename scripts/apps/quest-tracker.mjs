@@ -3,7 +3,9 @@
  * Minimal on-screen HUD showing current tracked quest objectives
  */
 
-import { MODULE_ID } from "../module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
+
 import { localize, getFlag } from "../utils/helpers.mjs";
 import { questHandler } from "../handlers/quest-handler.mjs";
 import { QuestStatus, ObjectiveType } from "../data/quest-model.mjs";

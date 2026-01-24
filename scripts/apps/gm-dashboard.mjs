@@ -3,7 +3,8 @@
  * Central management interface for GMs to oversee all module features
  */
 
-import { MODULE_ID } from "../module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 

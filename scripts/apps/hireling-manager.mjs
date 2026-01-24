@@ -3,7 +3,9 @@
  * Hireling and mount management interface using Foundry V13 ApplicationV2
  */
 
-import { MODULE_ID } from "../module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
+
 import { localize, formatCurrency } from "../utils/helpers.mjs";
 import { hirelingHandler } from "../handlers/hireling-handler.mjs";
 import { HirelingStatus, LoyaltyLevel, ContractType } from "../data/hireling-model.mjs";
