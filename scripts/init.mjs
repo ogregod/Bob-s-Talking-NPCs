@@ -560,5 +560,3 @@ function getRelationshipTier(value) {
   return "allied";
 }
 
-// Export for use by other modules
-export { registerReadyHooks };
