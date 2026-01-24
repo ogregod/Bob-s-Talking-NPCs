@@ -69,6 +69,31 @@ export const EffectType = Object.freeze({
 });
 
 /**
+ * Action types for dialogue action handlers
+ */
+export const ActionType = Object.freeze({
+  START_QUEST: "start_quest",
+  COMPLETE_QUEST: "complete_quest",
+  FAIL_QUEST: "fail_quest",
+  UPDATE_OBJECTIVE: "update_objective",
+  MODIFY_REPUTATION: "modify_reputation",
+  MODIFY_RELATIONSHIP: "modify_relationship",
+  GIVE_ITEM: "give_item",
+  TAKE_ITEM: "take_item",
+  GIVE_GOLD: "give_gold",
+  TAKE_GOLD: "take_gold",
+  GIVE_XP: "give_xp",
+  SET_VARIABLE: "set_variable",
+  UNLOCK_DIALOGUE: "unlock_dialogue",
+  OPEN_SHOP: "open_shop",
+  OPEN_BANK: "open_bank",
+  PLAY_SOUND: "play_sound",
+  RUN_MACRO: "run_macro",
+  END_DIALOGUE: "end_dialogue",
+  START_COMBAT: "start_combat"
+});
+
+/**
  * Comparison operators enum
  */
 export const Comparison = Object.freeze({

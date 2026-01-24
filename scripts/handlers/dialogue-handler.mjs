@@ -6,10 +6,11 @@
 import { MODULE_ID } from "../module.mjs";
 import {
   createDialogue,
-  createDialogueNode,
-  createDialogueResponse,
+  createNode,
+  createResponse,
   NodeType,
   ConditionType,
+  EffectType,
   ActionType,
   validateDialogue
 } from "../data/dialogue-model.mjs";
