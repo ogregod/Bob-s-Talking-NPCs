@@ -3,7 +3,8 @@
  * Handles multiplayer synchronization via Foundry's socket system
  */
 
-import { MODULE_ID } from "./module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
 
 /**
  * Socket namespace for this module

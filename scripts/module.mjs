@@ -81,6 +81,25 @@ Hooks.once("ready", () => {
   const moduleData = game.modules.get(MODULE_ID);
   console.log(`${MODULE_ID} | ${MODULE_NAME} v${moduleData?.version} is ready`);
 
+  // Send welcome message to chat (GM only to avoid spam)
+  if (game.user.isGM) {
+    ChatMessage.create({
+      content: `<div style="border: 2px solid #7b68ee; border-radius: 8px; padding: 10px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <h3 style="margin: 0 0 8px 0; color: #7b68ee; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-comments"></i> Bob's Talking NPCs
+        </h3>
+        <p style="margin: 0; color: #e0e0e0; font-size: 0.9em;">
+          Module loaded successfully! v${moduleData?.version || "0.1.0"}
+        </p>
+        <p style="margin: 4px 0 0 0; color: #a0a0a0; font-size: 0.8em;">
+          Double-click an NPC token to start a dialogue. Type <code>/bobsnpc</code> for commands.
+        </p>
+      </div>`,
+      whisper: [game.user.id],
+      speaker: { alias: "Bob's Talking NPCs" }
+    });
+  }
+
   // Emit hook for other modules to know we're ready
   Hooks.callAll("bobsNPCReady", game.bobsnpc);
 });
