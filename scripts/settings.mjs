@@ -3,7 +3,8 @@
  * Registers all world (GM) and client (player) settings
  */
 
-import { MODULE_ID } from "./module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
 
 /**
  * Register all module settings

@@ -3,7 +3,8 @@
  * Exposes the game.bobsnpc API for external access and macro support
  */
 
-import { MODULE_ID } from "./module.mjs";
+// Define MODULE_ID locally to avoid circular dependency with module.mjs
+const MODULE_ID = "bobs-talking-npcs";
 import { emit, SocketEvents, getActiveDialogue } from "./socket.mjs";
 import { getSetting } from "./settings.mjs";
 

@@ -594,6 +594,16 @@ export class QuestHandler {
   }
 
   /**
+   * Get quests for the entire party
+   * @returns {object[]} All party quests (deduplicated)
+   */
+  getPartyQuests() {
+    // Return all quests from the world cache
+    // In the future, this could filter to only quests accepted by party members
+    return Array.from(this._questCache.values());
+  }
+
+  /**
    * Get completed quests for a player
    * @param {string} actorUuid - Player actor UUID
    * @returns {object[]}
