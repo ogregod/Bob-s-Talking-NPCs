@@ -338,6 +338,33 @@ function registerWorldSettings() {
     type: Object,
     default: {}
   });
+
+  // Crime records storage
+  game.settings.register(MODULE_ID, "crimes", {
+    name: "Crimes",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {}
+  });
+
+  // Stables data storage
+  game.settings.register(MODULE_ID, "stables", {
+    name: "Stables",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {}
+  });
+
+  // Faction data storage
+  game.settings.register(MODULE_ID, "factions", {
+    name: "Factions",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {}
+  });
 }
 
 /**

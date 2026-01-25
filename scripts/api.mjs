@@ -47,6 +47,21 @@ export class BobsNPCAPI {
     this.ui = new UIAPI();
     this.backup = new BackupAPI();
 
+    // Handlers property for backwards compatibility with app files
+    // Apps can access game.bobsnpc.handlers.quest, game.bobsnpc.handlers.faction, etc.
+    this.handlers = {
+      quest: this.quests,
+      faction: this.factions,
+      relationship: this.relationships,
+      shop: this.shop,
+      bank: this.bank,
+      crime: this.crime,
+      hireling: this.hirelings,
+      mount: this.mounts,
+      trade: this.trade,
+      npc: new NPCHandler()
+    };
+
     console.log(`${MODULE_ID} | API initialized`);
   }
 
@@ -200,6 +215,15 @@ class QuestsAPI {
   }
 
   /**
+   * Alias for get() - used by quest-log.mjs
+   * @param {string} questId
+   * @returns {object|null}
+   */
+  getQuest(questId) {
+    return this.get(questId);
+  }
+
+  /**
    * Get all quests matching filter
    * @param {object} filter
    * @param {string} filter.status - Filter by status
@@ -210,6 +234,24 @@ class QuestsAPI {
   getAll(filter = {}) {
     // Implementation: retrieve from JournalEntryPages
     return [];
+  }
+
+  /**
+   * Get all quests for the party
+   * @returns {object[]}
+   */
+  getPartyQuests() {
+    return this.getAll();
+  }
+
+  /**
+   * Abandon a quest
+   * @param {string} questId
+   * @param {string} actorUuid
+   * @returns {Promise<boolean>}
+   */
+  async abandonQuest(questId, actorUuid) {
+    return this.abandon(questId, actorUuid);
   }
 
   /**
@@ -339,6 +381,15 @@ class QuestsAPI {
 class FactionsAPI {
   get(factionId) { return null; }
   getAll() { return []; }
+
+  /**
+   * Alias for getAll() - used by faction-window.mjs
+   * @returns {object[]}
+   */
+  getAllFactions() {
+    return this.getAll();
+  }
+
   async create(factionData) { return null; }
   async update(factionId, updates) { return null; }
   async delete(factionId) { return false; }
@@ -348,8 +399,34 @@ class FactionsAPI {
     return true;
   }
 
-  getReputation(factionId, playerUuid) { return 0; }
-  getRank(factionId, playerUuid) { return null; }
+  getReputation(actorUuid, factionId) { return 0; }
+  getRank(actorUuid, factionId) { return null; }
+
+  /**
+   * Get reputation level string from numeric value
+   * @param {number} reputation - Reputation value
+   * @returns {string} Level string
+   */
+  getReputationLevel(reputation) {
+    if (reputation >= 2000) return "exalted";
+    if (reputation >= 1000) return "revered";
+    if (reputation >= 500) return "honored";
+    if (reputation >= 100) return "friendly";
+    if (reputation >= -100) return "neutral";
+    if (reputation >= -500) return "unfriendly";
+    if (reputation >= -1000) return "hostile";
+    return "hated";
+  }
+
+  /**
+   * Get NPCs belonging to a faction
+   * @param {string} factionId
+   * @returns {Promise<object[]>}
+   */
+  async getFactionNPCs(factionId) {
+    // Implementation: search actors with faction flag
+    return [];
+  }
 
   async setRank(factionId, playerUuid, rankId) {
     if (!game.user.isGM) {
@@ -916,5 +993,56 @@ class BackupAPI {
     // Implementation: restore data
     console.log(`${MODULE_ID} | Backup restored from ${backupData.date}`);
     return true;
+  }
+}
+
+/**
+ * NPC Handler
+ * Manages NPC configuration and behavior
+ */
+class NPCHandler {
+  /**
+   * Get NPC configuration
+   * @param {string} actorUuid - NPC actor UUID
+   * @returns {object|null}
+   */
+  getNPCConfig(actorUuid) {
+    const actor = fromUuidSync(actorUuid);
+    if (!actor) return null;
+    return actor.getFlag(MODULE_ID, "config") || null;
+  }
+
+  /**
+   * Set NPC configuration
+   * @param {string} actorUuid - NPC actor UUID
+   * @param {object} config - Configuration object
+   * @returns {Promise<object>}
+   */
+  async setNPCConfig(actorUuid, config) {
+    const actor = await fromUuid(actorUuid);
+    if (!actor) throw new Error("Actor not found");
+    return actor.setFlag(MODULE_ID, "config", config);
+  }
+
+  /**
+   * Check if actor is configured as an NPC
+   * @param {string} actorUuid - Actor UUID
+   * @returns {boolean}
+   */
+  isConfigured(actorUuid) {
+    return !!this.getNPCConfig(actorUuid);
+  }
+
+  /**
+   * Get all configured NPCs
+   * @returns {object[]}
+   */
+  getAllConfiguredNPCs() {
+    return game.actors.filter(a => a.getFlag(MODULE_ID, "config"))
+      .map(a => ({
+        uuid: a.uuid,
+        name: a.name,
+        config: a.getFlag(MODULE_ID, "config")
+      }));
   }
 }
