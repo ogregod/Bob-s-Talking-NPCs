@@ -320,6 +320,24 @@ function registerWorldSettings() {
     type: Object,
     default: {}
   });
+
+  // Bounty data storage
+  game.settings.register(MODULE_ID, "bounties", {
+    name: "Bounties",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {}
+  });
+
+  // Mount data storage
+  game.settings.register(MODULE_ID, "mounts", {
+    name: "Mounts",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {}
+  });
 }
 
 /**
