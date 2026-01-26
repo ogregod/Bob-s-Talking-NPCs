@@ -1052,13 +1052,113 @@
       "ServiceUnavailable": "Service unavailable",
       "InvalidTarget": "Invalid target",
       "ActionFailed": "Action failed",
-      "GMOnly": "This feature is only available to Game Masters"
+      "GMOnly": "This feature is only available to Game Masters",
+      "NoActorSelected": "No actor selected"
     },
 
     "Keybindings": {
       "OpenQuestLog": "Open Quest Log",
       "OpenFactions": "Open Faction Overview",
       "ToggleTracker": "Toggle Quest Tracker"
+    },
+
+    "Factions": {
+      "Title": "Factions",
+      "Overview": "Faction Overview",
+      "All": "All",
+      "Allied": "Allied",
+      "Neutral": "Neutral",
+      "Hostile": "Hostile",
+      "Members": "Members",
+      "NoFactions": "No factions available"
+    },
+
+    "QuestLog": {
+      "Title": "Quest Log",
+      "NoQuests": "No quests available",
+      "All": "All",
+      "Active": "Active",
+      "Completed": "Completed",
+      "Failed": "Failed",
+      "AbandonTitle": "Abandon Quest",
+      "AbandonConfirm": "Are you sure you want to abandon this quest? This cannot be undone.",
+      "QuestAbandoned": "Quest abandoned",
+      "NoLocation": "This quest has no map location"
+    },
+
+    "QuestStatus": {
+      "available": "Available",
+      "active": "Active",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "failed": "Failed",
+      "abandoned": "Abandoned"
+    },
+
+    "QuestType": {
+      "main": "Main Quest",
+      "side": "Side Quest",
+      "daily": "Daily Quest",
+      "repeatable": "Repeatable",
+      "event": "Event Quest",
+      "hidden": "Hidden Quest"
+    },
+
+    "ObjectiveType": {
+      "collect": "Collect",
+      "kill": "Defeat",
+      "talk_to": "Talk To",
+      "discover": "Discover",
+      "escort": "Escort",
+      "defend": "Defend",
+      "interact": "Interact",
+      "custom": "Custom"
+    },
+
+    "TimeLimit": {
+      "Expired": "Expired",
+      "Days": "{days} days remaining",
+      "Hours": "{hours} hours remaining"
+    },
+
+    "Complete": "Complete",
+    "Incomplete": "Incomplete",
+
+    "ReputationLevel": {
+      "hated": "Hated",
+      "hostile": "Hostile",
+      "unfriendly": "Unfriendly",
+      "neutral": "Neutral",
+      "friendly": "Friendly",
+      "honored": "Honored",
+      "revered": "Revered",
+      "exalted": "Exalted"
+    },
+
+    "RelationType": {
+      "allied": "Allied",
+      "friendly": "Friendly",
+      "neutral": "Neutral",
+      "rival": "Rival",
+      "hostile": "Hostile",
+      "enemy": "Enemy"
+    },
+
+    "Benefits": {
+      "SmallDiscount": "5% discount on purchases",
+      "MediumDiscount": "10% discount on purchases",
+      "LargeDiscount": "15% discount on purchases",
+      "MaxDiscount": "20% discount on purchases",
+      "SpecialQuests": "Access to special faction quests",
+      "ExclusiveItems": "Access to exclusive faction items",
+      "HonoraryTitle": "Honorary faction title"
+    },
+
+    "Penalties": {
+      "RefuseService": "NPCs refuse to serve you",
+      "HostileNPCs": "Faction NPCs are hostile",
+      "AttackOnSight": "Attacked on sight",
+      "Bounty": "Bounty placed on your head"
     }
   }
 }

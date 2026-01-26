@@ -180,6 +180,19 @@ function registerHandlebarsHelpers() {
     return Math.round((current / max) * 100);
   });
 
+  // Join array helper - joins array elements with a separator
+  Handlebars.registerHelper("join", function(array, separator) {
+    if (!Array.isArray(array)) return "";
+    if (typeof separator !== "string") separator = ", ";
+    return array.join(separator);
+  });
+
+  // Include helper - check if array includes a value
+  Handlebars.registerHelper("includes", function(array, value) {
+    if (!Array.isArray(array)) return false;
+    return array.includes(value);
+  });
+
   console.log(`${MODULE_ID} | Handlebars helpers registered`);
 }
 

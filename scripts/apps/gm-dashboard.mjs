@@ -153,8 +153,8 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
     // Get factions from settings or journal
     const factions = game.settings.get(MODULE_ID, "factions") || [];
 
-    // Get active events
-    const activeEvents = game.world.getFlag(MODULE_ID, "activeEvents") || [];
+    // Get active events from settings (V13 compatible)
+    const activeEvents = game.settings.get(MODULE_ID, "activeEvents") || [];
 
     // Calculate statistics
     const stats = {
@@ -164,7 +164,7 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
       questsByStatus: this.#countQuestsByStatus(quests),
       totalFactions: factions.length,
       activeEvents: activeEvents.length,
-      worldStateCount: Object.keys(game.world.getFlag(MODULE_ID, "worldState") || {}).length
+      worldStateCount: Object.keys(game.settings.get(MODULE_ID, "worldState") || {}).length
     };
 
     // Recent activity
@@ -269,8 +269,8 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    * @returns {Promise<object>}
    */
   async #prepareWorldData() {
-    const worldState = game.world.getFlag(MODULE_ID, "worldState") || {};
-    const activeEvents = game.world.getFlag(MODULE_ID, "activeEvents") || [];
+    const worldState = game.settings.get(MODULE_ID, "worldState") || {};
+    const activeEvents = game.settings.get(MODULE_ID, "activeEvents") || [];
 
     const stateEntries = Object.entries(worldState).map(([key, value]) => ({
       key,

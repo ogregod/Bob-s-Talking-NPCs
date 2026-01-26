@@ -365,6 +365,24 @@ function registerWorldSettings() {
     type: Object,
     default: {}
   });
+
+  // World state variables (for conditional logic in dialogues/quests)
+  game.settings.register(MODULE_ID, "worldState", {
+    name: "World State",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {}
+  });
+
+  // Active world events
+  game.settings.register(MODULE_ID, "activeEvents", {
+    name: "Active Events",
+    scope: "world",
+    config: false,
+    type: Array,
+    default: []
+  });
 }
 
 /**
