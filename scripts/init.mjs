@@ -180,6 +180,13 @@ function registerHandlebarsHelpers() {
     return Math.round((current / max) * 100);
   });
 
+  // Concat helper - concatenates strings together
+  Handlebars.registerHelper("concat", function(...args) {
+    // Remove the Handlebars options object from the end
+    args.pop();
+    return args.join("");
+  });
+
   // Join array helper - joins array elements with a separator
   Handlebars.registerHelper("join", function(array, separator) {
     if (!Array.isArray(array)) return "";
