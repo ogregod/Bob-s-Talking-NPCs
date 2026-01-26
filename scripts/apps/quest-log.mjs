@@ -144,11 +144,17 @@ export class QuestLog extends HandlebarsApplicationMixin(ApplicationV2) {
    * @private
    */
   async _getPlayerQuests() {
+    const handler = getQuestHandler();
+    if (!handler) {
+      console.warn("bobs-talking-npcs | Quest handler not available");
+      return [];
+    }
+
     if (!this.actorUuid) {
       // Get quests for all party members if no specific actor
-      return getQuestHandler().getPartyQuests();
+      return handler.getPartyQuests?.() || [];
     }
-    return getQuestHandler().getPlayerQuests(this.actorUuid);
+    return handler.getPlayerQuests?.(this.actorUuid) || [];
   }
 
   /**

@@ -84,7 +84,12 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const context = await super._prepareContext(options);
 
     // Get all factions
-    const allFactions = getFactionHandler().getAllFactions();
+    const handler = getFactionHandler();
+    if (!handler) {
+      console.warn("bobs-talking-npcs | Faction handler not available");
+      return { ...context, factions: [], hasFactions: false, counts: { all: 0, allied: 0, neutral: 0, hostile: 0 } };
+    }
+    const allFactions = handler.getAllFactions?.() || [];
 
     // Get player's standings
     const playerStandings = await this._getPlayerStandings(allFactions);
@@ -130,11 +135,13 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   async _getPlayerStandings(factions) {
     const standings = [];
+    const handler = getFactionHandler();
+    if (!handler) return standings;
 
     for (const faction of factions) {
-      const reputation = await getFactionHandler().getReputation(this.actorUuid, faction.id);
-      const rank = await getFactionHandler().getRank(this.actorUuid, faction.id);
-      const level = getFactionHandler().getReputationLevel(reputation);
+      const reputation = handler.getReputation?.(this.actorUuid, faction.id) || 0;
+      const rank = handler.getRank?.(this.actorUuid, faction.id) || null;
+      const level = handler.getReputationLevel?.(reputation) || "neutral";
 
       standings.push({
         ...faction,
@@ -325,7 +332,8 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   _prepareFactionRelations(faction) {
     if (!faction.relations) return [];
 
-    const allFactions = getFactionHandler().getAllFactions();
+    const handler = getFactionHandler();
+    const allFactions = handler?.getAllFactions?.() || [];
 
     return Object.entries(faction.relations).map(([factionId, relation]) => {
       const relatedFaction = allFactions.find(f => f.id === factionId);
@@ -452,7 +460,8 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const factionId = target.dataset.factionId;
 
     // Get NPCs belonging to this faction
-    const npcs = await getFactionHandler().getFactionNPCs(factionId);
+    const handler = getFactionHandler();
+    const npcs = handler?.getFactionNPCs ? await handler.getFactionNPCs(factionId) : [];
 
     // Show in a dialog
     const content = await renderTemplate(

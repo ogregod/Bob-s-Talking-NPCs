@@ -43,9 +43,9 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     this._unsavedChanges = false;
 
     // Working copy of NPC config
-    this._config = foundry.utils.deepClone(
-      getNpcHandler().getNPCConfig(npc) || this._getDefaultConfig()
-    );
+    // Get existing config from actor flags, or use default
+    const existingConfig = npc?.getFlag?.(MODULE_ID, "config") || null;
+    this._config = foundry.utils.deepClone(existingConfig || this._getDefaultConfig());
   }
 
   /** @override */

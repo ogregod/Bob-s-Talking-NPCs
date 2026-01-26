@@ -71,11 +71,12 @@ Hooks.once("ready", () => {
   // Register socket handlers for multiplayer sync
   registerSocket();
 
-  // Register hooks that require game to be ready
-  registerReadyHooks();
-
-  // Expose the public API at game.bobsnpc
+  // IMPORTANT: Create the API FIRST, before initializing handlers
+  // This way registerReadyHooks() can add handlers to the existing API object
   game.bobsnpc = new BobsNPCAPI();
+
+  // Register hooks that require game to be ready (this adds handlers to game.bobsnpc)
+  registerReadyHooks();
 
   // Log ready message with version
   const moduleData = game.modules.get(MODULE_ID);

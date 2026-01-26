@@ -47,20 +47,9 @@ export class BobsNPCAPI {
     this.ui = new UIAPI();
     this.backup = new BackupAPI();
 
-    // Handlers property for backwards compatibility with app files
-    // Apps can access game.bobsnpc.handlers.quest, game.bobsnpc.handlers.faction, etc.
-    this.handlers = {
-      quest: this.quests,
-      faction: this.factions,
-      relationship: this.relationships,
-      shop: this.shop,
-      bank: this.bank,
-      crime: this.crime,
-      hireling: this.hirelings,
-      mount: this.mounts,
-      trade: this.trade,
-      npc: new NPCHandler()
-    };
+    // Note: handlers property is set by init.mjs after API creation
+    // This allows real handler classes (QuestHandler, FactionHandler, etc.) to be used
+    // instead of the placeholder sub-API classes
 
     console.log(`${MODULE_ID} | API initialized`);
   }
