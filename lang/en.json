@@ -923,6 +923,7 @@
       "AddTrainingSkill": "Add Training Skill",
       "FactionMemberships": "Faction Memberships",
       "FactionMembershipsHint": "Factions this NPC belongs to",
+      "Role": "Role",
       "FactionRole": {
         "Member": "Member",
         "Officer": "Officer",
@@ -966,7 +967,115 @@
       "GMNotes": "GM Notes",
       "Tags": "Tags",
       "TagsPlaceholder": "merchant, friendly, important...",
-      "TagsHint": "Comma-separated tags for filtering and organization"
+      "TagsHint": "Comma-separated tags for filtering and organization",
+
+      "AssignedRoles": "Assigned Roles",
+      "Primary": "Primary",
+      "SetPrimary": "Set as Primary",
+      "Remove": "Remove",
+      "NoRoles": "No roles assigned",
+      "AddRole": "Add Role",
+      "SelectRole": "Select a role...",
+      "RoleDescriptions": "Role Descriptions",
+      "RoleDescription": {
+        "Merchant": "This NPC can buy and sell items to players",
+        "QuestGiver": "This NPC can offer quests to players",
+        "QuestTurnIn": "This NPC can accept completed quests",
+        "Banker": "This NPC provides banking services",
+        "StableMaster": "This NPC manages mount storage and sales",
+        "Innkeeper": "This NPC provides lodging and meals",
+        "Trainer": "This NPC can train skills or abilities",
+        "Enchanter": "This NPC provides enchanting services",
+        "Transporter": "This NPC offers fast travel services",
+        "Informant": "This NPC provides rumors and information",
+        "HirelingRecruiter": "This NPC recruits hirelings for the party",
+        "Fence": "This NPC buys stolen goods",
+        "FactionRepresentative": "This NPC represents a faction"
+      },
+
+      "AssignedDialogues": "Assigned Dialogues",
+      "DialoguesHint": "Dialogues available for this NPC",
+      "Default": "Default",
+      "SetDefault": "Set as Default",
+      "Edit": "Edit",
+      "NoDialogues": "No dialogues assigned",
+      "AddDialogue": "Add Dialogue",
+      "CreateNewDialogue": "Create New Dialogue",
+
+      "ScheduleSettings": "Schedule Settings",
+      "EnableSchedule": "Enable Schedule",
+      "EnableScheduleHint": "When enabled, this NPC follows a daily schedule",
+      "ScheduleEntries": "Schedule Entries",
+      "StartTime": "Start Time",
+      "EndTime": "End Time",
+      "Days": "Days",
+      "Location": "Location",
+      "LocationPlaceholder": "e.g., Market Square, Tavern",
+      "ActivityLabel": "Activity",
+      "Activity": {
+        "Working": "Working",
+        "Sleeping": "Sleeping",
+        "Traveling": "Traveling",
+        "Socializing": "Socializing",
+        "Unavailable": "Unavailable"
+      },
+      "NoScheduleEntries": "No schedule entries defined",
+      "DeleteEntry": "Delete Entry",
+
+      "MerchantService": "Merchant Service",
+      "EnableService": "Enable Service",
+      "Shop": "Shop",
+      "SelectShop": "Select a shop...",
+      "PriceMarkup": "Price Markup",
+      "MarkupHint": "Percentage markup on base prices (100% = normal)",
+      "QuestGiverService": "Quest Giver Service",
+      "AvailableQuests": "Available Quests",
+      "QuestsHint": "Quests this NPC can offer",
+      "QuestSelectorPlaceholder": "Select quests to offer...",
+      "BankerService": "Banker Service",
+      "Bank": "Bank",
+      "SelectBank": "Select a bank...",
+      "TrainerService": "Trainer Service",
+      "TrainableSkills": "Trainable Skills",
+      "SkillsPlaceholder": "Select skills this NPC can train...",
+      "MaxTrainingLevel": "Max Training Level",
+      "InnkeeperService": "Innkeeper Service",
+      "RoomPrice": "Room Price",
+      "RoomPriceHint": "Price per night in gold pieces",
+      "FenceService": "Fence Service",
+      "FenceMarkup": "Fence Markup",
+      "FenceMarkupHint": "Percentage of item value paid for stolen goods",
+      "NoServicesAvailable": "No services available",
+      "AddRolesForServices": "Add roles to enable services",
+
+      "PortraitSettings": "Portrait Settings",
+      "DialoguePortrait": "Dialogue Portrait",
+      "SelectImage": "Select Image",
+      "Clear": "Clear",
+      "PortraitHint": "Image shown during dialogue with this NPC",
+      "TokenIndicator": "Token Indicator",
+      "IndicatorType": "Indicator Type",
+      "IndicatorTypes": {
+        "None": "None",
+        "Icon": "Icon",
+        "Glow": "Glow",
+        "Both": "Icon and Glow"
+      },
+      "IndicatorHint": "Visual indicator shown on the NPC token",
+      "CustomIndicator": "Custom Indicator",
+      "CustomIndicatorPlaceholder": "FontAwesome icon class (e.g., fa-star)",
+      "PreviewIndicator": "Preview Indicator",
+      "NameDisplay": "Name Display",
+      "NameDisplayMode": "Name Display Mode",
+      "NameDisplayModes": {
+        "Default": "Use Default",
+        "Always": "Always Show",
+        "Hover": "Show on Hover",
+        "Owner": "Owner Only",
+        "Hidden": "Hidden"
+      },
+      "ShowTitle": "Show Title",
+      "ShowTitleHint": "Display the NPC's title alongside their name"
     },
 
     "NPC": {
@@ -986,12 +1095,58 @@
         "Informant": "Informant",
         "HirelingRecruiter": "Hireling Recruiter",
         "Fence": "Fence",
-        "FactionRepresentative": "Faction Representative"
+        "FactionRepresentative": "Faction Representative",
+        "Guard": "Guard"
       },
       "Schedule": "Schedule",
       "Availability": "Availability",
       "Closed": "Closed",
       "WrongLocation": "Wrong Location"
+    },
+
+    "NPCRole": {
+      "Merchant": {
+        "Description": "This NPC can buy and sell items to players"
+      },
+      "QuestGiver": {
+        "Description": "This NPC can offer quests to players"
+      },
+      "QuestTurnIn": {
+        "Description": "This NPC can accept completed quests"
+      },
+      "Banker": {
+        "Description": "This NPC provides banking services"
+      },
+      "StableMaster": {
+        "Description": "This NPC manages mount storage and sales"
+      },
+      "Innkeeper": {
+        "Description": "This NPC provides lodging and meals"
+      },
+      "Trainer": {
+        "Description": "This NPC can train skills or abilities"
+      },
+      "Enchanter": {
+        "Description": "This NPC provides enchanting services"
+      },
+      "Transporter": {
+        "Description": "This NPC offers fast travel services"
+      },
+      "Informant": {
+        "Description": "This NPC provides rumors and information"
+      },
+      "HirelingRecruiter": {
+        "Description": "This NPC recruits hirelings for the party"
+      },
+      "Fence": {
+        "Description": "This NPC buys stolen goods"
+      },
+      "FactionRepresentative": {
+        "Description": "This NPC represents a faction"
+      },
+      "Guard": {
+        "Description": "This NPC patrols and enforces the law"
+      }
     },
 
     "WorldState": {
@@ -1118,7 +1273,25 @@
       "SortProgress": "Progress",
       "NoQuests": "No quests found",
       "New": "New",
-      "Categories": "Categories"
+      "Categories": "Categories",
+      "RecommendedLevel": "Recommended Level",
+      "Untrack": "Stop Tracking",
+      "Track": "Track Quest",
+      "Share": "Share Quest",
+      "Abandon": "Abandon Quest",
+      "QuestGiver": "Quest Giver",
+      "Objectives": "Objectives",
+      "HiddenObjective": "???",
+      "Optional": "Optional",
+      "ShowOnMap": "Show on Map",
+      "Complete": "Complete",
+      "Rewards": "Rewards",
+      "ChooseReward": "Choose a reward",
+      "QuestChain": "Quest Chain",
+      "Part": "Part",
+      "Of": "of",
+      "GMNotes": "GM Notes",
+      "SelectQuest": "Select a quest to view details"
     },
 
     "QuestStatus": {
