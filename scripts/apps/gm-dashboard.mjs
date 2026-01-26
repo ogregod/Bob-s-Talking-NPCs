@@ -246,7 +246,9 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    * @returns {Promise<object>}
    */
   async #prepareFactionsData() {
-    const factions = game.settings.get(MODULE_ID, "factions") || [];
+    const factionsData = game.settings.get(MODULE_ID, "factions") || {};
+    // Convert object to array if needed (settings stores as Object)
+    const factions = Array.isArray(factionsData) ? factionsData : Object.values(factionsData);
 
     const factionList = factions.map(faction => ({
       id: faction.id,

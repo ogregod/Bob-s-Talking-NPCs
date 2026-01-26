@@ -947,7 +947,26 @@
       "CustomColor": "Custom color",
       "NameColor": "Name Color",
       "SaveConfig": "Save Configuration",
-      "ResetDefaults": "Reset to Defaults"
+      "ResetDefaults": "Reset to Defaults",
+      "BasicSettings": "Basic Settings",
+      "EnableModule": "Enable Module Features",
+      "EnableModuleHint": "Enable Bob's Talking NPCs features for this NPC",
+      "PrimaryRole": "Primary Role",
+      "None": "None",
+      "PrimaryRoleHint": "The main function this NPC serves",
+      "Behavior": "Behavior Settings",
+      "InteractionRange": "Interaction Range",
+      "Squares": "squares",
+      "GreetOnApproach": "Greet on Approach",
+      "GreetingDialogue": "Greeting Dialogue",
+      "RequireLineOfSight": "Require Line of Sight",
+      "InteractionCooldown": "Interaction Cooldown",
+      "Seconds": "seconds",
+      "Metadata": "Metadata",
+      "GMNotes": "GM Notes",
+      "Tags": "Tags",
+      "TagsPlaceholder": "merchant, friendly, important...",
+      "TagsHint": "Comma-separated tags for filtering and organization"
     },
 
     "NPC": {
@@ -1084,6 +1103,22 @@
       "AbandonConfirm": "Are you sure you want to abandon this quest? This cannot be undone.",
       "QuestAbandoned": "Quest abandoned",
       "NoLocation": "This quest has no map location"
+    },
+
+    "Quests": {
+      "All": "All",
+      "Active": "Active",
+      "Completed": "Completed",
+      "Failed": "Failed",
+      "SearchPlaceholder": "Search quests...",
+      "SortBy": "Sort by",
+      "SortRecent": "Most Recent",
+      "SortName": "Name",
+      "SortLevel": "Level",
+      "SortProgress": "Progress",
+      "NoQuests": "No quests found",
+      "New": "New",
+      "Categories": "Categories"
     },
 
     "QuestStatus": {
