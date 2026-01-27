@@ -1,0 +1,197 @@
+{{!-- Dialogue Node Config - Effects Tab --}}
+<div class="tab-content effects-tab {{theme}}" {{#unless (eq activeTab "effects")}}hidden{{/unless}}>
+  <section class="config-section">
+    <div class="section-header">
+      <h3>{{localize "DialogueEditor.NodeEffects"}}</h3>
+      <button type="button" class="add-btn" data-action="addEffect" data-target="node">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "DialogueEditor.AddEffect"}}
+      </button>
+    </div>
+
+    <p class="section-hint">{{localize "DialogueEditor.EffectsHint"}}</p>
+
+    {{#if effectsDisplay.length}}
+      <div class="effects-list">
+        {{#each effectsDisplay}}
+          <div class="effect-entry" data-index="{{this.index}}">
+            <div class="effect-header">
+              <span class="effect-type">{{this.typeLabel}}</span>
+              <button type="button" class="control-btn danger" data-action="removeEffect" data-target="node" data-index="{{this.index}}">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+
+            <div class="effect-config">
+              <div class="form-group">
+                <label>{{localize "DialogueEditor.EffectType"}}</label>
+                <select name="node.effects.{{this.index}}.type">
+                  {{#each ../effectTypes}}
+                    <option value="{{this.value}}" {{#if (eq this.value ../type)}}selected{{/if}}>{{this.label}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              {{!-- Set Flag Effect --}}
+              {{#if (eq this.type "set_flag")}}
+                <div class="form-row">
+                  <div class="form-group third">
+                    <label>{{localize "DialogueEditor.Scope"}}</label>
+                    <select name="node.effects.{{this.index}}.scope">
+                      <option value="world" {{#if (eq this.scope "world")}}selected{{/if}}>{{localize "DialogueEditor.ScopeWorld"}}</option>
+                      <option value="actor" {{#if (eq this.scope "actor")}}selected{{/if}}>{{localize "DialogueEditor.ScopeActor"}}</option>
+                      <option value="npc" {{#if (eq this.scope "npc")}}selected{{/if}}>{{localize "DialogueEditor.ScopeNPC"}}</option>
+                    </select>
+                  </div>
+                  <div class="form-group third">
+                    <label>{{localize "DialogueEditor.FlagKey"}}</label>
+                    <input type="text" name="node.effects.{{this.index}}.key" value="{{this.key}}" />
+                  </div>
+                  <div class="form-group third">
+                    <label>{{localize "DialogueEditor.Value"}}</label>
+                    <input type="text" name="node.effects.{{this.index}}.value" value="{{this.value}}" />
+                  </div>
+                </div>
+              {{/if}}
+
+              {{!-- Give/Take Gold Effect --}}
+              {{#if (or (eq this.type "give_gold") (eq this.type "take_gold"))}}
+                <div class="form-group">
+                  <label>{{localize "DialogueEditor.Amount"}}</label>
+                  <input type="number" name="node.effects.{{this.index}}.amount" value="{{this.amount}}" min="0" />
+                </div>
+              {{/if}}
+
+              {{!-- Give XP Effect --}}
+              {{#if (eq this.type "give_xp")}}
+                <div class="form-group">
+                  <label>{{localize "DialogueEditor.XPAmount"}}</label>
+                  <input type="number" name="node.effects.{{this.index}}.amount" value="{{this.amount}}" min="0" />
+                </div>
+              {{/if}}
+
+              {{!-- Give/Take Item Effect --}}
+              {{#if (or (eq this.type "give_item") (eq this.type "take_item"))}}
+                <div class="form-row">
+                  <div class="form-group two-thirds">
+                    <label>{{localize "DialogueEditor.ItemID"}}</label>
+                    <input type="text" name="node.effects.{{this.index}}.itemId" value="{{this.itemId}}" />
+                  </div>
+                  <div class="form-group third">
+                    <label>{{localize "DialogueEditor.Quantity"}}</label>
+                    <input type="number" name="node.effects.{{this.index}}.quantity" value="{{this.quantity}}" min="1" />
+                  </div>
+                </div>
+              {{/if}}
+
+              {{!-- Modify Relationship Effect --}}
+              {{#if (eq this.type "modify_relationship")}}
+                <div class="form-group">
+                  <label>{{localize "DialogueEditor.RelationshipChange"}}</label>
+                  <input type="number" name="node.effects.{{this.index}}.amount" value="{{this.amount}}" />
+                  <p class="hint">{{localize "DialogueEditor.RelationshipChangeHint"}}</p>
+                </div>
+              {{/if}}
+
+              {{!-- Modify Faction Rep Effect --}}
+              {{#if (eq this.type "modify_faction_reputation")}}
+                <div class="form-row">
+                  <div class="form-group half">
+                    <label>{{localize "DialogueEditor.FactionID"}}</label>
+                    <input type="text" name="node.effects.{{this.index}}.factionId" value="{{this.factionId}}" />
+                  </div>
+                  <div class="form-group half">
+                    <label>{{localize "DialogueEditor.Amount"}}</label>
+                    <input type="number" name="node.effects.{{this.index}}.amount" value="{{this.amount}}" />
+                  </div>
+                </div>
+              {{/if}}
+
+              {{!-- Quest Effects --}}
+              {{#if (or (eq this.type "start_quest") (eq this.type "complete_quest") (eq this.type "fail_quest"))}}
+                <div class="form-group">
+                  <label>{{localize "DialogueEditor.QuestID"}}</label>
+                  <input type="text" name="node.effects.{{this.index}}.questId" value="{{this.questId}}" />
+                </div>
+              {{/if}}
+
+              {{!-- Complete Objective Effect --}}
+              {{#if (eq this.type "complete_objective")}}
+                <div class="form-row">
+                  <div class="form-group half">
+                    <label>{{localize "DialogueEditor.QuestID"}}</label>
+                    <input type="text" name="node.effects.{{this.index}}.questId" value="{{this.questId}}" />
+                  </div>
+                  <div class="form-group half">
+                    <label>{{localize "DialogueEditor.ObjectiveID"}}</label>
+                    <input type="text" name="node.effects.{{this.index}}.objectiveId" value="{{this.objectiveId}}" />
+                  </div>
+                </div>
+              {{/if}}
+
+              {{!-- Chat Message Effect --}}
+              {{#if (eq this.type "chat_message")}}
+                <div class="form-group">
+                  <label>{{localize "DialogueEditor.MessageContent"}}</label>
+                  <textarea name="node.effects.{{this.index}}.content" rows="2">{{this.content}}</textarea>
+                </div>
+                <div class="form-row">
+                  <div class="form-group half">
+                    <label>{{localize "DialogueEditor.Speaker"}}</label>
+                    <select name="node.effects.{{this.index}}.speaker">
+                      <option value="npc" {{#if (eq this.speaker "npc")}}selected{{/if}}>{{localize "DialogueEditor.SpeakerNPC"}}</option>
+                      <option value="narrator" {{#if (eq this.speaker "narrator")}}selected{{/if}}>{{localize "DialogueEditor.SpeakerNarrator"}}</option>
+                      <option value="system" {{#if (eq this.speaker "system")}}selected{{/if}}>{{localize "DialogueEditor.SpeakerSystem"}}</option>
+                    </select>
+                  </div>
+                  <div class="form-group half">
+                    <label>
+                      <input type="checkbox" name="node.effects.{{this.index}}.whisper" {{#if this.whisper}}checked{{/if}} />
+                      {{localize "DialogueEditor.WhisperToPlayer"}}
+                    </label>
+                  </div>
+                </div>
+              {{/if}}
+
+              {{!-- Play Sound Effect --}}
+              {{#if (eq this.type "play_sound")}}
+                <div class="form-row">
+                  <div class="form-group two-thirds">
+                    <label>{{localize "DialogueEditor.SoundPath"}}</label>
+                    <input type="text" name="node.effects.{{this.index}}.path" value="{{this.path}}"
+                           placeholder="sounds/example.wav" />
+                  </div>
+                  <div class="form-group third">
+                    <label>{{localize "DialogueEditor.Volume"}}</label>
+                    <input type="number" name="node.effects.{{this.index}}.volume" value="{{this.volume}}"
+                           min="0" max="1" step="0.1" />
+                  </div>
+                </div>
+              {{/if}}
+
+              {{!-- Add Bounty Effect --}}
+              {{#if (eq this.type "add_bounty")}}
+                <div class="form-row">
+                  <div class="form-group half">
+                    <label>{{localize "DialogueEditor.BountyAmount"}}</label>
+                    <input type="number" name="node.effects.{{this.index}}.amount" value="{{this.amount}}" min="0" />
+                  </div>
+                  <div class="form-group half">
+                    <label>{{localize "DialogueEditor.Region"}}</label>
+                    <input type="text" name="node.effects.{{this.index}}.region" value="{{this.region}}" />
+                  </div>
+                </div>
+              {{/if}}
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="empty-state">
+        <i class="fa-solid fa-bolt"></i>
+        <p>{{localize "DialogueEditor.NoEffects"}}</p>
+        <p class="hint">{{localize "DialogueEditor.NoEffectsHint"}}</p>
+      </div>
+    {{/if}}
+  </section>
+</div>

@@ -1,0 +1,109 @@
+{{!-- Dialogue Node Config - Responses Tab --}}
+<div class="tab-content responses-tab {{theme}}" {{#unless (eq activeTab "responses")}}hidden{{/unless}}>
+  <section class="config-section">
+    <div class="section-header">
+      <h3>
+        {{#if (eq nodeType "npc_speech")}}{{localize "DialogueEditor.PlayerResponses"}}{{else}}{{localize "DialogueEditor.PlayerChoices"}}{{/if}}
+      </h3>
+      <button type="button" class="add-btn" data-action="addResponse">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "DialogueEditor.AddResponse"}}
+      </button>
+    </div>
+
+    {{#if responsesDisplay.length}}
+      <div class="responses-list">
+        {{#each responsesDisplay}}
+          <div class="response-entry" data-index="{{this.index}}">
+            <div class="response-header">
+              <span class="response-number">{{add this.index 1}}</span>
+              <div class="response-controls">
+                <button type="button" class="control-btn" data-action="moveResponseUp" data-index="{{this.index}}"
+                        {{#if (eq this.index 0)}}disabled{{/if}} data-tooltip="{{localize 'DialogueEditor.MoveUp'}}">
+                  <i class="fa-solid fa-arrow-up"></i>
+                </button>
+                <button type="button" class="control-btn" data-action="moveResponseDown" data-index="{{this.index}}"
+                        {{#if (eq this.index (subtract ../responsesDisplay.length 1))}}disabled{{/if}} data-tooltip="{{localize 'DialogueEditor.MoveDown'}}">
+                  <i class="fa-solid fa-arrow-down"></i>
+                </button>
+                <button type="button" class="control-btn danger" data-action="removeResponse" data-index="{{this.index}}"
+                        data-tooltip="{{localize 'DialogueEditor.RemoveResponse'}}">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="response-content">
+              <div class="form-group">
+                <label>{{localize "DialogueEditor.ResponseText"}}</label>
+                <textarea name="node.responses.{{this.index}}.text" rows="2" placeholder="{{localize 'DialogueEditor.ResponseTextPlaceholder'}}">{{this.text}}</textarea>
+              </div>
+
+              <div class="form-group">
+                <label>{{localize "DialogueEditor.LeadsTo"}}</label>
+                <select name="node.responses.{{this.index}}.nextNodeId">
+                  <option value="">{{localize "DialogueEditor.SelectNode"}}</option>
+                  {{#each ../otherNodes}}
+                    <option value="{{this.id}}" {{#if (eq this.id ../nextNodeId)}}selected{{/if}}>{{this.label}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group half">
+                  <label>
+                    <input type="checkbox" name="node.responses.{{this.index}}.hidden" {{#if this.hidden}}checked{{/if}} />
+                    {{localize "DialogueEditor.HideIfConditionsFail"}}
+                  </label>
+                </div>
+              </div>
+
+              <div class="response-metadata">
+                <span class="metadata-badge" data-tooltip="{{localize 'DialogueEditor.ResponseConditions'}}">
+                  <i class="fa-solid fa-filter"></i> {{this.conditionsCount}}
+                </span>
+                <span class="metadata-badge" data-tooltip="{{localize 'DialogueEditor.ResponseEffects'}}">
+                  <i class="fa-solid fa-bolt"></i> {{this.effectsCount}}
+                </span>
+                {{#if this.hasSkillCheck}}
+                  <span class="metadata-badge skill-check" data-tooltip="{{localize 'DialogueEditor.HasSkillCheck'}}">
+                    <i class="fa-solid fa-dice-d20"></i>
+                  </span>
+                {{/if}}
+              </div>
+
+              {{!-- Inline Skill Check --}}
+              <details class="response-details">
+                <summary>{{localize "DialogueEditor.InlineSkillCheck"}}</summary>
+                <div class="details-content">
+                  <div class="form-row">
+                    <div class="form-group half">
+                      <label>{{localize "DialogueEditor.Skill"}}</label>
+                      <select name="node.responses.{{this.index}}.skillCheck.skill">
+                        <option value="">{{localize "DialogueEditor.NoSkillCheck"}}</option>
+                        {{#each ../skillOptions}}
+                          <option value="{{this.value}}" {{#if (eq this.value ../skillCheck.skill)}}selected{{/if}}>{{this.label}}</option>
+                        {{/each}}
+                      </select>
+                    </div>
+                    <div class="form-group half">
+                      <label>{{localize "DialogueEditor.DC"}}</label>
+                      <input type="number" name="node.responses.{{this.index}}.skillCheck.dc"
+                             value="{{this.skillCheck.dc}}" min="1" max="40" />
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="empty-state">
+        <i class="fa-solid fa-comments"></i>
+        <p>{{localize "DialogueEditor.NoResponses"}}</p>
+        <p class="hint">{{localize "DialogueEditor.AddResponseHint"}}</p>
+      </div>
+    {{/if}}
+  </section>
+</div>

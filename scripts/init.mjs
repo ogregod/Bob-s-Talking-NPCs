@@ -117,7 +117,21 @@ async function loadTemplates() {
     `modules/${MODULE_ID}/templates/trade/header.hbs`,
     `modules/${MODULE_ID}/templates/trade/your-offer.hbs`,
     `modules/${MODULE_ID}/templates/trade/their-offer.hbs`,
-    `modules/${MODULE_ID}/templates/trade/footer.hbs`
+    `modules/${MODULE_ID}/templates/trade/footer.hbs`,
+
+    // Dialogue Editor templates
+    `modules/${MODULE_ID}/templates/dialogue-editor/toolbar.hbs`,
+    `modules/${MODULE_ID}/templates/dialogue-editor/canvas.hbs`,
+    `modules/${MODULE_ID}/templates/dialogue-editor/sidebar.hbs`,
+    `modules/${MODULE_ID}/templates/dialogue-editor/node-panel.hbs`,
+
+    // Dialogue Node Config templates
+    `modules/${MODULE_ID}/templates/dialogue-node-config/tabs.hbs`,
+    `modules/${MODULE_ID}/templates/dialogue-node-config/content.hbs`,
+    `modules/${MODULE_ID}/templates/dialogue-node-config/responses.hbs`,
+    `modules/${MODULE_ID}/templates/dialogue-node-config/conditions.hbs`,
+    `modules/${MODULE_ID}/templates/dialogue-node-config/effects.hbs`,
+    `modules/${MODULE_ID}/templates/dialogue-node-config/footer.hbs`
   ];
 
   try {
@@ -208,6 +222,12 @@ function registerHandlebarsHelpers() {
   // Subtract helper
   Handlebars.registerHelper("subtract", function(a, b) {
     return (Number(a) || 0) - (Number(b) || 0);
+  });
+
+  // Lookup helper - get value from object by key
+  Handlebars.registerHelper("lookup", function(obj, key) {
+    if (!obj || key === undefined) return undefined;
+    return obj[key];
   });
 
   console.log(`${MODULE_ID} | Handlebars helpers registered`);

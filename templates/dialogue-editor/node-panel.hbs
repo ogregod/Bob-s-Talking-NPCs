@@ -1,0 +1,217 @@
+{{!-- Dialogue Editor Node Properties Panel --}}
+<div class="dialogue-editor-node-panel {{theme}}">
+  {{#if selectedNode}}
+    <header class="node-panel-header">
+      <h3>
+        <i class="fa-solid {{lookup ../nodeTypeIcons selectedNode.type}}"></i>
+        {{localize (concat "DialogueEditor.NodeType." selectedNode.type)}}
+      </h3>
+      <div class="node-panel-actions">
+        <button type="button" class="panel-btn" data-action="editNode" data-tooltip="{{localize 'DialogueEditor.EditNodeDetails'}}">
+          <i class="fa-solid fa-edit"></i>
+        </button>
+        <button type="button" class="panel-btn danger" data-action="deleteNode" data-tooltip="{{localize 'DialogueEditor.DeleteNode'}}">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="node-panel-content">
+      {{!-- Node Label --}}
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.NodeLabel"}}</label>
+        <input type="text" name="node.label" value="{{selectedNode.label}}"
+               placeholder="{{localize 'DialogueEditor.NodeLabelPlaceholder'}}" />
+      </div>
+
+      {{!-- NPC Speech Node --}}
+      {{#if (eq selectedNode.type "npc_speech")}}
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.SpeechText"}}</label>
+          <textarea name="node.text" rows="4" placeholder="{{localize 'DialogueEditor.SpeechTextPlaceholder'}}">{{selectedNode.text}}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.Responses"}}</label>
+          <div class="responses-list">
+            {{#each selectedNode.responses}}
+              <div class="response-item">
+                <span class="response-num">{{add @index 1}}.</span>
+                <span class="response-text">{{this.text}}</span>
+              </div>
+            {{else}}
+              <p class="empty-hint">{{localize "DialogueEditor.NoResponses"}}</p>
+            {{/each}}
+          </div>
+          <button type="button" class="add-btn small" data-action="editNode">
+            <i class="fa-solid fa-plus"></i>
+            {{localize "DialogueEditor.ManageResponses"}}
+          </button>
+        </div>
+      {{/if}}
+
+      {{!-- Player Choice Node --}}
+      {{#if (eq selectedNode.type "player_choice")}}
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.Prompt"}}</label>
+          <input type="text" name="node.prompt" value="{{selectedNode.prompt}}"
+                 placeholder="{{localize 'DialogueEditor.PromptPlaceholder'}}" />
+        </div>
+
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.Choices"}}</label>
+          <div class="responses-list">
+            {{#each selectedNode.responses}}
+              <div class="response-item">
+                <span class="response-num">{{add @index 1}}.</span>
+                <span class="response-text">{{this.text}}</span>
+              </div>
+            {{else}}
+              <p class="empty-hint">{{localize "DialogueEditor.NoChoices"}}</p>
+            {{/each}}
+          </div>
+          <button type="button" class="add-btn small" data-action="editNode">
+            <i class="fa-solid fa-plus"></i>
+            {{localize "DialogueEditor.ManageChoices"}}
+          </button>
+        </div>
+      {{/if}}
+
+      {{!-- Skill Check Node --}}
+      {{#if (eq selectedNode.type "skill_check")}}
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.CheckText"}}</label>
+          <textarea name="node.text" rows="2">{{selectedNode.text}}</textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half">
+            <label>{{localize "DialogueEditor.Skill"}}</label>
+            <span class="readonly-value">{{selectedNode.skillCheck.skill}}</span>
+          </div>
+          <div class="form-group half">
+            <label>{{localize "DialogueEditor.DC"}}</label>
+            <span class="readonly-value">{{selectedNode.skillCheck.dc}}</span>
+          </div>
+        </div>
+
+        <div class="connection-info">
+          <div class="connection-item success">
+            <i class="fa-solid fa-check"></i>
+            {{localize "DialogueEditor.OnSuccess"}}:
+            {{#if selectedNode.skillCheck.successNodeId}}
+              <span class="connected">{{localize "DialogueEditor.Connected"}}</span>
+            {{else}}
+              <span class="disconnected">{{localize "DialogueEditor.NotConnected"}}</span>
+            {{/if}}
+          </div>
+          <div class="connection-item failure">
+            <i class="fa-solid fa-times"></i>
+            {{localize "DialogueEditor.OnFailure"}}:
+            {{#if selectedNode.skillCheck.failureNodeId}}
+              <span class="connected">{{localize "DialogueEditor.Connected"}}</span>
+            {{else}}
+              <span class="disconnected">{{localize "DialogueEditor.NotConnected"}}</span>
+            {{/if}}
+          </div>
+        </div>
+      {{/if}}
+
+      {{!-- Quest Offer Node --}}
+      {{#if (eq selectedNode.type "quest_offer")}}
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.OfferText"}}</label>
+          <textarea name="node.text" rows="2">{{selectedNode.text}}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.Quest"}}</label>
+          <span class="readonly-value">{{#if selectedNode.questId}}{{selectedNode.questId}}{{else}}{{localize "DialogueEditor.NoQuestSelected"}}{{/if}}</span>
+        </div>
+      {{/if}}
+
+      {{!-- Quest Turn-in Node --}}
+      {{#if (eq selectedNode.type "quest_turnin")}}
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.TurnInText"}}</label>
+          <textarea name="node.text" rows="2">{{selectedNode.text}}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.Quest"}}</label>
+          <span class="readonly-value">{{#if selectedNode.questId}}{{selectedNode.questId}}{{else}}{{localize "DialogueEditor.NoQuestSelected"}}{{/if}}</span>
+        </div>
+      {{/if}}
+
+      {{!-- Shop Node --}}
+      {{#if (eq selectedNode.type "shop")}}
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.ShopText"}}</label>
+          <textarea name="node.text" rows="2">{{selectedNode.text}}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.ShopType"}}</label>
+          <span class="readonly-value">{{selectedNode.shopType}}</span>
+        </div>
+      {{/if}}
+
+      {{!-- Branch Node --}}
+      {{#if (eq selectedNode.type "branch")}}
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.Branches"}}</label>
+          <div class="branches-list">
+            {{#each selectedNode.branches}}
+              <div class="branch-item">
+                <span class="branch-num">{{add @index 1}}.</span>
+                <span class="branch-conditions">{{this.conditions.length}} {{localize "DialogueEditor.Conditions"}}</span>
+              </div>
+            {{else}}
+              <p class="empty-hint">{{localize "DialogueEditor.NoBranches"}}</p>
+            {{/each}}
+          </div>
+          <button type="button" class="add-btn small" data-action="editNode">
+            <i class="fa-solid fa-plus"></i>
+            {{localize "DialogueEditor.ManageBranches"}}
+          </button>
+        </div>
+      {{/if}}
+
+      {{!-- End Node --}}
+      {{#if (eq selectedNode.type "end")}}
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.ClosingText"}}</label>
+          <textarea name="node.text" rows="2" placeholder="{{localize 'DialogueEditor.ClosingTextPlaceholder'}}">{{selectedNode.text}}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.EndType"}}</label>
+          <span class="readonly-value">{{selectedNode.endType}}</span>
+        </div>
+      {{/if}}
+
+      {{!-- Conditions & Effects Summary --}}
+      <div class="node-metadata">
+        <div class="metadata-item">
+          <i class="fa-solid fa-filter"></i>
+          <span>{{selectedNode.conditions.length}} {{localize "DialogueEditor.Conditions"}}</span>
+        </div>
+        <div class="metadata-item">
+          <i class="fa-solid fa-bolt"></i>
+          <span>{{selectedNode.effects.length}} {{localize "DialogueEditor.Effects"}}</span>
+        </div>
+      </div>
+
+      <button type="button" class="edit-details-btn" data-action="editNode">
+        <i class="fa-solid fa-cog"></i>
+        {{localize "DialogueEditor.EditAllProperties"}}
+      </button>
+    </div>
+  {{else}}
+    <div class="no-selection">
+      <i class="fa-solid fa-mouse-pointer"></i>
+      <p>{{localize "DialogueEditor.SelectNodeToEdit"}}</p>
+      <p class="hint">{{localize "DialogueEditor.SelectNodeHint"}}</p>
+    </div>
+  {{/if}}
+</div>

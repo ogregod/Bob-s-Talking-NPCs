@@ -19,6 +19,7 @@
 @import url("./components/trade.css");
 @import url("./components/quest-editor.css");
 @import url("./components/faction-editor.css");
+@import url("./components/dialogue-editor.css");
 
 /* ===== CSS Layer for V13 Compatibility ===== */
 @layer bobsnpc {

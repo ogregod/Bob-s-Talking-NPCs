@@ -1,0 +1,9 @@
+{{!-- Dialogue Node Config Tabs --}}
+<nav class="node-config-tabs {{theme}}">
+  {{#each tabs}}
+    <button type="button" class="tab-btn {{this.cssClass}}" data-action="changeTab" data-tab="{{this.id}}">
+      <i class="fa-solid {{this.icon}}"></i>
+      {{this.label}}
+    </button>
+  {{/each}}
+</nav>

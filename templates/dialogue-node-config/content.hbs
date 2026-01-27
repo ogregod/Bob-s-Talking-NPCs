@@ -1,0 +1,253 @@
+{{!-- Dialogue Node Config - Content Tab --}}
+<div class="tab-content content-tab {{theme}}" {{#unless (eq activeTab "content")}}hidden{{/unless}}>
+  <section class="config-section">
+    <h3>{{localize "DialogueEditor.BasicProperties"}}</h3>
+
+    <div class="form-group">
+      <label>{{localize "DialogueEditor.NodeLabel"}}</label>
+      <input type="text" name="node.label" value="{{node.label}}"
+             placeholder="{{localize 'DialogueEditor.NodeLabelPlaceholder'}}" />
+      <p class="hint">{{localize "DialogueEditor.NodeLabelHint"}}</p>
+    </div>
+
+    <div class="form-group">
+      <label>{{localize "DialogueEditor.NodeType"}}</label>
+      <select name="node.type" disabled>
+        {{#each nodeTypes}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+      <p class="hint">{{localize "DialogueEditor.NodeTypeHint"}}</p>
+    </div>
+  </section>
+
+  {{!-- NPC Speech / Player Choice Content --}}
+  {{#if (or (eq nodeType "npc_speech") (eq nodeType "player_choice") (eq nodeType "skill_check") (eq nodeType "end"))}}
+    <section class="config-section">
+      <h3>{{localize "DialogueEditor.TextContent"}}</h3>
+
+      <div class="form-group">
+        <label>
+          {{#if (eq nodeType "npc_speech")}}{{localize "DialogueEditor.NPCSpeechText"}}{{/if}}
+          {{#if (eq nodeType "player_choice")}}{{localize "DialogueEditor.PromptText"}}{{/if}}
+          {{#if (eq nodeType "skill_check")}}{{localize "DialogueEditor.CheckDescription"}}{{/if}}
+          {{#if (eq nodeType "end")}}{{localize "DialogueEditor.ClosingText"}}{{/if}}
+        </label>
+        <textarea name="node.text" rows="4" placeholder="{{localize 'DialogueEditor.EnterText'}}">{{node.text}}</textarea>
+      </div>
+
+      {{#if (eq nodeType "npc_speech")}}
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.Speaker"}}</label>
+          <select name="node.speaker">
+            <option value="self" {{#if (eq node.speaker "self")}}selected{{/if}}>{{localize "DialogueEditor.SpeakerSelf"}}</option>
+            <option value="custom" {{#unless (eq node.speaker "self")}}selected{{/unless}}>{{localize "DialogueEditor.SpeakerCustom"}}</option>
+          </select>
+        </div>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  {{!-- Skill Check Configuration --}}
+  {{#if hasSkillCheck}}
+    <section class="config-section">
+      <h3>{{localize "DialogueEditor.SkillCheckConfig"}}</h3>
+
+      <div class="form-row">
+        <div class="form-group half">
+          <label>{{localize "DialogueEditor.Skill"}}</label>
+          <select name="node.skillCheck.skill">
+            {{#each skillOptions}}
+              <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        <div class="form-group half">
+          <label>{{localize "DialogueEditor.DC"}}</label>
+          <input type="number" name="node.skillCheck.dc" value="{{node.skillCheck.dc}}" min="1" max="40" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="node.skillCheck.canRetry" {{#if node.skillCheck.canRetry}}checked{{/if}} />
+          {{localize "DialogueEditor.AllowRetry"}}
+        </label>
+      </div>
+
+      {{#if node.skillCheck.canRetry}}
+        <div class="form-row">
+          <div class="form-group half">
+            <label>{{localize "DialogueEditor.RetryDC"}}</label>
+            <input type="number" name="node.skillCheck.retryDC" value="{{node.skillCheck.retryDC}}" min="1" max="40"
+                   placeholder="{{localize 'DialogueEditor.SameAsDC'}}" />
+          </div>
+          <div class="form-group half">
+            <label>{{localize "DialogueEditor.MaxRetries"}}</label>
+            <input type="number" name="node.skillCheck.maxRetries" value="{{node.skillCheck.maxRetries}}" min="1" max="10" />
+          </div>
+        </div>
+      {{/if}}
+
+      <h4>{{localize "DialogueEditor.Connections"}}</h4>
+
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.OnSuccess"}}</label>
+        <select name="node.skillCheck.successNodeId">
+          <option value="">{{localize "DialogueEditor.SelectNode"}}</option>
+          {{#each otherNodes}}
+            <option value="{{this.id}}" {{#if (eq this.id ../node.skillCheck.successNodeId)}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.OnFailure"}}</label>
+        <select name="node.skillCheck.failureNodeId">
+          <option value="">{{localize "DialogueEditor.SelectNode"}}</option>
+          {{#each otherNodes}}
+            <option value="{{this.id}}" {{#if (eq this.id ../node.skillCheck.failureNodeId)}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.OnCritSuccess"}}</label>
+        <select name="node.skillCheck.critSuccessNodeId">
+          <option value="">{{localize "DialogueEditor.UseSameAsSuccess"}}</option>
+          {{#each otherNodes}}
+            <option value="{{this.id}}" {{#if (eq this.id ../node.skillCheck.critSuccessNodeId)}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.OnCritFailure"}}</label>
+        <select name="node.skillCheck.critFailureNodeId">
+          <option value="">{{localize "DialogueEditor.UseSameAsFailure"}}</option>
+          {{#each otherNodes}}
+            <option value="{{this.id}}" {{#if (eq this.id ../node.skillCheck.critFailureNodeId)}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </section>
+  {{/if}}
+
+  {{!-- Quest Configuration --}}
+  {{#if hasQuestId}}
+    <section class="config-section">
+      <h3>{{localize "DialogueEditor.QuestConfig"}}</h3>
+
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.QuestID"}}</label>
+        <input type="text" name="node.questId" value="{{node.questId}}"
+               placeholder="{{localize 'DialogueEditor.EnterQuestId'}}" />
+      </div>
+
+      {{#if (eq nodeType "quest_offer")}}
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.OnAccept"}}</label>
+          <select name="node.acceptNodeId">
+            <option value="">{{localize "DialogueEditor.SelectNode"}}</option>
+            {{#each otherNodes}}
+              <option value="{{this.id}}" {{#if (eq this.id ../node.acceptNodeId)}}selected{{/if}}>{{this.label}}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.OnDecline"}}</label>
+          <select name="node.declineNodeId">
+            <option value="">{{localize "DialogueEditor.SelectNode"}}</option>
+            {{#each otherNodes}}
+              <option value="{{this.id}}" {{#if (eq this.id ../node.declineNodeId)}}selected{{/if}}>{{this.label}}</option>
+            {{/each}}
+          </select>
+        </div>
+      {{/if}}
+
+      {{#if (eq nodeType "quest_turnin")}}
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.OnComplete"}}</label>
+          <select name="node.successNodeId">
+            <option value="">{{localize "DialogueEditor.SelectNode"}}</option>
+            {{#each otherNodes}}
+              <option value="{{this.id}}" {{#if (eq this.id ../node.successNodeId)}}selected{{/if}}>{{this.label}}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>{{localize "DialogueEditor.OnIncomplete"}}</label>
+          <select name="node.incompleteNodeId">
+            <option value="">{{localize "DialogueEditor.SelectNode"}}</option>
+            {{#each otherNodes}}
+              <option value="{{this.id}}" {{#if (eq this.id ../node.incompleteNodeId)}}selected{{/if}}>{{this.label}}</option>
+            {{/each}}
+          </select>
+        </div>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  {{!-- Shop Configuration --}}
+  {{#if hasShopType}}
+    <section class="config-section">
+      <h3>{{localize "DialogueEditor.ShopConfig"}}</h3>
+
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.ShopType"}}</label>
+        <select name="node.shopType">
+          <option value="merchant" {{#if (eq node.shopType "merchant")}}selected{{/if}}>{{localize "DialogueEditor.ShopTypeMerchant"}}</option>
+          <option value="fence" {{#if (eq node.shopType "fence")}}selected{{/if}}>{{localize "DialogueEditor.ShopTypeFence"}}</option>
+          <option value="stable" {{#if (eq node.shopType "stable")}}selected{{/if}}>{{localize "DialogueEditor.ShopTypeStable"}}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.AfterShop"}}</label>
+        <select name="node.nextNodeId">
+          <option value="">{{localize "DialogueEditor.EndDialogue"}}</option>
+          {{#each otherNodes}}
+            <option value="{{this.id}}" {{#if (eq this.id ../node.nextNodeId)}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </section>
+  {{/if}}
+
+  {{!-- End Node Configuration --}}
+  {{#if hasEndType}}
+    <section class="config-section">
+      <h3>{{localize "DialogueEditor.EndConfig"}}</h3>
+
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.EndType"}}</label>
+        <select name="node.endType">
+          <option value="normal" {{#if (eq node.endType "normal")}}selected{{/if}}>{{localize "DialogueEditor.EndTypeNormal"}}</option>
+          <option value="hostile" {{#if (eq node.endType "hostile")}}selected{{/if}}>{{localize "DialogueEditor.EndTypeHostile"}}</option>
+          <option value="trade" {{#if (eq node.endType "trade")}}selected{{/if}}>{{localize "DialogueEditor.EndTypeTrade"}}</option>
+          <option value="combat" {{#if (eq node.endType "combat")}}selected{{/if}}>{{localize "DialogueEditor.EndTypeCombat"}}</option>
+        </select>
+      </div>
+    </section>
+  {{/if}}
+
+  {{!-- Next Node (for simple node types) --}}
+  {{#if hasNextNode}}
+    <section class="config-section">
+      <h3>{{localize "DialogueEditor.Connection"}}</h3>
+
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.NextNode"}}</label>
+        <select name="node.nextNodeId">
+          <option value="">{{localize "DialogueEditor.SelectNode"}}</option>
+          {{#each otherNodes}}
+            <option value="{{this.id}}" {{#if (eq this.id ../node.nextNodeId)}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </section>
+  {{/if}}
+</div>

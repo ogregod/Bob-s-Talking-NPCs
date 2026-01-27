@@ -686,8 +686,10 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onEditDialogue(event, target) {
     const dialogueId = target.dataset.dialogueId;
 
-    // Open dialogue editor (to be implemented)
-    ui.notifications.info(localize("NPCConfig.DialogueEditorNotImplemented"));
+    // Dynamically import and open dialogue editor
+    const { DialogueEditor } = await import("./dialogue-editor.mjs");
+    const dialogue = getDialogueHandler()?.getDialogue(dialogueId);
+    DialogueEditor.open(dialogue || dialogueId);
   }
 
   static #onAddFaction(event, target) {
