@@ -17,6 +17,8 @@
 @import url("./components/npc-config.css");
 @import url("./components/gm-dashboard.css");
 @import url("./components/trade.css");
+@import url("./components/quest-editor.css");
+@import url("./components/faction-editor.css");
 
 /* ===== CSS Layer for V13 Compatibility ===== */
 @layer bobsnpc {

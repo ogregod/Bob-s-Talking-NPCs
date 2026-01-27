@@ -62,9 +62,37 @@
         <div class="form-group">
           <label>{{localize "BOBSNPC.NPCConfig.AvailableQuests"}}</label>
           <p class="hint">{{localize "BOBSNPC.NPCConfig.QuestsHint"}}</p>
-          <div class="quests-selector">
-            {{!-- Quest selection interface --}}
-            <p class="placeholder">{{localize "BOBSNPC.NPCConfig.QuestSelectorPlaceholder"}}</p>
+
+          {{#if servicesDisplay.questGiver.assignedQuests.length}}
+            <ul class="assigned-items-list">
+              {{#each servicesDisplay.questGiver.assignedQuests}}
+                <li class="assigned-item">
+                  <i class="fa-solid fa-scroll"></i>
+                  <span class="item-name">{{this.name}}</span>
+                  <span class="item-status status-{{this.status}}">{{this.statusLabel}}</span>
+                  <button type="button" class="remove-btn" data-action="removeServiceItem"
+                          data-service="questGiver" data-index="{{@index}}">
+                    <i class="fa-solid fa-times"></i>
+                  </button>
+                </li>
+              {{/each}}
+            </ul>
+          {{else}}
+            <p class="empty-hint">{{localize "BOBSNPC.NPCConfig.NoQuestsAssigned"}}</p>
+          {{/if}}
+
+          <div class="add-item-row">
+            <select class="quest-select" data-service="questGiver">
+              <option value="">{{localize "BOBSNPC.NPCConfig.SelectQuest"}}</option>
+              {{#each availableQuests}}
+                <option value="{{this.id}}">{{this.name}} ({{this.categoryLabel}})</option>
+              {{/each}}
+            </select>
+            <button type="button" class="add-btn" data-action="addServiceItem"
+                    data-service="questGiver" data-item-type="quest">
+              <i class="fa-solid fa-plus"></i>
+              {{localize "BOBSNPC.NPCConfig.AddQuest"}}
+            </button>
           </div>
         </div>
       {{/if}}

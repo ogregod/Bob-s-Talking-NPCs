@@ -24,6 +24,11 @@ function getFactionHandler() {
   return game.bobsnpc?.handlers?.faction;
 }
 
+/** Get quest handler instance from API */
+function getQuestHandler() {
+  return game.bobsnpc?.handlers?.quest;
+}
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 /**
@@ -189,10 +194,14 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     const context = await super._prepareContext(options);
 
     // Get available data for dropdowns
-    const allDialogues = getDialogueHandler().getAllDialogues();
-    const allFactions = getFactionHandler().getAllFactions();
+    const allDialogues = getDialogueHandler()?.getAllDialogues() || [];
+    const allFactions = getFactionHandler()?.getAllFactions() || [];
+    const allQuests = getQuestHandler()?.getAllQuests() || [];
     const allShops = await this._getAvailableShops();
     const allBanks = await this._getAvailableBanks();
+
+    // Get assigned quest IDs for filtering
+    const assignedQuestIds = this._config.services?.questGiver?.quests || [];
 
     return {
       ...context,
@@ -210,6 +219,15 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       availableRoles: this._prepareRoleOptions(),
       availableDialogues: allDialogues.map(d => ({ id: d.id, name: d.name })),
       availableFactions: allFactions.map(f => ({ id: f.id, name: f.name })),
+      availableQuests: allQuests
+        .filter(q => !assignedQuestIds.includes(q.id))
+        .map(q => ({
+          id: q.id,
+          name: q.name,
+          category: q.category,
+          categoryLabel: this._getCategoryLabel(q.category),
+          status: q.status
+        })),
       availableShops: allShops,
       availableBanks: allBanks,
       availableIndicators: this._prepareIndicatorOptions(),
@@ -220,12 +238,47 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       dialoguesDisplay: this._prepareDialoguesDisplay(allDialogues),
       scheduleDisplay: this._prepareScheduleDisplay(),
       factionsDisplay: this._prepareFactionsDisplay(allFactions),
-      servicesDisplay: this._prepareServicesDisplay(),
+      servicesDisplay: this._prepareServicesDisplay(allQuests),
 
       // System info
       isGM: game.user.isGM,
       theme: game.settings.get(MODULE_ID, "theme") || "dark"
     };
+  }
+
+  /**
+   * Get category display label
+   * @param {string} category
+   * @returns {string}
+   * @private
+   */
+  _getCategoryLabel(category) {
+    const labels = {
+      main_story: localize("QuestEditor.Category.MainStory"),
+      side_quest: localize("QuestEditor.Category.SideQuest"),
+      bounty: localize("QuestEditor.Category.Bounty"),
+      daily: localize("QuestEditor.Category.Daily"),
+      guild_contract: localize("QuestEditor.Category.GuildContract"),
+      custom: localize("QuestEditor.Category.Custom")
+    };
+    return labels[category] || category;
+  }
+
+  /**
+   * Get status display label
+   * @param {string} status
+   * @returns {string}
+   * @private
+   */
+  _getStatusLabel(status) {
+    const labels = {
+      available: localize("QuestEditor.Status.Available"),
+      accepted: localize("QuestEditor.Status.Accepted"),
+      in_progress: localize("QuestEditor.Status.InProgress"),
+      completed: localize("QuestEditor.Status.Completed"),
+      failed: localize("QuestEditor.Status.Failed")
+    };
+    return labels[status] || status;
   }
 
   /**
@@ -418,11 +471,15 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
   /**
    * Prepare services for display
+   * @param {object[]} allQuests - All available quests
    * @returns {object}
    * @private
    */
-  _prepareServicesDisplay() {
+  _prepareServicesDisplay(allQuests = []) {
     const services = this._config.services;
+
+    // Get assigned quest IDs (support both 'quests' and 'questIds' for backwards compatibility)
+    const assignedQuestIds = services.questGiver?.quests || services.questGiver?.questIds || [];
 
     return {
       merchant: {
@@ -431,7 +488,17 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       },
       questGiver: {
         ...services.questGiver,
-        hasRole: this._config.roles.includes(NPCRole.QUEST_GIVER)
+        hasRole: this._config.roles.includes(NPCRole.QUEST_GIVER),
+        assignedQuests: assignedQuestIds.map((questId, index) => {
+          const quest = allQuests.find(q => q.id === questId);
+          return {
+            id: questId,
+            name: quest?.name || questId,
+            status: quest?.status || "unknown",
+            statusLabel: this._getStatusLabel(quest?.status || "unknown"),
+            index
+          };
+        })
       },
       banker: {
         ...services.banker,
@@ -649,17 +716,40 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     const service = target.dataset.service;
     const itemType = target.dataset.itemType;
 
-    // Add item to service configuration
-    // Implementation depends on service type
-    ui.notifications.info(`Add ${itemType} to ${service} - to be implemented`);
+    if (service === "questGiver" && itemType === "quest") {
+      const select = this.element.querySelector('select.quest-select[data-service="questGiver"]');
+      const questId = select?.value;
+
+      if (!questId) {
+        ui.notifications.warn(localize("NPCConfig.SelectQuestFirst"));
+        return;
+      }
+
+      // Initialize the quests array if needed
+      if (!this._config.services.questGiver.quests) {
+        this._config.services.questGiver.quests = [];
+      }
+
+      // Add the quest ID if not already present
+      if (!this._config.services.questGiver.quests.includes(questId)) {
+        this._config.services.questGiver.quests.push(questId);
+        this._unsavedChanges = true;
+        this.render();
+      }
+    }
   }
 
   static #onRemoveServiceItem(event, target) {
     const service = target.dataset.service;
     const index = parseInt(target.dataset.index);
 
-    // Remove item from service configuration
-    ui.notifications.info(`Remove item from ${service} - to be implemented`);
+    if (service === "questGiver") {
+      if (!this._config.services.questGiver.quests) return;
+
+      this._config.services.questGiver.quests.splice(index, 1);
+      this._unsavedChanges = true;
+      this.render();
+    }
   }
 
   static async #onTestIndicator(event, target) {

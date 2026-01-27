@@ -1,0 +1,551 @@
+/**
+ * Bob's Talking NPCs - Quest Editor Styles
+ */
+
+@layer bobsnpc {
+  /* ===== Quest Editor Layout ===== */
+  .quest-editor {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* ===== Tabs ===== */
+  .quest-editor-tabs {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    overflow-x: auto;
+  }
+
+  .quest-editor-tabs .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+    white-space: nowrap;
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .quest-editor-tabs .tab-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .quest-editor-tabs .tab-btn.active {
+    background: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  /* ===== Tab Content ===== */
+  .quest-editor .tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .quest-editor .tab-content[hidden] {
+    display: none;
+  }
+
+  /* ===== Editor Sections ===== */
+  .editor-section {
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    padding: var(--bobsnpc-spacing-md);
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .editor-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .editor-section h3 {
+    margin: 0 0 var(--bobsnpc-spacing-md) 0;
+    padding-bottom: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    font-size: var(--bobsnpc-font-size-base);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    padding-bottom: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .section-header h3 {
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+
+  .section-hint {
+    margin-top: calc(var(--bobsnpc-spacing-md) * -1 + var(--bobsnpc-spacing-xs));
+    margin-bottom: var(--bobsnpc-spacing-md);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Form Layout ===== */
+  .quest-editor .form-group {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .quest-editor .form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .quest-editor .form-group > label {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    font-weight: var(--bobsnpc-font-weight-medium);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  .quest-editor .form-row {
+    display: flex;
+    gap: var(--bobsnpc-spacing-md);
+    flex-wrap: wrap;
+  }
+
+  .quest-editor .form-row .form-group {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .quest-editor input[type="text"],
+  .quest-editor input[type="number"],
+  .quest-editor select,
+  .quest-editor textarea {
+    width: 100%;
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .quest-editor input:focus,
+  .quest-editor select:focus,
+  .quest-editor textarea:focus {
+    outline: none;
+    border-color: var(--bobsnpc-primary);
+    box-shadow: 0 0 0 2px rgba(var(--bobsnpc-primary-rgb), 0.2);
+  }
+
+  .quest-editor textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .quest-editor .hint {
+    margin-top: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .quest-editor .checkbox-group label {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .quest-editor .checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin-right: var(--bobsnpc-spacing-xs);
+  }
+
+  /* ===== Actor Selector ===== */
+  .actor-selector {
+    margin-top: var(--bobsnpc-spacing-sm);
+  }
+
+  .selected-actor {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .selected-actor .actor-portrait {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    object-fit: cover;
+  }
+
+  .selected-actor .actor-name {
+    flex: 1;
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .selected-actor .clear-btn {
+    padding: var(--bobsnpc-spacing-xs);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    transition: color var(--bobsnpc-transition-fast);
+  }
+
+  .selected-actor .clear-btn:hover {
+    color: var(--bobsnpc-danger);
+  }
+
+  .select-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) dashed var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .select-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    border-style: solid;
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .select-btn.secondary {
+    background: transparent;
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  /* ===== Objectives List ===== */
+  .objectives-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .objective-entry {
+    background: var(--bobsnpc-bg-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    overflow: hidden;
+  }
+
+  .objective-header {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .objective-number {
+    font-weight: var(--bobsnpc-font-weight-bold);
+    color: var(--bobsnpc-primary);
+  }
+
+  .objective-type-badge {
+    padding: 2px var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-elevated);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .objective-actions {
+    margin-left: auto;
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .objective-actions button {
+    padding: var(--bobsnpc-spacing-xs);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    transition: color var(--bobsnpc-transition-fast);
+  }
+
+  .objective-actions button:hover:not(:disabled) {
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .objective-actions button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .objective-actions .remove-btn:hover {
+    color: var(--bobsnpc-danger);
+  }
+
+  .objective-form {
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .objective-type-options {
+    margin-top: var(--bobsnpc-spacing-md);
+    padding-top: var(--bobsnpc-spacing-md);
+    border-top: var(--bobsnpc-border-width) dashed var(--bobsnpc-border-color);
+  }
+
+  /* ===== Reward Items List ===== */
+  .reward-items-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .reward-item-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .reward-item-entry .item-img {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    object-fit: cover;
+  }
+
+  .reward-item-entry .item-name {
+    flex: 1;
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .reward-item-entry .item-quantity {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .reward-item-entry .item-quantity input {
+    width: 60px;
+  }
+
+  .reward-item-entry .remove-btn {
+    padding: var(--bobsnpc-spacing-xs);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+  }
+
+  .reward-item-entry .remove-btn:hover {
+    color: var(--bobsnpc-danger);
+  }
+
+  /* ===== Reputation Rewards List ===== */
+  .reputation-rewards-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .reputation-reward-entry {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .reputation-reward-entry .form-group {
+    flex: 1;
+    margin: 0;
+  }
+
+  .reputation-reward-entry .remove-btn {
+    padding: var(--bobsnpc-spacing-sm);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  .reputation-reward-entry .remove-btn:hover {
+    color: var(--bobsnpc-danger);
+  }
+
+  /* ===== Prerequisite Quests List ===== */
+  .prereq-quests-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .prereq-quest-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .prereq-quest-entry i {
+    color: var(--bobsnpc-primary);
+  }
+
+  .prereq-quest-entry .quest-name {
+    flex: 1;
+  }
+
+  .prereq-quest-entry .remove-btn {
+    padding: var(--bobsnpc-spacing-xs);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+  }
+
+  .prereq-quest-entry .remove-btn:hover {
+    color: var(--bobsnpc-danger);
+  }
+
+  /* ===== Empty State ===== */
+  .quest-editor .empty-state {
+    text-align: center;
+    padding: var(--bobsnpc-spacing-lg);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .quest-editor .empty-state i {
+    font-size: 2rem;
+    margin-bottom: var(--bobsnpc-spacing-sm);
+    opacity: 0.5;
+  }
+
+  .quest-editor .empty-state.small {
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .quest-editor .empty-state.small i {
+    display: none;
+  }
+
+  /* ===== Icons ===== */
+  .gold-icon {
+    color: #ffd700;
+  }
+
+  .xp-icon {
+    color: #9b59b6;
+  }
+
+  /* ===== Add Button ===== */
+  .add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-success);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: white;
+    cursor: pointer;
+    font-size: var(--bobsnpc-font-size-sm);
+    transition: background var(--bobsnpc-transition-fast);
+  }
+
+  .add-btn:hover {
+    background: var(--bobsnpc-success-hover);
+  }
+
+  /* ===== Footer ===== */
+  .quest-editor-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-secondary);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .footer-left,
+  .footer-right {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .quest-editor-footer button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    font-size: var(--bobsnpc-font-size-sm);
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .quest-editor-footer .primary-btn {
+    background: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .quest-editor-footer .primary-btn:hover {
+    background: var(--bobsnpc-primary-hover);
+  }
+
+  .quest-editor-footer .secondary-btn {
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .quest-editor-footer .secondary-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .quest-editor-footer .danger-btn {
+    background: transparent;
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-danger);
+    color: var(--bobsnpc-danger);
+  }
+
+  .quest-editor-footer .danger-btn:hover {
+    background: var(--bobsnpc-danger);
+    color: white;
+  }
+}

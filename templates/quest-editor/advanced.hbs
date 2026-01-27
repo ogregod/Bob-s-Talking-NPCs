@@ -1,0 +1,123 @@
+{{!-- Quest Editor - Advanced Tab --}}
+<div class="tab-content advanced-tab {{theme}}" {{#unless (eq activeTab 'advanced')}}hidden{{/unless}}>
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.RepeatableSettings"}}</h3>
+
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" name="quest.repeatable.enabled" {{#if quest.repeatable.enabled}}checked{{/if}} />
+        {{localize "BOBSNPC.QuestEditor.RepeatableEnabled"}}
+      </label>
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.RepeatableEnabledHint"}}</p>
+    </div>
+
+    {{#if quest.repeatable.enabled}}
+      <div class="form-row">
+        <div class="form-group">
+          <label for="repeatable-type">{{localize "BOBSNPC.QuestEditor.RepeatableType"}}</label>
+          <select id="repeatable-type" name="quest.repeatable.type">
+            {{#each repeatableOptions}}
+              <option value="{{this.value}}" {{#if (eq this.value ../quest.repeatable.type)}}selected{{/if}}>
+                {{this.label}}
+              </option>
+            {{/each}}
+          </select>
+        </div>
+
+        {{#if (eq quest.repeatable.type 'cooldown')}}
+          <div class="form-group">
+            <label for="cooldown-days">{{localize "BOBSNPC.QuestEditor.CooldownDays"}}</label>
+            <input type="number" id="cooldown-days" name="quest.repeatable.cooldownDays"
+                   value="{{quest.repeatable.cooldownDays}}" min="1" />
+          </div>
+        {{/if}}
+      </div>
+    {{/if}}
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.TimeLimitSettings"}}</h3>
+
+    <div class="form-group">
+      <label for="time-limit">{{localize "BOBSNPC.QuestEditor.TimeLimit"}}</label>
+      <input type="number" id="time-limit" name="quest.timeLimit" value="{{quest.timeLimit}}"
+             min="0" placeholder="{{localize 'BOBSNPC.QuestEditor.NoTimeLimit'}}" />
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.TimeLimitHint"}}</p>
+    </div>
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.GiverDeathBehavior"}}</h3>
+
+    <div class="form-group">
+      <label for="on-giver-death">{{localize "BOBSNPC.QuestEditor.OnGiverDeath"}}</label>
+      <select id="on-giver-death" name="quest.onGiverDeath">
+        {{#each onGiverDeathOptions}}
+          <option value="{{this.value}}" {{#if (eq this.value ../quest.onGiverDeath)}}selected{{/if}}>
+            {{this.label}}
+          </option>
+        {{/each}}
+      </select>
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.OnGiverDeathHint"}}</p>
+    </div>
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.AbandonmentSettings"}}</h3>
+
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" name="quest.abandonment.allowed" {{#if quest.abandonment.allowed}}checked{{/if}} />
+        {{localize "BOBSNPC.QuestEditor.AllowAbandonment"}}
+      </label>
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.AllowAbandonmentHint"}}</p>
+    </div>
+
+    {{#if quest.abandonment.allowed}}
+      <div class="form-group">
+        <label for="abandon-cooldown">{{localize "BOBSNPC.QuestEditor.AbandonCooldown"}}</label>
+        <input type="number" id="abandon-cooldown" name="quest.abandonment.consequences.cooldownDays"
+               value="{{quest.abandonment.consequences.cooldownDays}}" min="0" />
+        <p class="hint">{{localize "BOBSNPC.QuestEditor.AbandonCooldownHint"}}</p>
+      </div>
+    {{/if}}
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.ConflictSettings"}}</h3>
+
+    <div class="form-group">
+      <label for="conflicts-with">{{localize "BOBSNPC.QuestEditor.ConflictsWith"}}</label>
+      <select id="conflicts-with" name="quest.conflictsWith" multiple>
+        {{#each otherQuests}}
+          <option value="{{this.id}}" {{#if (includes ../quest.conflictsWith this.id)}}selected{{/if}}>
+            {{this.name}}
+          </option>
+        {{/each}}
+      </select>
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.ConflictsWithHint"}}</p>
+    </div>
+
+    <div class="form-group">
+      <label for="mutually-exclusive">{{localize "BOBSNPC.QuestEditor.MutuallyExclusive"}}</label>
+      <select id="mutually-exclusive" name="quest.mutuallyExclusive" multiple>
+        {{#each otherQuests}}
+          <option value="{{this.id}}" {{#if (includes ../quest.mutuallyExclusive this.id)}}selected{{/if}}>
+            {{this.name}}
+          </option>
+        {{/each}}
+      </select>
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.MutuallyExclusiveHint"}}</p>
+    </div>
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.Notes"}}</h3>
+
+    <div class="form-group">
+      <label for="party-notes">{{localize "BOBSNPC.QuestEditor.PartyNotes"}}</label>
+      <textarea id="party-notes" name="quest.partyNotes" rows="3">{{quest.partyNotes}}</textarea>
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.PartyNotesHint"}}</p>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,91 @@
+{{!-- Quest Editor - Prerequisites Tab --}}
+<div class="tab-content prerequisites-tab {{theme}}" {{#unless (eq activeTab 'prerequisites')}}hidden{{/unless}}>
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.LevelRequirements"}}</h3>
+
+    <div class="form-group">
+      <label for="prereq-level">{{localize "BOBSNPC.QuestEditor.MinimumLevel"}}</label>
+      <input type="number" id="prereq-level" name="quest.prerequisites.level" value="{{quest.prerequisites.level}}"
+             min="0" placeholder="0" />
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.MinimumLevelHint"}}</p>
+    </div>
+  </section>
+
+  <section class="editor-section">
+    <div class="section-header">
+      <h3>{{localize "BOBSNPC.QuestEditor.RequiredQuests"}}</h3>
+      <button type="button" class="add-btn" data-action="addPrereqQuest">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.QuestEditor.AddQuest"}}
+      </button>
+    </div>
+
+    <p class="section-hint">{{localize "BOBSNPC.QuestEditor.RequiredQuestsHint"}}</p>
+
+    {{#if prereqQuestsDisplay.length}}
+      <ul class="prereq-quests-list">
+        {{#each prereqQuestsDisplay}}
+          <li class="prereq-quest-entry">
+            <i class="fa-solid fa-scroll"></i>
+            <span class="quest-name">{{this.name}}</span>
+            <button type="button" class="remove-btn" data-action="removePrereqQuest" data-index="{{this.index}}">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <div class="empty-state small">
+        <p>{{localize "BOBSNPC.QuestEditor.NoRequiredQuests"}}</p>
+      </div>
+    {{/if}}
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.FactionRequirements"}}</h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="prereq-faction">{{localize "BOBSNPC.QuestEditor.RequiredFaction"}}</label>
+        <select id="prereq-faction" name="quest.prerequisites.factionReputation.factionId">
+          <option value="">{{localize "BOBSNPC.QuestEditor.NoFactionRequired"}}</option>
+          {{#each factions}}
+            <option value="{{this.id}}" {{#if (eq this.id ../quest.prerequisites.factionReputation.factionId)}}selected{{/if}}>
+              {{this.name}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="prereq-reputation">{{localize "BOBSNPC.QuestEditor.MinimumReputation"}}</label>
+        <input type="number" id="prereq-reputation" name="quest.prerequisites.factionReputation.minimum"
+               value="{{quest.prerequisites.factionReputation.minimum}}" />
+      </div>
+    </div>
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.OtherRequirements"}}</h3>
+
+    <div class="form-group">
+      <label for="prereq-gold">{{localize "BOBSNPC.QuestEditor.RequiredGold"}}</label>
+      <input type="number" id="prereq-gold" name="quest.prerequisites.gold" value="{{quest.prerequisites.gold}}"
+             min="0" />
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.RequiredGoldHint"}}</p>
+    </div>
+
+    <div class="form-group">
+      <label for="display-prereqs">{{localize "BOBSNPC.QuestEditor.DisplayPrerequisites"}}</label>
+      <select id="display-prereqs" name="quest.displayPrerequisites">
+        <option value="locked" {{#if (eq quest.displayPrerequisites 'locked')}}selected{{/if}}>
+          {{localize "BOBSNPC.QuestEditor.DisplayLocked"}}
+        </option>
+        <option value="hidden" {{#if (eq quest.displayPrerequisites 'hidden')}}selected{{/if}}>
+          {{localize "BOBSNPC.QuestEditor.DisplayHidden"}}
+        </option>
+      </select>
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.DisplayPrerequisitesHint"}}</p>
+    </div>
+  </section>
+</div>

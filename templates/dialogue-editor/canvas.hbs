@@ -1,0 +1,23 @@
+{{!-- Dialogue Editor Canvas --}}
+<div class="dialogue-editor-canvas-container {{theme}}">
+  <canvas id="dialogue-canvas" class="dialogue-canvas"></canvas>
+
+  <div class="canvas-info">
+    <span class="node-count">
+      <i class="fa-solid fa-project-diagram"></i>
+      {{nodeCount}} {{localize "DialogueEditor.Nodes"}}
+    </span>
+  </div>
+
+  <div class="canvas-hints">
+    <span class="hint">
+      <kbd>Scroll</kbd> {{localize "DialogueEditor.HintZoom"}}
+    </span>
+    <span class="hint">
+      <kbd>Shift+Drag</kbd> {{localize "DialogueEditor.HintPan"}}
+    </span>
+    <span class="hint">
+      <kbd>Double-click</kbd> {{localize "DialogueEditor.HintAddNode"}}
+    </span>
+  </div>
+</div>

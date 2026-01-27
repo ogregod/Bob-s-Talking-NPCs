@@ -190,17 +190,21 @@ export class BobsNPCAPI {
 }
 
 /**
- * Quests API
+ * Quests API - Delegates to quest-handler
  */
 class QuestsAPI {
+  /** @returns {object|null} Quest handler instance */
+  get #handler() {
+    return game.bobsnpc?.handlers?.quest;
+  }
+
   /**
    * Get a quest by ID
    * @param {string} questId
    * @returns {object|null}
    */
   get(questId) {
-    // Implementation: retrieve from JournalEntryPage flags
-    return null;
+    return this.#handler?.getQuest(questId) || null;
   }
 
   /**
@@ -221,8 +225,15 @@ class QuestsAPI {
    * @returns {object[]}
    */
   getAll(filter = {}) {
-    // Implementation: retrieve from JournalEntryPages
-    return [];
+    const quests = this.#handler?.getAllQuests() || [];
+    if (!filter || Object.keys(filter).length === 0) return quests;
+
+    return quests.filter(q => {
+      if (filter.status && q.status !== filter.status) return false;
+      if (filter.category && q.category !== filter.category) return false;
+      if (filter.giver && q.giverId !== filter.giver) return false;
+      return true;
+    });
   }
 
   /**
@@ -230,7 +241,7 @@ class QuestsAPI {
    * @returns {object[]}
    */
   getPartyQuests() {
-    return this.getAll();
+    return this.#handler?.getPartyQuests() || [];
   }
 
   /**
@@ -252,8 +263,7 @@ class QuestsAPI {
     if (!game.user.isGM) {
       throw new Error("Only GM can create quests");
     }
-    // Implementation: create JournalEntryPage with quest data
-    return null;
+    return this.#handler?.createQuest(questData) || null;
   }
 
   /**
@@ -266,8 +276,7 @@ class QuestsAPI {
     if (!game.user.isGM) {
       throw new Error("Only GM can update quests");
     }
-    // Implementation: update JournalEntryPage flags
-    return null;
+    return this.#handler?.updateQuest(questId, updates) || null;
   }
 
   /**
@@ -279,8 +288,7 @@ class QuestsAPI {
     if (!game.user.isGM) {
       throw new Error("Only GM can delete quests");
     }
-    // Implementation: delete JournalEntryPage
-    return false;
+    return this.#handler?.deleteQuest(questId) || false;
   }
 
   /**
@@ -290,9 +298,8 @@ class QuestsAPI {
    * @returns {Promise<boolean>}
    */
   async accept(questId, playerUuids = []) {
-    emit(SocketEvents.QUEST_ACCEPT, { questId, playerUuids });
-    Hooks.call(`${MODULE_ID}.questAccepted`, { questId, playerUuids });
-    return true;
+    const actors = playerUuids.map(uuid => fromUuidSync(uuid)).filter(Boolean);
+    return this.#handler?.acceptQuest(questId, actors) || false;
   }
 
   /**
@@ -301,8 +308,7 @@ class QuestsAPI {
    * @returns {Promise<boolean>}
    */
   async complete(questId) {
-    emit(SocketEvents.QUEST_COMPLETE, { questId });
-    return true;
+    return this.#handler?.completeQuest(questId) || false;
   }
 
   /**
@@ -312,8 +318,7 @@ class QuestsAPI {
    * @returns {Promise<boolean>}
    */
   async fail(questId, reason) {
-    emit(SocketEvents.QUEST_FAIL, { questId, reason });
-    return true;
+    return this.#handler?.failQuest(questId, reason) || false;
   }
 
   /**
@@ -327,8 +332,8 @@ class QuestsAPI {
       ui.notifications.warn(game.i18n.localize("BOBSNPC.Quest.Messages.CannotAbandon"));
       return false;
     }
-    emit(SocketEvents.QUEST_ABANDON, { questId, playerUuid });
-    return true;
+    const actor = await fromUuid(playerUuid);
+    return this.#handler?.abandonQuest(questId, actor) || false;
   }
 
   /**
@@ -338,8 +343,7 @@ class QuestsAPI {
    * @returns {Promise<boolean>}
    */
   async completeObjective(questId, objectiveId) {
-    emit(SocketEvents.QUEST_OBJECTIVE, { questId, objectiveId, completed: true });
-    return true;
+    return this.#handler?.completeObjective(questId, objectiveId) || false;
   }
 
   /**
@@ -359,17 +363,39 @@ class QuestsAPI {
    * @returns {object[]}
    */
   getPlayerQuests(playerUuid, status = null) {
-    // Implementation: filter quests by acceptedBy array
-    return [];
+    const actor = fromUuidSync(playerUuid);
+    if (!actor) return [];
+    const quests = this.#handler?.getPlayerQuests(actor) || [];
+    if (!status) return quests;
+    return quests.filter(q => q.status === status);
   }
 }
 
 /**
- * Factions API
+ * Factions API - Delegates to faction-handler
  */
 class FactionsAPI {
-  get(factionId) { return null; }
-  getAll() { return []; }
+  /** @returns {object|null} Faction handler instance */
+  get #handler() {
+    return game.bobsnpc?.handlers?.faction;
+  }
+
+  /**
+   * Get a faction by ID
+   * @param {string} factionId
+   * @returns {object|null}
+   */
+  get(factionId) {
+    return this.#handler?.getFaction(factionId) || null;
+  }
+
+  /**
+   * Get all factions
+   * @returns {object[]}
+   */
+  getAll() {
+    return this.#handler?.getAllFactions() || [];
+  }
 
   /**
    * Alias for getAll() - used by faction-window.mjs
@@ -379,17 +405,79 @@ class FactionsAPI {
     return this.getAll();
   }
 
-  async create(factionData) { return null; }
-  async update(factionId, updates) { return null; }
-  async delete(factionId) { return false; }
-
-  async modifyReputation(factionId, playerUuid, amount) {
-    emit(SocketEvents.FACTION_REPUTATION, { factionId, playerUuid, amount });
-    return true;
+  /**
+   * Create a new faction
+   * @param {object} factionData
+   * @returns {Promise<object>}
+   */
+  async create(factionData) {
+    if (!game.user.isGM) {
+      throw new Error("Only GM can create factions");
+    }
+    return this.#handler?.createFaction(factionData) || null;
   }
 
-  getReputation(actorUuid, factionId) { return 0; }
-  getRank(actorUuid, factionId) { return null; }
+  /**
+   * Update a faction
+   * @param {string} factionId
+   * @param {object} updates
+   * @returns {Promise<object>}
+   */
+  async update(factionId, updates) {
+    if (!game.user.isGM) {
+      throw new Error("Only GM can update factions");
+    }
+    return this.#handler?.updateFaction(factionId, updates) || null;
+  }
+
+  /**
+   * Delete a faction
+   * @param {string} factionId
+   * @returns {Promise<boolean>}
+   */
+  async delete(factionId) {
+    if (!game.user.isGM) {
+      throw new Error("Only GM can delete factions");
+    }
+    return this.#handler?.deleteFaction(factionId) || false;
+  }
+
+  /**
+   * Modify reputation with a faction
+   * @param {string} factionId
+   * @param {string} playerUuid
+   * @param {number} amount
+   * @returns {Promise<boolean>}
+   */
+  async modifyReputation(factionId, playerUuid, amount) {
+    const actor = await fromUuid(playerUuid);
+    if (!actor) return false;
+    return this.#handler?.modifyReputation(factionId, actor, amount) || false;
+  }
+
+  /**
+   * Get player reputation with a faction
+   * @param {string} actorUuid
+   * @param {string} factionId
+   * @returns {number}
+   */
+  getReputation(actorUuid, factionId) {
+    const actor = fromUuidSync(actorUuid);
+    if (!actor) return 0;
+    return this.#handler?.getReputation(factionId, actor) || 0;
+  }
+
+  /**
+   * Get player rank in a faction
+   * @param {string} actorUuid
+   * @param {string} factionId
+   * @returns {object|null}
+   */
+  getRank(actorUuid, factionId) {
+    const actor = fromUuidSync(actorUuid);
+    if (!actor) return null;
+    return this.#handler?.getRank(factionId, actor) || null;
+  }
 
   /**
    * Get reputation level string from numeric value
@@ -397,14 +485,7 @@ class FactionsAPI {
    * @returns {string} Level string
    */
   getReputationLevel(reputation) {
-    if (reputation >= 2000) return "exalted";
-    if (reputation >= 1000) return "revered";
-    if (reputation >= 500) return "honored";
-    if (reputation >= 100) return "friendly";
-    if (reputation >= -100) return "neutral";
-    if (reputation >= -500) return "unfriendly";
-    if (reputation >= -1000) return "hostile";
-    return "hated";
+    return this.#handler?.getReputationLevel(reputation) || "neutral";
   }
 
   /**
@@ -413,23 +494,35 @@ class FactionsAPI {
    * @returns {Promise<object[]>}
    */
   async getFactionNPCs(factionId) {
-    // Implementation: search actors with faction flag
-    return [];
+    return this.#handler?.getFactionNPCs(factionId) || [];
   }
 
+  /**
+   * Set a player's rank in a faction
+   * @param {string} factionId
+   * @param {string} playerUuid
+   * @param {string} rankId
+   * @returns {Promise<boolean>}
+   */
   async setRank(factionId, playerUuid, rankId) {
     if (!game.user.isGM) {
       throw new Error("Only GM can set faction ranks");
     }
-    emit(SocketEvents.FACTION_RANK, { factionId, playerUuid, newRank: rankId });
-    return true;
+    const actor = await fromUuid(playerUuid);
+    if (!actor) return false;
+    return this.#handler?.setRank(factionId, actor, rankId) || false;
   }
 }
 
 /**
- * Relationships API
+ * Relationships API - Delegates to relationship-handler
  */
 class RelationshipsAPI {
+  /** @returns {object|null} Relationship handler instance */
+  get #handler() {
+    return game.bobsnpc?.handlers?.relationship;
+  }
+
   /**
    * Get relationship value between NPC and player
    * @param {string} npcUuid
@@ -437,8 +530,10 @@ class RelationshipsAPI {
    * @returns {number} Value from -100 to 100
    */
   get(npcUuid, playerUuid) {
-    // Implementation: get from NPC actor flags
-    return 0;
+    const npc = fromUuidSync(npcUuid);
+    const player = fromUuidSync(playerUuid);
+    if (!npc || !player) return 0;
+    return this.#handler?.getRelationship(npc, player)?.value || 0;
   }
 
   /**
@@ -449,8 +544,10 @@ class RelationshipsAPI {
    * @returns {Promise<boolean>}
    */
   async modify(npcUuid, playerUuid, amount) {
-    emit(SocketEvents.RELATIONSHIP_CHANGE, { npcUuid, playerUuid, amount });
-    return true;
+    const npc = await fromUuid(npcUuid);
+    const player = await fromUuid(playerUuid);
+    if (!npc || !player) return false;
+    return this.#handler?.modifyRelationship(npc, player, amount) || false;
   }
 
   /**
@@ -461,9 +558,11 @@ class RelationshipsAPI {
    * @returns {Promise<boolean>}
    */
   async set(npcUuid, playerUuid, value) {
+    const npc = await fromUuid(npcUuid);
+    const player = await fromUuid(playerUuid);
+    if (!npc || !player) return false;
     const clamped = Math.max(-100, Math.min(100, value));
-    // Implementation: set flag directly
-    return true;
+    return this.#handler?.setRelationship(npc, player, clamped) || false;
   }
 
   /**
@@ -473,151 +572,458 @@ class RelationshipsAPI {
    * @returns {string}
    */
   getTier(npcUuid, playerUuid) {
-    const value = this.get(npcUuid, playerUuid);
-    if (value <= -75) return "hostile";
-    if (value <= -50) return "hated";
-    if (value <= -25) return "unfriendly";
-    if (value < 25) return "neutral";
-    if (value < 50) return "friendly";
-    if (value < 75) return "trusted";
-    return "allied";
+    const npc = fromUuidSync(npcUuid);
+    const player = fromUuidSync(playerUuid);
+    if (!npc || !player) return "neutral";
+    return this.#handler?.getRelationshipTier(npc, player) || "neutral";
+  }
+
+  /**
+   * Get all relationships for a player
+   * @param {string} playerUuid
+   * @returns {object[]}
+   */
+  getAllForPlayer(playerUuid) {
+    const player = fromUuidSync(playerUuid);
+    if (!player) return [];
+    return this.#handler?.getPlayerRelationships(player) || [];
   }
 }
 
 /**
- * Shop API
+ * Shop API - Delegates to merchant-handler
  */
 class ShopAPI {
+  /** @returns {object|null} Merchant handler instance */
+  get #handler() {
+    return game.bobsnpc?.handlers?.merchant;
+  }
+
+  /**
+   * Open a shop session
+   * @param {string} npcUuid
+   * @param {string} playerUuid
+   * @returns {Promise<string>} Session ID
+   */
   async open(npcUuid, playerUuid = null) {
-    Hooks.call(`${MODULE_ID}.openShop`, { npcUuid, playerUuid });
+    const merchant = await fromUuid(npcUuid);
+    const customer = playerUuid ? await fromUuid(playerUuid) : game.user.character;
+    if (!merchant) return null;
+    return this.#handler?.openShop(merchant, customer) || null;
   }
 
-  async close(npcUuid) {
-    Hooks.call(`${MODULE_ID}.closeShop`, { npcUuid });
+  /**
+   * Close a shop session
+   * @param {string} sessionId
+   * @returns {Promise<boolean>}
+   */
+  async close(sessionId) {
+    return this.#handler?.closeShop(sessionId) || false;
   }
 
-  getInventory(npcUuid) { return []; }
-
-  async buy(npcUuid, playerUuid, itemId, quantity) {
-    emit(SocketEvents.SHOP_TRANSACTION, {
-      npcUuid,
-      playerUuid,
-      transaction: { type: "buy", itemId, quantity }
-    });
-    return true;
+  /**
+   * Get shop inventory
+   * @param {string} npcUuid
+   * @returns {object[]}
+   */
+  getInventory(npcUuid) {
+    const merchant = fromUuidSync(npcUuid);
+    if (!merchant) return [];
+    return this.#handler?.getInventory(merchant) || [];
   }
 
-  async sell(npcUuid, playerUuid, itemId, quantity) {
-    emit(SocketEvents.SHOP_TRANSACTION, {
-      npcUuid,
-      playerUuid,
-      transaction: { type: "sell", itemId, quantity }
-    });
-    return true;
+  /**
+   * Purchase items from a shop
+   * @param {string} sessionId
+   * @param {object[]} items - Items to buy [{itemId, quantity}]
+   * @returns {Promise<object>}
+   */
+  async buy(sessionId, items) {
+    return this.#handler?.purchaseItems(sessionId, items) || { success: false };
   }
 
-  getPrice(npcUuid, playerUuid, itemId, isBuying) {
-    // Implementation: calculate price with modifiers
-    return 0;
+  /**
+   * Sell items to a shop
+   * @param {string} sessionId
+   * @param {object[]} items - Items to sell [{itemId, quantity}]
+   * @returns {Promise<object>}
+   */
+  async sell(sessionId, items) {
+    return this.#handler?.sellItems(sessionId, items) || { success: false };
+  }
+
+  /**
+   * Get price for an item
+   * @param {string} merchantUuid
+   * @param {string} customerUuid
+   * @param {string} itemId
+   * @param {boolean} isBuying
+   * @returns {number}
+   */
+  getPrice(merchantUuid, customerUuid, itemId, isBuying) {
+    const merchant = fromUuidSync(merchantUuid);
+    const customer = fromUuidSync(customerUuid);
+    if (!merchant) return 0;
+    return this.#handler?.calculatePrice(merchant, customer, itemId, isBuying) || 0;
+  }
+
+  /**
+   * Attempt to haggle
+   * @param {string} sessionId
+   * @returns {Promise<object>}
+   */
+  async haggle(sessionId) {
+    return this.#handler?.attemptHaggle(sessionId) || { success: false };
   }
 }
 
 /**
- * Bank API
+ * Bank API - Delegates to bank-handler
  */
 class BankAPI {
-  async open(npcUuid, playerUuid = null) {
-    Hooks.call(`${MODULE_ID}.openBank`, { npcUuid, playerUuid });
+  /** @returns {object|null} Bank handler instance */
+  get #handler() {
+    return game.bobsnpc?.handlers?.bank;
   }
 
-  async deposit(npcUuid, playerUuid, amount) {
-    emit(SocketEvents.BANK_TRANSACTION, {
-      npcUuid,
-      playerUuid,
-      transaction: { type: "deposit", amount }
-    });
-    return true;
+  /**
+   * Open a bank session
+   * @param {string} bankId
+   * @param {string} playerUuid
+   * @returns {Promise<string>} Session ID
+   */
+  async open(bankId, playerUuid = null) {
+    const player = playerUuid ? await fromUuid(playerUuid) : game.user.character;
+    if (!player) return null;
+    return this.#handler?.openBank(bankId, player) || null;
   }
 
-  async withdraw(npcUuid, playerUuid, amount) {
-    emit(SocketEvents.BANK_TRANSACTION, {
-      npcUuid,
-      playerUuid,
-      transaction: { type: "withdraw", amount }
-    });
-    return true;
+  /**
+   * Deposit currency
+   * @param {string} accountId
+   * @param {number} amount - Amount in copper pieces
+   * @returns {Promise<object>}
+   */
+  async deposit(accountId, amount) {
+    return this.#handler?.deposit(accountId, amount) || { success: false };
   }
 
-  getBalance(npcUuid, playerUuid) { return 0; }
-
-  async takeLoan(npcUuid, playerUuid, amount) {
-    emit(SocketEvents.BANK_TRANSACTION, {
-      npcUuid,
-      playerUuid,
-      transaction: { type: "loan", amount }
-    });
-    return true;
+  /**
+   * Withdraw currency
+   * @param {string} accountId
+   * @param {number} amount - Amount in copper pieces
+   * @returns {Promise<object>}
+   */
+  async withdraw(accountId, amount) {
+    return this.#handler?.withdraw(accountId, amount) || { success: false };
   }
 
-  async repayLoan(npcUuid, playerUuid, amount) {
-    emit(SocketEvents.BANK_TRANSACTION, {
-      npcUuid,
-      playerUuid,
-      transaction: { type: "repay", amount }
-    });
-    return true;
+  /**
+   * Get account balance
+   * @param {string} accountId
+   * @returns {number} Balance in copper pieces
+   */
+  getBalance(accountId) {
+    return this.#handler?.getBalance(accountId) || 0;
+  }
+
+  /**
+   * Get player's account at a bank
+   * @param {string} bankId
+   * @param {string} playerUuid
+   * @returns {object|null}
+   */
+  getAccount(bankId, playerUuid) {
+    const player = fromUuidSync(playerUuid);
+    if (!player) return null;
+    return this.#handler?.getAccount(bankId, player) || null;
+  }
+
+  /**
+   * Take a loan
+   * @param {string} bankId
+   * @param {string} playerUuid
+   * @param {number} amount
+   * @returns {Promise<object>}
+   */
+  async takeLoan(bankId, playerUuid, amount) {
+    const player = await fromUuid(playerUuid);
+    if (!player) return { success: false };
+    return this.#handler?.takeLoan(bankId, player, amount) || { success: false };
+  }
+
+  /**
+   * Repay a loan
+   * @param {string} loanId
+   * @param {number} amount
+   * @returns {Promise<object>}
+   */
+  async repayLoan(loanId, amount) {
+    return this.#handler?.repayLoan(loanId, amount) || { success: false };
+  }
+
+  /**
+   * Get player's loans
+   * @param {string} playerUuid
+   * @returns {object[]}
+   */
+  getLoans(playerUuid) {
+    const player = fromUuidSync(playerUuid);
+    if (!player) return [];
+    return this.#handler?.getPlayerLoans(player) || [];
   }
 }
 
 /**
- * Crime API
+ * Crime API - Delegates to crime-handler
  */
 class CrimeAPI {
-  async addBounty(playerUuid, region, amount, crime) {
+  /** @returns {object|null} Crime handler instance */
+  get #handler() {
+    return game.bobsnpc?.handlers?.crime;
+  }
+
+  /**
+   * Add a bounty
+   * @param {string} playerUuid
+   * @param {string} jurisdictionId
+   * @param {number} amount
+   * @param {string} crime
+   * @returns {Promise<boolean>}
+   */
+  async addBounty(playerUuid, jurisdictionId, amount, crime) {
     if (!getSetting("bountyEnabled")) return false;
-    emit(SocketEvents.CRIME_BOUNTY, { playerUuid, region, amount, crime });
-    return true;
+    const player = await fromUuid(playerUuid);
+    if (!player) return false;
+    return this.#handler?.addBounty(jurisdictionId, player, amount, crime) || false;
   }
 
-  getBounty(playerUuid, region = null) {
-    // Implementation: get from world flags
-    return 0;
+  /**
+   * Get bounty for a player
+   * @param {string} playerUuid
+   * @param {string} jurisdictionId
+   * @returns {number}
+   */
+  getBounty(playerUuid, jurisdictionId = null) {
+    const player = fromUuidSync(playerUuid);
+    if (!player) return 0;
+    return this.#handler?.getBounty(jurisdictionId, player) || 0;
   }
 
-  async clearBounty(playerUuid, region, method) {
-    // Implementation: remove bounty
-    return true;
+  /**
+   * Clear a bounty
+   * @param {string} playerUuid
+   * @param {string} jurisdictionId
+   * @param {string} method - "pay", "jail", "pardon"
+   * @returns {Promise<boolean>}
+   */
+  async clearBounty(playerUuid, jurisdictionId, method) {
+    const player = await fromUuid(playerUuid);
+    if (!player) return false;
+
+    switch (method) {
+      case "pay":
+        return this.#handler?.payBounty(jurisdictionId, player) || false;
+      case "jail":
+        return this.#handler?.serveJailTime(jurisdictionId, player) || false;
+      case "pardon":
+        return this.#handler?.grantPardon(jurisdictionId, player) || false;
+      default:
+        return false;
+    }
   }
 
+  /**
+   * Attempt to steal from an NPC
+   * @param {string} playerUuid
+   * @param {string} npcUuid
+   * @param {string} itemId
+   * @returns {Promise<object>}
+   */
   async attemptSteal(playerUuid, npcUuid, itemId) {
     if (!getSetting("stealingEnabled")) {
       ui.notifications.warn("Stealing is disabled");
-      return null;
+      return { success: false, reason: "disabled" };
     }
-    // Implementation: perform steal check
-    return null;
+    const player = await fromUuid(playerUuid);
+    const npc = await fromUuid(npcUuid);
+    if (!player || !npc) return { success: false, reason: "invalid_actors" };
+    return this.#handler?.attemptSteal(player, npc, itemId) || { success: false };
+  }
+
+  /**
+   * Report a crime
+   * @param {string} playerUuid
+   * @param {string} crimeType
+   * @param {object} details
+   * @returns {Promise<object>}
+   */
+  async reportCrime(playerUuid, crimeType, details = {}) {
+    const player = await fromUuid(playerUuid);
+    if (!player) return { success: false };
+    return this.#handler?.reportCrime(player, crimeType, details) || { success: false };
+  }
+
+  /**
+   * Get criminal record
+   * @param {string} playerUuid
+   * @returns {object}
+   */
+  getCriminalRecord(playerUuid) {
+    const player = fromUuidSync(playerUuid);
+    if (!player) return null;
+    return this.#handler?.getCriminalRecord(player) || null;
   }
 }
 
 /**
- * Hirelings API
+ * Hirelings API - Delegates to hireling-handler
  */
 class HirelingsAPI {
-  async hire(hirelingUuid, employerUuid, terms) { return false; }
-  async dismiss(hirelingUuid) { return false; }
-  async pay(hirelingUuid) { return false; }
-  getLoyalty(hirelingUuid) { return 0; }
-  async modifyLoyalty(hirelingUuid, amount) { return false; }
+  /** @returns {object|null} Hireling handler instance */
+  get #handler() {
+    return game.bobsnpc?.handlers?.hireling;
+  }
+
+  /**
+   * Hire a hireling
+   * @param {string} hirelingId
+   * @param {string} employerUuid
+   * @param {object} terms - Contract terms
+   * @returns {Promise<object>}
+   */
+  async hire(hirelingId, employerUuid, terms = {}) {
+    const employer = await fromUuid(employerUuid);
+    if (!employer) return { success: false };
+    return this.#handler?.hireHireling(hirelingId, employer, terms) || { success: false };
+  }
+
+  /**
+   * Dismiss a hireling
+   * @param {string} hirelingId
+   * @returns {Promise<boolean>}
+   */
+  async dismiss(hirelingId) {
+    return this.#handler?.dismissHireling(hirelingId) || false;
+  }
+
+  /**
+   * Pay a hireling's wages
+   * @param {string} hirelingId
+   * @returns {Promise<object>}
+   */
+  async pay(hirelingId) {
+    return this.#handler?.payWages(hirelingId) || { success: false };
+  }
+
+  /**
+   * Get hireling loyalty
+   * @param {string} hirelingId
+   * @returns {number}
+   */
+  getLoyalty(hirelingId) {
+    return this.#handler?.getLoyalty(hirelingId) || 0;
+  }
+
+  /**
+   * Modify hireling loyalty
+   * @param {string} hirelingId
+   * @param {number} amount
+   * @returns {Promise<boolean>}
+   */
+  async modifyLoyalty(hirelingId, amount) {
+    return this.#handler?.modifyLoyalty(hirelingId, amount) || false;
+  }
+
+  /**
+   * Get all hirelings for an employer
+   * @param {string} employerUuid
+   * @returns {object[]}
+   */
+  getHirelings(employerUuid) {
+    const employer = fromUuidSync(employerUuid);
+    if (!employer) return [];
+    return this.#handler?.getPlayerHirelings(employer) || [];
+  }
+
+  /**
+   * Get available hirelings for hire
+   * @returns {object[]}
+   */
+  getAvailable() {
+    return this.#handler?.getAvailableHirelings() || [];
+  }
 }
 
 /**
- * Mounts API
+ * Mounts API - Delegates to hireling-handler (mounts are managed there)
  */
 class MountsAPI {
-  async purchase(mountUuid, buyerUuid) { return false; }
-  async stable(mountUuid, stableNpcUuid) { return false; }
-  async retrieve(mountUuid) { return false; }
-  async summon(mountUuid, sceneId, position) { return false; }
+  /** @returns {object|null} Hireling handler instance (handles mounts) */
+  get #handler() {
+    return game.bobsnpc?.handlers?.hireling;
+  }
+
+  /**
+   * Purchase a mount
+   * @param {string} mountId
+   * @param {string} buyerUuid
+   * @returns {Promise<object>}
+   */
+  async purchase(mountId, buyerUuid) {
+    const buyer = await fromUuid(buyerUuid);
+    if (!buyer) return { success: false };
+    return this.#handler?.purchaseMount(mountId, buyer) || { success: false };
+  }
+
+  /**
+   * Stable a mount
+   * @param {string} mountId
+   * @param {string} stableId
+   * @returns {Promise<object>}
+   */
+  async stable(mountId, stableId) {
+    return this.#handler?.stableMount(mountId, stableId) || { success: false };
+  }
+
+  /**
+   * Retrieve a mount from stable
+   * @param {string} mountId
+   * @returns {Promise<object>}
+   */
+  async retrieve(mountId) {
+    return this.#handler?.retrieveMount(mountId) || { success: false };
+  }
+
+  /**
+   * Summon a mount to a location
+   * @param {string} mountId
+   * @param {string} sceneId
+   * @param {object} position - {x, y}
+   * @returns {Promise<object>}
+   */
+  async summon(mountId, sceneId, position) {
+    return this.#handler?.summonMount(mountId, sceneId, position) || { success: false };
+  }
+
+  /**
+   * Get all mounts for an owner
+   * @param {string} ownerUuid
+   * @returns {object[]}
+   */
+  getMounts(ownerUuid) {
+    const owner = fromUuidSync(ownerUuid);
+    if (!owner) return [];
+    return this.#handler?.getPlayerMounts(owner) || [];
+  }
+
+  /**
+   * Get available stables
+   * @returns {object[]}
+   */
+  getStables() {
+    return this.#handler?.getStables() || [];
+  }
 }
 
 /**
@@ -652,20 +1058,21 @@ class TradeAPI {
 }
 
 /**
- * World State API
+ * World State API - Uses game.settings for V13 compatibility
  */
 class WorldStateAPI {
   /**
-   * Get a world state flag
+   * Get a world state variable
    * @param {string} key
    * @returns {*}
    */
   get(key) {
-    return game.world.getFlag(MODULE_ID, `worldState.${key}`);
+    const worldState = game.settings.get(MODULE_ID, "worldState") || {};
+    return worldState[key];
   }
 
   /**
-   * Set a world state flag
+   * Set a world state variable
    * @param {string} key
    * @param {*} value
    * @returns {Promise<*>}
@@ -674,11 +1081,13 @@ class WorldStateAPI {
     if (!game.user.isGM) {
       throw new Error("Only GM can set world state");
     }
-    return game.world.setFlag(MODULE_ID, `worldState.${key}`, value);
+    const worldState = game.settings.get(MODULE_ID, "worldState") || {};
+    worldState[key] = value;
+    return game.settings.set(MODULE_ID, "worldState", worldState);
   }
 
   /**
-   * Delete a world state flag
+   * Delete a world state variable
    * @param {string} key
    * @returns {Promise<*>}
    */
@@ -686,7 +1095,9 @@ class WorldStateAPI {
     if (!game.user.isGM) {
       throw new Error("Only GM can delete world state");
     }
-    return game.world.unsetFlag(MODULE_ID, `worldState.${key}`);
+    const worldState = game.settings.get(MODULE_ID, "worldState") || {};
+    delete worldState[key];
+    return game.settings.set(MODULE_ID, "worldState", worldState);
   }
 
   /**
@@ -694,32 +1105,87 @@ class WorldStateAPI {
    * @returns {object}
    */
   getAll() {
-    return game.world.getFlag(MODULE_ID, "worldState") || {};
+    return game.settings.get(MODULE_ID, "worldState") || {};
   }
 }
 
 /**
- * Events API
+ * Events API - World events management
  */
 class EventsAPI {
-  async trigger(eventId) {
+  /**
+   * Trigger a world event
+   * @param {string} eventId
+   * @param {object} eventData - Optional event data
+   * @returns {Promise<boolean>}
+   */
+  async trigger(eventId, eventData = {}) {
     if (!game.user.isGM) {
       throw new Error("Only GM can trigger events");
     }
-    Hooks.call(`${MODULE_ID}.eventTriggered`, { eventId });
+
+    // Add to active events
+    const activeEvents = game.settings.get(MODULE_ID, "activeEvents") || [];
+    const event = {
+      id: eventId,
+      startedAt: Date.now(),
+      ...eventData
+    };
+    activeEvents.push(event);
+    await game.settings.set(MODULE_ID, "activeEvents", activeEvents);
+
+    Hooks.call(`${MODULE_ID}.eventTriggered`, { eventId, event });
     return true;
   }
 
+  /**
+   * End a world event
+   * @param {string} eventId
+   * @returns {Promise<boolean>}
+   */
   async end(eventId) {
     if (!game.user.isGM) {
       throw new Error("Only GM can end events");
     }
-    Hooks.call(`${MODULE_ID}.eventEnded`, { eventId });
+
+    // Remove from active events
+    const activeEvents = game.settings.get(MODULE_ID, "activeEvents") || [];
+    const index = activeEvents.findIndex(e => e.id === eventId);
+    if (index === -1) return false;
+
+    const [event] = activeEvents.splice(index, 1);
+    await game.settings.set(MODULE_ID, "activeEvents", activeEvents);
+
+    Hooks.call(`${MODULE_ID}.eventEnded`, { eventId, event });
     return true;
   }
 
+  /**
+   * Get all active events
+   * @returns {object[]}
+   */
   getActive() {
-    return game.world.getFlag(MODULE_ID, "activeEvents") || [];
+    return game.settings.get(MODULE_ID, "activeEvents") || [];
+  }
+
+  /**
+   * Check if an event is active
+   * @param {string} eventId
+   * @returns {boolean}
+   */
+  isActive(eventId) {
+    const activeEvents = this.getActive();
+    return activeEvents.some(e => e.id === eventId);
+  }
+
+  /**
+   * Get a specific active event
+   * @param {string} eventId
+   * @returns {object|null}
+   */
+  get(eventId) {
+    const activeEvents = this.getActive();
+    return activeEvents.find(e => e.id === eventId) || null;
   }
 }
 

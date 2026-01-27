@@ -1,0 +1,28 @@
+{{!-- Quest Editor - Tab Navigation --}}
+<nav class="quest-editor-tabs {{theme}}">
+  <button type="button" class="tab-btn {{#if (eq activeTab 'general')}}active{{/if}}"
+          data-action="changeTab" data-tab="general">
+    <i class="fa-solid fa-info-circle"></i>
+    {{localize "BOBSNPC.QuestEditor.TabGeneral"}}
+  </button>
+  <button type="button" class="tab-btn {{#if (eq activeTab 'objectives')}}active{{/if}}"
+          data-action="changeTab" data-tab="objectives">
+    <i class="fa-solid fa-list-check"></i>
+    {{localize "BOBSNPC.QuestEditor.TabObjectives"}}
+  </button>
+  <button type="button" class="tab-btn {{#if (eq activeTab 'rewards')}}active{{/if}}"
+          data-action="changeTab" data-tab="rewards">
+    <i class="fa-solid fa-gift"></i>
+    {{localize "BOBSNPC.QuestEditor.TabRewards"}}
+  </button>
+  <button type="button" class="tab-btn {{#if (eq activeTab 'prerequisites')}}active{{/if}}"
+          data-action="changeTab" data-tab="prerequisites">
+    <i class="fa-solid fa-lock"></i>
+    {{localize "BOBSNPC.QuestEditor.TabPrerequisites"}}
+  </button>
+  <button type="button" class="tab-btn {{#if (eq activeTab 'advanced')}}active{{/if}}"
+          data-action="changeTab" data-tab="advanced">
+    <i class="fa-solid fa-cog"></i>
+    {{localize "BOBSNPC.QuestEditor.TabAdvanced"}}
+  </button>
+</nav>

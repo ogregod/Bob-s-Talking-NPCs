@@ -1,0 +1,128 @@
+{{!-- Quest Editor - General Tab --}}
+<div class="tab-content general-tab {{theme}}" {{#unless (eq activeTab 'general')}}hidden{{/unless}}>
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.BasicInfo"}}</h3>
+
+    <div class="form-group">
+      <label for="quest-name">{{localize "BOBSNPC.QuestEditor.Name"}}</label>
+      <input type="text" id="quest-name" name="quest.name" value="{{quest.name}}" required />
+    </div>
+
+    <div class="form-group">
+      <label for="quest-summary">{{localize "BOBSNPC.QuestEditor.Summary"}}</label>
+      <input type="text" id="quest-summary" name="quest.summary" value="{{quest.summary}}"
+             placeholder="{{localize 'BOBSNPC.QuestEditor.SummaryPlaceholder'}}" />
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.SummaryHint"}}</p>
+    </div>
+
+    <div class="form-group">
+      <label for="quest-description">{{localize "BOBSNPC.QuestEditor.Description"}}</label>
+      <textarea id="quest-description" name="quest.description" rows="5">{{quest.description}}</textarea>
+    </div>
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.Classification"}}</h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="quest-category">{{localize "BOBSNPC.QuestEditor.Category"}}</label>
+        <select id="quest-category" name="quest.category">
+          {{#each categoryOptions}}
+            <option value="{{this.value}}" {{#if (eq this.value ../quest.category)}}selected{{/if}}>
+              {{this.label}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="quest-status">{{localize "BOBSNPC.QuestEditor.Status"}}</label>
+        <select id="quest-status" name="quest.status">
+          {{#each statusOptions}}
+            <option value="{{this.value}}" {{#if (eq this.value ../quest.status)}}selected{{/if}}>
+              {{this.label}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="quest-visibility">{{localize "BOBSNPC.QuestEditor.Visibility"}}</label>
+        <select id="quest-visibility" name="quest.visibility">
+          {{#each visibilityOptions}}
+            <option value="{{this.value}}" {{#if (eq this.value ../quest.visibility)}}selected{{/if}}>
+              {{this.label}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="quest-sort-order">{{localize "BOBSNPC.QuestEditor.SortOrder"}}</label>
+        <input type="number" id="quest-sort-order" name="quest.sortOrder" value="{{quest.sortOrder}}" />
+      </div>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" name="quest.hidden" {{#if quest.hidden}}checked{{/if}} />
+        {{localize "BOBSNPC.QuestEditor.Hidden"}}
+      </label>
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.HiddenHint"}}</p>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" name="quest.pinned" {{#if quest.pinned}}checked{{/if}} />
+        {{localize "BOBSNPC.QuestEditor.Pinned"}}
+      </label>
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.PinnedHint"}}</p>
+    </div>
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.QuestGiver"}}</h3>
+
+    <div class="actor-selector">
+      {{#if giverActor}}
+        <div class="selected-actor">
+          <img src="{{giverActor.img}}" alt="{{giverActor.name}}" class="actor-portrait" />
+          <span class="actor-name">{{giverActor.name}}</span>
+          <button type="button" class="clear-btn" data-action="clearQuestGiver">
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+      {{else}}
+        <button type="button" class="select-btn" data-action="selectQuestGiver">
+          <i class="fa-solid fa-user-plus"></i>
+          {{localize "BOBSNPC.QuestEditor.SelectQuestGiver"}}
+        </button>
+      {{/if}}
+    </div>
+
+    <div class="form-group">
+      <label>{{localize "BOBSNPC.QuestEditor.TurnInActor"}}</label>
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.TurnInActorHint"}}</p>
+
+      <div class="actor-selector">
+        {{#if turnInActor}}
+          <div class="selected-actor">
+            <img src="{{turnInActor.img}}" alt="{{turnInActor.name}}" class="actor-portrait" />
+            <span class="actor-name">{{turnInActor.name}}</span>
+            <button type="button" class="clear-btn" data-action="clearTurnInActor">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </div>
+        {{else}}
+          <button type="button" class="select-btn secondary" data-action="selectTurnInActor">
+            <i class="fa-solid fa-user-plus"></i>
+            {{localize "BOBSNPC.QuestEditor.SelectTurnInActor"}}
+          </button>
+        {{/if}}
+      </div>
+    </div>
+  </section>
+</div>

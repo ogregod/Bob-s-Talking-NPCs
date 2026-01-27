@@ -1,0 +1,94 @@
+{{!-- Faction Editor - General Tab --}}
+<div class="tab-content general-tab {{theme}}" {{#unless (eq activeTab 'general')}}hidden{{/unless}}>
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.FactionEditor.BasicInfo"}}</h3>
+
+    <div class="form-group">
+      <label for="faction-name">{{localize "BOBSNPC.FactionEditor.Name"}}</label>
+      <input type="text" id="faction-name" name="faction.name" value="{{faction.name}}" required />
+    </div>
+
+    <div class="form-group">
+      <label for="faction-shortdesc">{{localize "BOBSNPC.FactionEditor.ShortDescription"}}</label>
+      <input type="text" id="faction-shortdesc" name="faction.shortDescription" value="{{faction.shortDescription}}"
+             placeholder="{{localize 'BOBSNPC.FactionEditor.ShortDescriptionPlaceholder'}}" />
+      <p class="hint">{{localize "BOBSNPC.FactionEditor.ShortDescriptionHint"}}</p>
+    </div>
+
+    <div class="form-group">
+      <label for="faction-description">{{localize "BOBSNPC.FactionEditor.Description"}}</label>
+      <textarea id="faction-description" name="faction.description" rows="5">{{faction.description}}</textarea>
+    </div>
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.FactionEditor.Appearance"}}</h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="faction-color">{{localize "BOBSNPC.FactionEditor.Color"}}</label>
+        <div class="color-picker-wrapper">
+          <input type="color" id="faction-color" name="faction.color" value="{{faction.color}}" />
+          <span class="color-preview" style="background-color: {{faction.color}}"></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>{{localize "BOBSNPC.FactionEditor.Icon"}}</label>
+        <div class="icon-picker">
+          {{#each iconOptions}}
+            <button type="button" class="icon-option {{#if (eq this.value ../faction.icon)}}selected{{/if}}"
+                    data-action="pickIcon" data-icon="{{this.value}}"
+                    title="{{this.label}}">
+              <i class="fa-solid {{this.value}}"></i>
+            </button>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="faction-banner">{{localize "BOBSNPC.FactionEditor.Banner"}}</label>
+      <input type="text" id="faction-banner" name="faction.banner" value="{{faction.banner}}"
+             placeholder="{{localize 'BOBSNPC.FactionEditor.BannerPlaceholder'}}" />
+      <p class="hint">{{localize "BOBSNPC.FactionEditor.BannerHint"}}</p>
+    </div>
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.FactionEditor.Headquarters"}}</h3>
+
+    <div class="form-group">
+      <label for="hq-scene">{{localize "BOBSNPC.FactionEditor.HQScene"}}</label>
+      <input type="text" id="hq-scene" name="faction.headquarters.sceneId" value="{{faction.headquarters.sceneId}}"
+             placeholder="Scene.xxxx" />
+      <p class="hint">{{localize "BOBSNPC.FactionEditor.HQSceneHint"}}</p>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" name="faction.headquarters.specialDialogue"
+               {{#if faction.headquarters.specialDialogue}}checked{{/if}} />
+        {{localize "BOBSNPC.FactionEditor.SpecialDialogue"}}
+      </label>
+      <p class="hint">{{localize "BOBSNPC.FactionEditor.SpecialDialogueHint"}}</p>
+    </div>
+  </section>
+
+  <section class="editor-section faction-preview">
+    <h3>{{localize "BOBSNPC.FactionEditor.Preview"}}</h3>
+    <div class="faction-preview-card">
+      <div class="preview-header" style="background-color: {{faction.color}}">
+        {{#if faction.icon}}
+          <i class="fa-solid {{faction.icon}} preview-icon"></i>
+        {{else}}
+          <i class="fa-solid fa-flag preview-icon"></i>
+        {{/if}}
+        <span class="preview-name">{{faction.name}}</span>
+      </div>
+      <div class="preview-body">
+        <p class="preview-desc">{{faction.shortDescription}}</p>
+      </div>
+    </div>
+  </section>
+</div>

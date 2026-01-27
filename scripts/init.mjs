@@ -200,6 +200,16 @@ function registerHandlebarsHelpers() {
     return array.includes(value);
   });
 
+  // Add helper - add numbers together
+  Handlebars.registerHelper("add", function(a, b) {
+    return (Number(a) || 0) + (Number(b) || 0);
+  });
+
+  // Subtract helper
+  Handlebars.registerHelper("subtract", function(a, b) {
+    return (Number(a) || 0) - (Number(b) || 0);
+  });
+
   console.log(`${MODULE_ID} | Handlebars helpers registered`);
 }
 

@@ -1,0 +1,29 @@
+{{!-- Faction Editor - Footer --}}
+<footer class="faction-editor-footer {{theme}}">
+  <div class="footer-left">
+    {{#unless isNew}}
+      <button type="button" class="danger-btn" data-action="deleteFaction">
+        <i class="fa-solid fa-trash"></i>
+        {{localize "BOBSNPC.FactionEditor.Delete"}}
+      </button>
+      <button type="button" class="secondary-btn" data-action="duplicateFaction">
+        <i class="fa-solid fa-copy"></i>
+        {{localize "BOBSNPC.FactionEditor.Duplicate"}}
+      </button>
+    {{/unless}}
+  </div>
+
+  <div class="footer-right">
+    <button type="button" class="secondary-btn" data-action="cancelEdit">
+      {{localize "BOBSNPC.FactionEditor.Cancel"}}
+    </button>
+    <button type="button" class="primary-btn" data-action="saveFaction">
+      <i class="fa-solid fa-save"></i>
+      {{#if isNew}}
+        {{localize "BOBSNPC.FactionEditor.Create"}}
+      {{else}}
+        {{localize "BOBSNPC.FactionEditor.Save"}}
+      {{/if}}
+    </button>
+  </div>
+</footer>

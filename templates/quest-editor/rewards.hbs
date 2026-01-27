@@ -1,0 +1,125 @@
+{{!-- Quest Editor - Rewards Tab --}}
+<div class="tab-content rewards-tab {{theme}}" {{#unless (eq activeTab 'rewards')}}hidden{{/unless}}>
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.BasicRewards"}}</h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="reward-gold">
+          <i class="fa-solid fa-coins gold-icon"></i>
+          {{localize "BOBSNPC.QuestEditor.Gold"}}
+        </label>
+        <input type="number" id="reward-gold" name="quest.rewards.gold" value="{{quest.rewards.gold}}" min="0" />
+      </div>
+
+      <div class="form-group">
+        <label for="reward-xp">
+          <i class="fa-solid fa-star xp-icon"></i>
+          {{localize "BOBSNPC.QuestEditor.XP"}}
+        </label>
+        <input type="number" id="reward-xp" name="quest.rewards.xp" value="{{quest.rewards.xp}}" min="0" />
+      </div>
+
+      <div class="form-group">
+        <label for="reward-distribution">{{localize "BOBSNPC.QuestEditor.Distribution"}}</label>
+        <select id="reward-distribution" name="quest.rewards.distribution">
+          {{#each distributionOptions}}
+            <option value="{{this.value}}" {{#if (eq this.value ../quest.rewards.distribution)}}selected{{/if}}>
+              {{this.label}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="editor-section">
+    <div class="section-header">
+      <h3>{{localize "BOBSNPC.QuestEditor.ItemRewards"}}</h3>
+      <button type="button" class="add-btn" data-action="addRewardItem">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.QuestEditor.AddItem"}}
+      </button>
+    </div>
+
+    {{#if rewardItemsDisplay.length}}
+      <ul class="reward-items-list">
+        {{#each rewardItemsDisplay}}
+          <li class="reward-item-entry">
+            <img src="{{this.img}}" alt="{{this.name}}" class="item-img" />
+            <span class="item-name">{{this.name}}</span>
+            <div class="item-quantity">
+              <label>x</label>
+              <input type="number" name="quest.rewards.items.{{this.index}}.quantity" value="{{this.quantity}}" min="1" />
+            </div>
+            <button type="button" class="remove-btn" data-action="removeRewardItem" data-index="{{this.index}}">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <div class="empty-state small">
+        <p>{{localize "BOBSNPC.QuestEditor.NoItemRewards"}}</p>
+      </div>
+    {{/if}}
+  </section>
+
+  <section class="editor-section">
+    <div class="section-header">
+      <h3>{{localize "BOBSNPC.QuestEditor.ReputationRewards"}}</h3>
+      <button type="button" class="add-btn" data-action="addReputationReward">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.QuestEditor.AddReputation"}}
+      </button>
+    </div>
+
+    {{#if reputationRewardsDisplay.length}}
+      <ul class="reputation-rewards-list">
+        {{#each reputationRewardsDisplay}}
+          <li class="reputation-reward-entry">
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.QuestEditor.Faction"}}</label>
+              <select name="quest.rewards.reputation.{{this.index}}.factionId">
+                {{#each ../factions}}
+                  <option value="{{this.id}}" {{#if (eq this.id ../this.factionId)}}selected{{/if}}>
+                    {{this.name}}
+                  </option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.QuestEditor.Amount"}}</label>
+              <input type="number" name="quest.rewards.reputation.{{this.index}}.amount" value="{{this.amount}}" />
+            </div>
+            <button type="button" class="remove-btn" data-action="removeReputationReward" data-index="{{this.index}}">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <div class="empty-state small">
+        <p>{{localize "BOBSNPC.QuestEditor.NoReputationRewards"}}</p>
+      </div>
+    {{/if}}
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.QuestEditor.SpecialRewards"}}</h3>
+
+    <div class="form-group">
+      <label for="reward-companion">{{localize "BOBSNPC.QuestEditor.CompanionReward"}}</label>
+      <input type="text" id="reward-companion" name="quest.rewards.companion" value="{{quest.rewards.companion}}"
+             placeholder="Actor.xxxx" />
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.CompanionRewardHint"}}</p>
+    </div>
+
+    <div class="form-group">
+      <label for="reward-property">{{localize "BOBSNPC.QuestEditor.PropertyReward"}}</label>
+      <input type="text" id="reward-property" name="quest.rewards.property" value="{{quest.rewards.property}}"
+             placeholder="Scene.xxxx" />
+      <p class="hint">{{localize "BOBSNPC.QuestEditor.PropertyRewardHint"}}</p>
+    </div>
+  </section>
+</div>

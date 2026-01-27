@@ -1,0 +1,86 @@
+{{!-- Faction Editor - Settings Tab --}}
+<div class="tab-content settings-tab {{theme}}" {{#unless (eq activeTab 'settings')}}hidden{{/unless}}>
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.FactionEditor.ReputationSettings"}}</h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="rep-min">{{localize "BOBSNPC.FactionEditor.MinReputation"}}</label>
+        <input type="number" id="rep-min" name="faction.reputation.min" value="{{faction.reputation.min}}" />
+      </div>
+      <div class="form-group">
+        <label for="rep-max">{{localize "BOBSNPC.FactionEditor.MaxReputation"}}</label>
+        <input type="number" id="rep-max" name="faction.reputation.max" value="{{faction.reputation.max}}" />
+      </div>
+      <div class="form-group">
+        <label for="rep-start">{{localize "BOBSNPC.FactionEditor.StartingReputation"}}</label>
+        <input type="number" id="rep-start" name="faction.reputation.startingValue"
+               value="{{faction.reputation.startingValue}}" />
+      </div>
+    </div>
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.FactionEditor.ReputationDecay"}}</h3>
+
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" name="faction.reputation.decay.enabled"
+               {{#if faction.reputation.decay.enabled}}checked{{/if}} />
+        {{localize "BOBSNPC.FactionEditor.EnableDecay"}}
+      </label>
+      <p class="hint">{{localize "BOBSNPC.FactionEditor.EnableDecayHint"}}</p>
+    </div>
+
+    {{#if faction.reputation.decay.enabled}}
+      <div class="form-row">
+        <div class="form-group">
+          <label for="decay-amount">{{localize "BOBSNPC.FactionEditor.DecayAmount"}}</label>
+          <input type="number" id="decay-amount" name="faction.reputation.decay.amount"
+                 value="{{faction.reputation.decay.amount}}" min="0" />
+        </div>
+        <div class="form-group">
+          <label for="decay-interval">{{localize "BOBSNPC.FactionEditor.DecayInterval"}}</label>
+          <select id="decay-interval" name="faction.reputation.decay.interval">
+            {{#each decayIntervalOptions}}
+              <option value="{{this.value}}" {{#if (eq this.value ../faction.reputation.decay.interval)}}selected{{/if}}>
+                {{this.label}}
+              </option>
+            {{/each}}
+          </select>
+        </div>
+      </div>
+    {{/if}}
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.FactionEditor.OtherSettings"}}</h3>
+
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" name="faction.useDefaultRanks" {{#if faction.useDefaultRanks}}checked{{/if}} />
+        {{localize "BOBSNPC.FactionEditor.UseDefaultRanks"}}
+      </label>
+      <p class="hint">{{localize "BOBSNPC.FactionEditor.UseDefaultRanksHint"}}</p>
+    </div>
+  </section>
+
+  <section class="editor-section info-section">
+    <h3>{{localize "BOBSNPC.FactionEditor.FactionInfo"}}</h3>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="info-label">{{localize "BOBSNPC.FactionEditor.FactionID"}}</span>
+        <code class="info-value">{{faction.id}}</code>
+      </div>
+      <div class="info-item">
+        <span class="info-label">{{localize "BOBSNPC.FactionEditor.MemberCount"}}</span>
+        <span class="info-value">{{faction.members.length}}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">{{localize "BOBSNPC.FactionEditor.RankCount"}}</span>
+        <span class="info-value">{{faction.ranks.length}}</span>
+      </div>
+    </div>
+  </section>
+</div>

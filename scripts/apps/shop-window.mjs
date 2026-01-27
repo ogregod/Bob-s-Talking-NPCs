@@ -719,8 +719,141 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static async #onUseService(event, target) {
     const serviceId = target.dataset.serviceId;
-    // Service usage would be implemented based on service type
-    ui.notifications.info(localize("Shop.ServiceUsed"));
+
+    if (!this._sessionId || !this._playerActor) {
+      ui.notifications.error(localize("Shop.NoSession"));
+      return;
+    }
+
+    // Get items that can use this service
+    const eligibleItems = this._getEligibleItemsForService(serviceId);
+
+    if (eligibleItems.length === 0) {
+      ui.notifications.warn(localize("Shop.NoEligibleItems"));
+      return;
+    }
+
+    // Show item picker dialog
+    const selectedItemId = await this._showServiceItemPicker(serviceId, eligibleItems);
+    if (!selectedItemId) return;
+
+    // Call the merchant handler to use the service
+    const handler = getMerchantHandler();
+    const result = await handler.useService(this._sessionId, serviceId, { itemId: selectedItemId });
+
+    if (result.success) {
+      ui.notifications.info(result.message || localize("Shop.ServiceComplete"));
+      // Refresh to update gold display
+      this.render();
+    } else {
+      ui.notifications.error(result.message || localize("Shop.ServiceFailed"));
+    }
+  }
+
+  /**
+   * Get items eligible for a specific service
+   * @param {string} serviceType
+   * @returns {object[]}
+   * @private
+   */
+  _getEligibleItemsForService(serviceType) {
+    if (!this._playerActor?.items) return [];
+
+    const items = Array.from(this._playerActor.items);
+
+    switch (serviceType) {
+      case "identify":
+        // Items that can be identified (unidentified magic items)
+        return items.filter(item => {
+          const identified = item.system?.identified ?? true;
+          return !identified || item.getFlag("core", "sourceId");
+        }).map(item => ({
+          id: item.id,
+          name: item.name,
+          img: item.img,
+          type: item.type
+        }));
+
+      case "repair":
+        // Items that can be repaired (weapons, armor, equipment)
+        return items.filter(item => {
+          const types = ["weapon", "equipment", "armor", "loot"];
+          return types.includes(item.type);
+        }).map(item => ({
+          id: item.id,
+          name: item.name,
+          img: item.img,
+          type: item.type
+        }));
+
+      case "appraise":
+        // Any item can be appraised
+        return items.filter(item => {
+          const types = ["weapon", "equipment", "armor", "loot", "consumable", "container", "tool"];
+          return types.includes(item.type);
+        }).map(item => ({
+          id: item.id,
+          name: item.name,
+          img: item.img,
+          type: item.type,
+          value: item.system?.price?.value || "?"
+        }));
+
+      default:
+        return [];
+    }
+  }
+
+  /**
+   * Show item picker dialog for service
+   * @param {string} serviceType
+   * @param {object[]} items
+   * @returns {Promise<string|null>}
+   * @private
+   */
+  async _showServiceItemPicker(serviceType, items) {
+    const serviceLabels = {
+      identify: localize("Shop.Service.Identify"),
+      repair: localize("Shop.Service.Repair"),
+      appraise: localize("Shop.Service.Appraise")
+    };
+
+    const itemOptions = items.map(item =>
+      `<option value="${item.id}">${item.name} (${item.type})</option>`
+    ).join("");
+
+    return new Promise((resolve) => {
+      new Dialog({
+        title: serviceLabels[serviceType] || localize("Shop.SelectItem"),
+        content: `
+          <form class="service-item-picker">
+            <p>${localize("Shop.SelectItemForService")}</p>
+            <div class="form-group">
+              <label>${localize("Shop.Item")}</label>
+              <select name="itemId" style="width: 100%;">
+                ${itemOptions}
+              </select>
+            </div>
+          </form>
+        `,
+        buttons: {
+          use: {
+            icon: '<i class="fas fa-check"></i>',
+            label: localize("Shop.UseService"),
+            callback: (html) => {
+              const itemId = html.find('[name="itemId"]').val();
+              resolve(itemId);
+            }
+          },
+          cancel: {
+            icon: '<i class="fas fa-times"></i>',
+            label: localize("Shop.Cancel"),
+            callback: () => resolve(null)
+          }
+        },
+        default: "use"
+      }).render(true);
+    });
   }
 
   static async #onCloseShop(event, target) {

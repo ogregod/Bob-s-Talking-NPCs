@@ -1,0 +1,145 @@
+{{!-- Quest Editor - Objectives Tab --}}
+<div class="tab-content objectives-tab {{theme}}" {{#unless (eq activeTab 'objectives')}}hidden{{/unless}}>
+  <section class="editor-section">
+    <div class="section-header">
+      <h3>{{localize "BOBSNPC.QuestEditor.Objectives"}}</h3>
+      <button type="button" class="add-btn" data-action="addObjective">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.QuestEditor.AddObjective"}}
+      </button>
+    </div>
+
+    {{#if objectivesDisplay.length}}
+      <ul class="objectives-list">
+        {{#each objectivesDisplay}}
+          <li class="objective-entry" data-index="{{this.index}}">
+            <div class="objective-header">
+              <span class="objective-number">#{{add this.index 1}}</span>
+              <span class="objective-type-badge">{{this.typeLabel}}</span>
+              <div class="objective-actions">
+                <button type="button" class="move-btn" data-action="moveObjectiveUp" data-index="{{this.index}}"
+                        {{#unless this.canMoveUp}}disabled{{/unless}}>
+                  <i class="fa-solid fa-chevron-up"></i>
+                </button>
+                <button type="button" class="move-btn" data-action="moveObjectiveDown" data-index="{{this.index}}"
+                        {{#unless this.canMoveDown}}disabled{{/unless}}>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <button type="button" class="remove-btn" data-action="removeObjective" data-index="{{this.index}}">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="objective-form">
+              <div class="form-group">
+                <label>{{localize "BOBSNPC.QuestEditor.ObjectiveText"}}</label>
+                <input type="text" name="quest.objectives.{{this.index}}.text" value="{{this.text}}" />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>{{localize "BOBSNPC.QuestEditor.ObjectiveType"}}</label>
+                  <select name="quest.objectives.{{this.index}}.type">
+                    {{#each ../objectiveTypeOptions}}
+                      <option value="{{this.value}}" {{#if (eq this.value ../this.type)}}selected{{/if}}>
+                        {{this.label}}
+                      </option>
+                    {{/each}}
+                  </select>
+                </div>
+
+                <div class="form-group checkbox-group">
+                  <label>
+                    <input type="checkbox" name="quest.objectives.{{this.index}}.optional"
+                           {{#if this.optional}}checked{{/if}} />
+                    {{localize "BOBSNPC.QuestEditor.Optional"}}
+                  </label>
+                </div>
+
+                <div class="form-group checkbox-group">
+                  <label>
+                    <input type="checkbox" name="quest.objectives.{{this.index}}.hidden"
+                           {{#if this.hidden}}checked{{/if}} />
+                    {{localize "BOBSNPC.QuestEditor.HiddenObjective"}}
+                  </label>
+                </div>
+              </div>
+
+              {{!-- Kill Count Options --}}
+              {{#if (eq this.type 'kill_count')}}
+                <div class="objective-type-options">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>{{localize "BOBSNPC.QuestEditor.KillTarget"}}</label>
+                      <input type="text" name="quest.objectives.{{this.index}}.killTarget" value="{{this.killTarget}}"
+                             placeholder="{{localize 'BOBSNPC.QuestEditor.KillTargetPlaceholder'}}" />
+                    </div>
+                    <div class="form-group">
+                      <label>{{localize "BOBSNPC.QuestEditor.KillCount"}}</label>
+                      <input type="number" name="quest.objectives.{{this.index}}.killCount" value="{{this.killCount}}"
+                             min="1" />
+                    </div>
+                  </div>
+                </div>
+              {{/if}}
+
+              {{!-- Item Collect Options --}}
+              {{#if (eq this.type 'item_collect')}}
+                <div class="objective-type-options">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>{{localize "BOBSNPC.QuestEditor.ItemId"}}</label>
+                      <input type="text" name="quest.objectives.{{this.index}}.itemId" value="{{this.itemId}}"
+                             placeholder="Item.xxxx" />
+                    </div>
+                    <div class="form-group">
+                      <label>{{localize "BOBSNPC.QuestEditor.ItemCount"}}</label>
+                      <input type="number" name="quest.objectives.{{this.index}}.itemCount" value="{{this.itemCount}}"
+                             min="1" />
+                    </div>
+                  </div>
+                  <div class="form-group checkbox-group">
+                    <label>
+                      <input type="checkbox" name="quest.objectives.{{this.index}}.consumeItems"
+                             {{#if this.consumeItems}}checked{{/if}} />
+                      {{localize "BOBSNPC.QuestEditor.ConsumeItems"}}
+                    </label>
+                    <p class="hint">{{localize "BOBSNPC.QuestEditor.ConsumeItemsHint"}}</p>
+                  </div>
+                </div>
+              {{/if}}
+
+              {{!-- Location Options --}}
+              {{#if (eq this.type 'location')}}
+                <div class="objective-type-options">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>{{localize "BOBSNPC.QuestEditor.LocationScene"}}</label>
+                      <input type="text" name="quest.objectives.{{this.index}}.locationSceneId" value="{{this.locationSceneId}}"
+                             placeholder="Scene.xxxx" />
+                    </div>
+                    <div class="form-group">
+                      <label>{{localize "BOBSNPC.QuestEditor.LocationRegion"}}</label>
+                      <input type="text" name="quest.objectives.{{this.index}}.locationRegion" value="{{this.locationRegion}}"
+                             placeholder="{{localize 'BOBSNPC.QuestEditor.LocationRegionPlaceholder'}}" />
+                    </div>
+                  </div>
+                </div>
+              {{/if}}
+            </div>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <div class="empty-state">
+        <i class="fa-solid fa-list-check"></i>
+        <p>{{localize "BOBSNPC.QuestEditor.NoObjectives"}}</p>
+        <button type="button" class="add-btn" data-action="addObjective">
+          <i class="fa-solid fa-plus"></i>
+          {{localize "BOBSNPC.QuestEditor.AddFirstObjective"}}
+        </button>
+      </div>
+    {{/if}}
+  </section>
+</div>

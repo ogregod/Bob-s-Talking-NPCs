@@ -1,0 +1,81 @@
+{{!-- Faction Editor - Relationships Tab --}}
+<div class="tab-content relationships-tab {{theme}}" {{#unless (eq activeTab 'relationships')}}hidden{{/unless}}>
+  <section class="editor-section">
+    <div class="section-header">
+      <h3>{{localize "BOBSNPC.FactionEditor.FactionRelationships"}}</h3>
+      <button type="button" class="add-btn" data-action="addRelationship">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.FactionEditor.AddRelationship"}}
+      </button>
+    </div>
+
+    <p class="section-hint">{{localize "BOBSNPC.FactionEditor.RelationshipsHint"}}</p>
+
+    {{#if relationshipsDisplay.length}}
+      <ul class="relationships-list">
+        {{#each relationshipsDisplay}}
+          <li class="relationship-entry">
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.FactionEditor.Faction"}}</label>
+              <select name="faction.factionRelationships.{{this.index}}.factionId">
+                {{#each ../otherFactions}}
+                  <option value="{{this.id}}" {{#if (eq this.id ../this.factionId)}}selected{{/if}}>
+                    {{this.name}}
+                  </option>
+                {{/each}}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.FactionEditor.RelationshipType"}}</label>
+              <select name="faction.factionRelationships.{{this.index}}.type">
+                {{#each ../relationshipTypeOptions}}
+                  <option value="{{this.value}}" {{#if (eq this.value ../this.type)}}selected{{/if}}>
+                    {{this.label}}
+                  </option>
+                {{/each}}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.FactionEditor.ReputationEffect"}}</label>
+              <input type="number" name="faction.factionRelationships.{{this.index}}.reputationEffect"
+                     value="{{this.reputationEffect}}" step="0.1" />
+              <p class="hint">{{localize "BOBSNPC.FactionEditor.ReputationEffectHint"}}</p>
+            </div>
+
+            <button type="button" class="remove-btn" data-action="removeRelationship" data-index="{{this.index}}">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <div class="empty-state small">
+        <p>{{localize "BOBSNPC.FactionEditor.NoRelationships"}}</p>
+      </div>
+    {{/if}}
+  </section>
+
+  <section class="editor-section">
+    <h3>{{localize "BOBSNPC.FactionEditor.RelationshipLegend"}}</h3>
+    <div class="relationship-legend">
+      <div class="legend-item">
+        <span class="legend-badge allied">{{localize "BOBSNPC.FactionEditor.Relationship.Allied"}}</span>
+        <span class="legend-desc">{{localize "BOBSNPC.FactionEditor.AlliedDescription"}}</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-badge neutral">{{localize "BOBSNPC.FactionEditor.Relationship.Neutral"}}</span>
+        <span class="legend-desc">{{localize "BOBSNPC.FactionEditor.NeutralDescription"}}</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-badge rival">{{localize "BOBSNPC.FactionEditor.Relationship.Rival"}}</span>
+        <span class="legend-desc">{{localize "BOBSNPC.FactionEditor.RivalDescription"}}</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-badge enemy">{{localize "BOBSNPC.FactionEditor.Relationship.Enemy"}}</span>
+        <span class="legend-desc">{{localize "BOBSNPC.FactionEditor.EnemyDescription"}}</span>
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,107 @@
+{{!-- Faction Editor - Ranks Tab --}}
+<div class="tab-content ranks-tab {{theme}}" {{#unless (eq activeTab 'ranks')}}hidden{{/unless}}>
+  <section class="editor-section">
+    <div class="section-header">
+      <h3>{{localize "BOBSNPC.FactionEditor.Ranks"}}</h3>
+      <div class="header-actions">
+        <button type="button" class="secondary-btn" data-action="useDefaultRanks">
+          <i class="fa-solid fa-undo"></i>
+          {{localize "BOBSNPC.FactionEditor.ResetDefaults"}}
+        </button>
+        <button type="button" class="add-btn" data-action="addRank">
+          <i class="fa-solid fa-plus"></i>
+          {{localize "BOBSNPC.FactionEditor.AddRank"}}
+        </button>
+      </div>
+    </div>
+
+    <p class="section-hint">{{localize "BOBSNPC.FactionEditor.RanksHint"}}</p>
+
+    {{#if ranksDisplay.length}}
+      <ul class="ranks-list">
+        {{#each ranksDisplay}}
+          <li class="rank-entry" data-index="{{this.index}}">
+            <div class="rank-header">
+              <span class="rank-order">#{{add this.index 1}}</span>
+              {{#if this.color}}
+                <span class="rank-color-preview" style="background-color: {{this.color}}"></span>
+              {{/if}}
+              <span class="rank-name-display">{{this.name}}</span>
+              <div class="rank-actions">
+                <button type="button" class="move-btn" data-action="moveRankUp" data-index="{{this.index}}"
+                        {{#unless this.canMoveUp}}disabled{{/unless}}>
+                  <i class="fa-solid fa-chevron-up"></i>
+                </button>
+                <button type="button" class="move-btn" data-action="moveRankDown" data-index="{{this.index}}"
+                        {{#unless this.canMoveDown}}disabled{{/unless}}>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <button type="button" class="remove-btn" data-action="removeRank" data-index="{{this.index}}">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="rank-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>{{localize "BOBSNPC.FactionEditor.RankName"}}</label>
+                  <input type="text" name="faction.ranks.{{this.index}}.name" value="{{this.name}}" />
+                </div>
+                <div class="form-group">
+                  <label>{{localize "BOBSNPC.FactionEditor.RankColor"}}</label>
+                  <input type="color" name="faction.ranks.{{this.index}}.color" value="{{this.color}}" />
+                </div>
+              </div>
+
+              <div class="form-subsection">
+                <h4>{{localize "BOBSNPC.FactionEditor.Requirements"}}</h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>{{localize "BOBSNPC.FactionEditor.RequiredReputation"}}</label>
+                    <input type="number" name="faction.ranks.{{this.index}}.requirements.reputation"
+                           value="{{this.requirements.reputation}}" min="0" />
+                  </div>
+                  <div class="form-group">
+                    <label>{{localize "BOBSNPC.FactionEditor.RequiredQuests"}}</label>
+                    <input type="number" name="faction.ranks.{{this.index}}.requirements.questsCompleted"
+                           value="{{this.requirements.questsCompleted}}" min="0" />
+                  </div>
+                  <div class="form-group">
+                    <label>{{localize "BOBSNPC.FactionEditor.RequiredGold"}}</label>
+                    <input type="number" name="faction.ranks.{{this.index}}.requirements.goldRequired"
+                           value="{{this.requirements.goldRequired}}" min="0" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-subsection">
+                <h4>{{localize "BOBSNPC.FactionEditor.Benefits"}}</h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>{{localize "BOBSNPC.FactionEditor.PriceDiscount"}}</label>
+                    <div class="input-with-suffix">
+                      <input type="number" name="faction.ranks.{{this.index}}.benefits.priceDiscount"
+                             value="{{this.benefits.priceDiscount}}" min="0" max="1" step="0.05" />
+                      <span class="suffix">%</span>
+                    </div>
+                    <p class="hint">{{localize "BOBSNPC.FactionEditor.PriceDiscountHint"}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <div class="empty-state">
+        <i class="fa-solid fa-medal"></i>
+        <p>{{localize "BOBSNPC.FactionEditor.NoRanks"}}</p>
+        <button type="button" class="add-btn" data-action="addRank">
+          <i class="fa-solid fa-plus"></i>
+          {{localize "BOBSNPC.FactionEditor.AddFirstRank"}}
+        </button>
+      </div>
+    {{/if}}
+  </section>
+</div>

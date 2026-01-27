@@ -6,6 +6,9 @@
 // Define MODULE_ID locally to avoid circular dependency with module.mjs
 const MODULE_ID = "bobs-talking-npcs";
 
+import { QuestEditor } from "./quest-editor.mjs";
+import { FactionEditor } from "./faction-editor.mjs";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 /**
@@ -442,8 +445,8 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    * Create new quest
    */
   static async #onCreateQuest(event, target) {
-    ui.notifications.info(game.i18n.localize("BOBSNPC.GMDashboard.CreateQuestNotImplemented"));
-    // TODO: Open quest editor dialog
+    const editor = new QuestEditor(null);
+    editor.render(true);
   }
 
   /**
@@ -451,8 +454,13 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   static async #onEditQuest(event, target) {
     const questId = target.dataset.questId;
-    ui.notifications.info(`Edit quest: ${questId}`);
-    // TODO: Open quest editor dialog
+    const quest = game.bobsnpc?.handlers?.quest?.getQuest(questId);
+    if (!quest) {
+      ui.notifications.error(game.i18n.localize("BOBSNPC.GMDashboard.QuestNotFound"));
+      return;
+    }
+    const editor = new QuestEditor(quest);
+    editor.render(true);
   }
 
   /**
@@ -460,15 +468,17 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   static async #onDeleteQuest(event, target) {
     const questId = target.dataset.questId;
+    const quest = game.bobsnpc?.handlers?.quest?.getQuest(questId);
+    const questName = quest?.name || questId;
 
     const confirmed = await Dialog.confirm({
       title: game.i18n.localize("BOBSNPC.GMDashboard.DeleteQuest"),
-      content: game.i18n.localize("BOBSNPC.GMDashboard.DeleteQuestConfirm")
+      content: game.i18n.format("BOBSNPC.GMDashboard.DeleteQuestConfirm", { name: questName })
     });
 
     if (confirmed) {
-      // TODO: Delete quest
-      ui.notifications.info(`Deleted quest: ${questId}`);
+      await game.bobsnpc?.handlers?.quest?.deleteQuest(questId);
+      ui.notifications.info(game.i18n.format("BOBSNPC.GMDashboard.QuestDeleted", { name: questName }));
       this.render();
     }
   }
@@ -477,8 +487,8 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    * Create new faction
    */
   static async #onCreateFaction(event, target) {
-    ui.notifications.info(game.i18n.localize("BOBSNPC.GMDashboard.CreateFactionNotImplemented"));
-    // TODO: Open faction editor dialog
+    const editor = new FactionEditor(null);
+    editor.render(true);
   }
 
   /**
@@ -486,8 +496,13 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   static async #onEditFaction(event, target) {
     const factionId = target.dataset.factionId;
-    ui.notifications.info(`Edit faction: ${factionId}`);
-    // TODO: Open faction editor dialog
+    const faction = game.bobsnpc?.handlers?.faction?.getFaction(factionId);
+    if (!faction) {
+      ui.notifications.error(game.i18n.localize("BOBSNPC.GMDashboard.FactionNotFound"));
+      return;
+    }
+    const editor = new FactionEditor(faction);
+    editor.render(true);
   }
 
   /**
@@ -495,15 +510,17 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   static async #onDeleteFaction(event, target) {
     const factionId = target.dataset.factionId;
+    const faction = game.bobsnpc?.handlers?.faction?.getFaction(factionId);
+    const factionName = faction?.name || factionId;
 
     const confirmed = await Dialog.confirm({
       title: game.i18n.localize("BOBSNPC.GMDashboard.DeleteFaction"),
-      content: game.i18n.localize("BOBSNPC.GMDashboard.DeleteFactionConfirm")
+      content: game.i18n.format("BOBSNPC.GMDashboard.DeleteFactionConfirm", { name: factionName })
     });
 
     if (confirmed) {
-      // TODO: Delete faction
-      ui.notifications.info(`Deleted faction: ${factionId}`);
+      await game.bobsnpc?.handlers?.faction?.deleteFaction(factionId);
+      ui.notifications.info(game.i18n.format("BOBSNPC.GMDashboard.FactionDeleted", { name: factionName }));
       this.render();
     }
   }

@@ -1,0 +1,23 @@
+{{!-- Faction Editor - Tab Navigation --}}
+<nav class="faction-editor-tabs {{theme}}">
+  <button type="button" class="tab-btn {{#if (eq activeTab 'general')}}active{{/if}}"
+          data-action="changeTab" data-tab="general">
+    <i class="fa-solid fa-info-circle"></i>
+    {{localize "BOBSNPC.FactionEditor.TabGeneral"}}
+  </button>
+  <button type="button" class="tab-btn {{#if (eq activeTab 'ranks')}}active{{/if}}"
+          data-action="changeTab" data-tab="ranks">
+    <i class="fa-solid fa-medal"></i>
+    {{localize "BOBSNPC.FactionEditor.TabRanks"}}
+  </button>
+  <button type="button" class="tab-btn {{#if (eq activeTab 'relationships')}}active{{/if}}"
+          data-action="changeTab" data-tab="relationships">
+    <i class="fa-solid fa-handshake"></i>
+    {{localize "BOBSNPC.FactionEditor.TabRelationships"}}
+  </button>
+  <button type="button" class="tab-btn {{#if (eq activeTab 'settings')}}active{{/if}}"
+          data-action="changeTab" data-tab="settings">
+    <i class="fa-solid fa-cog"></i>
+    {{localize "BOBSNPC.FactionEditor.TabSettings"}}
+  </button>
+</nav>

@@ -1,0 +1,595 @@
+/**
+ * Bob's Talking NPCs - Faction Editor Styles
+ */
+
+@layer bobsnpc {
+  /* ===== Faction Editor Layout ===== */
+  .faction-editor {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* ===== Tabs ===== */
+  .faction-editor-tabs {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    overflow-x: auto;
+  }
+
+  .faction-editor-tabs .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+    white-space: nowrap;
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .faction-editor-tabs .tab-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .faction-editor-tabs .tab-btn.active {
+    background: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  /* ===== Tab Content ===== */
+  .faction-editor .tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .faction-editor .tab-content[hidden] {
+    display: none;
+  }
+
+  /* ===== Editor Sections ===== */
+  .faction-editor .editor-section {
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    padding: var(--bobsnpc-spacing-md);
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .faction-editor .editor-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .faction-editor .editor-section h3 {
+    margin: 0 0 var(--bobsnpc-spacing-md) 0;
+    padding-bottom: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    font-size: var(--bobsnpc-font-size-base);
+  }
+
+  .faction-editor .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    padding-bottom: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .faction-editor .section-header h3 {
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+
+  .faction-editor .header-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .faction-editor .section-hint {
+    margin-top: calc(var(--bobsnpc-spacing-md) * -1 + var(--bobsnpc-spacing-xs));
+    margin-bottom: var(--bobsnpc-spacing-md);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Form Layout ===== */
+  .faction-editor .form-group {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .faction-editor .form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .faction-editor .form-group > label {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    font-weight: var(--bobsnpc-font-weight-medium);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  .faction-editor .form-row {
+    display: flex;
+    gap: var(--bobsnpc-spacing-md);
+    flex-wrap: wrap;
+  }
+
+  .faction-editor .form-row .form-group {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .faction-editor input[type="text"],
+  .faction-editor input[type="number"],
+  .faction-editor select,
+  .faction-editor textarea {
+    width: 100%;
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .faction-editor input:focus,
+  .faction-editor select:focus,
+  .faction-editor textarea:focus {
+    outline: none;
+    border-color: var(--bobsnpc-primary);
+    box-shadow: 0 0 0 2px rgba(var(--bobsnpc-primary-rgb), 0.2);
+  }
+
+  .faction-editor textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .faction-editor .hint {
+    margin-top: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .faction-editor .checkbox-group label {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .faction-editor .checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin-right: var(--bobsnpc-spacing-xs);
+  }
+
+  /* ===== Color Picker ===== */
+  .color-picker-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .color-picker-wrapper input[type="color"] {
+    width: 50px;
+    height: 36px;
+    padding: 2px;
+    cursor: pointer;
+  }
+
+  .color-preview {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  /* ===== Icon Picker ===== */
+  .icon-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--bobsnpc-spacing-xs);
+    margin-top: var(--bobsnpc-spacing-sm);
+  }
+
+  .icon-option {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bobsnpc-bg-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .icon-option:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .icon-option.selected {
+    background: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  /* ===== Faction Preview ===== */
+  .faction-preview-card {
+    border-radius: var(--bobsnpc-border-radius-md);
+    overflow: hidden;
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .faction-preview-card .preview-header {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-md);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .faction-preview-card .preview-icon {
+    font-size: 1.5rem;
+  }
+
+  .faction-preview-card .preview-name {
+    font-size: var(--bobsnpc-font-size-lg);
+    font-weight: var(--bobsnpc-font-weight-bold);
+  }
+
+  .faction-preview-card .preview-body {
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-primary);
+  }
+
+  .faction-preview-card .preview-desc {
+    margin: 0;
+    font-style: italic;
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  /* ===== Ranks List ===== */
+  .ranks-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .rank-entry {
+    background: var(--bobsnpc-bg-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    overflow: hidden;
+  }
+
+  .rank-header {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .rank-order {
+    font-weight: var(--bobsnpc-font-weight-bold);
+    color: var(--bobsnpc-primary);
+  }
+
+  .rank-color-preview {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .rank-name-display {
+    flex: 1;
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .rank-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .rank-actions button {
+    padding: var(--bobsnpc-spacing-xs);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    transition: color var(--bobsnpc-transition-fast);
+  }
+
+  .rank-actions button:hover:not(:disabled) {
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .rank-actions button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .rank-actions .remove-btn:hover {
+    color: var(--bobsnpc-danger);
+  }
+
+  .rank-form {
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .form-subsection {
+    margin-top: var(--bobsnpc-spacing-md);
+    padding-top: var(--bobsnpc-spacing-md);
+    border-top: var(--bobsnpc-border-width) dashed var(--bobsnpc-border-color);
+  }
+
+  .form-subsection h4 {
+    margin: 0 0 var(--bobsnpc-spacing-sm) 0;
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .input-with-suffix {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .input-with-suffix input {
+    flex: 1;
+  }
+
+  .input-with-suffix .suffix {
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Relationships List ===== */
+  .relationships-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .relationship-entry {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .relationship-entry .form-group {
+    flex: 1;
+    margin: 0;
+  }
+
+  .relationship-entry .remove-btn {
+    padding: var(--bobsnpc-spacing-sm);
+    background: transparent;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  .relationship-entry .remove-btn:hover {
+    color: var(--bobsnpc-danger);
+  }
+
+  /* ===== Relationship Legend ===== */
+  .relationship-legend {
+    display: grid;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .legend-badge {
+    padding: 2px var(--bobsnpc-spacing-sm);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-xs);
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .legend-badge.allied {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+  }
+
+  .legend-badge.neutral {
+    background: rgba(158, 158, 158, 0.2);
+    color: #9e9e9e;
+  }
+
+  .legend-badge.rival {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+  }
+
+  .legend-badge.enemy {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+  }
+
+  .legend-desc {
+    color: var(--bobsnpc-text-secondary);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  /* ===== Info Section ===== */
+  .info-section .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .info-label {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+    text-transform: uppercase;
+  }
+
+  .info-value {
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  code.info-value {
+    font-family: monospace;
+    background: var(--bobsnpc-bg-primary);
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-xs);
+  }
+
+  /* ===== Empty State ===== */
+  .faction-editor .empty-state {
+    text-align: center;
+    padding: var(--bobsnpc-spacing-lg);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .faction-editor .empty-state i {
+    font-size: 2rem;
+    margin-bottom: var(--bobsnpc-spacing-sm);
+    opacity: 0.5;
+  }
+
+  .faction-editor .empty-state.small {
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .faction-editor .empty-state.small i {
+    display: none;
+  }
+
+  /* ===== Buttons ===== */
+  .faction-editor .add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-success);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: white;
+    cursor: pointer;
+    font-size: var(--bobsnpc-font-size-sm);
+    transition: background var(--bobsnpc-transition-fast);
+  }
+
+  .faction-editor .add-btn:hover {
+    background: var(--bobsnpc-success-hover);
+  }
+
+  .faction-editor .secondary-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+    cursor: pointer;
+    font-size: var(--bobsnpc-font-size-sm);
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .faction-editor .secondary-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  /* ===== Footer ===== */
+  .faction-editor-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-secondary);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .faction-editor-footer .footer-left,
+  .faction-editor-footer .footer-right {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .faction-editor-footer button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    font-size: var(--bobsnpc-font-size-sm);
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .faction-editor-footer .primary-btn {
+    background: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .faction-editor-footer .primary-btn:hover {
+    background: var(--bobsnpc-primary-hover);
+  }
+
+  .faction-editor-footer .secondary-btn {
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .faction-editor-footer .secondary-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .faction-editor-footer .danger-btn {
+    background: transparent;
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-danger);
+    color: var(--bobsnpc-danger);
+  }
+
+  .faction-editor-footer .danger-btn:hover {
+    background: var(--bobsnpc-danger);
+    color: white;
+  }
+}

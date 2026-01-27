@@ -1,0 +1,29 @@
+{{!-- Quest Editor - Footer --}}
+<footer class="quest-editor-footer {{theme}}">
+  <div class="footer-left">
+    {{#unless isNew}}
+      <button type="button" class="danger-btn" data-action="deleteQuest">
+        <i class="fa-solid fa-trash"></i>
+        {{localize "BOBSNPC.QuestEditor.Delete"}}
+      </button>
+      <button type="button" class="secondary-btn" data-action="duplicateQuest">
+        <i class="fa-solid fa-copy"></i>
+        {{localize "BOBSNPC.QuestEditor.Duplicate"}}
+      </button>
+    {{/unless}}
+  </div>
+
+  <div class="footer-right">
+    <button type="button" class="secondary-btn" data-action="cancelEdit">
+      {{localize "BOBSNPC.QuestEditor.Cancel"}}
+    </button>
+    <button type="button" class="primary-btn" data-action="saveQuest">
+      <i class="fa-solid fa-save"></i>
+      {{#if isNew}}
+        {{localize "BOBSNPC.QuestEditor.Create"}}
+      {{else}}
+        {{localize "BOBSNPC.QuestEditor.Save"}}
+      {{/if}}
+    </button>
+  </div>
+</footer>
