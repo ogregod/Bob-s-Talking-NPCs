@@ -131,7 +131,24 @@ async function loadTemplates() {
     `modules/${MODULE_ID}/templates/dialogue-node-config/responses.hbs`,
     `modules/${MODULE_ID}/templates/dialogue-node-config/conditions.hbs`,
     `modules/${MODULE_ID}/templates/dialogue-node-config/effects.hbs`,
-    `modules/${MODULE_ID}/templates/dialogue-node-config/footer.hbs`
+    `modules/${MODULE_ID}/templates/dialogue-node-config/footer.hbs`,
+
+    // Quest Editor templates
+    `modules/${MODULE_ID}/templates/quest-editor/tabs.hbs`,
+    `modules/${MODULE_ID}/templates/quest-editor/general.hbs`,
+    `modules/${MODULE_ID}/templates/quest-editor/objectives.hbs`,
+    `modules/${MODULE_ID}/templates/quest-editor/rewards.hbs`,
+    `modules/${MODULE_ID}/templates/quest-editor/prerequisites.hbs`,
+    `modules/${MODULE_ID}/templates/quest-editor/advanced.hbs`,
+    `modules/${MODULE_ID}/templates/quest-editor/footer.hbs`,
+
+    // Faction Editor templates
+    `modules/${MODULE_ID}/templates/faction-editor/tabs.hbs`,
+    `modules/${MODULE_ID}/templates/faction-editor/general.hbs`,
+    `modules/${MODULE_ID}/templates/faction-editor/ranks.hbs`,
+    `modules/${MODULE_ID}/templates/faction-editor/relationships.hbs`,
+    `modules/${MODULE_ID}/templates/faction-editor/settings.hbs`,
+    `modules/${MODULE_ID}/templates/faction-editor/footer.hbs`
   ];
 
   try {

@@ -1148,8 +1148,6 @@
       "ExportFailed": "Failed to export data",
       "ImportComplete": "Imported {success} items ({skipped} skipped, {errors} errors)",
       "ImportFailed": "Failed to import data",
-      "CreateQuestNotImplemented": "Quest editor coming soon!",
-      "CreateFactionNotImplemented": "Faction editor coming soon!",
       "QuestNotFound": "Quest not found",
       "QuestDeleted": "Deleted quest: {name}",
       "FactionNotFound": "Faction not found",
