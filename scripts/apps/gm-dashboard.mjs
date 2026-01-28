@@ -445,8 +445,15 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    * Create new quest
    */
   static async #onCreateQuest(event, target) {
-    const editor = new QuestEditor(null);
-    editor.render(true);
+    console.log(`${MODULE_ID} | onCreateQuest called, QuestEditor available:`, !!QuestEditor);
+    try {
+      const editor = new QuestEditor(null);
+      console.log(`${MODULE_ID} | QuestEditor instance created:`, editor);
+      editor.render(true);
+    } catch (error) {
+      console.error(`${MODULE_ID} | Failed to open Quest Editor:`, error);
+      ui.notifications.error("Failed to open Quest Editor - check console (F12)");
+    }
   }
 
   /**
@@ -459,8 +466,13 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
       ui.notifications.error(game.i18n.localize("BOBSNPC.GMDashboard.QuestNotFound"));
       return;
     }
-    const editor = new QuestEditor(quest);
-    editor.render(true);
+    try {
+      const editor = new QuestEditor(quest);
+      editor.render(true);
+    } catch (error) {
+      console.error(`${MODULE_ID} | Failed to open Quest Editor:`, error);
+      ui.notifications.error("Failed to open Quest Editor - check console (F12)");
+    }
   }
 
   /**
@@ -487,8 +499,15 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    * Create new faction
    */
   static async #onCreateFaction(event, target) {
-    const editor = new FactionEditor(null);
-    editor.render(true);
+    console.log(`${MODULE_ID} | onCreateFaction called, FactionEditor available:`, !!FactionEditor);
+    try {
+      const editor = new FactionEditor(null);
+      console.log(`${MODULE_ID} | FactionEditor instance created:`, editor);
+      editor.render(true);
+    } catch (error) {
+      console.error(`${MODULE_ID} | Failed to open Faction Editor:`, error);
+      ui.notifications.error("Failed to open Faction Editor - check console (F12)");
+    }
   }
 
   /**
