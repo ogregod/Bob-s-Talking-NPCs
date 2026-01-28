@@ -408,19 +408,21 @@
       "NodeType": "Type",
       "NodeTypeHint": "The node type cannot be changed after creation",
 
-      "NodeType.NPC_SPEECH": "NPC Speech",
-      "NodeType.PLAYER_CHOICE": "Player Choice",
-      "NodeType.SKILL_CHECK": "Skill Check",
-      "NodeType.SHOP": "Shop",
-      "NodeType.QUEST_OFFER": "Quest Offer",
-      "NodeType.QUEST_TURNIN": "Quest Turn-in",
-      "NodeType.REWARD": "Reward",
-      "NodeType.SERVICE": "Service",
-      "NodeType.BANK": "Bank",
-      "NodeType.HIRE": "Hire",
-      "NodeType.STABLE": "Stable",
-      "NodeType.BRANCH": "Branch",
-      "NodeType.END": "End",
+      "NodeTypes": {
+        "NPC_SPEECH": "NPC Speech",
+        "PLAYER_CHOICE": "Player Choice",
+        "SKILL_CHECK": "Skill Check",
+        "SHOP": "Shop",
+        "QUEST_OFFER": "Quest Offer",
+        "QUEST_TURNIN": "Quest Turn-in",
+        "REWARD": "Reward",
+        "SERVICE": "Service",
+        "BANK": "Bank",
+        "HIRE": "Hire",
+        "STABLE": "Stable",
+        "BRANCH": "Branch",
+        "END": "End"
+      },
 
       "NoText": "(no text)",
       "Responses": "responses",
@@ -523,20 +525,22 @@
       "Invert": "NOT",
 
       "ConditionType": "Condition Type",
-      "ConditionType.QUEST_STATUS": "Quest Status",
-      "ConditionType.QUEST_OBJECTIVE": "Quest Objective",
-      "ConditionType.FACTION_RANK": "Faction Rank",
-      "ConditionType.FACTION_REPUTATION": "Faction Reputation",
-      "ConditionType.RELATIONSHIP": "Relationship Level",
-      "ConditionType.PLAYER_LEVEL": "Player Level",
-      "ConditionType.PLAYER_CLASS": "Player Class",
-      "ConditionType.PLAYER_RACE": "Player Race",
-      "ConditionType.HAS_ITEM": "Has Item",
-      "ConditionType.HAS_GOLD": "Has Gold",
-      "ConditionType.FLAG": "Flag/Variable",
-      "ConditionType.TIME": "Time of Day",
-      "ConditionType.PREVIOUS_CHOICE": "Previous Choice",
-      "ConditionType.RANDOM": "Random Chance",
+      "ConditionTypes": {
+        "QUEST_STATUS": "Quest Status",
+        "QUEST_OBJECTIVE": "Quest Objective",
+        "FACTION_RANK": "Faction Rank",
+        "FACTION_REPUTATION": "Faction Reputation",
+        "RELATIONSHIP": "Relationship Level",
+        "PLAYER_LEVEL": "Player Level",
+        "PLAYER_CLASS": "Player Class",
+        "PLAYER_RACE": "Player Race",
+        "HAS_ITEM": "Has Item",
+        "HAS_GOLD": "Has Gold",
+        "FLAG": "Flag/Variable",
+        "TIME": "Time of Day",
+        "PREVIOUS_CHOICE": "Previous Choice",
+        "RANDOM": "Random Chance"
+      },
 
       "Scope": "Scope",
       "ScopeWorld": "World",
@@ -565,23 +569,25 @@
       "Effects": "effects",
 
       "EffectType": "Effect Type",
-      "EffectType.MODIFY_RELATIONSHIP": "Modify Relationship",
-      "EffectType.MODIFY_FACTION_REP": "Modify Faction Rep",
-      "EffectType.SET_FLAG": "Set Flag",
-      "EffectType.GIVE_ITEM": "Give Item",
-      "EffectType.TAKE_ITEM": "Take Item",
-      "EffectType.GIVE_GOLD": "Give Gold",
-      "EffectType.TAKE_GOLD": "Take Gold",
-      "EffectType.GIVE_XP": "Give XP",
-      "EffectType.START_QUEST": "Start Quest",
-      "EffectType.COMPLETE_QUEST": "Complete Quest",
-      "EffectType.FAIL_QUEST": "Fail Quest",
-      "EffectType.COMPLETE_OBJECTIVE": "Complete Objective",
-      "EffectType.ADD_BOUNTY": "Add Bounty",
-      "EffectType.CHAT_MESSAGE": "Chat Message",
-      "EffectType.UNLOCK_AREA": "Unlock Area",
-      "EffectType.PLAY_SOUND": "Play Sound",
-      "EffectType.PLAY_ANIMATION": "Play Animation",
+      "EffectTypes": {
+        "MODIFY_RELATIONSHIP": "Modify Relationship",
+        "MODIFY_FACTION_REP": "Modify Faction Rep",
+        "SET_FLAG": "Set Flag",
+        "GIVE_ITEM": "Give Item",
+        "TAKE_ITEM": "Take Item",
+        "GIVE_GOLD": "Give Gold",
+        "TAKE_GOLD": "Take Gold",
+        "GIVE_XP": "Give XP",
+        "START_QUEST": "Start Quest",
+        "COMPLETE_QUEST": "Complete Quest",
+        "FAIL_QUEST": "Fail Quest",
+        "COMPLETE_OBJECTIVE": "Complete Objective",
+        "ADD_BOUNTY": "Add Bounty",
+        "CHAT_MESSAGE": "Chat Message",
+        "UNLOCK_AREA": "Unlock Area",
+        "PLAY_SOUND": "Play Sound",
+        "PLAY_ANIMATION": "Play Animation"
+      },
 
       "Amount": "Amount",
       "XPAmount": "XP Amount",
@@ -1183,23 +1189,29 @@
       "Pinned": "Pinned Quest",
       "PinnedHint": "Quest appears at the top of quest lists",
 
-      "Status.Available": "Available",
-      "Status.Accepted": "Accepted",
-      "Status.InProgress": "In Progress",
-      "Status.Completed": "Completed",
-      "Status.Failed": "Failed",
+      "Statuses": {
+        "Available": "Available",
+        "Accepted": "Accepted",
+        "InProgress": "In Progress",
+        "Completed": "Completed",
+        "Failed": "Failed"
+      },
 
-      "Category.MainStory": "Main Story",
-      "Category.SideQuest": "Side Quest",
-      "Category.Bounty": "Bounty",
-      "Category.Daily": "Daily",
-      "Category.GuildContract": "Guild Contract",
-      "Category.Custom": "Custom",
+      "Categories": {
+        "MainStory": "Main Story",
+        "SideQuest": "Side Quest",
+        "Bounty": "Bounty",
+        "Daily": "Daily",
+        "GuildContract": "Guild Contract",
+        "Custom": "Custom"
+      },
 
-      "Visibility.Party": "Party Wide",
-      "Visibility.Individual": "Individual",
-      "Visibility.ClassSpecific": "Class Specific",
-      "Visibility.Secret": "Secret",
+      "Visibilities": {
+        "Party": "Party Wide",
+        "Individual": "Individual",
+        "ClassSpecific": "Class Specific",
+        "Secret": "Secret"
+      },
 
       "QuestGiver": "Quest Giver",
       "SelectQuestGiver": "Select Quest Giver",
@@ -1217,10 +1229,12 @@
       "Optional": "Optional",
       "HiddenObjective": "Hidden",
 
-      "ObjectiveType.Manual": "Manual",
-      "ObjectiveType.KillCount": "Kill Count",
-      "ObjectiveType.ItemCollect": "Item Collection",
-      "ObjectiveType.Location": "Visit Location",
+      "ObjectiveTypes": {
+        "Manual": "Manual",
+        "KillCount": "Kill Count",
+        "ItemCollect": "Item Collection",
+        "Location": "Visit Location"
+      },
 
       "KillTarget": "Target Name/UUID",
       "KillTargetPlaceholder": "e.g., Goblin or Actor.xxxx",
@@ -1237,9 +1251,11 @@
       "Gold": "Gold",
       "XP": "Experience Points",
       "Distribution": "Distribution",
-      "Distribution.Split": "Split Among Party",
-      "Distribution.FullEach": "Full Amount Each",
-      "Distribution.GMChoice": "GM Decides",
+      "Distributions": {
+        "Split": "Split Among Party",
+        "FullEach": "Full Amount Each",
+        "GMChoice": "GM Decides"
+      },
 
       "ItemRewards": "Item Rewards",
       "AddItem": "Add Item",
@@ -1293,11 +1309,13 @@
       "RepeatableEnabled": "Quest is Repeatable",
       "RepeatableEnabledHint": "Allow this quest to be completed multiple times",
       "RepeatableType": "Repeat Type",
-      "Repeatable.None": "Not Repeatable",
-      "Repeatable.Daily": "Daily",
-      "Repeatable.Weekly": "Weekly",
-      "Repeatable.Infinite": "Infinite",
-      "Repeatable.Cooldown": "Cooldown Period",
+      "Repeatables": {
+        "None": "Not Repeatable",
+        "Daily": "Daily",
+        "Weekly": "Weekly",
+        "Infinite": "Infinite",
+        "Cooldown": "Cooldown Period"
+      },
       "CooldownDays": "Cooldown (Days)",
 
       "TimeLimitSettings": "Time Limit Settings",
@@ -1307,10 +1325,12 @@
 
       "GiverDeathBehavior": "Quest Giver Death Behavior",
       "OnGiverDeath": "If Quest Giver Dies",
-      "OnGiverDeath.GMPrompt": "Ask GM",
-      "OnGiverDeath.Fail": "Fail Quest",
-      "OnGiverDeath.Continue": "Continue Quest",
-      "OnGiverDeath.UseAlternative": "Use Alternative NPC",
+      "OnGiverDeaths": {
+        "GMPrompt": "Ask GM",
+        "Fail": "Fail Quest",
+        "Continue": "Continue Quest",
+        "UseAlternative": "Use Alternative NPC"
+      },
       "OnGiverDeathHint": "What happens if the quest giver dies while quest is active",
 
       "AbandonmentSettings": "Abandonment Settings",
@@ -1409,10 +1429,12 @@
       "ReputationEffectHint": "Multiplier for reputation changes (e.g., -0.5 means losing rep here)",
       "NoFactionsAvailable": "No other factions available",
 
-      "Relationship.Allied": "Allied",
-      "Relationship.Neutral": "Neutral",
-      "Relationship.Rival": "Rival",
-      "Relationship.Enemy": "Enemy",
+      "Relationships": {
+        "Allied": "Allied",
+        "Neutral": "Neutral",
+        "Rival": "Rival",
+        "Enemy": "Enemy"
+      },
 
       "RelationshipLegend": "Relationship Types",
       "AlliedDescription": "Friendly faction, shared reputation gains",
@@ -1430,9 +1452,11 @@
       "EnableDecayHint": "Reputation slowly decreases over time if inactive",
       "DecayAmount": "Decay Amount",
       "DecayInterval": "Decay Interval",
-      "Decay.Day": "Daily",
-      "Decay.Week": "Weekly",
-      "Decay.Month": "Monthly",
+      "Decays": {
+        "Day": "Daily",
+        "Week": "Weekly",
+        "Month": "Monthly"
+      },
 
       "OtherSettings": "Other Settings",
       "UseDefaultRanks": "Use Default Rank System",
