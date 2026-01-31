@@ -84,6 +84,7 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       addDialogue: NPCConfig.#onAddDialogue,
       removeDialogue: NPCConfig.#onRemoveDialogue,
       editDialogue: NPCConfig.#onEditDialogue,
+      createDialogue: NPCConfig.#onCreateDialogue,
       addFaction: NPCConfig.#onAddFaction,
       removeFaction: NPCConfig.#onRemoveFaction,
       addServiceItem: NPCConfig.#onAddServiceItem,
@@ -692,6 +693,12 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     DialogueEditor.open(dialogue || dialogueId);
   }
 
+  static async #onCreateDialogue(event, target) {
+    // Dynamically import and open dialogue editor for new dialogue
+    const { DialogueEditor } = await import("./dialogue-editor.mjs");
+    DialogueEditor.open(null); // null creates a new dialogue
+  }
+
   static #onAddFaction(event, target) {
     const select = this.element.querySelector('select[name="newFaction"]');
     const factionId = select?.value;
@@ -774,7 +781,7 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       this._config.metadata.modifiedBy = game.user.id;
 
       // Save to NPC
-      await getNpcHandler().configureNPC(this.npc, this._config);
+      await getNpcHandler().configureNPC(this.npc.uuid, this._config);
 
       this._unsavedChanges = false;
       ui.notifications.info(localize("NPCConfig.Saved"));

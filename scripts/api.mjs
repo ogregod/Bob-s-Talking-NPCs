@@ -1330,7 +1330,7 @@ class UIAPI {
     }
 
     // Create new config window for each NPC
-    const npcConfig = new NPCConfig({ npc });
+    const npcConfig = new NPCConfig(npc);
     npcConfig.render(true);
     console.log(`${MODULE_ID} | Opening NPC config for ${npc.name}`);
     return npcConfig;
