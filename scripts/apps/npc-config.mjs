@@ -48,9 +48,26 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     this._unsavedChanges = false;
 
     // Working copy of NPC config
-    // Get existing config from actor flags, or use default
-    const existingConfig = npc?.getFlag?.(MODULE_ID, "config") || null;
-    this._config = foundry.utils.deepClone(existingConfig || this._getDefaultConfig());
+    // Get existing config from actor flags, merged with defaults to ensure all properties exist
+    const existingConfig = npc?.getFlag?.(MODULE_ID, "config") || {};
+    this._config = foundry.utils.mergeObject(
+      this._getDefaultConfig(),
+      existingConfig,
+      { inplace: false }
+    );
+
+    // Ensure array properties are actually arrays (mergeObject doesn't convert types)
+    if (!Array.isArray(this._config.roles)) this._config.roles = [];
+    if (!Array.isArray(this._config.dialogues)) this._config.dialogues = [];
+    if (!Array.isArray(this._config.factions)) this._config.factions = [];
+    if (!Array.isArray(this._config.schedule?.entries)) {
+      this._config.schedule = this._config.schedule || {};
+      this._config.schedule.entries = [];
+    }
+    if (!Array.isArray(this._config.metadata?.tags)) {
+      this._config.metadata = this._config.metadata || {};
+      this._config.metadata.tags = [];
+    }
   }
 
   /** @override */
