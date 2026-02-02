@@ -85,7 +85,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     },
     position: {
       width: 1200,
-      height: 800
+      height: 750
     },
     actions: {
       addNode: DialogueEditor.#onAddNode,
@@ -144,10 +144,17 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       ? this._dialogue.nodes[this._selectedNodeId]
       : null;
 
+    // Build node type icons lookup
+    const nodeTypeIcons = {};
+    Object.values(NodeType).forEach(type => {
+      nodeTypeIcons[type] = this._getNodeTypeIcon(type);
+    });
+
     return {
       ...context,
       dialogue: this._dialogue,
       nodeTypes,
+      nodeTypeIcons,
       selectedNode,
       selectedNodeId: this._selectedNodeId,
       zoom: Math.round(this._zoom * 100),

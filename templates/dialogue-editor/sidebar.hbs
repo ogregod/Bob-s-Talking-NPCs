@@ -1,35 +1,44 @@
 {{!-- Dialogue Editor Sidebar --}}
 <aside class="dialogue-editor-sidebar {{theme}}">
+  {{!-- Quick Add Section at Top for Easy Access --}}
+  <section class="sidebar-section quick-add">
+    <h3>
+      <i class="fa-solid fa-plus-circle"></i>
+      {{localize "DialogueEditor.QuickAdd"}}
+    </h3>
+    <div class="quick-add-buttons">
+      {{#each nodeTypes}}
+        <button type="button" class="quick-add-btn" data-action="addNode" data-node-type="{{this.value}}"
+                data-tooltip="{{this.label}}">
+          <i class="fa-solid {{this.icon}}"></i>
+        </button>
+      {{/each}}
+    </div>
+  </section>
+
+  {{!-- Dialogue Info - Collapsed by Default --}}
   <section class="sidebar-section dialogue-info">
     <h3>
       <i class="fa-solid fa-info-circle"></i>
       {{localize "DialogueEditor.DialogueInfo"}}
     </h3>
-
     <div class="form-group">
       <label>{{localize "DialogueEditor.DialogueName"}}</label>
       <input type="text" name="dialogue.name" value="{{dialogue.name}}" />
     </div>
-
     <div class="form-group">
       <label>{{localize "DialogueEditor.Description"}}</label>
-      <textarea name="dialogue.description" rows="3">{{dialogue.description}}</textarea>
-    </div>
-
-    <div class="form-group">
-      <label>{{localize "DialogueEditor.AssociatedActor"}}</label>
-      <input type="text" name="dialogue.actorUuid" value="{{dialogue.actorUuid}}"
-             placeholder="{{localize 'DialogueEditor.ActorUuidPlaceholder'}}" />
+      <textarea name="dialogue.description" rows="2">{{dialogue.description}}</textarea>
     </div>
   </section>
 
+  {{!-- Node List - Main Focus --}}
   <section class="sidebar-section node-list">
     <h3>
       <i class="fa-solid fa-list"></i>
       {{localize "DialogueEditor.NodeList"}}
-      <span class="count">({{nodeCount}})</span>
+      <span class="count">{{nodeCount}}</span>
     </h3>
-
     <div class="node-list-container">
       {{#each dialogue.nodes}}
         <div class="node-list-item {{#if (eq this.id ../selectedNodeId)}}selected{{/if}} {{#if (eq this.id ../dialogue.startNodeId)}}is-start{{/if}}"
@@ -44,22 +53,6 @@
         <div class="empty-message">
           {{localize "DialogueEditor.NoNodes"}}
         </div>
-      {{/each}}
-    </div>
-  </section>
-
-  <section class="sidebar-section quick-add">
-    <h3>
-      <i class="fa-solid fa-plus-circle"></i>
-      {{localize "DialogueEditor.QuickAdd"}}
-    </h3>
-
-    <div class="quick-add-buttons">
-      {{#each nodeTypes}}
-        <button type="button" class="quick-add-btn" data-action="addNode" data-node-type="{{this.value}}"
-                data-tooltip="{{this.label}}">
-          <i class="fa-solid {{this.icon}}"></i>
-        </button>
       {{/each}}
     </div>
   </section>
