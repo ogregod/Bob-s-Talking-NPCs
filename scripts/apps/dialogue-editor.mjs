@@ -64,6 +64,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     this._ctx = null;
     this._animationFrameId = null;
     this._needsRender = true;  // Dirty flag for on-demand rendering
+    this._eventsInitialized = false;  // Prevent duplicate event listeners
 
     // Node dimensions
     this._nodeWidth = 200;
@@ -170,17 +171,25 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   _onRender(context, options) {
     super._onRender(context, options);
 
-    // Setup canvas
+    // Setup canvas - only initialize events once to prevent listener stacking
     this._canvas = this.element.querySelector("#dialogue-canvas");
     if (this._canvas) {
       this._ctx = this._canvas.getContext("2d");
-      this._setupCanvasEvents();
-      this._resizeCanvas();
-      this._startRenderLoop();
-    }
 
-    // Setup keyboard shortcuts
-    this._setupKeyboardShortcuts();
+      // Only setup events once - prevents exponential listener accumulation
+      if (!this._eventsInitialized) {
+        this._setupCanvasEvents();
+        this._setupKeyboardShortcuts();
+        this._eventsInitialized = true;
+      }
+
+      this._resizeCanvas();
+
+      // Only start render loop if not already running
+      if (!this._animationFrameId) {
+        this._startRenderLoop();
+      }
+    }
   }
 
   /** @override */
@@ -190,6 +199,15 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       cancelAnimationFrame(this._animationFrameId);
       this._animationFrameId = null;
     }
+
+    // Remove keyboard event listener
+    if (this._keydownHandler) {
+      document.removeEventListener("keydown", this._keydownHandler);
+      this._keydownHandler = null;
+    }
+
+    // Reset event initialization flag
+    this._eventsInitialized = false;
 
     await super._onClose(options);
   }
@@ -667,6 +685,13 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
    * @private
    */
   _onCanvasDoubleClick(event) {
+    // Debounce - prevent rapid node creation
+    const now = Date.now();
+    if (this._lastDoubleClick && now - this._lastDoubleClick < 300) {
+      return;
+    }
+    this._lastDoubleClick = now;
+
     const pos = this._getMousePos(event);
     const worldPos = this._screenToWorld(pos);
     const nodeId = this._hitTestNodes(worldPos);
