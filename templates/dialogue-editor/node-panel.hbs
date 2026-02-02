@@ -4,13 +4,13 @@
     <header class="node-panel-header">
       <h3>
         <i class="fa-solid {{lookup ../nodeTypeIcons selectedNode.type}}"></i>
-        {{localize (concat "DialogueEditor.NodeType." selectedNode.type)}}
+        {{localize (concat "BOBSNPC.DialogueEditor.NodeTypes." selectedNode.type)}}
       </h3>
       <div class="node-panel-actions">
-        <button type="button" class="panel-btn" data-action="editNode" data-tooltip="{{localize 'DialogueEditor.EditNodeDetails'}}">
+        <button type="button" class="panel-btn" data-action="editNode" data-tooltip="{{localize 'BOBSNPC.DialogueEditor.EditNodeDetails'}}">
           <i class="fa-solid fa-edit"></i>
         </button>
-        <button type="button" class="panel-btn danger" data-action="deleteNode" data-tooltip="{{localize 'DialogueEditor.DeleteNode'}}">
+        <button type="button" class="panel-btn danger" data-action="deleteNode" data-tooltip="{{localize 'BOBSNPC.DialogueEditor.DeleteNode'}}">
           <i class="fa-solid fa-trash"></i>
         </button>
       </div>
@@ -19,20 +19,20 @@
     <div class="node-panel-content">
       {{!-- Node Label --}}
       <div class="form-group">
-        <label>{{localize "DialogueEditor.NodeLabel"}}</label>
+        <label>{{localize "BOBSNPC.DialogueEditor.NodeLabel"}}</label>
         <input type="text" name="node.label" value="{{selectedNode.label}}"
-               placeholder="{{localize 'DialogueEditor.NodeLabelPlaceholder'}}" />
+               placeholder="{{localize 'BOBSNPC.DialogueEditor.NodeLabelPlaceholder'}}" />
       </div>
 
       {{!-- NPC Speech Node --}}
       {{#if (eq selectedNode.type "npc_speech")}}
         <div class="form-group">
-          <label>{{localize "DialogueEditor.SpeechText"}}</label>
-          <textarea name="node.text" rows="4" placeholder="{{localize 'DialogueEditor.SpeechTextPlaceholder'}}">{{selectedNode.text}}</textarea>
+          <label>{{localize "BOBSNPC.DialogueEditor.SpeechText"}}</label>
+          <textarea name="node.text" rows="4" placeholder="{{localize 'BOBSNPC.DialogueEditor.SpeechTextPlaceholder'}}">{{selectedNode.text}}</textarea>
         </div>
 
         <div class="form-group">
-          <label>{{localize "DialogueEditor.Responses"}}</label>
+          <label>{{localize "BOBSNPC.DialogueEditor.Responses"}}</label>
           <div class="responses-list">
             {{#each selectedNode.responses}}
               <div class="response-item">
@@ -40,12 +40,12 @@
                 <span class="response-text">{{this.text}}</span>
               </div>
             {{else}}
-              <p class="empty-hint">{{localize "DialogueEditor.NoResponses"}}</p>
+              <p class="empty-hint">{{localize "BOBSNPC.DialogueEditor.NoResponses"}}</p>
             {{/each}}
           </div>
           <button type="button" class="add-btn small" data-action="editNode">
             <i class="fa-solid fa-plus"></i>
-            {{localize "DialogueEditor.ManageResponses"}}
+            {{localize "BOBSNPC.DialogueEditor.ManageResponses"}}
           </button>
         </div>
       {{/if}}
@@ -53,13 +53,13 @@
       {{!-- Player Choice Node --}}
       {{#if (eq selectedNode.type "player_choice")}}
         <div class="form-group">
-          <label>{{localize "DialogueEditor.Prompt"}}</label>
+          <label>{{localize "BOBSNPC.DialogueEditor.Prompt"}}</label>
           <input type="text" name="node.prompt" value="{{selectedNode.prompt}}"
-                 placeholder="{{localize 'DialogueEditor.PromptPlaceholder'}}" />
+                 placeholder="{{localize 'BOBSNPC.DialogueEditor.PromptPlaceholder'}}" />
         </div>
 
         <div class="form-group">
-          <label>{{localize "DialogueEditor.Choices"}}</label>
+          <label>{{localize "BOBSNPC.DialogueEditor.Choices"}}</label>
           <div class="responses-list">
             {{#each selectedNode.responses}}
               <div class="response-item">
@@ -67,12 +67,12 @@
                 <span class="response-text">{{this.text}}</span>
               </div>
             {{else}}
-              <p class="empty-hint">{{localize "DialogueEditor.NoChoices"}}</p>
+              <p class="empty-hint">{{localize "BOBSNPC.DialogueEditor.NoChoices"}}</p>
             {{/each}}
           </div>
           <button type="button" class="add-btn small" data-action="editNode">
             <i class="fa-solid fa-plus"></i>
-            {{localize "DialogueEditor.ManageChoices"}}
+            {{localize "BOBSNPC.DialogueEditor.ManageChoices"}}
           </button>
         </div>
       {{/if}}
@@ -80,17 +80,17 @@
       {{!-- Skill Check Node --}}
       {{#if (eq selectedNode.type "skill_check")}}
         <div class="form-group">
-          <label>{{localize "DialogueEditor.CheckText"}}</label>
+          <label>{{localize "BOBSNPC.DialogueEditor.CheckText"}}</label>
           <textarea name="node.text" rows="2">{{selectedNode.text}}</textarea>
         </div>
 
         <div class="form-row">
           <div class="form-group half">
-            <label>{{localize "DialogueEditor.Skill"}}</label>
+            <label>{{localize "BOBSNPC.DialogueEditor.Skill"}}</label>
             <span class="readonly-value">{{selectedNode.skillCheck.skill}}</span>
           </div>
           <div class="form-group half">
-            <label>{{localize "DialogueEditor.DC"}}</label>
+            <label>{{localize "BOBSNPC.DialogueEditor.DC"}}</label>
             <span class="readonly-value">{{selectedNode.skillCheck.dc}}</span>
           </div>
         </div>
@@ -98,20 +98,20 @@
         <div class="connection-info">
           <div class="connection-item success">
             <i class="fa-solid fa-check"></i>
-            {{localize "DialogueEditor.OnSuccess"}}:
+            {{localize "BOBSNPC.DialogueEditor.OnSuccess"}}:
             {{#if selectedNode.skillCheck.successNodeId}}
-              <span class="connected">{{localize "DialogueEditor.Connected"}}</span>
+              <span class="connected">{{localize "BOBSNPC.DialogueEditor.Connected"}}</span>
             {{else}}
-              <span class="disconnected">{{localize "DialogueEditor.NotConnected"}}</span>
+              <span class="disconnected">{{localize "BOBSNPC.DialogueEditor.NotConnected"}}</span>
             {{/if}}
           </div>
           <div class="connection-item failure">
             <i class="fa-solid fa-times"></i>
-            {{localize "DialogueEditor.OnFailure"}}:
+            {{localize "BOBSNPC.DialogueEditor.OnFailure"}}:
             {{#if selectedNode.skillCheck.failureNodeId}}
-              <span class="connected">{{localize "DialogueEditor.Connected"}}</span>
+              <span class="connected">{{localize "BOBSNPC.DialogueEditor.Connected"}}</span>
             {{else}}
-              <span class="disconnected">{{localize "DialogueEditor.NotConnected"}}</span>
+              <span class="disconnected">{{localize "BOBSNPC.DialogueEditor.NotConnected"}}</span>
             {{/if}}
           </div>
         </div>
@@ -120,38 +120,38 @@
       {{!-- Quest Offer Node --}}
       {{#if (eq selectedNode.type "quest_offer")}}
         <div class="form-group">
-          <label>{{localize "DialogueEditor.OfferText"}}</label>
+          <label>{{localize "BOBSNPC.DialogueEditor.OfferText"}}</label>
           <textarea name="node.text" rows="2">{{selectedNode.text}}</textarea>
         </div>
 
         <div class="form-group">
-          <label>{{localize "DialogueEditor.Quest"}}</label>
-          <span class="readonly-value">{{#if selectedNode.questId}}{{selectedNode.questId}}{{else}}{{localize "DialogueEditor.NoQuestSelected"}}{{/if}}</span>
+          <label>{{localize "BOBSNPC.DialogueEditor.Quest"}}</label>
+          <span class="readonly-value">{{#if selectedNode.questId}}{{selectedNode.questId}}{{else}}{{localize "BOBSNPC.DialogueEditor.NoQuestSelected"}}{{/if}}</span>
         </div>
       {{/if}}
 
       {{!-- Quest Turn-in Node --}}
       {{#if (eq selectedNode.type "quest_turnin")}}
         <div class="form-group">
-          <label>{{localize "DialogueEditor.TurnInText"}}</label>
+          <label>{{localize "BOBSNPC.DialogueEditor.TurnInText"}}</label>
           <textarea name="node.text" rows="2">{{selectedNode.text}}</textarea>
         </div>
 
         <div class="form-group">
-          <label>{{localize "DialogueEditor.Quest"}}</label>
-          <span class="readonly-value">{{#if selectedNode.questId}}{{selectedNode.questId}}{{else}}{{localize "DialogueEditor.NoQuestSelected"}}{{/if}}</span>
+          <label>{{localize "BOBSNPC.DialogueEditor.Quest"}}</label>
+          <span class="readonly-value">{{#if selectedNode.questId}}{{selectedNode.questId}}{{else}}{{localize "BOBSNPC.DialogueEditor.NoQuestSelected"}}{{/if}}</span>
         </div>
       {{/if}}
 
       {{!-- Shop Node --}}
       {{#if (eq selectedNode.type "shop")}}
         <div class="form-group">
-          <label>{{localize "DialogueEditor.ShopText"}}</label>
+          <label>{{localize "BOBSNPC.DialogueEditor.ShopText"}}</label>
           <textarea name="node.text" rows="2">{{selectedNode.text}}</textarea>
         </div>
 
         <div class="form-group">
-          <label>{{localize "DialogueEditor.ShopType"}}</label>
+          <label>{{localize "BOBSNPC.DialogueEditor.ShopType"}}</label>
           <span class="readonly-value">{{selectedNode.shopType}}</span>
         </div>
       {{/if}}
@@ -159,20 +159,20 @@
       {{!-- Branch Node --}}
       {{#if (eq selectedNode.type "branch")}}
         <div class="form-group">
-          <label>{{localize "DialogueEditor.Branches"}}</label>
+          <label>{{localize "BOBSNPC.DialogueEditor.Branches"}}</label>
           <div class="branches-list">
             {{#each selectedNode.branches}}
               <div class="branch-item">
                 <span class="branch-num">{{add @index 1}}.</span>
-                <span class="branch-conditions">{{this.conditions.length}} {{localize "DialogueEditor.Conditions"}}</span>
+                <span class="branch-conditions">{{this.conditions.length}} {{localize "BOBSNPC.DialogueEditor.Conditions"}}</span>
               </div>
             {{else}}
-              <p class="empty-hint">{{localize "DialogueEditor.NoBranches"}}</p>
+              <p class="empty-hint">{{localize "BOBSNPC.DialogueEditor.NoBranches"}}</p>
             {{/each}}
           </div>
           <button type="button" class="add-btn small" data-action="editNode">
             <i class="fa-solid fa-plus"></i>
-            {{localize "DialogueEditor.ManageBranches"}}
+            {{localize "BOBSNPC.DialogueEditor.ManageBranches"}}
           </button>
         </div>
       {{/if}}
@@ -180,12 +180,12 @@
       {{!-- End Node --}}
       {{#if (eq selectedNode.type "end")}}
         <div class="form-group">
-          <label>{{localize "DialogueEditor.ClosingText"}}</label>
-          <textarea name="node.text" rows="2" placeholder="{{localize 'DialogueEditor.ClosingTextPlaceholder'}}">{{selectedNode.text}}</textarea>
+          <label>{{localize "BOBSNPC.DialogueEditor.ClosingText"}}</label>
+          <textarea name="node.text" rows="2" placeholder="{{localize 'BOBSNPC.DialogueEditor.ClosingTextPlaceholder'}}">{{selectedNode.text}}</textarea>
         </div>
 
         <div class="form-group">
-          <label>{{localize "DialogueEditor.EndType"}}</label>
+          <label>{{localize "BOBSNPC.DialogueEditor.EndType"}}</label>
           <span class="readonly-value">{{selectedNode.endType}}</span>
         </div>
       {{/if}}
@@ -194,24 +194,24 @@
       <div class="node-metadata">
         <div class="metadata-item">
           <i class="fa-solid fa-filter"></i>
-          <span>{{selectedNode.conditions.length}} {{localize "DialogueEditor.Conditions"}}</span>
+          <span>{{selectedNode.conditions.length}} {{localize "BOBSNPC.DialogueEditor.Conditions"}}</span>
         </div>
         <div class="metadata-item">
           <i class="fa-solid fa-bolt"></i>
-          <span>{{selectedNode.effects.length}} {{localize "DialogueEditor.Effects"}}</span>
+          <span>{{selectedNode.effects.length}} {{localize "BOBSNPC.DialogueEditor.Effects"}}</span>
         </div>
       </div>
 
       <button type="button" class="edit-details-btn" data-action="editNode">
         <i class="fa-solid fa-cog"></i>
-        {{localize "DialogueEditor.EditAllProperties"}}
+        {{localize "BOBSNPC.DialogueEditor.EditAllProperties"}}
       </button>
     </div>
   {{else}}
     <div class="no-selection">
       <i class="fa-solid fa-mouse-pointer"></i>
-      <p>{{localize "DialogueEditor.SelectNodeToEdit"}}</p>
-      <p class="hint">{{localize "DialogueEditor.SelectNodeHint"}}</p>
+      <p>{{localize "BOBSNPC.DialogueEditor.SelectNodeToEdit"}}</p>
+      <p class="hint">{{localize "BOBSNPC.DialogueEditor.SelectNodeHint"}}</p>
     </div>
   {{/if}}
 </div>

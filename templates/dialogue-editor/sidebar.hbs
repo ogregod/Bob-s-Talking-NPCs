@@ -1,10 +1,10 @@
 {{!-- Dialogue Editor Sidebar --}}
 <aside class="dialogue-editor-sidebar {{theme}}">
-  {{!-- Quick Add Section at Top for Easy Access --}}
+  {{!-- Quick Add Section --}}
   <section class="sidebar-section quick-add">
     <h3>
       <i class="fa-solid fa-plus-circle"></i>
-      {{localize "DialogueEditor.QuickAdd"}}
+      {{localize "BOBSNPC.DialogueEditor.QuickAdd"}}
     </h3>
     <div class="quick-add-buttons">
       {{#each nodeTypes}}
@@ -16,27 +16,11 @@
     </div>
   </section>
 
-  {{!-- Dialogue Info - Collapsed by Default --}}
-  <section class="sidebar-section dialogue-info">
-    <h3>
-      <i class="fa-solid fa-info-circle"></i>
-      {{localize "DialogueEditor.DialogueInfo"}}
-    </h3>
-    <div class="form-group">
-      <label>{{localize "DialogueEditor.DialogueName"}}</label>
-      <input type="text" name="dialogue.name" value="{{dialogue.name}}" />
-    </div>
-    <div class="form-group">
-      <label>{{localize "DialogueEditor.Description"}}</label>
-      <textarea name="dialogue.description" rows="2">{{dialogue.description}}</textarea>
-    </div>
-  </section>
-
-  {{!-- Node List - Main Focus --}}
+  {{!-- Node List --}}
   <section class="sidebar-section node-list">
     <h3>
       <i class="fa-solid fa-list"></i>
-      {{localize "DialogueEditor.NodeList"}}
+      {{localize "BOBSNPC.DialogueEditor.NodeList"}}
       <span class="count">{{nodeCount}}</span>
     </h3>
     <div class="node-list-container">
@@ -51,9 +35,92 @@
         </div>
       {{else}}
         <div class="empty-message">
-          {{localize "DialogueEditor.NoNodes"}}
+          {{localize "BOBSNPC.DialogueEditor.NoNodes"}}
         </div>
       {{/each}}
     </div>
   </section>
+
+  {{!-- Selected Node Properties --}}
+  {{#if selectedNode}}
+  <section class="sidebar-section selected-node">
+    <h3>
+      <i class="fa-solid {{lookup nodeTypeIcons selectedNode.type}}"></i>
+      {{localize "BOBSNPC.DialogueEditor.SelectedNode"}}
+      <div class="node-actions">
+        <button type="button" class="icon-btn" data-action="editNode" data-tooltip="{{localize 'BOBSNPC.DialogueEditor.EditNode'}}">
+          <i class="fa-solid fa-edit"></i>
+        </button>
+        <button type="button" class="icon-btn danger" data-action="deleteNode" data-tooltip="{{localize 'BOBSNPC.DialogueEditor.DeleteNode'}}">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </h3>
+
+    <div class="node-props">
+      <div class="form-group">
+        <label>{{localize "BOBSNPC.DialogueEditor.NodeLabel"}}</label>
+        <input type="text" name="node.label" value="{{selectedNode.label}}"
+               placeholder="{{localize 'BOBSNPC.DialogueEditor.NodeLabelPlaceholder'}}" />
+      </div>
+
+      {{!-- Type-specific content preview --}}
+      {{#if (eq selectedNode.type "npc_speech")}}
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.DialogueEditor.SpeechText"}}</label>
+          <textarea name="node.text" rows="3">{{selectedNode.text}}</textarea>
+        </div>
+        <div class="node-stat">
+          <i class="fa-solid fa-reply"></i>
+          {{selectedNode.responses.length}} {{localize "BOBSNPC.DialogueEditor.Responses"}}
+        </div>
+      {{/if}}
+
+      {{#if (eq selectedNode.type "player_choice")}}
+        <div class="node-stat">
+          <i class="fa-solid fa-list-ol"></i>
+          {{selectedNode.responses.length}} {{localize "BOBSNPC.DialogueEditor.Choices"}}
+        </div>
+      {{/if}}
+
+      {{#if (eq selectedNode.type "skill_check")}}
+        <div class="node-stats-row">
+          <div class="node-stat">
+            <i class="fa-solid fa-dice-d20"></i>
+            {{selectedNode.skillCheck.skill}}
+          </div>
+          <div class="node-stat">
+            <span class="dc-label">DC</span> {{selectedNode.skillCheck.dc}}
+          </div>
+        </div>
+      {{/if}}
+
+      {{#if (eq selectedNode.type "quest_offer")}}
+        <div class="node-stat">
+          <i class="fa-solid fa-scroll"></i>
+          {{#if selectedNode.questId}}{{selectedNode.questId}}{{else}}{{localize "BOBSNPC.DialogueEditor.NoQuestSelected"}}{{/if}}
+        </div>
+      {{/if}}
+
+      {{#if (eq selectedNode.type "quest_turnin")}}
+        <div class="node-stat">
+          <i class="fa-solid fa-check-circle"></i>
+          {{#if selectedNode.questId}}{{selectedNode.questId}}{{else}}{{localize "BOBSNPC.DialogueEditor.NoQuestSelected"}}{{/if}}
+        </div>
+      {{/if}}
+
+      {{#if (eq selectedNode.type "end")}}
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.DialogueEditor.ClosingText"}}</label>
+          <textarea name="node.text" rows="2">{{selectedNode.text}}</textarea>
+        </div>
+      {{/if}}
+
+      <button type="button" class="edit-full-btn" data-action="editNode">
+        <i class="fa-solid fa-cog"></i>
+        {{localize "BOBSNPC.DialogueEditor.EditAllProperties"}}
+      </button>
+    </div>
+  </section>
+  {{/if}}
 </aside>

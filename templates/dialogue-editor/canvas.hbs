@@ -5,10 +5,10 @@
   {{#unless nodeCount}}
   <div class="canvas-empty-state">
     <i class="fa-solid fa-project-diagram"></i>
-    <h4>{{localize "DialogueEditor.EmptyCanvasTitle"}}</h4>
-    <p>{{localize "DialogueEditor.EmptyCanvasHint1"}}</p>
-    <p>{{localize "DialogueEditor.EmptyCanvasHint2"}}</p>
-    <span class="shortcut">{{localize "DialogueEditor.EmptyCanvasShortcut"}}</span>
+    <h4>{{localize "BOBSNPC.DialogueEditor.EmptyCanvasTitle"}}</h4>
+    <p>{{localize "BOBSNPC.DialogueEditor.EmptyCanvasHint1"}}</p>
+    <p>{{localize "BOBSNPC.DialogueEditor.EmptyCanvasHint2"}}</p>
+    <span class="shortcut">{{localize "BOBSNPC.DialogueEditor.EmptyCanvasShortcut"}}</span>
   </div>
   {{/unless}}
 
@@ -16,20 +16,20 @@
   <div class="canvas-info">
     <span class="node-count">
       <i class="fa-solid fa-project-diagram"></i>
-      {{nodeCount}} {{localize "DialogueEditor.Nodes"}}
+      {{nodeCount}} {{localize "BOBSNPC.DialogueEditor.Nodes"}}
     </span>
   </div>
   {{/if}}
 
   <div class="canvas-hints">
     <span class="hint">
-      <kbd>Scroll</kbd> {{localize "DialogueEditor.HintZoom"}}
+      <kbd>Scroll</kbd> {{localize "BOBSNPC.DialogueEditor.HintZoom"}}
     </span>
     <span class="hint">
-      <kbd>Shift+Drag</kbd> {{localize "DialogueEditor.HintPan"}}
+      <kbd>Shift+Drag</kbd> {{localize "BOBSNPC.DialogueEditor.HintPan"}}
     </span>
     <span class="hint">
-      <kbd>Double-click</kbd> {{localize "DialogueEditor.HintAddNode"}}
+      <kbd>Double-click</kbd> {{localize "BOBSNPC.DialogueEditor.HintAddNode"}}
     </span>
   </div>
 </div>

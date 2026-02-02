@@ -4,7 +4,8 @@
       "Bash(dir:*)",
       "Bash(findstr:*)",
       "Bash(powershell -Command:*)",
-      "Bash(tar:*)"
+      "Bash(tar:*)",
+      "Read(//c/Users/Bob/Videos/Captures/**)"
     ]
   }
 }
