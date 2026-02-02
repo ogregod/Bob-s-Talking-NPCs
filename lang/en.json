@@ -389,6 +389,11 @@
       "HintPan": "to pan",
       "HintAddNode": "to add node",
 
+      "EmptyCanvasTitle": "Start Building Your Dialogue",
+      "EmptyCanvasHint1": "Use the Quick Add buttons on the left to add nodes.",
+      "EmptyCanvasHint2": "Or double-click anywhere on the canvas.",
+      "EmptyCanvasShortcut": "Double-click to add your first node",
+
       "DialogueInfo": "Dialogue Info",
       "DialogueName": "Name",
       "Description": "Description",

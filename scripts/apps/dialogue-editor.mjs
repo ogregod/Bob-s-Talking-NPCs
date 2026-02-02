@@ -63,6 +63,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     this._canvas = null;
     this._ctx = null;
     this._animationFrameId = null;
+    this._needsRender = true;  // Dirty flag for on-demand rendering
 
     // Node dimensions
     this._nodeWidth = 200;
@@ -196,15 +197,26 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   // ==================== Canvas Rendering ====================
 
   /**
-   * Start the canvas render loop
+   * Start the canvas render loop (on-demand rendering)
    * @private
    */
   _startRenderLoop() {
     const render = () => {
-      this._renderCanvas();
+      if (this._needsRender) {
+        this._renderCanvas();
+        this._needsRender = false;
+      }
       this._animationFrameId = requestAnimationFrame(render);
     };
     render();
+  }
+
+  /**
+   * Request a canvas redraw
+   * @private
+   */
+  _requestCanvasRender() {
+    this._needsRender = true;
   }
 
   /**
@@ -545,6 +557,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     if (this._isPanning) {
       this._pan.x = pos.x - this._dragOffset.x;
       this._pan.y = pos.y - this._dragOffset.y;
+      this._requestCanvasRender();
       return;
     }
 
@@ -553,6 +566,13 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       const node = this._dialogue.nodes[this._selectedNodeId];
       node.position.x = Math.round((worldPos.x - this._dragOffset.x) / 20) * 20;
       node.position.y = Math.round((worldPos.y - this._dragOffset.y) / 20) * 20;
+      this._requestCanvasRender();
+      return;
+    }
+
+    // Active connection drawing
+    if (this._connectionStart) {
+      this._requestCanvasRender();
       return;
     }
 
@@ -561,6 +581,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     if (nodeId !== this._hoveredNodeId) {
       this._hoveredNodeId = nodeId;
       this._canvas.style.cursor = nodeId ? "pointer" : "default";
+      this._requestCanvasRender();
     }
   }
 
@@ -610,7 +631,20 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     this._pan.x += (worldPosAfter.x - worldPosBefore.x) * this._zoom;
     this._pan.y += (worldPosAfter.y - worldPosBefore.y) * this._zoom;
 
-    this.render({ parts: ["toolbar"] });
+    // Request canvas redraw and update zoom display
+    this._requestCanvasRender();
+    this._updateZoomDisplay();
+  }
+
+  /**
+   * Update zoom level display without full re-render
+   * @private
+   */
+  _updateZoomDisplay() {
+    const zoomEl = this.element?.querySelector(".zoom-level");
+    if (zoomEl) {
+      zoomEl.textContent = `${Math.round(this._zoom * 100)}%`;
+    }
   }
 
   /**
@@ -742,6 +776,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   _selectNode(nodeId) {
     this._selectedNodeId = nodeId;
+    this._requestCanvasRender();
     this.render({ parts: ["nodePanel", "sidebar"] });
   }
 
@@ -753,6 +788,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     if (socketHit.type === "output") {
       this._connectionStart = socketHit;
       this._connectionType = socketHit.connectionType;
+      this._requestCanvasRender();
     }
   }
 
@@ -776,6 +812,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       { text: localize("DialogueEditor.NewResponse") }
     );
 
+    this._requestCanvasRender();
     this.render({ parts: ["sidebar"] });
   }
 
@@ -813,6 +850,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       callback: (updatedNode) => {
         this._saveUndoState();
         this._dialogue.nodes[nodeId] = updatedNode;
+        this._requestCanvasRender();
         this.render({ parts: ["sidebar", "nodePanel"] });
       }
     });
@@ -1143,6 +1181,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     this._redoStack.push(JSON.stringify(this._dialogue));
     this._dialogue = JSON.parse(this._undoStack.pop());
     this._selectedNodeId = null;
+    this._requestCanvasRender();
     this.render({ parts: ["toolbar", "sidebar", "nodePanel"] });
   }
 
@@ -1156,6 +1195,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     this._undoStack.push(JSON.stringify(this._dialogue));
     this._dialogue = JSON.parse(this._redoStack.pop());
     this._selectedNodeId = null;
+    this._requestCanvasRender();
     this.render({ parts: ["toolbar", "sidebar", "nodePanel"] });
   }
 
@@ -1242,6 +1282,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       this._selectedNodeId = null;
     }
 
+    this._requestCanvasRender();
     this.render({ parts: ["sidebar", "nodePanel"] });
   }
 
@@ -1275,6 +1316,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   _setStartNode(nodeId) {
     this._saveUndoState();
     this._dialogue.startNodeId = nodeId;
+    this._requestCanvasRender();
     ui.notifications.info(localize("DialogueEditor.StartNodeSet"));
   }
 
@@ -1315,12 +1357,14 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static #onZoomIn(event, target) {
     this._zoom = Math.min(2, this._zoom * 1.2);
-    this.render({ parts: ["toolbar"] });
+    this._requestCanvasRender();
+    this._updateZoomDisplay();
   }
 
   static #onZoomOut(event, target) {
     this._zoom = Math.max(0.25, this._zoom / 1.2);
-    this.render({ parts: ["toolbar"] });
+    this._requestCanvasRender();
+    this._updateZoomDisplay();
   }
 
   static #onZoomFit(event, target) {
@@ -1347,13 +1391,15 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     this._pan.x = (this._canvas.width - contentWidth * this._zoom) / 2 - minX * this._zoom + padding * this._zoom;
     this._pan.y = (this._canvas.height - contentHeight * this._zoom) / 2 - minY * this._zoom + padding * this._zoom;
 
-    this.render({ parts: ["toolbar"] });
+    this._requestCanvasRender();
+    this._updateZoomDisplay();
   }
 
   static #onZoomReset(event, target) {
     this._zoom = 1;
     this._pan = { x: 0, y: 0 };
-    this.render({ parts: ["toolbar"] });
+    this._requestCanvasRender();
+    this._updateZoomDisplay();
   }
 
   static async #onValidate(event, target) {
