@@ -629,7 +629,32 @@
       "HandlerNotFound": "Dialogue handler not available",
       "ExportSuccess": "Dialogue exported",
       "ImportSuccess": "Dialogue imported",
-      "ImportError": "Failed to import dialogue"
+      "ImportError": "Failed to import dialogue",
+
+      "BrowseDialogues": "Browse Dialogues",
+      "DialogueNamePlaceholder": "Enter dialogue name...",
+      "DialogueDescriptionPlaceholder": "Optional description...",
+      "DialogueId": "Dialogue ID",
+      "NodeCount": "Node count",
+      "CreateNew": "Create New",
+      "OpenSelected": "Open Selected",
+      "DeleteDialogue": "Delete Dialogue",
+      "DeleteDialogueConfirm": "Are you sure you want to delete '{name}'? This cannot be undone.",
+      "DialogueDeleted": "Dialogue deleted",
+      "NoDialoguesSaved": "No Dialogues Saved",
+      "NoDialoguesHint": "Create a new dialogue to get started.",
+      "UnnamedDialogue": "Unnamed Dialogue",
+      "NewDialogueConfirm": "Create a new dialogue? Any unsaved changes will be lost.",
+      "DialogueDescription": "Description",
+      "SpeechText": "Speech Text",
+      "SpeechTextPlaceholder": "What the NPC says...",
+      "Prompt": "Prompt",
+      "PromptPlaceholder": "Optional prompt for the player...",
+      "CheckText": "Check Description",
+      "OfferText": "Offer Text",
+      "TurnInText": "Turn-in Text",
+      "ShopText": "Shop Text",
+      "Quest": "Quest"
     },
 
     "Faction": {

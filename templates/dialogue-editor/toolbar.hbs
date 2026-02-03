@@ -1,6 +1,12 @@
 {{!-- Dialogue Editor Toolbar --}}
 <header class="dialogue-editor-toolbar {{theme}}">
   <div class="toolbar-section file-actions">
+    <button type="button" class="toolbar-btn" data-action="browseDialogues" data-tooltip="{{localize 'BOBSNPC.DialogueEditor.BrowseDialogues'}}">
+      <i class="fa-solid fa-folder-open"></i>
+    </button>
+    <button type="button" class="toolbar-btn" data-action="newDialogue" data-tooltip="{{localize 'BOBSNPC.DialogueEditor.NewDialogue'}}">
+      <i class="fa-solid fa-file-circle-plus"></i>
+    </button>
     <button type="button" class="toolbar-btn" data-action="save" data-tooltip="{{localize 'BOBSNPC.DialogueEditor.Save'}} (Ctrl+S)">
       <i class="fa-solid fa-save"></i>
     </button>

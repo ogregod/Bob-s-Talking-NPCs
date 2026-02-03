@@ -1186,3 +1186,208 @@
 .node-panel-content {
   padding-top: 4px;
 }
+
+/* ==================== Dialogue Info Section ==================== */
+
+.dialogue-info {
+  background: var(--bobsnpc-bg-tertiary);
+  border-bottom: 2px solid var(--bobsnpc-accent);
+}
+
+.dialogue-info .form-group {
+  margin-bottom: 8px;
+}
+
+.dialogue-info input,
+.dialogue-info textarea {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--bobsnpc-border);
+  border-radius: 4px;
+  background: var(--bobsnpc-bg-primary);
+  color: var(--bobsnpc-text);
+  font-size: 12px;
+}
+
+.dialogue-info input:focus,
+.dialogue-info textarea:focus {
+  border-color: var(--bobsnpc-accent);
+  outline: none;
+}
+
+.dialogue-info textarea {
+  resize: vertical;
+  min-height: 40px;
+}
+
+.dialogue-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--bobsnpc-text-muted);
+}
+
+.dialogue-meta .meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dialogue-meta .meta-item i {
+  opacity: 0.7;
+}
+
+/* ==================== Dialogue Browser ==================== */
+
+.dialogue-browser-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px;
+  background: var(--bobsnpc-bg-primary);
+}
+
+.browser-toolbar {
+  margin-bottom: 12px;
+}
+
+.browser-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--bobsnpc-border);
+  border-radius: 4px;
+  background: var(--bobsnpc-bg-secondary);
+  color: var(--bobsnpc-text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.browser-btn:hover:not(:disabled) {
+  background: var(--bobsnpc-bg-tertiary);
+  border-color: var(--bobsnpc-accent);
+}
+
+.browser-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.browser-btn.primary {
+  background: var(--bobsnpc-accent);
+  border-color: var(--bobsnpc-accent);
+  color: white;
+}
+
+.browser-btn.primary:hover {
+  background: var(--bobsnpc-accent-hover);
+}
+
+.dialogue-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dialogue-item {
+  padding: 12px;
+  background: var(--bobsnpc-bg-secondary);
+  border: 1px solid var(--bobsnpc-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dialogue-item:hover {
+  background: var(--bobsnpc-bg-tertiary);
+  border-color: var(--bobsnpc-text-muted);
+}
+
+.dialogue-item.selected {
+  border-color: var(--bobsnpc-accent);
+  background: rgba(var(--bobsnpc-accent-rgb), 0.1);
+}
+
+.dialogue-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.dialogue-name {
+  font-weight: 600;
+  color: var(--bobsnpc-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dialogue-name i {
+  color: var(--bobsnpc-accent);
+}
+
+.dialogue-description {
+  font-size: 11px;
+  color: var(--bobsnpc-text-muted);
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.dialogue-item .dialogue-meta {
+  font-size: 10px;
+}
+
+.delete-btn {
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: var(--bobsnpc-text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.delete-btn:hover {
+  background: var(--bobsnpc-danger);
+  color: white;
+}
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--bobsnpc-text-muted);
+}
+
+.empty-state i {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.3;
+}
+
+.empty-state h4 {
+  margin: 0 0 8px 0;
+  color: var(--bobsnpc-text);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 12px;
+}
+
+.browser-footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--bobsnpc-border);
+  display: flex;
+  justify-content: flex-end;
+}

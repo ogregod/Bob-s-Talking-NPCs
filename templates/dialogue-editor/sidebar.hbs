@@ -1,5 +1,32 @@
 {{!-- Dialogue Editor Sidebar --}}
 <aside class="dialogue-editor-sidebar {{theme}}">
+  {{!-- Dialogue Info Section --}}
+  <section class="sidebar-section dialogue-info">
+    <h3>
+      <i class="fa-solid fa-comments"></i>
+      {{localize "BOBSNPC.DialogueEditor.DialogueInfo"}}
+    </h3>
+    <div class="form-group">
+      <label>{{localize "BOBSNPC.DialogueEditor.DialogueName"}}</label>
+      <input type="text" name="dialogue.name" value="{{dialogue.name}}"
+             placeholder="{{localize 'BOBSNPC.DialogueEditor.DialogueNamePlaceholder'}}" />
+    </div>
+    <div class="form-group">
+      <label>{{localize "BOBSNPC.DialogueEditor.DialogueDescription"}}</label>
+      <textarea name="dialogue.description" rows="2" placeholder="{{localize 'BOBSNPC.DialogueEditor.DialogueDescriptionPlaceholder'}}">{{dialogue.description}}</textarea>
+    </div>
+    <div class="dialogue-meta">
+      <span class="meta-item" data-tooltip="{{localize 'BOBSNPC.DialogueEditor.DialogueId'}}">
+        <i class="fa-solid fa-fingerprint"></i>
+        {{truncate dialogue.id 8}}
+      </span>
+      <span class="meta-item" data-tooltip="{{localize 'BOBSNPC.DialogueEditor.NodeCount'}}">
+        <i class="fa-solid fa-project-diagram"></i>
+        {{nodeCount}} {{localize "BOBSNPC.DialogueEditor.Nodes"}}
+      </span>
+    </div>
+  </section>
+
   {{!-- Quick Add Section --}}
   <section class="sidebar-section quick-add">
     <h3>

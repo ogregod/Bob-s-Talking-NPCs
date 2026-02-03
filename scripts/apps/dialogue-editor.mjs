@@ -120,7 +120,9 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       save: DialogueEditor.#onSave,
       saveAndClose: DialogueEditor.#onSaveAndClose,
       exportDialogue: DialogueEditor.#onExport,
-      importDialogue: DialogueEditor.#onImport
+      importDialogue: DialogueEditor.#onImport,
+      browseDialogues: DialogueEditor.#onBrowseDialogues,
+      newDialogue: DialogueEditor.#onNewDialogue
     }
   };
 
@@ -204,6 +206,57 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       if (!this._animationFrameId) {
         this._startRenderLoop();
       }
+    }
+
+    // Setup form input handlers for dialogue properties
+    this._setupFormHandlers();
+  }
+
+  /**
+   * Setup form input handlers
+   * @private
+   */
+  _setupFormHandlers() {
+    // Dialogue name
+    const nameInput = this.element.querySelector('input[name="dialogue.name"]');
+    if (nameInput) {
+      nameInput.addEventListener("change", (e) => {
+        this._dialogue.name = e.target.value || localize("DialogueEditor.NewDialogue");
+        // Update window title
+        this.setWindowTitle(this.title);
+      });
+    }
+
+    // Dialogue description
+    const descInput = this.element.querySelector('textarea[name="dialogue.description"]');
+    if (descInput) {
+      descInput.addEventListener("change", (e) => {
+        this._dialogue.description = e.target.value || "";
+      });
+    }
+
+    // Node label (in sidebar)
+    const nodeLabelInput = this.element.querySelector('input[name="node.label"]');
+    if (nodeLabelInput && this._selectedNodeId) {
+      nodeLabelInput.addEventListener("change", (e) => {
+        const node = this._dialogue.nodes[this._selectedNodeId];
+        if (node) {
+          node.label = e.target.value;
+          this._needsRender = true;
+        }
+      });
+    }
+
+    // Node text (in sidebar)
+    const nodeTextInput = this.element.querySelector('textarea[name="node.text"]');
+    if (nodeTextInput && this._selectedNodeId) {
+      nodeTextInput.addEventListener("change", (e) => {
+        const node = this._dialogue.nodes[this._selectedNodeId];
+        if (node) {
+          node.text = e.target.value;
+          this._needsRender = true;
+        }
+      });
     }
   }
 
@@ -1535,6 +1588,46 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     };
 
     input.click();
+  }
+
+  static async #onBrowseDialogues(event, target) {
+    const { DialogueBrowser } = await import("./dialogue-browser.mjs");
+    const browser = new DialogueBrowser({
+      callback: (dialogue) => {
+        if (dialogue) {
+          // Load selected dialogue
+          this._dialogue = foundry.utils.deepClone(dialogue);
+          this._isNewDialogue = false;
+          this._selectedNodeId = null;
+          this._zoom = this._dialogue.editorZoom || 1;
+          this._pan = { ...this._dialogue.editorPan } || { x: 0, y: 0 };
+          this.render();
+        }
+      }
+    });
+    browser.render(true);
+  }
+
+  static async #onNewDialogue(event, target) {
+    // Ask for confirmation if current dialogue has unsaved changes
+    const confirmed = await Dialog.confirm({
+      title: localize("DialogueEditor.NewDialogue"),
+      content: `<p>${localize("DialogueEditor.NewDialogueConfirm")}</p>`,
+      yes: () => true,
+      no: () => false,
+      defaultYes: false
+    });
+
+    if (confirmed) {
+      this._dialogue = createDialogue({ name: localize("DialogueEditor.NewDialogue") });
+      this._isNewDialogue = true;
+      this._selectedNodeId = null;
+      this._zoom = 1;
+      this._pan = { x: 0, y: 0 };
+      this._undoStack = [];
+      this._redoStack = [];
+      this.render();
+    }
   }
 
   /**

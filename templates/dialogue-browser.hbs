@@ -1,0 +1,58 @@
+{{!-- Dialogue Browser --}}
+<div class="dialogue-browser-content {{theme}}">
+  <div class="browser-toolbar">
+    <button type="button" class="browser-btn primary" data-action="createNew">
+      <i class="fa-solid fa-plus"></i>
+      {{localize "BOBSNPC.DialogueEditor.CreateNew"}}
+    </button>
+  </div>
+
+  {{#if hasDialogues}}
+  <div class="dialogue-list">
+    {{#each dialogues}}
+    <div class="dialogue-item {{#if this.selected}}selected{{/if}}"
+         data-dialogue-id="{{this.id}}"
+         data-action="selectDialogue">
+      <div class="dialogue-item-header">
+        <span class="dialogue-name">
+          <i class="fa-solid fa-comments"></i>
+          {{this.name}}
+        </span>
+        <button type="button" class="delete-btn" data-action="deleteDialogue"
+                data-tooltip="{{localize 'BOBSNPC.DialogueEditor.DeleteDialogue'}}">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      {{#if this.description}}
+      <p class="dialogue-description">{{this.description}}</p>
+      {{/if}}
+      <div class="dialogue-meta">
+        <span class="meta-item">
+          <i class="fa-solid fa-project-diagram"></i>
+          {{this.nodeCount}} {{localize "BOBSNPC.DialogueEditor.Nodes"}}
+        </span>
+        {{#if this.updatedAt}}
+        <span class="meta-item">
+          <i class="fa-solid fa-clock"></i>
+          {{this.updatedAt}}
+        </span>
+        {{/if}}
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  {{else}}
+  <div class="empty-state">
+    <i class="fa-solid fa-folder-open"></i>
+    <h4>{{localize "BOBSNPC.DialogueEditor.NoDialoguesSaved"}}</h4>
+    <p>{{localize "BOBSNPC.DialogueEditor.NoDialoguesHint"}}</p>
+  </div>
+  {{/if}}
+
+  <div class="browser-footer">
+    <button type="button" class="browser-btn" data-action="openDialogue" {{#unless selectedId}}disabled{{/unless}}>
+      <i class="fa-solid fa-folder-open"></i>
+      {{localize "BOBSNPC.DialogueEditor.OpenSelected"}}
+    </button>
+  </div>
+</div>
