@@ -549,7 +549,7 @@ export function createDialogue(data = {}) {
     expectedScenes: data.expectedScenes || [],  // Scene UUIDs where this NPC should be
 
     // Nodes map
-    nodes: {},
+    nodes: data.nodes || {},
 
     // Metadata
     createdAt: data.createdAt || Date.now(),
