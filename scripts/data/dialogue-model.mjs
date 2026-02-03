@@ -8,6 +8,18 @@ const MODULE_ID = "bobs-talking-npcs";
 import { generateId } from "../utils/helpers.mjs";
 
 /**
+ * Ensure a value is an array (handles Foundry form data converting arrays to objects)
+ * @param {*} value - Value that should be an array
+ * @returns {Array}
+ */
+function ensureArray(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'object') return Object.values(value);
+  return [];
+}
+
+/**
  * Dialogue node types enum
  */
 export const NodeType = Object.freeze({
@@ -580,7 +592,7 @@ export function removeNode(dialogue, nodeId) {
   Object.values(dialogue.nodes).forEach(node => {
     // Clean up responses
     if (node.responses) {
-      node.responses = node.responses.filter(r => r.nextNodeId !== nodeId);
+      node.responses = ensureArray(node.responses).filter(r => r.nextNodeId !== nodeId);
     }
 
     // Clean up direct references
@@ -601,7 +613,7 @@ export function removeNode(dialogue, nodeId) {
 
     // Clean up branch references
     if (node.branches) {
-      node.branches = node.branches.filter(b => b.nextNodeId !== nodeId);
+      node.branches = ensureArray(node.branches).filter(b => b.nextNodeId !== nodeId);
     }
   });
 
@@ -638,7 +650,7 @@ export function connectNodes(dialogue, fromNodeId, toNodeId, connectionType = "n
         ...options,
         nextNodeId: toNodeId
       });
-      fromNode.responses = fromNode.responses || [];
+      fromNode.responses = ensureArray(fromNode.responses);
       fromNode.responses.push(response);
       break;
     case "success":
@@ -659,7 +671,7 @@ export function connectNodes(dialogue, fromNodeId, toNodeId, connectionType = "n
       fromNode.defaultNodeId = toNodeId;
       break;
     case "branch":
-      fromNode.branches = fromNode.branches || [];
+      fromNode.branches = ensureArray(fromNode.branches);
       fromNode.branches.push({
         id: generateId(),
         conditions: options.conditions || [],
@@ -708,17 +720,13 @@ export function validateDialogue(dialogue) {
     if (node.defaultNodeId) referencedNodes.add(node.defaultNodeId);
     if (node.incompleteNodeId) referencedNodes.add(node.incompleteNodeId);
 
-    if (node.responses) {
-      node.responses.forEach(r => {
-        if (r.nextNodeId) referencedNodes.add(r.nextNodeId);
-      });
-    }
+    ensureArray(node.responses).forEach(r => {
+      if (r.nextNodeId) referencedNodes.add(r.nextNodeId);
+    });
 
-    if (node.branches) {
-      node.branches.forEach(b => {
-        if (b.nextNodeId) referencedNodes.add(b.nextNodeId);
-      });
-    }
+    ensureArray(node.branches).forEach(b => {
+      if (b.nextNodeId) referencedNodes.add(b.nextNodeId);
+    });
 
     if (node.skillCheck) {
       if (node.skillCheck.successNodeId) referencedNodes.add(node.skillCheck.successNodeId);

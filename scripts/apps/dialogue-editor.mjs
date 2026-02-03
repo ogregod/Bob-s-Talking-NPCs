@@ -22,6 +22,21 @@ function getDialogueHandler() {
   return game.bobsnpc?.handlers?.dialogue;
 }
 
+/**
+ * Ensure a value is an array (handles Foundry form data converting arrays to objects)
+ * @param {*} value - Value that should be an array
+ * @returns {Array}
+ */
+function ensureArray(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  // Handle object with numeric keys (common Foundry form issue)
+  if (typeof value === 'object') {
+    return Object.values(value);
+  }
+  return [];
+}
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 /**
@@ -848,7 +863,8 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   async _createNodeAtPosition(worldPos, nodeType = NodeType.NPC_SPEECH) {
     this._saveUndoState();
 
-    const node = addNode(this._dialogue, {
+    // Build node data with type-specific defaults
+    const nodeData = {
       type: nodeType,
       position: {
         x: Math.round(worldPos.x / 20) * 20,
@@ -856,8 +872,21 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       },
       label: this._getNodeTypeLabel(nodeType),
       text: ""
-    });
+    };
 
+    // Add default responses for node types that need output sockets
+    if (nodeType === NodeType.PLAYER_CHOICE) {
+      nodeData.responses = [
+        { text: localize("DialogueEditor.DefaultChoice1") },
+        { text: localize("DialogueEditor.DefaultChoice2") }
+      ];
+    } else if (nodeType === NodeType.NPC_SPEECH) {
+      nodeData.responses = [
+        { text: localize("DialogueEditor.DefaultResponse") }
+      ];
+    }
+
+    const node = addNode(this._dialogue, nodeData);
     this._selectNode(node.id);
   }
 
@@ -1039,7 +1068,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       case NodeType.NPC_SPEECH:
         return [{ connectionType: "response", color: "#2ecc71", label: "" }];
       case NodeType.PLAYER_CHOICE:
-        return (node.responses || []).map((r, i) => ({
+        return ensureArray(node.responses).map((r, i) => ({
           connectionType: "response",
           color: "#9b59b6",
           label: `R${i + 1}`,
@@ -1061,7 +1090,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
           { connectionType: "failure", color: "#f39c12", label: "Incomplete" }
         ];
       case NodeType.BRANCH:
-        const branches = (node.branches || []).map((b, i) => ({
+        const branches = ensureArray(node.branches).map((b, i) => ({
           connectionType: "branch",
           color: "#95a5a6",
           label: `B${i + 1}`,
@@ -1083,12 +1112,12 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   _getNodeOutputsWithTargets(node) {
     switch (node.type) {
       case NodeType.NPC_SPEECH:
-        return (node.responses || []).map(r => ({
+        return ensureArray(node.responses).map(r => ({
           targetId: r.nextNodeId,
           color: "#2ecc71"
         }));
       case NodeType.PLAYER_CHOICE:
-        return (node.responses || []).map(r => ({
+        return ensureArray(node.responses).map(r => ({
           targetId: r.nextNodeId,
           color: "#9b59b6"
         }));
@@ -1108,7 +1137,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
           { targetId: node.incompleteNodeId, color: "#f39c12" }
         ];
       case NodeType.BRANCH:
-        const outputs = (node.branches || []).map(b => ({
+        const outputs = ensureArray(node.branches).map(b => ({
           targetId: b.nextNodeId,
           color: "#95a5a6"
         }));
@@ -1132,7 +1161,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       case NodeType.END:
         return node.text || localize("DialogueEditor.NoText");
       case NodeType.PLAYER_CHOICE:
-        const count = (node.responses || []).length;
+        const count = ensureArray(node.responses).length;
         return `${count} ${localize("DialogueEditor.Responses")}`;
       case NodeType.QUEST_OFFER:
       case NodeType.QUEST_TURNIN:

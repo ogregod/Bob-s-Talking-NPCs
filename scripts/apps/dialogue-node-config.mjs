@@ -21,6 +21,21 @@ import {
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 /**
+ * Ensure a value is an array (handles Foundry form data converting arrays to objects)
+ * @param {*} value - Value that should be an array
+ * @returns {Array}
+ */
+function ensureArray(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  // Handle object with numeric keys (common Foundry form issue)
+  if (typeof value === 'object') {
+    return Object.values(value);
+  }
+  return [];
+}
+
+/**
  * Dialogue Node Configuration Dialog
  * Allows detailed editing of a single dialogue node
  */
@@ -220,11 +235,11 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
    * @private
    */
   _prepareResponsesDisplay() {
-    return (this._node.responses || []).map((response, index) => ({
+    return ensureArray(this._node.responses).map((response, index) => ({
       ...response,
       index,
-      conditionsCount: response.conditions?.length || 0,
-      effectsCount: response.effects?.length || 0,
+      conditionsCount: ensureArray(response.conditions).length,
+      effectsCount: ensureArray(response.effects).length,
       hasSkillCheck: !!response.skillCheck
     }));
   }
@@ -234,7 +249,7 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
    * @private
    */
   _prepareConditionsDisplay(conditions) {
-    return (conditions || []).map((condition, index) => ({
+    return ensureArray(conditions).map((condition, index) => ({
       ...condition,
       index,
       typeLabel: localize(`DialogueEditor.ConditionType.${Object.keys(ConditionType).find(k => ConditionType[k] === condition.type)}`)
@@ -246,7 +261,7 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
    * @private
    */
   _prepareEffectsDisplay(effects) {
-    return (effects || []).map((effect, index) => ({
+    return ensureArray(effects).map((effect, index) => ({
       ...effect,
       index,
       typeLabel: localize(`DialogueEditor.EffectType.${Object.keys(EffectType).find(k => EffectType[k] === effect.type)}`)
@@ -258,7 +273,7 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
    * @private
    */
   _prepareBranchesDisplay() {
-    return (this._node.branches || []).map((branch, index) => ({
+    return ensureArray(this._node.branches).map((branch, index) => ({
       ...branch,
       index,
       conditionsCount: branch.conditions?.length || 0,
