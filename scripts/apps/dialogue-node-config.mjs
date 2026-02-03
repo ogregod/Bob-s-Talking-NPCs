@@ -311,9 +311,8 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
   }
 
   static #onAddResponse(event, target) {
-    if (!this._node.responses) {
-      this._node.responses = [];
-    }
+    // Ensure responses is an array (Foundry form data can convert arrays to objects)
+    this._node.responses = ensureArray(this._node.responses);
 
     this._node.responses.push(createResponse({
       text: localize("DialogueEditor.NewResponse"),
@@ -325,6 +324,7 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
 
   static #onRemoveResponse(event, target) {
     const index = parseInt(target.dataset.index);
+    this._node.responses = ensureArray(this._node.responses);
     this._node.responses.splice(index, 1);
     this.render({ parts: ["responses"] });
   }
@@ -333,12 +333,14 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
     const index = parseInt(target.dataset.index);
     if (index <= 0) return;
 
+    this._node.responses = ensureArray(this._node.responses);
     const responses = this._node.responses;
     [responses[index - 1], responses[index]] = [responses[index], responses[index - 1]];
     this.render({ parts: ["responses"] });
   }
 
   static #onMoveResponseDown(event, target) {
+    this._node.responses = ensureArray(this._node.responses);
     const index = parseInt(target.dataset.index);
     if (index >= this._node.responses.length - 1) return;
 
@@ -351,16 +353,13 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
     const targetType = target.dataset.target || "node";
 
     if (targetType === "node") {
-      if (!this._node.conditions) {
-        this._node.conditions = [];
-      }
+      this._node.conditions = ensureArray(this._node.conditions);
       this._node.conditions.push(createCondition({ type: ConditionType.FLAG }));
     } else if (targetType === "response") {
+      this._node.responses = ensureArray(this._node.responses);
       const responseIndex = parseInt(target.dataset.responseIndex);
       const response = this._node.responses[responseIndex];
-      if (!response.conditions) {
-        response.conditions = [];
-      }
+      response.conditions = ensureArray(response.conditions);
       response.conditions.push(createCondition({ type: ConditionType.FLAG }));
     }
 
@@ -372,10 +371,14 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
     const index = parseInt(target.dataset.index);
 
     if (targetType === "node") {
+      this._node.conditions = ensureArray(this._node.conditions);
       this._node.conditions.splice(index, 1);
     } else if (targetType === "response") {
+      this._node.responses = ensureArray(this._node.responses);
       const responseIndex = parseInt(target.dataset.responseIndex);
-      this._node.responses[responseIndex].conditions.splice(index, 1);
+      const response = this._node.responses[responseIndex];
+      response.conditions = ensureArray(response.conditions);
+      response.conditions.splice(index, 1);
     }
 
     this.render({ parts: ["conditions", "responses"] });
@@ -385,16 +388,13 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
     const targetType = target.dataset.target || "node";
 
     if (targetType === "node") {
-      if (!this._node.effects) {
-        this._node.effects = [];
-      }
+      this._node.effects = ensureArray(this._node.effects);
       this._node.effects.push(createEffect({ type: EffectType.SET_FLAG }));
     } else if (targetType === "response") {
+      this._node.responses = ensureArray(this._node.responses);
       const responseIndex = parseInt(target.dataset.responseIndex);
       const response = this._node.responses[responseIndex];
-      if (!response.effects) {
-        response.effects = [];
-      }
+      response.effects = ensureArray(response.effects);
       response.effects.push(createEffect({ type: EffectType.SET_FLAG }));
     }
 
@@ -406,19 +406,21 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
     const index = parseInt(target.dataset.index);
 
     if (targetType === "node") {
+      this._node.effects = ensureArray(this._node.effects);
       this._node.effects.splice(index, 1);
     } else if (targetType === "response") {
+      this._node.responses = ensureArray(this._node.responses);
       const responseIndex = parseInt(target.dataset.responseIndex);
-      this._node.responses[responseIndex].effects.splice(index, 1);
+      const response = this._node.responses[responseIndex];
+      response.effects = ensureArray(response.effects);
+      response.effects.splice(index, 1);
     }
 
     this.render({ parts: ["effects", "responses"] });
   }
 
   static #onAddBranch(event, target) {
-    if (!this._node.branches) {
-      this._node.branches = [];
-    }
+    this._node.branches = ensureArray(this._node.branches);
 
     this._node.branches.push({
       id: foundry.utils.randomID(),
@@ -431,6 +433,7 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
   }
 
   static #onRemoveBranch(event, target) {
+    this._node.branches = ensureArray(this._node.branches);
     const index = parseInt(target.dataset.index);
     this._node.branches.splice(index, 1);
     this.render();
