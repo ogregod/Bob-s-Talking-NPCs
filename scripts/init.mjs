@@ -247,6 +247,14 @@ function registerHandlebarsHelpers() {
     return obj[key];
   });
 
+  // Truncate helper - truncate string to a specified length
+  Handlebars.registerHelper("truncate", function(str, length) {
+    if (typeof str !== "string") return "";
+    if (typeof length !== "number") length = 20;
+    if (str.length <= length) return str;
+    return str.substring(0, length) + "...";
+  });
+
   console.log(`${MODULE_ID} | Handlebars helpers registered`);
 }
 
