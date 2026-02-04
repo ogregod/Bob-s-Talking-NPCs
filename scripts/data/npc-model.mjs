@@ -83,10 +83,21 @@ export function createScheduleEntry(data = {}) {
 
 /**
  * Create NPC roles configuration
- * @param {object} data - Roles data
+ * Supports both object format {merchant: true} and array format ["merchant"]
+ * @param {object|Array} data - Roles data
  * @returns {object}
  */
 export function createRoles(data = {}) {
+  // Handle array format (from NPC Config app)
+  if (Array.isArray(data)) {
+    const roles = {};
+    for (const role of Object.values(NPCRole)) {
+      roles[role] = data.includes(role);
+    }
+    return roles;
+  }
+
+  // Handle object format
   return {
     [NPCRole.QUEST_GIVER]: data[NPCRole.QUEST_GIVER] ?? false,
     [NPCRole.QUEST_TURNIN]: data[NPCRole.QUEST_TURNIN] ?? false,
@@ -157,13 +168,18 @@ export function createVoiceConfig(data = {}) {
 
 /**
  * Create schedule configuration
+ * Supports both 'availability' and 'entries' array formats
  * @param {object} data - Schedule data
  * @returns {object}
  */
 export function createScheduleConfig(data = {}) {
+  // Support both 'entries' (NPC Config app) and 'availability' (model) formats
+  const scheduleEntries = data.entries || data.availability || [];
+
   return {
     enabled: data.enabled ?? false,
-    availability: (data.availability || []).map(a => createScheduleEntry(a)),
+    entries: scheduleEntries,  // Preserve as 'entries' for NPC Config app compatibility
+    availability: scheduleEntries.map(a => createScheduleEntry(a)),  // Also keep 'availability' for backward compatibility
     unavailableDialogueId: data.unavailableDialogueId || null,
     unavailableMessage: data.unavailableMessage || "I'm not available right now."
   };
@@ -180,15 +196,20 @@ export function createNPCConfig(data = {}) {
     // Module enabled for this NPC
     enabled: data.enabled ?? false,
 
-    // NPC Roles
+    // NPC Roles (supports both array and object format)
     roles: createRoles(data.roles || {}),
+
+    // Primary role (from NPC Config app)
+    primaryRole: data.primaryRole || null,
 
     // Faction membership
     factions: data.factions || [],  // Array of faction IDs
     factionRanks: data.factionRanks || {},  // {factionId: rankId}
 
-    // Dialogue
-    dialogueId: data.dialogueId || null,
+    // Dialogue - support both formats
+    dialogueId: data.dialogueId || data.defaultDialogue || null,  // Primary dialogue
+    dialogues: data.dialogues || [],  // Array of all assigned dialogue IDs
+    defaultDialogue: data.defaultDialogue || data.dialogueId || null,  // Alias for dialogueId
     greetingOverrides: data.greetingOverrides || {},  // {condition: dialogueNodeId}
 
     // Merchant config (if role enabled)
@@ -197,15 +218,25 @@ export function createNPCConfig(data = {}) {
     // Bank config (if role enabled)
     bank: data.bank || null,  // Bank model data
 
-    // Services (if roles enabled)
-    services: {
-      training: data.services?.training || null,
-      enchanting: data.services?.enchanting || null,
-      transportation: data.services?.transportation || null,
-      information: data.services?.information || null,
-      inn: data.services?.inn || null,
-      repair: data.services?.repair || null
-    },
+    // Services - preserve all service configs from input
+    services: data.services ? {
+      // NPC Config app format
+      merchant: data.services.merchant || null,
+      questGiver: data.services.questGiver || null,
+      banker: data.services.banker || null,
+      trainer: data.services.trainer || null,
+      innkeeper: data.services.innkeeper || null,
+      stablemaster: data.services.stablemaster || null,
+      blacksmith: data.services.blacksmith || null,
+      fence: data.services.fence || null,
+      // Legacy format
+      training: data.services.training || null,
+      enchanting: data.services.enchanting || null,
+      transportation: data.services.transportation || null,
+      information: data.services.information || null,
+      inn: data.services.inn || null,
+      repair: data.services.repair || null
+    } : null,
 
     // Hirelings available (if recruiter)
     hirelings: data.hirelings || [],  // Actor UUIDs
@@ -224,7 +255,7 @@ export function createNPCConfig(data = {}) {
     // Haggling (overrides world settings)
     haggling: data.haggling ? createHagglingConfig(data.haggling) : null,
 
-    // Portrait
+    // Portrait (legacy format)
     portrait: createPortraitConfig(data.portrait || {}),
 
     // Voice
@@ -234,7 +265,25 @@ export function createNPCConfig(data = {}) {
     indicatorIcon: data.indicatorIcon || null,
     indicatorColor: data.indicatorColor || null,
 
-    // Behavior
+    // Appearance (NPC Config app format) - preserve full structure
+    appearance: data.appearance || {
+      portrait: null,
+      indicator: "none",
+      customIndicator: null,
+      nameDisplay: "always",
+      titleDisplay: true
+    },
+
+    // Behavior (NPC Config app format) - preserve full structure
+    behavior: data.behavior || {
+      interactionRange: 1,
+      greetOnApproach: false,
+      greetingDialogue: null,
+      requireLineOfSight: true,
+      cooldownBetweenInteractions: 0
+    },
+
+    // Legacy behavior fields
     canBeAttacked: data.canBeAttacked ?? true,
     essential: data.essential ?? false,  // Cannot be killed
     respawns: data.respawns ?? false,
@@ -248,7 +297,15 @@ export function createNPCConfig(data = {}) {
     // Notes (GM only)
     gmNotes: data.gmNotes || "",
 
-    // Metadata
+    // Metadata (NPC Config app format) - preserve full structure
+    metadata: data.metadata || {
+      notes: "",
+      tags: [],
+      lastModified: null,
+      modifiedBy: null
+    },
+
+    // Legacy metadata
     configuredAt: data.configuredAt || Date.now(),
     configuredBy: data.configuredBy || null
   };
@@ -256,11 +313,19 @@ export function createNPCConfig(data = {}) {
 
 /**
  * Get active roles for an NPC
+ * Supports both array and object formats for roles
  * @param {object} config - NPC config
  * @returns {string[]} Array of active role keys
  */
 export function getActiveRoles(config) {
   if (!config?.roles) return [];
+
+  // Handle array format
+  if (Array.isArray(config.roles)) {
+    return [...config.roles];
+  }
+
+  // Handle object format
   return Object.entries(config.roles)
     .filter(([_, enabled]) => enabled)
     .map(([role]) => role);
@@ -268,12 +333,21 @@ export function getActiveRoles(config) {
 
 /**
  * Check if NPC has a specific role
+ * Supports both array and object formats for roles
  * @param {object} config - NPC config
  * @param {string} role - Role to check
  * @returns {boolean}
  */
 export function hasRole(config, role) {
-  return config?.roles?.[role] ?? false;
+  if (!config?.roles) return false;
+
+  // Handle array format
+  if (Array.isArray(config.roles)) {
+    return config.roles.includes(role);
+  }
+
+  // Handle object format
+  return config.roles[role] ?? false;
 }
 
 /**
@@ -388,18 +462,19 @@ export function validateNPCConfig(config) {
   const errors = [];
   const warnings = [];
 
-  // Check for dialogue if enabled
-  if (config.enabled && !config.dialogueId) {
+  // Check for dialogue if enabled (support both dialogueId and defaultDialogue)
+  const hasDialogue = config.dialogueId || config.defaultDialogue || (config.dialogues?.length > 0);
+  if (config.enabled && !hasDialogue) {
     warnings.push("No dialogue configured - NPC won't have conversations");
   }
 
   // Check merchant config if role enabled
-  if (hasRole(config, NPCRole.MERCHANT) && !config.merchant) {
+  if (hasRole(config, NPCRole.MERCHANT) && !config.merchant && !config.services?.merchant?.enabled) {
     warnings.push("Merchant role enabled but no merchant config set");
   }
 
   // Check bank config if role enabled
-  if (hasRole(config, NPCRole.BANKER) && !config.bank) {
+  if (hasRole(config, NPCRole.BANKER) && !config.bank && !config.services?.banker?.enabled) {
     warnings.push("Banker role enabled but no bank config set");
   }
 
@@ -408,14 +483,17 @@ export function validateNPCConfig(config) {
     warnings.push("Faction representative role enabled but no factions assigned");
   }
 
-  // Check schedule validity
+  // Check schedule validity (support both 'entries' and 'availability')
   if (config.schedule?.enabled) {
-    for (const entry of config.schedule.availability || []) {
-      if (entry.from < 0 || entry.from > 23) {
-        errors.push(`Invalid schedule start hour: ${entry.from}`);
+    const scheduleEntries = config.schedule.entries || config.schedule.availability || [];
+    for (const entry of scheduleEntries) {
+      const startHour = entry.from ?? entry.startTime;
+      const endHour = entry.to ?? entry.endTime;
+      if (startHour !== undefined && (startHour < 0 || startHour > 23)) {
+        errors.push(`Invalid schedule start hour: ${startHour}`);
       }
-      if (entry.to < 0 || entry.to > 23) {
-        errors.push(`Invalid schedule end hour: ${entry.to}`);
+      if (endHour !== undefined && (endHour < 0 || endHour > 23)) {
+        errors.push(`Invalid schedule end hour: ${endHour}`);
       }
     }
   }
