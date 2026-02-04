@@ -72,20 +72,44 @@ export class BobsNPCAPI {
     }
 
     const config = actor.getFlag(MODULE_ID, "config");
-    if (!config?.dialogueId) {
+    const dialogueId = config?.defaultDialogue;
+    if (!dialogueId) {
       console.warn(`${MODULE_ID} | No dialogue configured for ${actor.name}`);
+      ui.notifications.warn(`${actor.name} has no dialogue assigned.`);
       return false;
     }
+
+    // Get the dialogue handler and start the dialogue
+    const dialogueHandler = this.handlers?.dialogue;
+    if (!dialogueHandler) {
+      console.error(`${MODULE_ID} | Dialogue handler not available`);
+      return false;
+    }
+
+    // Get the dialogue data
+    const dialogue = dialogueHandler.getDialogue(dialogueId);
+    if (!dialogue) {
+      console.error(`${MODULE_ID} | Dialogue not found: ${dialogueId}`);
+      ui.notifications.error(`Dialogue "${dialogueId}" not found.`);
+      return false;
+    }
+
+    // Open the dialogue window
+    const { DialogueWindow } = await import("./apps/dialogue-window.mjs");
+    const dialogueWindow = new DialogueWindow({
+      npcActorUuid: actorUuid,
+      playerActorUuid: game.user.character?.uuid,
+      dialogueId: dialogueId
+    });
+    await dialogueWindow.render(true);
 
     // Emit dialogue start event
     emit(SocketEvents.DIALOGUE_START, {
       npcUuid: actorUuid,
-      nodeId: options.startNodeId || config.startNodeId,
+      dialogueId,
+      nodeId: options.startNodeId || dialogue.startNodeId,
       participants: options.participants || [game.user.character?.uuid].filter(Boolean)
     });
-
-    // Open dialogue window - to be implemented
-    Hooks.call(`${MODULE_ID}.openDialogueWindow`, { actorUuid, config });
 
     return true;
   }

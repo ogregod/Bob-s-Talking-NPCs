@@ -7,9 +7,10 @@
 
 /* ApplicationV2 renders parts inside .window-content */
 .dialogue-editor .window-content {
+  --sidebar-width: 300px;
   display: grid;
   grid-template-rows: auto 1fr;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: var(--sidebar-width) 1fr;
   grid-template-areas:
     "toolbar toolbar"
     "sidebar canvas";
@@ -162,7 +163,7 @@
   font-size: 12px;
 }
 
-/* ==================== Sidebar (Left Panel - 300px) ==================== */
+/* ==================== Sidebar (Left Panel - Resizable) ==================== */
 
 .dialogue-editor-sidebar {
   grid-area: sidebar;
@@ -173,7 +174,57 @@
   overflow: hidden;
   min-height: 0;
   width: 300px;
-  min-width: 300px;
+  min-width: 200px;
+  max-width: 600px;
+  position: relative;
+}
+
+/* Sidebar Resize Handle */
+.sidebar-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -4px;
+  width: 8px;
+  height: 100%;
+  cursor: ew-resize;
+  background: transparent;
+  z-index: 100;
+  transition: background 0.15s ease;
+}
+
+.sidebar-resize-handle:hover,
+.sidebar-resize-handle.dragging {
+  background: var(--bobsnpc-accent);
+}
+
+.sidebar-resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 40px;
+  background: var(--bobsnpc-border);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.sidebar-resize-handle:hover::after,
+.sidebar-resize-handle.dragging::after {
+  opacity: 1;
+  background: white;
+}
+
+/* When resizing, prevent text selection */
+.dialogue-editor.resizing-sidebar {
+  user-select: none;
+  cursor: ew-resize;
+}
+
+.dialogue-editor.resizing-sidebar * {
+  cursor: ew-resize !important;
 }
 
 .dialogue-editor-node-panel {

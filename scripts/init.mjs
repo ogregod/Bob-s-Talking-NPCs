@@ -25,12 +25,14 @@ import { NPCHandler } from "./handlers/npc-handler.mjs";
 const handlers = {};
 
 /**
- * State for double-click detection on tokens
+ * State for right-click dialogue triggering
  */
 const tokenClickState = {
-  lastClickTime: 0,
-  lastClickedToken: null,
-  doubleClickThreshold: 300 // milliseconds
+  rightClickTimeout: null,
+  rightClickToken: null,
+  rightClickDelay: 400, // milliseconds - delay before triggering dialogue
+  lastRightClickTime: 0,
+  doubleRightClickThreshold: 300 // milliseconds - to detect double-right-click (targeting)
 };
 
 /**
@@ -335,11 +337,12 @@ export function getHandler(name) {
  * Register token interaction hooks
  */
 function registerTokenHooks() {
-  // Double-click detection on tokens
+  // Right-click dialogue triggering on tokens
   Hooks.on("canvasReady", () => {
     if (!canvas?.stage) return;
 
-    canvas.stage.on("pointerdown", handleCanvasClick);
+    canvas.stage.on("rightdown", handleCanvasRightClick);
+    canvas.stage.on("rightup", handleCanvasRightUp);
   });
 
   // Token HUD integration for NPC indicators
@@ -358,33 +361,59 @@ function registerTokenHooks() {
 }
 
 /**
- * Handle canvas click events for double-click detection
+ * Handle canvas right-click down event
  * @param {PIXI.InteractionEvent} event
  */
-function handleCanvasClick(event) {
-  // Find if a token was clicked
+function handleCanvasRightClick(event) {
+  // Find if a token was right-clicked
   const token = getTokenAtPoint(event.data.global);
   if (!token) {
-    tokenClickState.lastClickedToken = null;
+    cancelRightClickDialogue();
     return;
   }
 
   const now = Date.now();
-  const timeSinceLastClick = now - tokenClickState.lastClickTime;
+  const timeSinceLastRightClick = now - tokenClickState.lastRightClickTime;
 
-  // Check for double-click
+  // Check if this is a double-right-click (targeting) - cancel dialogue trigger
   if (
-    token === tokenClickState.lastClickedToken &&
-    timeSinceLastClick < tokenClickState.doubleClickThreshold
+    token === tokenClickState.rightClickToken &&
+    timeSinceLastRightClick < tokenClickState.doubleRightClickThreshold
   ) {
-    // Double-click detected!
-    handleTokenDoubleClick(token);
-    tokenClickState.lastClickedToken = null;
-    tokenClickState.lastClickTime = 0;
-  } else {
-    // Single click - record for potential double-click
-    tokenClickState.lastClickedToken = token;
-    tokenClickState.lastClickTime = now;
+    // Double-right-click detected - this is targeting, cancel any pending dialogue
+    cancelRightClickDialogue();
+    tokenClickState.lastRightClickTime = 0;
+    return;
+  }
+
+  // Record this right-click
+  tokenClickState.lastRightClickTime = now;
+  tokenClickState.rightClickToken = token;
+
+  // Start a delayed trigger for dialogue
+  // If the user releases quickly and doesn't double-right-click, dialogue will trigger
+  cancelRightClickDialogue(); // Cancel any existing timeout
+  tokenClickState.rightClickTimeout = setTimeout(() => {
+    handleTokenRightClickDialogue(token);
+  }, tokenClickState.rightClickDelay);
+}
+
+/**
+ * Handle canvas right-click up event
+ * @param {PIXI.InteractionEvent} event
+ */
+function handleCanvasRightUp(event) {
+  // Right-click released - the timeout will handle the dialogue trigger
+  // We don't cancel here because we want the delay to complete
+}
+
+/**
+ * Cancel pending right-click dialogue trigger
+ */
+function cancelRightClickDialogue() {
+  if (tokenClickState.rightClickTimeout) {
+    clearTimeout(tokenClickState.rightClickTimeout);
+    tokenClickState.rightClickTimeout = null;
   }
 }
 
@@ -406,31 +435,80 @@ function getTokenAtPoint(point) {
 }
 
 /**
- * Handle double-click on a token
- * @param {Token} token
+ * Handle right-click dialogue trigger on a token
+ * @param {Token} npcToken - The NPC token that was right-clicked
  */
-function handleTokenDoubleClick(token) {
+function handleTokenRightClickDialogue(npcToken) {
+  // Clear the timeout reference
+  tokenClickState.rightClickTimeout = null;
+
   // Check if this is an NPC with module configuration
-  const actor = token.actor;
+  const actor = npcToken.actor;
   if (!actor) return;
 
   const npcConfig = actor.getFlag(MODULE_ID, "config");
   if (!npcConfig?.enabled) return;
 
-  // Emit hook for dialogue initiation
-  Hooks.call(`${MODULE_ID}.npcInteraction`, {
-    token,
-    actor,
-    config: npcConfig,
-    initiator: game.user
-  });
+  // Check if there's no dialogue configured
+  if (!npcConfig.defaultDialogue) return;
 
-  // Start dialogue if the NPC has one configured
-  if (npcConfig.dialogueId) {
-    game.bobsnpc?.startDialogue(actor.uuid);
+  // Get the player's character token
+  const playerActor = game.user.character;
+  if (!playerActor) {
+    ui.notifications.warn(game.i18n.localize("BOBSNPC.Errors.NoActorSelected"));
+    return;
   }
 
+  // Find the player's token on the canvas
+  const playerToken = canvas.tokens.placeables.find(t => t.actor?.uuid === playerActor.uuid);
+  if (!playerToken) {
+    ui.notifications.warn(game.i18n.localize("BOBSNPC.Errors.NotOnScene"));
+    return;
+  }
+
+  // Check proximity - get interaction range from NPC config or use default
+  const interactionRange = npcConfig.behavior?.interactionRange ?? 2; // Default 2 squares
+  const distance = getTokenDistance(playerToken, npcToken);
+
+  if (distance > interactionRange) {
+    const msg = game.i18n.format("BOBSNPC.Errors.TooFarToTalk", { npc: actor.name });
+    ui.notifications.warn(msg);
+    return;
+  }
+
+  // Emit hook for dialogue initiation
+  Hooks.call(`${MODULE_ID}.npcInteraction`, {
+    token: npcToken,
+    actor,
+    config: npcConfig,
+    initiator: game.user,
+    playerToken
+  });
+
+  // Start dialogue
+  game.bobsnpc?.startDialogue(actor.uuid);
   console.log(`${MODULE_ID} | NPC interaction triggered for ${actor.name}`);
+}
+
+/**
+ * Calculate distance between two tokens in grid squares
+ * @param {Token} token1
+ * @param {Token} token2
+ * @returns {number} Distance in grid squares
+ */
+function getTokenDistance(token1, token2) {
+  // Get the center points of the tokens
+  const t1Center = token1.center;
+  const t2Center = token2.center;
+
+  // Calculate pixel distance
+  const dx = t1Center.x - t2Center.x;
+  const dy = t1Center.y - t2Center.y;
+  const pixelDistance = Math.sqrt(dx * dx + dy * dy);
+
+  // Convert to grid squares
+  const gridSize = canvas.grid.size;
+  return pixelDistance / gridSize;
 }
 
 /**

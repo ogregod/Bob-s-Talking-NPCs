@@ -155,7 +155,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
     const nodeTypes = Object.entries(NodeType).map(([key, value]) => ({
       value,
-      label: localize(`DialogueEditor.NodeType.${key}`),
+      label: localize(`DialogueEditor.NodeTypes.${key}`),
       icon: this._getNodeTypeIcon(value)
     }));
 
@@ -210,6 +210,9 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Setup form input handlers for dialogue properties
     this._setupFormHandlers();
+
+    // Setup sidebar resize handler
+    this._setupSidebarResize();
   }
 
   /**
@@ -258,6 +261,60 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
         }
       });
     }
+  }
+
+  /**
+   * Setup sidebar resize functionality
+   * @private
+   */
+  _setupSidebarResize() {
+    const resizeHandle = this.element.querySelector('.sidebar-resize-handle');
+    const sidebar = this.element.querySelector('.dialogue-editor-sidebar');
+    const windowContent = this.element.querySelector('.window-content');
+
+    if (!resizeHandle || !sidebar || !windowContent) return;
+
+    let isResizing = false;
+    let startX = 0;
+    let startWidth = 0;
+
+    const onMouseDown = (e) => {
+      isResizing = true;
+      startX = e.clientX;
+      startWidth = sidebar.offsetWidth;
+
+      resizeHandle.classList.add('dragging');
+      this.element.classList.add('resizing-sidebar');
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+
+      e.preventDefault();
+    };
+
+    const onMouseMove = (e) => {
+      if (!isResizing) return;
+
+      const deltaX = e.clientX - startX;
+      const newWidth = Math.min(600, Math.max(200, startWidth + deltaX));
+
+      windowContent.style.setProperty('--sidebar-width', `${newWidth}px`);
+      sidebar.style.width = `${newWidth}px`;
+
+      // Resize canvas to fit new space
+      this._resizeCanvas();
+    };
+
+    const onMouseUp = () => {
+      isResizing = false;
+      resizeHandle.classList.remove('dragging');
+      this.element.classList.remove('resizing-sidebar');
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    resizeHandle.addEventListener('mousedown', onMouseDown);
   }
 
   /** @override */
@@ -1109,7 +1166,7 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   _getNodeTypeLabel(type) {
     const key = Object.entries(NodeType).find(([k, v]) => v === type)?.[0];
-    return localize(`DialogueEditor.NodeType.${key}`) || type;
+    return localize(`DialogueEditor.NodeTypes.${key}`) || type;
   }
 
   /**

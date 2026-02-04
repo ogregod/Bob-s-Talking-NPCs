@@ -1882,7 +1882,9 @@
       "InvalidTarget": "Invalid target",
       "ActionFailed": "Action failed",
       "GMOnly": "This feature is only available to Game Masters",
-      "NoActorSelected": "No actor selected"
+      "NoActorSelected": "No actor selected",
+      "TooFarToTalk": "You are too far from {npc} to talk. Move closer!",
+      "NotOnScene": "Your character is not on this scene."
     },
 
     "Keybindings": {
