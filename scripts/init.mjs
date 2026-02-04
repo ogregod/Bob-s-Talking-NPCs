@@ -498,14 +498,24 @@ function cancelRightClickDialogue() {
 
 /**
  * Get token at a given screen point
- * @param {PIXI.Point} point
+ * @param {PIXI.Point} screenPoint - Screen coordinates from PIXI event
  * @returns {Token|null}
  */
-function getTokenAtPoint(point) {
+function getTokenAtPoint(screenPoint) {
   const tokens = canvas.tokens?.placeables || [];
 
+  // Convert screen coordinates to canvas world coordinates
+  const canvasPoint = canvas.stage.toLocal(screenPoint);
+
   for (const token of tokens) {
-    if (token.visible && token.bounds.contains(point.x, point.y)) {
+    if (!token.visible) continue;
+
+    // Check if point is within token bounds
+    const bounds = token.bounds;
+    if (canvasPoint.x >= bounds.x &&
+        canvasPoint.x <= bounds.x + bounds.width &&
+        canvasPoint.y >= bounds.y &&
+        canvasPoint.y <= bounds.y + bounds.height) {
       return token;
     }
   }
