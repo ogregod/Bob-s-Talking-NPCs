@@ -343,12 +343,31 @@ function registerTokenHooks() {
 
     canvas.stage.on("rightdown", handleCanvasRightClick);
     canvas.stage.on("rightup", handleCanvasRightUp);
+
+    // Refresh all token indicators when canvas is ready
+    refreshAllTokenIndicators();
   });
 
   // Token HUD integration for NPC indicators
   Hooks.on("renderTokenHUD", (hud, html, data) => {
     if (!getSetting("npcIndicators")) return;
     addTokenIndicators(hud, html, data);
+  });
+
+  // Add persistent indicators when tokens are drawn/refreshed
+  Hooks.on("refreshToken", (token) => {
+    if (!getSetting("npcIndicators")) return;
+    addPersistentTokenIndicator(token);
+  });
+
+  // Also handle token creation
+  Hooks.on("createToken", (tokenDoc) => {
+    if (!getSetting("npcIndicators")) return;
+    // Small delay to ensure token is fully rendered
+    setTimeout(() => {
+      const token = canvas.tokens?.get(tokenDoc.id);
+      if (token) addPersistentTokenIndicator(token);
+    }, 100);
   });
 
   // Token control for selection tracking
@@ -358,6 +377,66 @@ function registerTokenHooks() {
       Hooks.call(`${MODULE_ID}.tokenSelected`, token);
     }
   });
+}
+
+/**
+ * Refresh indicators for all tokens on the canvas
+ */
+function refreshAllTokenIndicators() {
+  if (!canvas?.tokens?.placeables) return;
+  for (const token of canvas.tokens.placeables) {
+    addPersistentTokenIndicator(token);
+  }
+}
+
+/**
+ * Add persistent indicator to a token (shows even without HUD)
+ * @param {Token} token - The token object
+ */
+function addPersistentTokenIndicator(token) {
+  if (!token?.actor) return;
+
+  // Remove existing indicator if present
+  const existingIndicator = token.children?.find(c => c.name === "bobsnpc-indicator");
+  if (existingIndicator) {
+    token.removeChild(existingIndicator);
+  }
+
+  const npcConfig = token.actor.getFlag(MODULE_ID, "config");
+  if (!npcConfig?.enabled) return;
+
+  // Check if NPC has dialogue configured
+  const hasDialogue = npcConfig.defaultDialogue || npcConfig.dialogueId || (npcConfig.dialogues?.length > 0);
+  if (!hasDialogue) return;
+
+  // Create indicator container
+  const indicator = new PIXI.Container();
+  indicator.name = "bobsnpc-indicator";
+
+  // Position above token
+  const tokenSize = Math.max(token.w, token.h);
+  indicator.position.set(tokenSize / 2, -10);
+
+  // Create chat bubble background
+  const bg = new PIXI.Graphics();
+  bg.beginFill(0x4fc3f7, 0.9);
+  bg.drawCircle(0, 0, 12);
+  bg.endFill();
+  // Add border
+  bg.lineStyle(2, 0xffffff, 0.8);
+  bg.drawCircle(0, 0, 12);
+  indicator.addChild(bg);
+
+  // Create icon using text (emoji as fallback)
+  const icon = new PIXI.Text("💬", {
+    fontSize: 12,
+    fill: 0xffffff
+  });
+  icon.anchor.set(0.5);
+  icon.position.set(0, 1);
+  indicator.addChild(icon);
+
+  token.addChild(indicator);
 }
 
 /**
@@ -449,8 +528,9 @@ function handleTokenRightClickDialogue(npcToken) {
   const npcConfig = actor.getFlag(MODULE_ID, "config");
   if (!npcConfig?.enabled) return;
 
-  // Check if there's no dialogue configured
-  if (!npcConfig.defaultDialogue) return;
+  // Check if there's a dialogue configured (support multiple formats)
+  const dialogueId = npcConfig.defaultDialogue || npcConfig.dialogueId || (npcConfig.dialogues?.[0]);
+  if (!dialogueId) return;
 
   // Get the player's character token
   const playerActor = game.user.character;
@@ -512,6 +592,22 @@ function getTokenDistance(token1, token2) {
 }
 
 /**
+ * Check if NPC has a specific role (supports both array and object formats)
+ * @param {object} config - NPC config
+ * @param {string} role - Role to check
+ * @returns {boolean}
+ */
+function checkNPCRole(config, role) {
+  if (!config?.roles) return false;
+  // Handle array format
+  if (Array.isArray(config.roles)) {
+    return config.roles.includes(role);
+  }
+  // Handle object format
+  return config.roles[role] ?? false;
+}
+
+/**
  * Add role indicators to token HUD
  * @param {TokenHUD} hud
  * @param {jQuery} html
@@ -525,28 +621,104 @@ function addTokenIndicators(hud, html, data) {
   const npcConfig = actor.getFlag(MODULE_ID, "config");
   if (!npcConfig?.enabled) return;
 
-  // Determine which indicators to show based on roles
+  // Determine which indicators to show based on roles and config
   const indicators = [];
 
-  if (npcConfig.roles?.questGiver) {
-    // Check if NPC has available quests
+  // Check for dialogue (chat bubble)
+  const hasDialogue = npcConfig.defaultDialogue || npcConfig.dialogueId || (npcConfig.dialogues?.length > 0);
+  if (hasDialogue) {
+    indicators.push({
+      icon: "fa-comment",
+      class: "bobsnpc-indicator-dialogue",
+      title: game.i18n.localize("BOBSNPC.NPC.HasDialogue"),
+      color: "#4fc3f7"
+    });
+  }
+
+  // Check roles using helper function
+  if (checkNPCRole(npcConfig, "questGiver")) {
     indicators.push({
       icon: "fa-exclamation",
       class: "bobsnpc-indicator-quest",
-      title: game.i18n.localize("BOBSNPC.NPC.Roles.QuestGiver")
+      title: game.i18n.localize("BOBSNPC.NPC.Roles.QuestGiver"),
+      color: "#ffd700"
     });
   }
 
-  if (npcConfig.roles?.merchant) {
+  if (checkNPCRole(npcConfig, "merchant")) {
     indicators.push({
       icon: "fa-coins",
       class: "bobsnpc-indicator-merchant",
-      title: game.i18n.localize("BOBSNPC.NPC.Roles.Merchant")
+      title: game.i18n.localize("BOBSNPC.NPC.Roles.Merchant"),
+      color: "#ff9800"
     });
   }
 
-  // Add indicators to HUD (implementation depends on desired visual style)
-  // This is a placeholder - full implementation would add DOM elements
+  if (checkNPCRole(npcConfig, "banker")) {
+    indicators.push({
+      icon: "fa-landmark",
+      class: "bobsnpc-indicator-banker",
+      title: game.i18n.localize("BOBSNPC.NPC.Roles.Banker"),
+      color: "#4caf50"
+    });
+  }
+
+  if (checkNPCRole(npcConfig, "innkeeper")) {
+    indicators.push({
+      icon: "fa-bed",
+      class: "bobsnpc-indicator-innkeeper",
+      title: game.i18n.localize("BOBSNPC.NPC.Roles.Innkeeper"),
+      color: "#795548"
+    });
+  }
+
+  if (checkNPCRole(npcConfig, "trainer")) {
+    indicators.push({
+      icon: "fa-graduation-cap",
+      class: "bobsnpc-indicator-trainer",
+      title: game.i18n.localize("BOBSNPC.NPC.Roles.Trainer"),
+      color: "#2196f3"
+    });
+  }
+
+  // Don't add anything if no indicators
+  if (indicators.length === 0) return;
+
+  // Create indicator container
+  const indicatorContainer = document.createElement("div");
+  indicatorContainer.className = "bobsnpc-hud-indicators";
+  indicatorContainer.style.cssText = `
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    z-index: 100;
+  `;
+
+  // Add each indicator
+  for (const indicator of indicators) {
+    const indicatorEl = document.createElement("div");
+    indicatorEl.className = `bobsnpc-hud-indicator ${indicator.class}`;
+    indicatorEl.title = indicator.title;
+    indicatorEl.style.cssText = `
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: ${indicator.color || "#607d8b"};
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      cursor: pointer;
+    `;
+    indicatorEl.innerHTML = `<i class="fa-solid ${indicator.icon}" style="color: white; font-size: 12px;"></i>`;
+    indicatorContainer.appendChild(indicatorEl);
+  }
+
+  // Append to HUD
+  html[0].appendChild(indicatorContainer);
 }
 
 /**
