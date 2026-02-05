@@ -128,14 +128,16 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     if (!this._session) {
+      console.log(`${MODULE_ID} | Starting dialogue session with dialogueId: "${this.dialogueId}"`);
       const result = await getDialogueHandler().startDialogue(
         this.dialogueId,
         this.npcActorUuid,
-        this.playerActorUuid
+        [this.playerActorUuid] // Pass as array since handler expects participantUuids
       );
+      console.log(`${MODULE_ID} | startDialogue result:`, result);
       this._session = result?.session;
-      this.sessionId = result?.sessionId;
-      this._currentNode = result?.currentNode;
+      this.sessionId = result?.session?.id;
+      this._currentNode = result?.node; // Handler returns 'node', not 'currentNode'
     } else {
       this._currentNode = this._session.currentNode;
     }
