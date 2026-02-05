@@ -383,6 +383,15 @@ function registerWorldSettings() {
     type: Array,
     default: []
   });
+
+  // Shops data storage
+  game.settings.register(MODULE_ID, "shops", {
+    name: "Shops",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {}
+  });
 }
 
 /**

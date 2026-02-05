@@ -1052,7 +1052,19 @@
       "SaveError": "Failed to save shop",
       "Created": "Shop created successfully",
       "ItemAdded": "Item added to inventory",
-      "ItemRemoved": "Item removed from inventory"
+      "ItemRemoved": "Item removed from inventory",
+      "NameRequired": "Shop name is required",
+      "OnlyItemsAllowed": "Only items can be added to shop inventory",
+      "ItemNotFound": "Item not found",
+      "ItemAlreadyInInventory": "Item is already in inventory",
+      "NoItemCompendiums": "No item compendiums found",
+      "SelectCompendium": "Select Compendium",
+      "Open": "Open",
+      "NoNPCsFound": "No NPCs found in this world",
+      "SelectNPC": "Select NPC",
+      "None": "None",
+      "LinkNPC": "Link NPC to Shop",
+      "Link": "Link"
     },
 
     "Bank": {

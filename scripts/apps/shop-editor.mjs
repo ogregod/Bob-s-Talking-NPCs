@@ -110,15 +110,88 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   async _preFirstRender(context, options) {
     await super._preFirstRender(context, options);
 
-    // Load shop data
+    // Load shop data or create default
     if (this.shopId) {
-      this._shop = getMerchantHandler().getMerchant(this.shopId);
+      const handler = getMerchantHandler();
+      this._shop = handler?.getMerchant(this.shopId);
       if (!this._shop) {
         throw new Error(`Shop not found: ${this.shopId}`);
       }
       // Create a working copy
       this._shop = foundry.utils.deepClone(this._shop);
+    } else {
+      // Create new shop with defaults
+      this._shop = this._createDefaultShop();
     }
+  }
+
+  /**
+   * Create a default shop structure
+   * @returns {object}
+   */
+  _createDefaultShop() {
+    return {
+      id: generateId(),
+      name: "",
+      description: "",
+      type: ShopType.GENERAL,
+      icon: "icons/svg/chest.svg",
+      color: "#7b68ee",
+      bannerImage: null,
+      npcActorUuid: null,
+      inventory: [],
+      pricing: {
+        buyMultiplier: 1.0,
+        sellMultiplier: 0.5,
+        useCharisma: false,
+        charismaMultiplier: 0.02,
+        displayMode: PriceDisplayMode.GOLD_DOWN
+      },
+      haggling: {
+        enabled: false,
+        skill: "persuasion",
+        baseDC: 15,
+        maxDiscount: 20,
+        discountPerPoint: 2,
+        attemptsPerVisit: 3,
+        cooldownHours: 24,
+        failurePenalty: 10,
+        critFailEffect: "none"
+      },
+      stockRefresh: {
+        type: StockRefreshType.NEVER,
+        customIntervalDays: 7,
+        randomizeStock: false,
+        variationPercent: 20
+      },
+      services: {
+        identify: { enabled: false, basePrice: 25, scaleByRarity: true },
+        repair: { enabled: false, pricePercent: 10 },
+        appraise: { enabled: false, price: 5 },
+        enchant: { enabled: false, priceMultiplier: 1.0 }
+      },
+      access: {
+        minLevel: 0,
+        maxLevel: 0,
+        requiredFaction: null,
+        minReputation: 0,
+        requiredRank: null,
+        requiredQuests: [],
+        operatingHours: { enabled: false, openHour: 8, closeHour: 20 }
+      },
+      buyBack: {
+        enabled: false,
+        duration: "session",
+        penalty: 0.1
+      },
+      currencyDrawer: {
+        enabled: false,
+        maxGold: 1000,
+        refreshType: "daily"
+      },
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
   }
 
   /** @override */
@@ -408,14 +481,39 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
    * @param {HTMLElement} target
    */
   static async #onSave(event, target) {
+    // Validate shop name
+    if (!this._shop.name?.trim()) {
+      ui.notifications.error(localize("ShopEditor.NameRequired"));
+      return;
+    }
+
     // Update timestamp
     this._shop.updatedAt = Date.now();
 
     // Save to handler
     const handler = getMerchantHandler();
-    await handler.updateMerchant(this.shopId, this._shop);
 
-    ui.notifications.info(localize("ShopEditor.Saved", { name: this._shop.name }));
+    if (this.shopId) {
+      // Update existing shop
+      if (handler?.updateMerchant) {
+        await handler.updateMerchant(this.shopId, this._shop);
+      } else {
+        // Fallback: save to world settings
+        await this._saveShopToSettings(this._shop);
+      }
+      ui.notifications.info(localize("ShopEditor.Saved", { name: this._shop.name }));
+    } else {
+      // Create new shop
+      if (handler?.createMerchant) {
+        await handler.createMerchant(this._shop);
+      } else {
+        // Fallback: save to world settings
+        await this._saveShopToSettings(this._shop);
+      }
+      // Set shopId now that it's saved
+      this.shopId = this._shop.id;
+      ui.notifications.info(localize("ShopEditor.Created", { name: this._shop.name }));
+    }
 
     // Refresh shop manager if open
     const manager = Object.values(ui.windows).find(w => w.constructor.name === "ShopManager");
@@ -424,6 +522,16 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     await this.close();
+  }
+
+  /**
+   * Save shop to world settings (fallback when handler not available)
+   * @param {object} shop - Shop data
+   */
+  async _saveShopToSettings(shop) {
+    const shops = game.settings.get(MODULE_ID, "shops") || {};
+    shops[shop.id] = shop;
+    await game.settings.set(MODULE_ID, "shops", shops);
   }
 
   /**
