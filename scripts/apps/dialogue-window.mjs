@@ -171,6 +171,11 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const speakerType = this._currentNode?.speaker || "npc";
     const speakerName = speakerType === "npc" ? (this._npcActor?.name || localize("NPC.Unknown")) : (this._playerActor?.name || game.user.name);
 
+    // Debug logging
+    console.log(`${MODULE_ID} | _prepareContext - currentNode:`, this._currentNode);
+    console.log(`${MODULE_ID} | _prepareContext - dialogueText: "${dialogueText}"`);
+    console.log(`${MODULE_ID} | _prepareContext - responses:`, responses);
+
     // Format responses with availability defaulting to true
     const formattedResponses = availableResponses.map((r, i) => ({
       ...r,
