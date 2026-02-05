@@ -469,6 +469,12 @@ export class DialogueHandler {
         case "voteSubmitted":
           this._onRemoteVoteSubmitted(data.data);
           break;
+        case "recordVisit":
+          // Only GM should handle this
+          if (game.user.isGM) {
+            await this._recordVisit(data.data.npcActorUuid, data.data.playerActorUuid);
+          }
+          break;
       }
     });
   }
@@ -1067,17 +1073,28 @@ export class DialogueHandler {
    * @private
    */
   async _recordVisit(npcActorUuid, playerActorUuid) {
+    // Only GM can update NPC actor flags
+    if (!game.user.isGM) {
+      // Request GM to record the visit via socket
+      this._emitSocket("recordVisit", { npcActorUuid, playerActorUuid });
+      return;
+    }
+
     const actor = await fromUuid(npcActorUuid);
     if (!actor) return;
 
-    const config = getFlag(actor, "config") || {};
-    config.visitCount = config.visitCount || {};
-    config.lastVisit = config.lastVisit || {};
+    try {
+      const config = getFlag(actor, "config") || {};
+      config.visitCount = config.visitCount || {};
+      config.lastVisit = config.lastVisit || {};
 
-    config.visitCount[playerActorUuid] = (config.visitCount[playerActorUuid] || 0) + 1;
-    config.lastVisit[playerActorUuid] = Date.now();
+      config.visitCount[playerActorUuid] = (config.visitCount[playerActorUuid] || 0) + 1;
+      config.lastVisit[playerActorUuid] = Date.now();
 
-    await setFlag(actor, "config", config);
+      await setFlag(actor, "config", config);
+    } catch (error) {
+      console.warn(`${MODULE_ID} | Could not record visit:`, error.message);
+    }
   }
 
   /**
