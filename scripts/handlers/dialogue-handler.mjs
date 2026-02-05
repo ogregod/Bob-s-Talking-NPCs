@@ -764,7 +764,13 @@ export class DialogueHandler {
       return { success: false, node: null, message: localize("BOBSNPC.NodeNotFound") };
     }
 
-    const response = currentNode.responses.find(r => r.id === responseId);
+    // Handle responses as array or object map
+    let response;
+    if (Array.isArray(currentNode.responses)) {
+      response = currentNode.responses.find(r => r.id === responseId);
+    } else if (currentNode.responses && typeof currentNode.responses === "object") {
+      response = currentNode.responses[responseId];
+    }
     if (!response) {
       return { success: false, node: null, message: localize("BOBSNPC.ResponseNotFound") };
     }

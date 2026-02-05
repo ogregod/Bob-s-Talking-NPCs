@@ -174,8 +174,11 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const portrait = this._getPortrait(npcConfig);
     const theme = game.settings.get(MODULE_ID, "theme") || "dark";
 
-    // Get available responses
-    const responses = this._currentNode?.responses || [];
+    // Get available responses (handle array or object map)
+    let responses = this._currentNode?.responses || [];
+    if (!Array.isArray(responses) && typeof responses === "object") {
+      responses = Object.values(responses);
+    }
     const availableResponses = await this._filterAvailableResponses(responses);
 
     // Get available services if at a service node
@@ -384,14 +387,24 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
   /**
    * Filter responses based on conditions
-   * @param {object[]} responses - All responses
+   * @param {object[]|object} responses - All responses (array or object map)
    * @returns {object[]} Available responses
    * @private
    */
   async _filterAvailableResponses(responses) {
     const available = [];
 
-    for (const response of responses) {
+    // Normalize responses to array if it's an object map
+    let responseArray = responses;
+    if (!Array.isArray(responses)) {
+      if (responses && typeof responses === "object") {
+        responseArray = Object.values(responses);
+      } else {
+        responseArray = [];
+      }
+    }
+
+    for (const response of responseArray) {
       if (response.conditions?.length > 0) {
         const conditionsMet = await getDialogueHandler().evaluateConditions(
           response.conditions,
