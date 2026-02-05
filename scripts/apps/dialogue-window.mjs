@@ -149,7 +149,7 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     return {
       ...context,
       npc: {
-        name: this._npcActor.name,
+        name: this._npcActor?.name || localize("NPC.Unknown"),
         portrait,
         uuid: this.npcActorUuid
       },
@@ -588,13 +588,20 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
    * @private
    */
   _getPortrait(config) {
+    const defaultPortrait = "icons/svg/mystery-man.svg";
+
+    // Handle case where actor isn't loaded yet
+    if (!this._npcActor) {
+      return defaultPortrait;
+    }
+
     if (config?.portrait?.source === "custom" && config.portrait.customPath) {
       return config.portrait.customPath;
     }
     if (config?.portrait?.source === "token") {
-      return this._npcActor.prototypeToken?.texture?.src || this._npcActor.img;
+      return this._npcActor.prototypeToken?.texture?.src || this._npcActor.img || defaultPortrait;
     }
-    return this._npcActor.img;
+    return this._npcActor.img || defaultPortrait;
   }
 
   /**

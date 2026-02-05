@@ -346,6 +346,9 @@ function registerTokenHooks() {
 
     // Refresh all token indicators when canvas is ready
     refreshAllTokenIndicators();
+
+    // Also register right-click on individual tokens
+    registerTokenRightClickHandlers();
   });
 
   // Token HUD integration for NPC indicators
@@ -358,6 +361,8 @@ function registerTokenHooks() {
   Hooks.on("refreshToken", (token) => {
     if (!getSetting("npcIndicators")) return;
     addPersistentTokenIndicator(token);
+    // Also ensure right-click handler is attached
+    attachTokenRightClickHandler(token);
   });
 
   // Also handle token creation
@@ -366,7 +371,10 @@ function registerTokenHooks() {
     // Small delay to ensure token is fully rendered
     setTimeout(() => {
       const token = canvas.tokens?.get(tokenDoc.id);
-      if (token) addPersistentTokenIndicator(token);
+      if (token) {
+        addPersistentTokenIndicator(token);
+        attachTokenRightClickHandler(token);
+      }
     }, 100);
   });
 
@@ -376,6 +384,69 @@ function registerTokenHooks() {
       // Track selected token for potential interactions
       Hooks.call(`${MODULE_ID}.tokenSelected`, token);
     }
+  });
+}
+
+/**
+ * Register right-click handlers on all existing tokens
+ */
+function registerTokenRightClickHandlers() {
+  if (!canvas?.tokens?.placeables) return;
+  for (const token of canvas.tokens.placeables) {
+    attachTokenRightClickHandler(token);
+  }
+}
+
+/**
+ * Attach right-click handler to a specific token
+ * @param {Token} token - The token to attach handler to
+ */
+function attachTokenRightClickHandler(token) {
+  if (!token || token._bobsnpcRightClickHandler) return;
+
+  // Mark that we've attached the handler
+  token._bobsnpcRightClickHandler = true;
+
+  // Make token interactive if it isn't already
+  if (token.eventMode !== "static" && token.eventMode !== "dynamic") {
+    token.eventMode = "static";
+  }
+
+  // Listen for right-click on the token directly
+  token.on("rightdown", (event) => {
+    console.log(`${MODULE_ID} | Token rightdown event on ${token.name}`);
+
+    const actor = token.actor;
+    if (!actor) return;
+
+    const npcConfig = actor.getFlag(MODULE_ID, "config");
+    if (!npcConfig?.enabled) return;
+
+    const hasDialogue = npcConfig.defaultDialogue || npcConfig.dialogueId || (npcConfig.dialogues?.length > 0);
+    if (!hasDialogue) return;
+
+    // Check for double-click (targeting)
+    const now = Date.now();
+    const timeSinceLastRightClick = now - tokenClickState.lastRightClickTime;
+
+    if (
+      token === tokenClickState.rightClickToken &&
+      timeSinceLastRightClick < tokenClickState.doubleRightClickThreshold
+    ) {
+      console.log(`${MODULE_ID} | Double right-click on token, cancelling dialogue`);
+      cancelRightClickDialogue();
+      tokenClickState.lastRightClickTime = 0;
+      return;
+    }
+
+    tokenClickState.lastRightClickTime = now;
+    tokenClickState.rightClickToken = token;
+
+    cancelRightClickDialogue();
+    console.log(`${MODULE_ID} | Starting dialogue timer for ${token.name}`);
+    tokenClickState.rightClickTimeout = setTimeout(() => {
+      handleTokenRightClickDialogue(token);
+    }, tokenClickState.rightClickDelay);
   });
 }
 
@@ -413,6 +484,10 @@ function addPersistentTokenIndicator(token) {
   const indicator = new PIXI.Container();
   indicator.name = "bobsnpc-indicator";
 
+  // Make the indicator interactive so it can receive click events
+  indicator.eventMode = "static";
+  indicator.cursor = "pointer";
+
   // Position above token
   const tokenSize = Math.max(token.w, token.h);
   indicator.position.set(tokenSize / 2, -10);
@@ -436,7 +511,69 @@ function addPersistentTokenIndicator(token) {
   icon.position.set(0, 1);
   indicator.addChild(icon);
 
+  // Add hit area for the indicator (circle with radius 12)
+  indicator.hitArea = new PIXI.Circle(0, 0, 14);
+
+  // Add click handler to trigger dialogue
+  indicator.on("pointerdown", (event) => {
+    console.log(`${MODULE_ID} | Chat bubble clicked for ${token.actor?.name}`);
+    event.stopPropagation();
+    handleIndicatorClick(token);
+  });
+
   token.addChild(indicator);
+}
+
+/**
+ * Handle click on the chat bubble indicator
+ * @param {Token} token - The token whose indicator was clicked
+ */
+function handleIndicatorClick(token) {
+  const actor = token?.actor;
+  if (!actor) return;
+
+  const npcConfig = actor.getFlag(MODULE_ID, "config");
+  if (!npcConfig?.enabled) return;
+
+  // Check if there's a dialogue configured
+  const dialogueId = npcConfig.defaultDialogue || npcConfig.dialogueId || (npcConfig.dialogues?.[0]);
+  if (!dialogueId) return;
+
+  // Get the player's character
+  const playerActor = game.user.character;
+  if (!playerActor) {
+    ui.notifications.warn(game.i18n.localize("BOBSNPC.Errors.NoActorSelected"));
+    return;
+  }
+
+  // Find the player's token on the canvas
+  const playerToken = canvas.tokens.placeables.find(t => t.actor?.uuid === playerActor.uuid);
+  if (!playerToken) {
+    ui.notifications.warn(game.i18n.localize("BOBSNPC.Errors.NotOnScene"));
+    return;
+  }
+
+  // Check proximity
+  const interactionRange = npcConfig.behavior?.interactionRange ?? 2;
+  const distance = getTokenDistance(playerToken, token);
+
+  if (distance > interactionRange) {
+    const msg = game.i18n.format("BOBSNPC.Errors.TooFarToTalk", { npc: actor.name });
+    ui.notifications.warn(msg);
+    return;
+  }
+
+  // Emit hook and start dialogue
+  Hooks.call(`${MODULE_ID}.npcInteraction`, {
+    token,
+    actor,
+    config: npcConfig,
+    initiator: game.user,
+    playerToken
+  });
+
+  game.bobsnpc?.startDialogue(actor.uuid);
+  console.log(`${MODULE_ID} | NPC interaction triggered via indicator for ${actor.name}`);
 }
 
 /**
@@ -444,9 +581,45 @@ function addPersistentTokenIndicator(token) {
  * @param {PIXI.InteractionEvent} event
  */
 function handleCanvasRightClick(event) {
+  // Get the click position - try different methods for PIXI v7+ compatibility
+  let screenPoint;
+  if (event.data?.global) {
+    screenPoint = event.data.global;
+  } else if (event.global) {
+    screenPoint = event.global;
+  } else if (event.client) {
+    // PIXI v7+ uses client coordinates
+    screenPoint = { x: event.client.x, y: event.client.y };
+  } else if (event.nativeEvent) {
+    // Fallback to native browser event
+    screenPoint = { x: event.nativeEvent.clientX, y: event.nativeEvent.clientY };
+  } else {
+    console.log(`${MODULE_ID} | Right-click event structure:`, event);
+    return;
+  }
+
+  console.log(`${MODULE_ID} | Right-click at screen:`, screenPoint.x, screenPoint.y);
+
   // Find if a token was right-clicked
-  const token = getTokenAtPoint(event.data.global);
+  const token = getTokenAtPoint(screenPoint);
+  console.log(`${MODULE_ID} | Token found:`, token?.name || "none");
+
   if (!token) {
+    cancelRightClickDialogue();
+    return;
+  }
+
+  // Check if this NPC has dialogue before proceeding
+  const npcConfig = token.actor?.getFlag(MODULE_ID, "config");
+  if (!npcConfig?.enabled) {
+    console.log(`${MODULE_ID} | Token ${token.name} is not configured as an NPC`);
+    cancelRightClickDialogue();
+    return;
+  }
+
+  const hasDialogue = npcConfig.defaultDialogue || npcConfig.dialogueId || (npcConfig.dialogues?.length > 0);
+  if (!hasDialogue) {
+    console.log(`${MODULE_ID} | Token ${token.name} has no dialogue configured`);
     cancelRightClickDialogue();
     return;
   }
@@ -460,6 +633,7 @@ function handleCanvasRightClick(event) {
     timeSinceLastRightClick < tokenClickState.doubleRightClickThreshold
   ) {
     // Double-right-click detected - this is targeting, cancel any pending dialogue
+    console.log(`${MODULE_ID} | Double right-click detected, cancelling dialogue`);
     cancelRightClickDialogue();
     tokenClickState.lastRightClickTime = 0;
     return;
@@ -472,6 +646,7 @@ function handleCanvasRightClick(event) {
   // Start a delayed trigger for dialogue
   // If the user releases quickly and doesn't double-right-click, dialogue will trigger
   cancelRightClickDialogue(); // Cancel any existing timeout
+  console.log(`${MODULE_ID} | Starting ${tokenClickState.rightClickDelay}ms timer for dialogue trigger`);
   tokenClickState.rightClickTimeout = setTimeout(() => {
     handleTokenRightClickDialogue(token);
   }, tokenClickState.rightClickDelay);
@@ -498,20 +673,45 @@ function cancelRightClickDialogue() {
 
 /**
  * Get token at a given screen point
- * @param {PIXI.Point} screenPoint - Screen coordinates from PIXI event
+ * @param {object} screenPoint - Screen coordinates from PIXI event
  * @returns {Token|null}
  */
 function getTokenAtPoint(screenPoint) {
   const tokens = canvas.tokens?.placeables || [];
 
   // Convert screen coordinates to canvas world coordinates
-  const canvasPoint = canvas.stage.toLocal(screenPoint);
+  // First transform to the canvas app coordinate space, then to world space
+  let canvasPoint;
+
+  try {
+    // Get the canvas element's bounding rect for proper offset calculation
+    const canvasRect = canvas.app.view.getBoundingClientRect();
+    const adjustedX = screenPoint.x - canvasRect.left;
+    const adjustedY = screenPoint.y - canvasRect.top;
+
+    // Transform through the canvas stage
+    const transform = canvas.stage.worldTransform;
+    const invTransform = transform.clone().invert();
+
+    canvasPoint = {
+      x: invTransform.a * adjustedX + invTransform.c * adjustedY + invTransform.tx,
+      y: invTransform.b * adjustedX + invTransform.d * adjustedY + invTransform.ty
+    };
+  } catch (e) {
+    // Fallback: try direct stage.toLocal
+    const pixiPoint = new PIXI.Point(screenPoint.x, screenPoint.y);
+    canvasPoint = canvas.stage.toLocal(pixiPoint);
+  }
+
+  console.log(`${MODULE_ID} | Canvas point:`, canvasPoint.x, canvasPoint.y);
 
   for (const token of tokens) {
     if (!token.visible) continue;
 
     // Check if point is within token bounds
     const bounds = token.bounds;
+    console.log(`${MODULE_ID} | Checking token ${token.name} bounds:`, bounds.x, bounds.y, bounds.width, bounds.height);
+
     if (canvasPoint.x >= bounds.x &&
         canvasPoint.x <= bounds.x + bounds.width &&
         canvasPoint.y >= bounds.y &&
