@@ -176,13 +176,23 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Get available responses (handle array or object map)
     let responses = this._currentNode?.responses || [];
+    console.log(`${MODULE_ID} | Raw responses from node:`, responses, `isArray: ${Array.isArray(responses)}`);
+
     if (!Array.isArray(responses) && typeof responses === "object") {
       // Convert object map to array, preserving the key as the id
       responses = Object.entries(responses).map(([key, value]) => ({
         ...value,
         id: value.id || key  // Use existing id or the object key
       }));
+    } else if (Array.isArray(responses)) {
+      // Ensure array items have IDs - generate if missing
+      responses = responses.map((r, index) => ({
+        ...r,
+        id: r.id || `response-${index}`  // Use existing id or generate one
+      }));
     }
+
+    console.log(`${MODULE_ID} | Processed responses with IDs:`, responses);
     const availableResponses = await this._filterAvailableResponses(responses);
 
     // Get available services if at a service node
