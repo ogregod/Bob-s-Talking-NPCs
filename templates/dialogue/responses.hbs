@@ -13,7 +13,7 @@
           {{#if this.icon}}
             <i class="response-icon fa-solid {{this.icon}}"></i>
           {{else}}
-            <span class="response-number">{{math @index "+" 1}}</span>
+            <span class="response-number">{{this.shortcut}}</span>
           {{/if}}
 
           <span class="response-text">{{this.text}}</span>
