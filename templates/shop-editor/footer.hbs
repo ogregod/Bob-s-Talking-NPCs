@@ -1,0 +1,21 @@
+{{!-- Shop Editor Footer --}}
+<footer class="shop-editor-footer">
+  <div class="footer-info">
+    {{#if shop.updatedAt}}
+      <span class="last-updated">
+        {{localize "BOBSNPC.ShopEditor.LastUpdated"}}: {{formatDate shop.updatedAt}}
+      </span>
+    {{/if}}
+  </div>
+
+  <div class="footer-actions">
+    <button type="button" class="btn cancel" data-action="cancel">
+      <i class="fa-solid fa-times"></i>
+      {{localize "BOBSNPC.Cancel"}}
+    </button>
+    <button type="button" class="btn primary save" data-action="save">
+      <i class="fa-solid fa-save"></i>
+      {{localize "BOBSNPC.Save"}}
+    </button>
+  </div>
+</footer>

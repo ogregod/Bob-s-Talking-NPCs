@@ -1,0 +1,49 @@
+{{!-- Shop Editor - Access Tab --}}
+<div class="tab-content" data-tab-content="access">
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.AccessRequirements"}}</h3>
+    <p class="hint">{{localize "BOBSNPC.ShopEditor.AccessHint"}}</p>
+
+    <div class="form-group">
+      <label for="access-level">{{localize "BOBSNPC.ShopEditor.LevelRequired"}}</label>
+      <input type="number" id="access-level" name="access.levelRequired" value="{{access.levelRequired}}" min="0">
+    </div>
+
+    <div class="form-group">
+      <label for="access-reputation">{{localize "BOBSNPC.ShopEditor.ReputationRequired"}}</label>
+      <input type="number" id="access-reputation" name="access.reputationRequired" value="{{access.reputationRequired}}" min="0">
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.FactionRequirement"}}</h3>
+
+    <div class="form-group">
+      <label for="access-faction">{{localize "BOBSNPC.ShopEditor.FactionRequired"}}</label>
+      <input type="text" id="access-faction" name="access.factionRequired" value="{{access.factionRequired}}" placeholder="{{localize 'BOBSNPC.ShopEditor.FactionIdPlaceholder'}}">
+    </div>
+
+    <div class="form-group">
+      <label for="access-rank">{{localize "BOBSNPC.ShopEditor.FactionRankRequired"}}</label>
+      <input type="text" id="access-rank" name="access.factionRankRequired" value="{{access.factionRankRequired}}" placeholder="{{localize 'BOBSNPC.ShopEditor.RankPlaceholder'}}">
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.QuestRequirement"}}</h3>
+
+    <div class="form-group">
+      <label for="access-quest">{{localize "BOBSNPC.ShopEditor.QuestRequired"}}</label>
+      <input type="text" id="access-quest" name="access.questRequired" value="{{access.questRequired}}" placeholder="{{localize 'BOBSNPC.ShopEditor.QuestIdPlaceholder'}}">
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.ClosedMessage"}}</h3>
+
+    <div class="form-group">
+      <label for="access-message">{{localize "BOBSNPC.ShopEditor.MessageWhenClosed"}}</label>
+      <textarea id="access-message" name="access.closedMessage" rows="2" placeholder="{{localize 'BOBSNPC.ShopEditor.ClosedMessagePlaceholder'}}">{{access.closedMessage}}</textarea>
+    </div>
+  </div>
+</div>

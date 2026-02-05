@@ -110,7 +110,10 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       saveConfig: NPCConfig.#onSaveConfig,
       resetConfig: NPCConfig.#onResetConfig,
       importConfig: NPCConfig.#onImportConfig,
-      exportConfig: NPCConfig.#onExportConfig
+      exportConfig: NPCConfig.#onExportConfig,
+      editShop: NPCConfig.#onEditShop,
+      createShop: NPCConfig.#onCreateShop,
+      openShopManager: NPCConfig.#onOpenShopManager
     }
   };
 
@@ -870,6 +873,21 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
     URL.revokeObjectURL(url);
     ui.notifications.info(localize("NPCConfig.ExportSuccess"));
+  }
+
+  static async #onEditShop(event, target) {
+    const shopId = this._config.services?.merchant?.shopId;
+    if (shopId) {
+      game.bobsnpc?.ui?.openShopEditor(shopId);
+    }
+  }
+
+  static async #onCreateShop(event, target) {
+    game.bobsnpc?.ui?.openShopEditor(null);
+  }
+
+  static async #onOpenShopManager(event, target) {
+    game.bobsnpc?.ui?.openShopManager();
   }
 
   // ==================== Lifecycle ====================

@@ -1,0 +1,11 @@
+{{!-- Shop Editor Navigation --}}
+<nav class="shop-editor-nav">
+  <ul class="tab-list">
+    {{#each tabs}}
+      <li class="tab-item {{#if this.active}}active{{/if}}" data-action="switchTab" data-tab="{{this.id}}">
+        <i class="fa-solid {{this.icon}}"></i>
+        <span>{{this.label}}</span>
+      </li>
+    {{/each}}
+  </ul>
+</nav>

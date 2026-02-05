@@ -1,0 +1,750 @@
+/**
+ * Bob's Talking NPCs - Shop Manager & Editor Styles
+ */
+
+@layer bobsnpc {
+  /* ===== Shop Manager ===== */
+
+  .shop-manager {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .shop-manager-header {
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .shop-manager-header .header-controls {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .shop-manager-header .search-box {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    padding: 0 var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-manager-header .search-box i {
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .shop-manager-header .search-box input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-manager-header .search-box .clear-btn {
+    background: none;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    padding: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-manager-header .filter-box select {
+    padding: var(--bobsnpc-spacing-sm);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .shop-manager-header .create-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-primary);
+    color: white;
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    transition: background var(--bobsnpc-transition-fast);
+  }
+
+  .shop-manager-header .create-btn:hover {
+    background: var(--bobsnpc-primary-light);
+  }
+
+  .shop-manager-header .header-info {
+    margin-top: var(--bobsnpc-spacing-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  /* Shop List */
+  .shop-list-section {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .shop-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .shop-entry:hover {
+    border-color: var(--bobsnpc-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .shop-entry .shop-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--bobsnpc-border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .shop-entry .shop-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .shop-entry .shop-name {
+    margin: 0 0 var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-md);
+  }
+
+  .shop-entry .shop-meta {
+    display: flex;
+    gap: var(--bobsnpc-spacing-md);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .shop-entry .shop-meta span {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-entry .shop-description {
+    margin: var(--bobsnpc-spacing-xs) 0 0;
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .shop-entry .shop-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-entry .action-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .shop-entry .action-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .shop-entry .action-btn.delete:hover {
+    background: var(--bobsnpc-error);
+    color: white;
+    border-color: var(--bobsnpc-error);
+  }
+
+  /* No Shops */
+  .no-shops {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--bobsnpc-spacing-xl);
+    color: var(--bobsnpc-text-muted);
+    text-align: center;
+  }
+
+  .no-shops i {
+    font-size: 48px;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    opacity: 0.5;
+  }
+
+  .no-shops .hint {
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  /* Templates Section */
+  .shop-templates {
+    display: none;
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .shop-templates.visible {
+    display: block;
+  }
+
+  .shop-templates .templates-header {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .shop-templates .templates-header h3 {
+    margin: 0 0 var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-templates .templates-header .hint {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+    margin: 0;
+  }
+
+  .templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .template-card {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+    text-align: left;
+  }
+
+  .template-card:hover {
+    border-color: var(--bobsnpc-primary);
+    transform: translateY(-2px);
+  }
+
+  .template-card .template-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .template-card .template-info h4 {
+    margin: 0;
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .template-card .template-info p {
+    margin: 2px 0 0;
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Shop Editor ===== */
+
+  .shop-editor {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .shop-editor-nav {
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .shop-editor-nav .tab-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-x: auto;
+  }
+
+  .shop-editor-nav .tab-item {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: var(--bobsnpc-text-secondary);
+    transition: all var(--bobsnpc-transition-fast);
+    white-space: nowrap;
+  }
+
+  .shop-editor-nav .tab-item:hover {
+    color: var(--bobsnpc-text-primary);
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .shop-editor-nav .tab-item.active {
+    color: var(--bobsnpc-primary);
+    border-bottom-color: var(--bobsnpc-primary);
+  }
+
+  .shop-editor .tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .shop-editor .form-section {
+    margin-bottom: var(--bobsnpc-spacing-lg);
+    padding-bottom: var(--bobsnpc-spacing-md);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .shop-editor .form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .shop-editor .form-section h3 {
+    margin: 0 0 var(--bobsnpc-spacing-md);
+    font-size: var(--bobsnpc-font-size-md);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .shop-editor .form-group {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .shop-editor .form-group label {
+    display: block;
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .shop-editor .form-group.checkbox label {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    cursor: pointer;
+  }
+
+  .shop-editor .form-group input[type="text"],
+  .shop-editor .form-group input[type="number"],
+  .shop-editor .form-group select,
+  .shop-editor .form-group textarea {
+    width: 100%;
+    padding: var(--bobsnpc-spacing-sm);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    background: var(--bobsnpc-bg-elevated);
+  }
+
+  .shop-editor .form-row {
+    display: flex;
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .shop-editor .form-group.half {
+    flex: 1;
+  }
+
+  .shop-editor .form-group.third {
+    flex: 1;
+  }
+
+  .shop-editor .form-group.quarter {
+    flex: 1;
+  }
+
+  .shop-editor .input-with-hint .hint,
+  .shop-editor .hint {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+    margin-top: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-editor .input-with-suffix {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-editor .input-with-suffix input {
+    flex: 1;
+  }
+
+  .shop-editor .input-with-suffix .suffix {
+    color: var(--bobsnpc-text-muted);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .shop-editor .file-picker-row {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-editor .file-picker-row input {
+    flex: 1;
+  }
+
+  .shop-editor .browse-btn {
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+  }
+
+  .shop-editor .banner-preview {
+    margin-top: var(--bobsnpc-spacing-sm);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    overflow: hidden;
+  }
+
+  .shop-editor .banner-preview img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+  }
+
+  .shop-editor .icon-picker {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-editor .icon-preview {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+
+  .shop-editor .icon-picker input {
+    flex: 1;
+  }
+
+  /* Linked NPC */
+  .shop-editor .linked-npc {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .shop-editor .linked-npc img {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    object-fit: cover;
+  }
+
+  .shop-editor .linked-npc span {
+    flex: 1;
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .shop-editor .unlink-btn {
+    background: none;
+    border: none;
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    padding: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-editor .unlink-btn:hover {
+    color: var(--bobsnpc-error);
+  }
+
+  .shop-editor .no-npc-linked {
+    text-align: center;
+    padding: var(--bobsnpc-spacing-md);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .shop-editor .link-btn {
+    margin-top: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+  }
+
+  /* Inventory */
+  .shop-editor .inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .shop-editor .inventory-header h3 {
+    margin: 0;
+  }
+
+  .shop-editor .inventory-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-editor .inventory-hint {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .shop-editor .inventory-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-xs);
+    min-height: 200px;
+    border: 2px dashed var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    padding: var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-editor .inventory-list.drag-over {
+    border-color: var(--bobsnpc-primary);
+    background: rgba(var(--bobsnpc-primary-rgb), 0.1);
+  }
+
+  .shop-editor .inventory-item {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .shop-editor .inventory-item .item-img {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    object-fit: cover;
+  }
+
+  .shop-editor .inventory-item .item-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .shop-editor .inventory-item .item-name {
+    display: block;
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .shop-editor .inventory-item .item-type {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .shop-editor .inventory-item .item-price,
+  .shop-editor .inventory-item .item-quantity {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .shop-editor .inventory-item .item-quantity .unlimited {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .shop-editor .inventory-item .item-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-editor .inventory-item .action-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bobsnpc-bg-tertiary);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+  }
+
+  .shop-editor .inventory-item .action-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .shop-editor .inventory-item .action-btn.delete:hover {
+    background: var(--bobsnpc-error);
+    color: white;
+  }
+
+  /* Rarity colors */
+  .shop-editor .inventory-item.rarity-common {
+    border-left: 3px solid #9e9e9e;
+  }
+
+  .shop-editor .inventory-item.rarity-uncommon {
+    border-left: 3px solid #4caf50;
+  }
+
+  .shop-editor .inventory-item.rarity-rare {
+    border-left: 3px solid #2196f3;
+  }
+
+  .shop-editor .inventory-item.rarity-veryRare {
+    border-left: 3px solid #9c27b0;
+  }
+
+  .shop-editor .inventory-item.rarity-legendary {
+    border-left: 3px solid #ff9800;
+  }
+
+  .shop-editor .inventory-item.rarity-artifact {
+    border-left: 3px solid #f44336;
+  }
+
+  .shop-editor .empty-inventory {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--bobsnpc-spacing-xl);
+    color: var(--bobsnpc-text-muted);
+    text-align: center;
+  }
+
+  .shop-editor .empty-inventory i {
+    font-size: 48px;
+    opacity: 0.5;
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  /* Currency Grid */
+  .shop-editor .currency-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-editor .currency-item {
+    text-align: center;
+  }
+
+  .shop-editor .currency-item label {
+    display: block;
+    font-size: var(--bobsnpc-font-size-sm);
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-editor .currency-item input {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Footer */
+  .shop-editor-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-secondary);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .shop-editor-footer .footer-info {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .shop-editor-footer .footer-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-editor-footer .btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .shop-editor-footer .btn.cancel {
+    background: var(--bobsnpc-bg-elevated);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .shop-editor-footer .btn.cancel:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .shop-editor-footer .btn.primary {
+    background: var(--bobsnpc-primary);
+    color: white;
+    border-color: var(--bobsnpc-primary);
+  }
+
+  .shop-editor-footer .btn.primary:hover {
+    background: var(--bobsnpc-primary-light);
+  }
+}

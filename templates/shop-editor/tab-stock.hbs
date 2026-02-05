@@ -1,0 +1,103 @@
+{{!-- Shop Editor - Stock Tab --}}
+<div class="tab-content" data-tab-content="stock">
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.StockRefresh"}}</h3>
+
+    <div class="form-group">
+      <label for="refresh-type">{{localize "BOBSNPC.ShopEditor.RefreshType"}}</label>
+      <select id="refresh-type" name="stockRefresh.type">
+        {{#each refreshTypeOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="refresh-interval">{{localize "BOBSNPC.ShopEditor.RefreshInterval"}}</label>
+      <div class="input-with-suffix">
+        <input type="number" id="refresh-interval" name="stockRefresh.interval" value="{{stockRefresh.interval}}" min="1">
+        <span class="suffix">{{localize "BOBSNPC.ShopEditor.Days"}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.PartialRefresh"}}</h3>
+
+    <div class="form-group checkbox">
+      <label>
+        <input type="checkbox" name="stockRefresh.partialRefresh" {{#if stockRefresh.partialRefresh}}checked{{/if}}>
+        {{localize "BOBSNPC.ShopEditor.PartialRefreshEnabled"}}
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="refresh-percent">{{localize "BOBSNPC.ShopEditor.RefreshPercent"}}</label>
+      <div class="input-with-suffix">
+        <input type="number" id="refresh-percent" name="stockRefresh.refreshPercent" value="{{stockRefresh.refreshPercent}}" step="0.1" min="0" max="1">
+        <span class="suffix">%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.Randomization"}}</h3>
+
+    <div class="form-group checkbox">
+      <label>
+        <input type="checkbox" name="stockRefresh.randomizeQuantities" {{#if stockRefresh.randomizeQuantities}}checked{{/if}}>
+        {{localize "BOBSNPC.ShopEditor.RandomizeQuantities"}}
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="quantity-variance">{{localize "BOBSNPC.ShopEditor.QuantityVariance"}}</label>
+      <div class="input-with-suffix">
+        <input type="number" id="quantity-variance" name="stockRefresh.quantityVariance" value="{{stockRefresh.quantityVariance}}" step="0.1" min="0" max="1">
+        <span class="suffix">± %</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="new-item-chance">{{localize "BOBSNPC.ShopEditor.NewItemChance"}}</label>
+      <div class="input-with-suffix">
+        <input type="number" id="new-item-chance" name="stockRefresh.newItemChance" value="{{stockRefresh.newItemChance}}" step="0.01" min="0" max="1">
+        <span class="suffix">%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.CurrencyDrawer"}}</h3>
+
+    <div class="form-group checkbox">
+      <label>
+        <input type="checkbox" name="drawer.unlimited" {{#if shop.drawer.unlimited}}checked{{/if}}>
+        {{localize "BOBSNPC.ShopEditor.UnlimitedDrawer"}}
+      </label>
+    </div>
+
+    <div class="currency-grid">
+      <div class="currency-item">
+        <label for="drawer-pp">PP</label>
+        <input type="number" id="drawer-pp" name="drawer.pp" value="{{shop.drawer.pp}}" min="0">
+      </div>
+      <div class="currency-item">
+        <label for="drawer-gp">GP</label>
+        <input type="number" id="drawer-gp" name="drawer.gp" value="{{shop.drawer.gp}}" min="0">
+      </div>
+      <div class="currency-item">
+        <label for="drawer-ep">EP</label>
+        <input type="number" id="drawer-ep" name="drawer.ep" value="{{shop.drawer.ep}}" min="0">
+      </div>
+      <div class="currency-item">
+        <label for="drawer-sp">SP</label>
+        <input type="number" id="drawer-sp" name="drawer.sp" value="{{shop.drawer.sp}}" min="0">
+      </div>
+      <div class="currency-item">
+        <label for="drawer-cp">CP</label>
+        <input type="number" id="drawer-cp" name="drawer.cp" value="{{shop.drawer.cp}}" min="0">
+      </div>
+    </div>
+  </div>
+</div>

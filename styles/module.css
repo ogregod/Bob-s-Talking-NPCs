@@ -20,6 +20,7 @@
 @import url("./components/quest-editor.css");
 @import url("./components/faction-editor.css");
 @import url("./components/dialogue-editor.css");
+@import url("./components/shop-manager.css");
 
 /* ===== CSS Layer for V13 Compatibility ===== */
 @layer bobsnpc {

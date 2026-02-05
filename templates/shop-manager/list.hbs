@@ -1,0 +1,55 @@
+{{!-- Shop Manager List --}}
+<section class="shop-list-section">
+  {{#if hasShops}}
+    <ul class="shop-list">
+      {{#each shops}}
+        <li class="shop-entry" data-shop-id="{{this.id}}">
+          <div class="shop-icon" style="background-color: {{this.color}}">
+            <i class="fa-solid {{this.typeIcon}}"></i>
+          </div>
+
+          <div class="shop-info">
+            <h4 class="shop-name">{{this.name}}</h4>
+            <div class="shop-meta">
+              <span class="shop-type">
+                <i class="fa-solid {{this.typeIcon}}"></i>
+                {{this.typeLabel}}
+              </span>
+              <span class="shop-items">
+                <i class="fa-solid fa-box"></i>
+                {{this.itemCount}} {{localize "BOBSNPC.ShopManager.Items"}}
+              </span>
+              {{#if this.linkedNpcName}}
+                <span class="shop-npc">
+                  <i class="fa-solid fa-user"></i>
+                  {{this.linkedNpcName}}
+                </span>
+              {{/if}}
+            </div>
+            {{#if this.description}}
+              <p class="shop-description">{{this.description}}</p>
+            {{/if}}
+          </div>
+
+          <div class="shop-actions">
+            <button type="button" class="action-btn edit" data-action="editShop" data-tooltip="{{localize 'BOBSNPC.ShopManager.Edit'}}">
+              <i class="fa-solid fa-edit"></i>
+            </button>
+            <button type="button" class="action-btn duplicate" data-action="duplicateShop" data-tooltip="{{localize 'BOBSNPC.ShopManager.Duplicate'}}">
+              <i class="fa-solid fa-copy"></i>
+            </button>
+            <button type="button" class="action-btn delete" data-action="deleteShop" data-tooltip="{{localize 'BOBSNPC.ShopManager.Delete'}}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <div class="no-shops">
+      <i class="fa-solid fa-store-slash"></i>
+      <p>{{localize "BOBSNPC.ShopManager.NoShops"}}</p>
+      <p class="hint">{{localize "BOBSNPC.ShopManager.NoShopsHint"}}</p>
+    </div>
+  {{/if}}
+</section>

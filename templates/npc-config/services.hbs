@@ -19,14 +19,29 @@
       {{#if config.services.merchant.enabled}}
         <div class="form-group">
           <label>{{localize "BOBSNPC.NPCConfig.Shop"}}</label>
-          <select name="config.services.merchant.shopId">
-            <option value="">{{localize "BOBSNPC.NPCConfig.SelectShop"}}</option>
-            {{#each availableShops}}
-              <option value="{{this.id}}" {{#if (eq this.id ../config.services.merchant.shopId)}}selected{{/if}}>
-                {{this.name}}
-              </option>
-            {{/each}}
-          </select>
+          <div class="select-with-actions">
+            <select name="config.services.merchant.shopId">
+              <option value="">{{localize "BOBSNPC.NPCConfig.SelectShop"}}</option>
+              {{#each availableShops}}
+                <option value="{{this.id}}" {{#if (eq this.id ../config.services.merchant.shopId)}}selected{{/if}}>
+                  {{this.name}}
+                </option>
+              {{/each}}
+            </select>
+            <div class="action-buttons">
+              {{#if config.services.merchant.shopId}}
+                <button type="button" class="btn btn-sm" data-action="editShop" title="{{localize 'BOBSNPC.NPCConfig.EditShop'}}">
+                  <i class="fa-solid fa-edit"></i>
+                </button>
+              {{/if}}
+              <button type="button" class="btn btn-sm" data-action="createShop" title="{{localize 'BOBSNPC.NPCConfig.CreateShop'}}">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+              <button type="button" class="btn btn-sm" data-action="openShopManager" title="{{localize 'BOBSNPC.NPCConfig.ManageShops'}}">
+                <i class="fa-solid fa-store"></i>
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">

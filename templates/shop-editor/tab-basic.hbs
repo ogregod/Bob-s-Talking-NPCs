@@ -1,0 +1,83 @@
+{{!-- Shop Editor - Basic Tab --}}
+<div class="tab-content" data-tab-content="basic">
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.BasicInfo"}}</h3>
+
+    <div class="form-group">
+      <label for="shop-name">{{localize "BOBSNPC.ShopEditor.ShopName"}}</label>
+      <input type="text" id="shop-name" name="name" value="{{shop.name}}" placeholder="{{localize 'BOBSNPC.ShopEditor.ShopNamePlaceholder'}}">
+    </div>
+
+    <div class="form-group">
+      <label for="shop-type">{{localize "BOBSNPC.ShopEditor.ShopType"}}</label>
+      <select id="shop-type" name="type">
+        {{#each typeOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="shop-description">{{localize "BOBSNPC.ShopEditor.Description"}}</label>
+      <textarea id="shop-description" name="description" rows="3" placeholder="{{localize 'BOBSNPC.ShopEditor.DescriptionPlaceholder'}}">{{shop.description}}</textarea>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.Appearance"}}</h3>
+
+    <div class="form-row">
+      <div class="form-group half">
+        <label for="shop-icon">{{localize "BOBSNPC.ShopEditor.Icon"}}</label>
+        <div class="icon-picker">
+          <div class="icon-preview" style="background-color: {{shop.color}}">
+            <i class="fa-solid {{shop.icon}}"></i>
+          </div>
+          <input type="text" id="shop-icon" name="icon" value="{{shop.icon}}" placeholder="fa-store">
+        </div>
+      </div>
+
+      <div class="form-group half">
+        <label for="shop-color">{{localize "BOBSNPC.ShopEditor.Color"}}</label>
+        <input type="color" id="shop-color" name="color" value="{{shop.color}}">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="shop-banner">{{localize "BOBSNPC.ShopEditor.BannerImage"}}</label>
+      <div class="file-picker-row">
+        <input type="text" id="shop-banner" name="bannerImage" value="{{shop.bannerImage}}" placeholder="{{localize 'BOBSNPC.ShopEditor.BannerPlaceholder'}}">
+        <button type="button" class="browse-btn" data-action="selectBanner">
+          <i class="fa-solid fa-folder-open"></i>
+        </button>
+      </div>
+      {{#if shop.bannerImage}}
+        <div class="banner-preview">
+          <img src="{{shop.bannerImage}}" alt="Banner preview">
+        </div>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.LinkedNPC"}}</h3>
+
+    {{#if linkedNpc}}
+      <div class="linked-npc">
+        <img src="{{linkedNpc.img}}" alt="{{linkedNpc.name}}">
+        <span>{{linkedNpc.name}}</span>
+        <button type="button" class="unlink-btn" data-action="unlinkNpc" data-tooltip="{{localize 'BOBSNPC.ShopEditor.Unlink'}}">
+          <i class="fa-solid fa-unlink"></i>
+        </button>
+      </div>
+    {{else}}
+      <div class="no-npc-linked">
+        <p>{{localize "BOBSNPC.ShopEditor.NoNPCLinked"}}</p>
+        <button type="button" class="link-btn" data-action="linkNpc">
+          <i class="fa-solid fa-link"></i>
+          {{localize "BOBSNPC.ShopEditor.LinkNPC"}}
+        </button>
+      </div>
+    {{/if}}
+  </div>
+</div>

@@ -1,0 +1,99 @@
+{{!-- Shop Editor - Pricing Tab --}}
+<div class="tab-content" data-tab-content="pricing">
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.BaseMultipliers"}}</h3>
+
+    <div class="form-row">
+      <div class="form-group half">
+        <label for="pricing-buy">{{localize "BOBSNPC.ShopEditor.BuyMultiplier"}}</label>
+        <div class="input-with-hint">
+          <input type="number" id="pricing-buy" name="pricing.baseBuyMultiplier" value="{{pricing.baseBuyMultiplier}}" step="0.1" min="0">
+          <span class="hint">{{localize "BOBSNPC.ShopEditor.BuyMultiplierHint"}}</span>
+        </div>
+      </div>
+
+      <div class="form-group half">
+        <label for="pricing-sell">{{localize "BOBSNPC.ShopEditor.SellMultiplier"}}</label>
+        <div class="input-with-hint">
+          <input type="number" id="pricing-sell" name="pricing.baseSellMultiplier" value="{{pricing.baseSellMultiplier}}" step="0.1" min="0">
+          <span class="hint">{{localize "BOBSNPC.ShopEditor.SellMultiplierHint"}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.PriceDisplay"}}</h3>
+
+    <div class="form-group">
+      <label for="pricing-display">{{localize "BOBSNPC.ShopEditor.DisplayMode"}}</label>
+      <select id="pricing-display" name="pricing.displayMode">
+        {{#each priceDisplayOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="form-group checkbox">
+      <label>
+        <input type="checkbox" name="pricing.roundPrices" {{#if pricing.roundPrices}}checked{{/if}}>
+        {{localize "BOBSNPC.ShopEditor.RoundPrices"}}
+      </label>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.CharismaEffects"}}</h3>
+
+    <div class="form-group checkbox">
+      <label>
+        <input type="checkbox" name="pricing.charismaAffectsPrices" {{#if pricing.charismaAffectsPrices}}checked{{/if}}>
+        {{localize "BOBSNPC.ShopEditor.CharismaAffectsPrices"}}
+      </label>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group third">
+        <label for="cha-buy">{{localize "BOBSNPC.ShopEditor.CharismaBuyBonus"}}</label>
+        <input type="number" id="cha-buy" name="pricing.charismaMultiplierBuy" value="{{pricing.charismaMultiplierBuy}}" step="0.01" min="0">
+      </div>
+
+      <div class="form-group third">
+        <label for="cha-sell">{{localize "BOBSNPC.ShopEditor.CharismaSellBonus"}}</label>
+        <input type="number" id="cha-sell" name="pricing.charismaMultiplierSell" value="{{pricing.charismaMultiplierSell}}" step="0.01" min="0">
+      </div>
+
+      <div class="form-group third">
+        <label for="cha-max">{{localize "BOBSNPC.ShopEditor.MaxCharismaDiscount"}}</label>
+        <input type="number" id="cha-max" name="pricing.maxCharismaDiscount" value="{{pricing.maxCharismaDiscount}}" step="0.01" min="0" max="1">
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.BuyBack"}}</h3>
+
+    <div class="form-group checkbox">
+      <label>
+        <input type="checkbox" name="buyBack.enabled" {{#if buyBack.enabled}}checked{{/if}}>
+        {{localize "BOBSNPC.ShopEditor.BuyBackEnabled"}}
+      </label>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group half checkbox">
+        <label>
+          <input type="checkbox" name="buyBack.requireIdentified" {{#if buyBack.requireIdentified}}checked{{/if}}>
+          {{localize "BOBSNPC.ShopEditor.RequireIdentified"}}
+        </label>
+      </div>
+
+      <div class="form-group half checkbox">
+        <label>
+          <input type="checkbox" name="buyBack.excludeEquipped" {{#if buyBack.excludeEquipped}}checked{{/if}}>
+          {{localize "BOBSNPC.ShopEditor.ExcludeEquipped"}}
+        </label>
+      </div>
+    </div>
+  </div>
+</div>

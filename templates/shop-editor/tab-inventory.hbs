@@ -1,0 +1,65 @@
+{{!-- Shop Editor - Inventory Tab --}}
+<div class="tab-content" data-tab-content="inventory">
+  <div class="inventory-header">
+    <h3>{{localize "BOBSNPC.ShopEditor.Inventory"}} ({{inventoryCount}})</h3>
+    <div class="inventory-actions">
+      <button type="button" class="btn" data-action="browseCompendium">
+        <i class="fa-solid fa-book"></i>
+        {{localize "BOBSNPC.ShopEditor.BrowseCompendium"}}
+      </button>
+      <button type="button" class="btn" data-action="addItem">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.ShopEditor.AddItem"}}
+      </button>
+    </div>
+  </div>
+
+  <div class="inventory-hint">
+    <i class="fa-solid fa-info-circle"></i>
+    {{localize "BOBSNPC.ShopEditor.DragDropHint"}}
+  </div>
+
+  {{#if hasInventory}}
+    <ul class="inventory-list">
+      {{#each inventory}}
+        <li class="inventory-item {{this.rarityClass}}" data-item-id="{{this.id}}">
+          <img class="item-img" src="{{this.itemImg}}" alt="{{this.itemName}}">
+
+          <div class="item-info">
+            <span class="item-name">{{this.itemName}}</span>
+            <span class="item-type">{{this.itemType}}</span>
+          </div>
+
+          <div class="item-price">
+            <i class="fa-solid fa-coins"></i>
+            <span>{{this.displayPrice}} gp</span>
+          </div>
+
+          <div class="item-quantity">
+            <label>{{localize "BOBSNPC.ShopEditor.Qty"}}:</label>
+            {{#if this.isUnlimited}}
+              <span class="unlimited">∞</span>
+            {{else}}
+              <span>{{this.quantity}}</span>
+            {{/if}}
+          </div>
+
+          <div class="item-actions">
+            <button type="button" class="action-btn edit" data-action="editItem" data-tooltip="{{localize 'BOBSNPC.ShopEditor.EditItem'}}">
+              <i class="fa-solid fa-edit"></i>
+            </button>
+            <button type="button" class="action-btn delete" data-action="removeItem" data-tooltip="{{localize 'BOBSNPC.ShopEditor.RemoveItem'}}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <div class="empty-inventory">
+      <i class="fa-solid fa-box-open"></i>
+      <p>{{localize "BOBSNPC.ShopEditor.EmptyInventory"}}</p>
+      <p class="hint">{{localize "BOBSNPC.ShopEditor.EmptyInventoryHint"}}</p>
+    </div>
+  {{/if}}
+</div>

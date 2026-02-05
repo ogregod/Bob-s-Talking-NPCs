@@ -1,0 +1,21 @@
+{{!-- Shop Templates Picker --}}
+<section class="shop-templates">
+  <div class="templates-header">
+    <h3>{{localize "BOBSNPC.ShopManager.ChooseTemplate"}}</h3>
+    <p class="hint">{{localize "BOBSNPC.ShopManager.TemplateHint"}}</p>
+  </div>
+
+  <div class="templates-grid">
+    {{#each templates}}
+      <button type="button" class="template-card" data-action="useTemplate" data-template="{{this.key}}">
+        <div class="template-icon" style="background-color: {{this.color}}">
+          <i class="fa-solid {{this.icon}}"></i>
+        </div>
+        <div class="template-info">
+          <h4>{{this.name}}</h4>
+          <p>{{this.description}}</p>
+        </div>
+      </button>
+    {{/each}}
+  </div>
+</section>

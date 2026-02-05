@@ -1,0 +1,41 @@
+{{!-- Shop Manager Header --}}
+<header class="shop-manager-header">
+  <div class="header-controls">
+    <div class="search-box">
+      <i class="fa-solid fa-search"></i>
+      <input type="text"
+             name="search"
+             placeholder="{{localize 'BOBSNPC.ShopManager.SearchPlaceholder'}}"
+             value="{{searchFilter}}"
+             data-action="search">
+      {{#if isFiltered}}
+        <button type="button" class="clear-btn" data-action="clearSearch" data-tooltip="{{localize 'BOBSNPC.ShopManager.ClearFilters'}}">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      {{/if}}
+    </div>
+
+    <div class="filter-box">
+      <select name="typeFilter" data-action="filterType">
+        {{#each typeOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <button type="button" class="create-btn" data-action="createShop">
+      <i class="fa-solid fa-plus"></i>
+      {{localize "BOBSNPC.ShopManager.CreateShop"}}
+    </button>
+  </div>
+
+  <div class="header-info">
+    <span class="shop-count">
+      {{#if isFiltered}}
+        {{localize "BOBSNPC.ShopManager.ShowingFiltered" count=shopCount total=totalShops}}
+      {{else}}
+        {{localize "BOBSNPC.ShopManager.ShopCount" count=shopCount}}
+      {{/if}}
+    </span>
+  </div>
+</header>

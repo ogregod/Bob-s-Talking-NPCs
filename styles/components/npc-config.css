@@ -528,6 +528,110 @@
     color: var(--bobsnpc-primary);
   }
 
+  /* Select with action buttons */
+  .select-with-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+    align-items: center;
+  }
+
+  .select-with-actions select {
+    flex: 1;
+  }
+
+  .select-with-actions .action-buttons {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .select-with-actions .btn.btn-sm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .select-with-actions .btn.btn-sm:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+  }
+
+  /* Assigned items list */
+  .assigned-items-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--bobsnpc-spacing-sm) 0;
+  }
+
+  .assigned-item {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .assigned-item .item-name {
+    flex: 1;
+    font-weight: var(--bobsnpc-font-weight-medium);
+  }
+
+  .assigned-item .item-status {
+    padding: 2px var(--bobsnpc-spacing-xs);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: var(--bobsnpc-font-size-xs);
+    text-transform: uppercase;
+  }
+
+  .item-status.status-available {
+    background: rgba(var(--bobsnpc-success-rgb), 0.2);
+    color: var(--bobsnpc-success);
+  }
+
+  .item-status.status-active,
+  .item-status.status-in_progress {
+    background: rgba(var(--bobsnpc-primary-rgb), 0.2);
+    color: var(--bobsnpc-primary);
+  }
+
+  .item-status.status-completed {
+    background: rgba(var(--bobsnpc-info-rgb), 0.2);
+    color: var(--bobsnpc-info);
+  }
+
+  .item-status.status-failed {
+    background: rgba(var(--bobsnpc-error-rgb), 0.2);
+    color: var(--bobsnpc-error);
+  }
+
+  .add-item-row {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+    margin-top: var(--bobsnpc-spacing-sm);
+  }
+
+  .add-item-row select {
+    flex: 1;
+  }
+
+  .empty-hint {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+    font-style: italic;
+    margin: var(--bobsnpc-spacing-sm) 0;
+  }
+
   /* ===== Factions Tab ===== */
   .factions-list {
     list-style: none;

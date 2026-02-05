@@ -29,6 +29,8 @@ import { PropertyManager } from "./apps/property-manager.mjs";
 import { NPCConfig } from "./apps/npc-config.mjs";
 import { GMDashboard } from "./apps/gm-dashboard.mjs";
 import { TradeWindow } from "./apps/trade-window.mjs";
+import { ShopManager } from "./apps/shop-manager.mjs";
+import { ShopEditor } from "./apps/shop-editor.mjs";
 
 // Export UI applications for external use
 export {
@@ -42,7 +44,9 @@ export {
   PropertyManager,
   NPCConfig,
   GMDashboard,
-  TradeWindow
+  TradeWindow,
+  ShopManager,
+  ShopEditor
 };
 
 /**
@@ -141,6 +145,12 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
         game.bobsnpc?.ui?.openGmDashboard();
         break;
 
+      case "shop":
+      case "shops":
+      case "merchant":
+        game.bobsnpc?.ui?.openShopManager();
+        break;
+
       case "npc": {
         // Configure selected token's NPC
         const selectedToken = canvas.tokens?.controlled?.[0];
@@ -165,6 +175,7 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
               <tr><td><code>/bobsnpc faction</code></td><td>Open Faction Overview</td></tr>
               <tr><td><code>/bobsnpc tracker</code></td><td>Open Quest Tracker</td></tr>
               <tr><td><code>/bobsnpc npc</code></td><td>Configure selected NPC</td></tr>
+              ${game.user.isGM ? '<tr><td><code>/bobsnpc shops</code></td><td>Open Shop Manager</td></tr>' : ''}
               ${game.user.isGM ? '<tr><td><code>/bobsnpc dashboard</code></td><td>Open GM Dashboard</td></tr>' : ''}
             </table>
             <p style="margin: 10px 0 0 0; color: #a0a0a0; font-size: 0.8em;">

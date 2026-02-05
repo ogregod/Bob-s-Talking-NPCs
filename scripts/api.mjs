@@ -20,6 +20,8 @@ import { PropertyManager } from "./apps/property-manager.mjs";
 import { NPCConfig } from "./apps/npc-config.mjs";
 import { GMDashboard } from "./apps/gm-dashboard.mjs";
 import { TradeWindow } from "./apps/trade-window.mjs";
+import { ShopManager } from "./apps/shop-manager.mjs";
+import { ShopEditor } from "./apps/shop-editor.mjs";
 
 /**
  * Singleton instances of UI applications
@@ -1377,6 +1379,44 @@ class UIAPI {
     }
     dashboard.render(true);
     console.log(`${MODULE_ID} | Opening GM dashboard`);
+  }
+
+  /**
+   * Open Shop Manager (GM only)
+   */
+  openShopManager() {
+    if (!game.user.isGM) {
+      ui.notifications.warn(game.i18n.localize("BOBSNPC.Errors.GMOnly"));
+      return;
+    }
+    Hooks.call(`${MODULE_ID}.openShopManager`);
+
+    let shopManager = appInstances.get("shopManager");
+    if (!shopManager) {
+      shopManager = new ShopManager();
+      appInstances.set("shopManager", shopManager);
+    }
+    shopManager.render(true);
+    console.log(`${MODULE_ID} | Opening shop manager`);
+    return shopManager;
+  }
+
+  /**
+   * Open Shop Editor (GM only)
+   * @param {string} shopId - Optional shop ID to edit (null for new shop)
+   * @param {string} template - Optional template to use for new shops
+   */
+  openShopEditor(shopId = null, template = null) {
+    if (!game.user.isGM) {
+      ui.notifications.warn(game.i18n.localize("BOBSNPC.Errors.GMOnly"));
+      return;
+    }
+    Hooks.call(`${MODULE_ID}.openShopEditor`, { shopId, template });
+
+    const shopEditor = new ShopEditor({ shopId, template });
+    shopEditor.render(true);
+    console.log(`${MODULE_ID} | Opening shop editor${shopId ? ` for ${shopId}` : " for new shop"}`);
+    return shopEditor;
   }
 
   /**

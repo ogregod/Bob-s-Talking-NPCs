@@ -1,0 +1,109 @@
+{{!-- Shop Editor - Haggling Tab --}}
+<div class="tab-content" data-tab-content="haggling">
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.HagglingSettings"}}</h3>
+
+    <div class="form-group checkbox">
+      <label>
+        <input type="checkbox" name="haggling.enabled" {{#if haggling.enabled}}checked{{/if}}>
+        {{localize "BOBSNPC.ShopEditor.HagglingEnabled"}}
+      </label>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.SkillDCs"}}</h3>
+
+    <div class="form-row">
+      <div class="form-group quarter">
+        <label for="dc-persuasion">{{localize "BOBSNPC.ShopEditor.Persuasion"}}</label>
+        <input type="number" id="dc-persuasion" name="haggling.persuasionDC" value="{{haggling.persuasionDC}}" min="1">
+      </div>
+
+      <div class="form-group quarter">
+        <label for="dc-intimidation">{{localize "BOBSNPC.ShopEditor.Intimidation"}}</label>
+        <input type="number" id="dc-intimidation" name="haggling.intimidationDC" value="{{haggling.intimidationDC}}" min="1">
+      </div>
+
+      <div class="form-group quarter">
+        <label for="dc-deception">{{localize "BOBSNPC.ShopEditor.Deception"}}</label>
+        <input type="number" id="dc-deception" name="haggling.deceptionDC" value="{{haggling.deceptionDC}}" min="1">
+      </div>
+
+      <div class="form-group quarter">
+        <label for="dc-insight">{{localize "BOBSNPC.ShopEditor.Insight"}}</label>
+        <input type="number" id="dc-insight" name="haggling.insightDC" value="{{haggling.insightDC}}" min="1">
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.Discounts"}}</h3>
+
+    <div class="form-row">
+      <div class="form-group third">
+        <label for="success-discount">{{localize "BOBSNPC.ShopEditor.SuccessDiscount"}}</label>
+        <div class="input-with-suffix">
+          <input type="number" id="success-discount" name="haggling.successDiscount" value="{{haggling.successDiscount}}" step="0.01" min="0" max="1">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+
+      <div class="form-group third">
+        <label for="crit-discount">{{localize "BOBSNPC.ShopEditor.CriticalDiscount"}}</label>
+        <div class="input-with-suffix">
+          <input type="number" id="crit-discount" name="haggling.criticalSuccessDiscount" value="{{haggling.criticalSuccessDiscount}}" step="0.01" min="0" max="1">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+
+      <div class="form-group third">
+        <label for="max-discount">{{localize "BOBSNPC.ShopEditor.MaxDiscount"}}</label>
+        <div class="input-with-suffix">
+          <input type="number" id="max-discount" name="haggling.maximumDiscount" value="{{haggling.maximumDiscount}}" step="0.01" min="0" max="1">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.Limits"}}</h3>
+
+    <div class="form-row">
+      <div class="form-group half">
+        <label for="max-attempts">{{localize "BOBSNPC.ShopEditor.MaxAttempts"}}</label>
+        <input type="number" id="max-attempts" name="haggling.maxAttempts" value="{{haggling.maxAttempts}}" min="1">
+      </div>
+
+      <div class="form-group half">
+        <label for="cooldown">{{localize "BOBSNPC.ShopEditor.CooldownHours"}}</label>
+        <input type="number" id="cooldown" name="haggling.cooldownHours" value="{{haggling.cooldownHours}}" min="0">
+      </div>
+    </div>
+
+    <div class="form-group checkbox">
+      <label>
+        <input type="checkbox" name="haggling.attemptsPerItem" {{#if haggling.attemptsPerItem}}checked{{/if}}>
+        {{localize "BOBSNPC.ShopEditor.AttemptsPerItem"}}
+      </label>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>{{localize "BOBSNPC.ShopEditor.FailureConsequences"}}</h3>
+
+    <div class="form-group">
+      <label for="fail-price">{{localize "BOBSNPC.ShopEditor.FailurePriceIncrease"}}</label>
+      <div class="input-with-suffix">
+        <input type="number" id="fail-price" name="haggling.failurePriceIncrease" value="{{haggling.failurePriceIncrease}}" step="0.01" min="0" max="1">
+        <span class="suffix">%</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="refuse-message">{{localize "BOBSNPC.ShopEditor.RefuseServiceMessage"}}</label>
+      <input type="text" id="refuse-message" name="haggling.refuseServiceMessage" value="{{haggling.refuseServiceMessage}}">
+    </div>
+  </div>
+</div>
