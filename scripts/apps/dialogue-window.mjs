@@ -182,16 +182,53 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       dc: r.skillCheck?.dc
     }));
 
+    // Format services with icons and labels
+    const formattedServices = services.map(s => ({
+      ...s,
+      icon: this._getServiceIcon(s.type),
+      label: localize(`Services.${s.type}`)
+    }));
+
+    // Get multiplayer info
+    const participants = this._session?.participants || [];
+    const isMultiplayer = participants.length > 1;
+
     return {
       ...context,
-      // Top-level variables for templates
+      // Top-level variables for header template
+      npcPortrait: portrait,
+      npcName: this._npcActor?.name || localize("NPC.Unknown"),
+      npcTitle: npcConfig?.title || null,
+      npcFaction: npcConfig?.faction?.name || null,
+      npcFactionColor: npcConfig?.faction?.color || null,
+      mood: this._currentNode?.emotion || "neutral",
+      moodIcon: this._getMoodIcon(this._currentNode?.emotion || "neutral"),
+
+      // Top-level variables for content template
       dialogueText,
-      speakerName: speakerType === "npc" ? speakerName : null, // Only show speaker name for NPC
+      speakerName: speakerType === "npc" ? speakerName : null,
       isTypewriting: this._isTyping,
+      hasItems: false, // TODO: implement item display
+      hasQuest: false, // TODO: implement quest display
+
+      // Top-level variables for responses template
       hasResponses: formattedResponses.length > 0,
+      responses: formattedResponses,
+      isMultiplayer,
+      participantCount: participants.length,
+      votingEnabled: false, // TODO: implement voting
+      votesCollected: 0,
+      hasVoted: false,
+
+      // Top-level variables for footer template
+      hasServices: formattedServices.length > 0,
+      services: formattedServices,
+      canGoBack: false, // TODO: implement history navigation
+      showHistory: false,
+      isGM: game.user.isGM,
       theme,
 
-      // Structured data
+      // Structured data (for backwards compatibility)
       npc: {
         name: this._npcActor?.name || localize("NPC.Unknown"),
         portrait,
@@ -211,21 +248,13 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         emotion: this._currentNode?.emotion || "neutral",
         isTyping: this._isTyping
       },
-      responses: formattedResponses,
-      services: services.map(s => ({
-        ...s,
-        icon: this._getServiceIcon(s.type),
-        label: localize(`Services.${s.type}`)
-      })),
+      participants,
       settings: {
         typewriterEnabled: game.settings.get(MODULE_ID, "typewriterSpeed") > 0,
         typewriterSpeed: game.settings.get(MODULE_ID, "typewriterSpeed"),
         soundEnabled: game.settings.get(MODULE_ID, "soundEnabled"),
         theme
-      },
-      isGM: game.user.isGM,
-      isMultiplayer: this._session?.participants?.length > 1,
-      participants: this._session?.participants || []
+      }
     };
   }
 
@@ -660,6 +689,29 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       fence: "fa-mask"
     };
     return icons[serviceType] || "fa-cog";
+  }
+
+  /**
+   * Get mood/emotion icon
+   * @param {string} mood - Mood/emotion type
+   * @returns {string} Icon class
+   * @private
+   */
+  _getMoodIcon(mood) {
+    const icons = {
+      neutral: "fa-meh",
+      happy: "fa-smile",
+      sad: "fa-frown",
+      angry: "fa-angry",
+      surprised: "fa-surprise",
+      fearful: "fa-grimace",
+      disgusted: "fa-dizzy",
+      friendly: "fa-smile-beam",
+      hostile: "fa-face-angry-horns",
+      suspicious: "fa-face-raised-eyebrow",
+      nervous: "fa-face-anxious-sweat"
+    };
+    return icons[mood] || "fa-meh";
   }
 
   // ==================== Static Factory ====================
