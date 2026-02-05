@@ -704,7 +704,17 @@ export class DialogueHandler {
     const dialogue = this.getDialogue(dialogueId);
     if (!dialogue) return null;
 
-    return dialogue.nodes.find(n => n.id === nodeId) || null;
+    // Nodes are stored as an object map, not an array
+    if (dialogue.nodes && typeof dialogue.nodes === "object") {
+      // If it's an object/map, access by key directly
+      if (!Array.isArray(dialogue.nodes)) {
+        return dialogue.nodes[nodeId] || null;
+      }
+      // If it's an array, use find
+      return dialogue.nodes.find(n => n.id === nodeId) || null;
+    }
+
+    return null;
   }
 
   /**
