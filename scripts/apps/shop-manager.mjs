@@ -83,8 +83,12 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const context = await super._prepareContext(options);
     const handler = getMerchantHandler();
 
-    // Get all shops
+    // Get all shops - try handler first, fall back to settings
     let shops = handler?.getAllMerchants() || [];
+    if (shops.length === 0) {
+      const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
+      shops = Object.values(shopsSettings);
+    }
 
     // Apply type filter
     if (this._typeFilter && this._typeFilter !== "all") {
@@ -144,11 +148,18 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       description: this._getTemplateDescription(key)
     }));
 
+    // Calculate total shops (before filtering)
+    let totalShops = handler?.getAllMerchants()?.length || 0;
+    if (totalShops === 0) {
+      const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
+      totalShops = Object.keys(shopsSettings).length;
+    }
+
     return {
       ...context,
       shops: enrichedShops,
       shopCount: enrichedShops.length,
-      totalShops: handler?.getAllMerchants()?.length || 0,
+      totalShops,
       hasShops: enrichedShops.length > 0,
       typeOptions,
       templates,
@@ -211,6 +222,43 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
     return descriptions[templateKey] || "";
   }
 
+  // ==================== Helper Methods ====================
+
+  /**
+   * Get a shop by ID from handler or settings
+   * @param {string} shopId - Shop ID
+   * @returns {Object|null}
+   */
+  _getShop(shopId) {
+    const handler = getMerchantHandler();
+    let shop = handler?.getMerchant(shopId);
+    if (!shop) {
+      const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
+      shop = shopsSettings[shopId];
+    }
+    return shop || null;
+  }
+
+  /**
+   * Save a shop to settings
+   * @param {Object} shop - Shop data
+   */
+  async _saveShopToSettings(shop) {
+    const shops = game.settings.get(MODULE_ID, "shops") || {};
+    shops[shop.id] = shop;
+    await game.settings.set(MODULE_ID, "shops", shops);
+  }
+
+  /**
+   * Delete a shop from settings
+   * @param {string} shopId - Shop ID
+   */
+  async _deleteShopFromSettings(shopId) {
+    const shops = game.settings.get(MODULE_ID, "shops") || {};
+    delete shops[shopId];
+    await game.settings.set(MODULE_ID, "shops", shops);
+  }
+
   // ==================== Actions ====================
 
   /**
@@ -236,9 +284,16 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Create shop from template
     const handler = getMerchantHandler();
-    const shop = await handler.createMerchant(
-      createMerchantFromTemplate(templateKey)
-    );
+    const shopData = createMerchantFromTemplate(templateKey);
+    let shop;
+
+    if (handler?.createMerchant) {
+      shop = await handler.createMerchant(shopData);
+    } else {
+      // Fall back to settings storage
+      shop = shopData;
+      await this._saveShopToSettings(shop);
+    }
 
     // Hide template picker
     const templateSection = this.element.querySelector(".shop-templates");
@@ -277,8 +332,7 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   static async #onDeleteShop(event, target) {
     const shopId = target.closest("[data-shop-id]").dataset.shopId;
-    const handler = getMerchantHandler();
-    const shop = handler.getMerchant(shopId);
+    const shop = this._getShop(shopId);
 
     if (!shop) return;
 
@@ -291,7 +345,12 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
     });
 
     if (confirmed) {
-      await handler.deleteMerchant(shopId);
+      const handler = getMerchantHandler();
+      if (handler?.deleteMerchant) {
+        await handler.deleteMerchant(shopId);
+      } else {
+        await this._deleteShopFromSettings(shopId);
+      }
       await this.render();
       ui.notifications.info(localize("ShopManager.ShopDeleted", { name: shop.name }));
     }
@@ -304,22 +363,32 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   static async #onDuplicateShop(event, target) {
     const shopId = target.closest("[data-shop-id]").dataset.shopId;
-    const handler = getMerchantHandler();
-    const shop = handler.getMerchant(shopId);
+    const shop = this._getShop(shopId);
 
     if (!shop) return;
 
+    // Import generateId for new shop ID
+    const { generateId } = await import("../utils/helpers.mjs");
+
     // Create copy with new ID and modified name
     const copy = {
-      ...shop,
-      id: undefined, // Will generate new ID
+      ...foundry.utils.deepClone(shop),
+      id: generateId(),
       name: `${shop.name} (Copy)`,
       npcActorUuid: null, // Don't link to same NPC
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
 
-    const newShop = await handler.createMerchant(copy);
+    const handler = getMerchantHandler();
+    let newShop;
+    if (handler?.createMerchant) {
+      newShop = await handler.createMerchant(copy);
+    } else {
+      newShop = copy;
+      await this._saveShopToSettings(copy);
+    }
+
     await this.render();
 
     ui.notifications.info(localize("ShopManager.ShopDuplicated", { name: newShop.name }));
