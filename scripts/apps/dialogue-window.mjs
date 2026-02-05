@@ -166,8 +166,32 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     // Get available services if at a service node
     const services = this._currentNode?.services || [];
 
+    // Build display text
+    const dialogueText = this._displayedText || this._currentNode?.text || "";
+    const speakerType = this._currentNode?.speaker || "npc";
+    const speakerName = speakerType === "npc" ? (this._npcActor?.name || localize("NPC.Unknown")) : (this._playerActor?.name || game.user.name);
+
+    // Format responses with availability defaulting to true
+    const formattedResponses = availableResponses.map((r, i) => ({
+      ...r,
+      index: i,
+      shortcut: i < 9 ? i + 1 : null,
+      available: r.available !== false, // Default to available
+      requiresRoll: !!r.skillCheck,
+      skillName: r.skillCheck?.skill ? localize(`Skills.${r.skillCheck.skill}`) : null,
+      dc: r.skillCheck?.dc
+    }));
+
     return {
       ...context,
+      // Top-level variables for templates
+      dialogueText,
+      speakerName: speakerType === "npc" ? speakerName : null, // Only show speaker name for NPC
+      isTypewriting: this._isTyping,
+      hasResponses: formattedResponses.length > 0,
+      theme,
+
+      // Structured data
       npc: {
         name: this._npcActor?.name || localize("NPC.Unknown"),
         portrait,
@@ -181,20 +205,13 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         id: this.dialogueId,
         sessionId: this.sessionId,
         nodeId: this._currentNode?.id,
-        text: this._displayedText || this._currentNode?.text || "",
+        text: dialogueText,
         fullText: this._currentNode?.text || "",
-        speaker: this._currentNode?.speaker || "npc",
+        speaker: speakerType,
         emotion: this._currentNode?.emotion || "neutral",
         isTyping: this._isTyping
       },
-      responses: availableResponses.map((r, i) => ({
-        ...r,
-        index: i,
-        shortcut: i < 9 ? i + 1 : null,
-        requiresRoll: !!r.skillCheck,
-        skillName: r.skillCheck?.skill ? localize(`Skills.${r.skillCheck.skill}`) : null,
-        dc: r.skillCheck?.dc
-      })),
+      responses: formattedResponses,
       services: services.map(s => ({
         ...s,
         icon: this._getServiceIcon(s.type),

@@ -119,7 +119,9 @@ function handleSocketEvent(data) {
     } catch (error) {
       console.error(`${MODULE_ID} | Error handling socket event ${type}:`, error);
     }
-  } else {
+  } else if (!type?.startsWith("dialogue.")) {
+    // Only warn for unhandled events that aren't dialogue events
+    // (dialogue events are handled by DialogueHandler's own socket listener)
     console.warn(`${MODULE_ID} | Unknown socket event type: ${type}`);
   }
 }
