@@ -48,6 +48,7 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     this._displayedText = "";
     this._fullText = "";
     this._isTyping = false;
+    this._initialized = false;
   }
 
   /** @override */
@@ -100,6 +101,18 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   /** @override */
   async _preFirstRender(context, options) {
     await super._preFirstRender(context, options);
+    // Register for socket updates
+    this._registerSocketListener();
+  }
+
+  /**
+   * Initialize dialogue data (lazy loading for _prepareContext)
+   * @private
+   */
+  async _ensureInitialized() {
+    // Only initialize once
+    if (this._initialized) return;
+    this._initialized = true;
 
     // Load actors
     this._npcActor = await fromUuid(this.npcActorUuid);
@@ -146,14 +159,14 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       };
       console.warn(`${MODULE_ID} | No dialogue found for ${npcName}, using fallback greeting`);
     }
-
-    // Register for socket updates
-    this._registerSocketListener();
   }
 
   /** @override */
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
+
+    // Ensure dialogue data is initialized before preparing context
+    await this._ensureInitialized();
 
     const npcConfig = getNpcHandler().getConfig(this.npcActorUuid);
     const portrait = this._getPortrait(npcConfig);
