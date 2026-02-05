@@ -120,11 +120,31 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         this.npcActorUuid,
         this.playerActorUuid
       );
-      this._session = result.session;
-      this.sessionId = result.sessionId;
-      this._currentNode = result.currentNode;
+      this._session = result?.session;
+      this.sessionId = result?.sessionId;
+      this._currentNode = result?.currentNode;
     } else {
       this._currentNode = this._session.currentNode;
+    }
+
+    // If no dialogue content exists, create a fallback greeting
+    if (!this._currentNode) {
+      const npcName = this._npcActor?.name || "NPC";
+      this._currentNode = {
+        id: "fallback-greeting",
+        type: "greeting",
+        text: `Greetings, traveler. I am ${npcName}. (No dialogue has been configured for this NPC yet.)`,
+        speaker: "npc",
+        emotion: "neutral",
+        responses: [
+          {
+            id: "farewell",
+            text: "Farewell.",
+            nextNodeId: null // Ends dialogue
+          }
+        ]
+      };
+      console.warn(`${MODULE_ID} | No dialogue found for ${npcName}, using fallback greeting`);
     }
 
     // Register for socket updates
