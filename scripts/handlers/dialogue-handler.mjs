@@ -774,7 +774,17 @@ export class DialogueHandler {
     // Handle responses as array or object map
     let response;
     if (Array.isArray(currentNode.responses)) {
+      // First try to find by id property
       response = currentNode.responses.find(r => r.id === responseId);
+
+      // If not found and responseId looks like "response-N", use index
+      if (!response && responseId.startsWith("response-")) {
+        const index = parseInt(responseId.replace("response-", ""), 10);
+        if (!isNaN(index) && index >= 0 && index < currentNode.responses.length) {
+          response = currentNode.responses[index];
+          console.log(`${MODULE_ID} | selectResponse - matched by index ${index}:`, response);
+        }
+      }
     } else if (currentNode.responses && typeof currentNode.responses === "object") {
       response = currentNode.responses[responseId];
     }
