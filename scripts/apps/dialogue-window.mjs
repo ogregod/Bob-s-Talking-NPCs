@@ -177,7 +177,11 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     // Get available responses (handle array or object map)
     let responses = this._currentNode?.responses || [];
     if (!Array.isArray(responses) && typeof responses === "object") {
-      responses = Object.values(responses);
+      // Convert object map to array, preserving the key as the id
+      responses = Object.entries(responses).map(([key, value]) => ({
+        ...value,
+        id: value.id || key  // Use existing id or the object key
+      }));
     }
     const availableResponses = await this._filterAvailableResponses(responses);
 
@@ -405,7 +409,11 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     let responseArray = responses;
     if (!Array.isArray(responses)) {
       if (responses && typeof responses === "object") {
-        responseArray = Object.values(responses);
+        // Convert object map to array, preserving the key as the id
+        responseArray = Object.entries(responses).map(([key, value]) => ({
+          ...value,
+          id: value.id || key  // Use existing id or the object key
+        }));
       } else {
         responseArray = [];
       }
