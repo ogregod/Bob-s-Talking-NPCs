@@ -195,15 +195,22 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     console.log(`${MODULE_ID} | _prepareContext - responses:`, responses);
 
     // Format responses with availability defaulting to true
-    const formattedResponses = availableResponses.map((r, i) => ({
-      ...r,
-      index: i,
-      shortcut: i < 9 ? i + 1 : null,
-      available: r.available !== false, // Default to available
-      requiresRoll: !!r.skillCheck,
-      skillName: r.skillCheck?.skill ? localize(`Skills.${r.skillCheck.skill}`) : null,
-      dc: r.skillCheck?.dc
-    }));
+    const formattedResponses = availableResponses.map((r, i) => {
+      // Only include skillCheck if it's properly configured with both skill and dc
+      const hasSkillCheck = r.skillCheck && r.skillCheck.skill && r.skillCheck.dc;
+      return {
+        ...r,
+        index: i,
+        shortcut: i < 9 ? i + 1 : null,
+        available: r.available !== false, // Default to available
+        requiresRoll: hasSkillCheck,
+        skillCheck: hasSkillCheck ? {
+          skill: r.skillCheck.skill,
+          dc: r.skillCheck.dc,
+          tooltip: `${r.skillCheck.skill} DC ${r.skillCheck.dc}`
+        } : null
+      };
+    });
 
     // Format services with icons and labels
     const formattedServices = services.map(s => ({
@@ -434,14 +441,26 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     try {
+      console.log(`${MODULE_ID} | Selecting response: ${responseId}`);
+
       const result = await getDialogueHandler().selectResponse(
         this.sessionId,
         responseId,
         rollResult
       );
 
+      console.log(`${MODULE_ID} | selectResponse result:`, result);
+
       if (result.ended) {
         // Dialogue ended
+        console.log(`${MODULE_ID} | Dialogue ended, closing window`);
+        await this.close();
+        return;
+      }
+
+      if (!result.node) {
+        // No node returned but not ended - something went wrong
+        console.warn(`${MODULE_ID} | No node returned from selectResponse but not ended`);
         await this.close();
         return;
       }
@@ -449,6 +468,8 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       // Update current node
       this._currentNode = result.node;
       this._displayedText = "";
+
+      console.log(`${MODULE_ID} | Moving to node:`, this._currentNode?.id, this._currentNode?.text?.substring(0, 50));
 
       // Re-render
       await this.render();
@@ -507,7 +528,15 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
     let rollResult = null;
     if (requiresRoll) {
-      const response = this._currentNode?.responses?.find(r => r.id === responseId);
+      // Handle responses as array or object map
+      let response;
+      const responses = this._currentNode?.responses;
+      if (Array.isArray(responses)) {
+        response = responses.find(r => r.id === responseId);
+      } else if (responses && typeof responses === "object") {
+        response = responses[responseId];
+      }
+
       if (response?.skillCheck) {
         rollResult = await this._handleSkillCheck(response);
         if (!rollResult) return; // Roll was cancelled

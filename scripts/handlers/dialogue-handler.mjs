@@ -756,13 +756,20 @@ export class DialogueHandler {
   async selectResponse(sessionId, responseId, rollResult = null) {
     const session = this.getSession(sessionId);
     if (!session) {
+      console.warn(`${MODULE_ID} | selectResponse: Session not found: ${sessionId}`);
       return { success: false, node: null, message: localize("BOBSNPC.SessionNotFound") };
     }
 
+    console.log(`${MODULE_ID} | selectResponse - sessionId: ${sessionId}, responseId: ${responseId}`);
+    console.log(`${MODULE_ID} | selectResponse - current node: ${session.currentNodeId}`);
+
     const currentNode = await this.getNode(session.dialogueId, session.currentNodeId);
     if (!currentNode) {
+      console.warn(`${MODULE_ID} | selectResponse: Node not found: ${session.currentNodeId}`);
       return { success: false, node: null, message: localize("BOBSNPC.NodeNotFound") };
     }
+
+    console.log(`${MODULE_ID} | selectResponse - currentNode responses:`, currentNode.responses);
 
     // Handle responses as array or object map
     let response;
@@ -771,9 +778,15 @@ export class DialogueHandler {
     } else if (currentNode.responses && typeof currentNode.responses === "object") {
       response = currentNode.responses[responseId];
     }
+
+    console.log(`${MODULE_ID} | selectResponse - found response:`, response);
+
     if (!response) {
+      console.warn(`${MODULE_ID} | selectResponse: Response not found: ${responseId}`);
       return { success: false, node: null, message: localize("BOBSNPC.ResponseNotFound") };
     }
+
+    console.log(`${MODULE_ID} | selectResponse - response.nextNodeId:`, response.nextNodeId);
 
     const context = this._createContext(session);
 
@@ -827,6 +840,13 @@ export class DialogueHandler {
 
       const nextNode = await this.getNode(session.dialogueId, nextNodeId);
 
+      // If next node doesn't exist, end dialogue
+      if (!nextNode) {
+        console.warn(`${MODULE_ID} | Next node "${nextNodeId}" not found, ending dialogue`);
+        await this.endDialogue(sessionId);
+        return { success: true, node: null, message: localize("BOBSNPC.DialogueEnded"), ended: true };
+      }
+
       // Execute entry actions for next node
       if (nextNode?.onEnter?.length > 0) {
         await this._executeActions(nextNode.onEnter, context);
@@ -835,6 +855,7 @@ export class DialogueHandler {
       // Check for auto-end nodes
       if (nextNode?.type === NodeType.END) {
         await this.endDialogue(sessionId);
+        return { success: true, node: nextNode, message: null, ended: true };
       }
 
       // Broadcast
@@ -847,11 +868,11 @@ export class DialogueHandler {
 
       Hooks.callAll("bobsNPCResponseSelected", session, response, nextNode);
 
-      return { success: true, node: nextNode, message: null };
+      return { success: true, node: nextNode, message: null, ended: false };
     } else {
       // No next node - end dialogue
       await this.endDialogue(sessionId);
-      return { success: true, node: null, message: localize("BOBSNPC.DialogueEnded") };
+      return { success: true, node: null, message: localize("BOBSNPC.DialogueEnded"), ended: true };
     }
   }
 
