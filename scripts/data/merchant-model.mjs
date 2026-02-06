@@ -35,8 +35,9 @@ export const StockRefreshType = Object.freeze({
   NEVER: "never",
   DAILY: "daily",
   WEEKLY: "weekly",
+  MONTHLY: "monthly",
   ON_VISIT: "onVisit",
-  MANUAL: "manual"
+  CUSTOM: "custom"
 });
 
 /**
@@ -56,6 +57,8 @@ export const ItemRarity = Object.freeze({
  */
 export const PriceDisplayMode = Object.freeze({
   EXACT: "exact",
+  GOLD_DOWN: "goldDown",
+  ALL: "all",
   RANGE: "range",
   HIDDEN: "hidden",
   ASK: "ask"

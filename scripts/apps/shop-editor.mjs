@@ -257,6 +257,9 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       return { ...context, error: "Shop not found" };
     }
 
+    // Ensure shop has valid defaults before building context
+    this._shop = this._ensureShopDefaults(this._shop);
+
     // Enrich inventory items with full item data
     const enrichedInventory = await this._enrichInventory(this._shop.inventory || []);
 
@@ -276,6 +279,10 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       label: localize(`ShopTypes.${key}`),
       selected: this._shop.type === value
     }));
+
+    console.log(`${MODULE_ID} | ShopEditor._prepareContext - typeOptions:`, typeOptions);
+    console.log(`${MODULE_ID} | ShopEditor._prepareContext - shop.type:`, this._shop.type);
+    console.log(`${MODULE_ID} | ShopEditor._prepareContext - shop.color:`, this._shop.color);
 
     const refreshTypeOptions = Object.entries(StockRefreshType).map(([key, value]) => ({
       value,

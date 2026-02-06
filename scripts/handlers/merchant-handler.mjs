@@ -876,7 +876,7 @@ export class MerchantHandler {
 
     for (const merchant of this.getAllMerchants()) {
       const refresh = merchant.stockRefresh;
-      if (refresh.type === StockRefreshType.NEVER || refresh.type === StockRefreshType.MANUAL) {
+      if (refresh.type === StockRefreshType.NEVER) {
         continue;
       }
 
@@ -889,6 +889,13 @@ export class MerchantHandler {
           break;
         case StockRefreshType.WEEKLY:
           shouldRefresh = now - lastRefresh > 7 * 24 * 60 * 60 * 1000;
+          break;
+        case StockRefreshType.MONTHLY:
+          shouldRefresh = now - lastRefresh > 30 * 24 * 60 * 60 * 1000;
+          break;
+        case StockRefreshType.CUSTOM:
+          const intervalDays = refresh.customIntervalDays || 7;
+          shouldRefresh = now - lastRefresh > intervalDays * 24 * 60 * 60 * 1000;
           break;
       }
 
