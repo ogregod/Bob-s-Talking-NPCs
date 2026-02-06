@@ -798,6 +798,42 @@
       "NoBuybackItems": "No items available for buyback"
     },
 
+    "ShopTypes": {
+      "GENERAL": "General Store",
+      "WEAPONS": "Weapons Shop",
+      "ARMOR": "Armor Shop",
+      "MAGIC": "Magic Shop",
+      "POTIONS": "Potions Shop",
+      "SCROLLS": "Scroll Shop",
+      "TOOLS": "Tools & Supplies",
+      "FOOD": "Food & Provisions",
+      "JEWELRY": "Jewelry Shop",
+      "BLACKSMITH": "Blacksmith",
+      "TAILOR": "Tailor",
+      "STABLE": "Stable",
+      "INN": "Inn & Tavern",
+      "BLACK_MARKET": "Black Market",
+      "CUSTOM": "Custom"
+    },
+
+    "StockRefreshTypes": {
+      "NEVER": "Never (Manual)",
+      "DAILY": "Daily",
+      "WEEKLY": "Weekly",
+      "MONTHLY": "Monthly",
+      "ON_VISIT": "Each Visit",
+      "CUSTOM": "Custom Interval"
+    },
+
+    "PriceDisplayModes": {
+      "EXACT": "Exact Price",
+      "GOLD_DOWN": "Gold and Below",
+      "ALL": "All Denominations",
+      "HIDDEN": "Hidden",
+      "ASK": "Ask Merchant",
+      "RANGE": "Price Range"
+    },
+
     "ShopManager": {
       "Title": "Shop Manager",
       "SearchPlaceholder": "Search shops...",

@@ -60,15 +60,25 @@ export class MerchantHandler {
 
   /**
    * Load merchants from storage
+   * Loads from both worldData.merchants and shops settings for compatibility
    * @private
    */
   async _loadMerchants() {
+    this._merchantCache.clear();
+
+    // Load from worldData.merchants (primary storage)
     const worldData = game.settings.get(MODULE_ID, "worldData") || {};
     const merchants = worldData.merchants || {};
-
-    this._merchantCache.clear();
     for (const [id, merchantData] of Object.entries(merchants)) {
       this._merchantCache.set(id, createMerchant(merchantData));
+    }
+
+    // Also load from shops settings (fallback storage) if not already in cache
+    const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
+    for (const [id, shopData] of Object.entries(shopsSettings)) {
+      if (!this._merchantCache.has(id)) {
+        this._merchantCache.set(id, createMerchant(shopData));
+      }
     }
   }
 
@@ -84,6 +94,7 @@ export class MerchantHandler {
 
   /**
    * Get merchant by ID
+   * Checks cache, then worldData.merchants, then shops settings
    * @param {string} merchantId - Merchant ID
    * @returns {object|null}
    */
@@ -92,23 +103,53 @@ export class MerchantHandler {
     let merchant = this._merchantCache.get(merchantId);
     if (merchant) return merchant;
 
-    // Fall back to settings storage
+    // Try worldData.merchants (primary storage)
+    const worldData = game.settings.get(MODULE_ID, "worldData") || {};
+    const merchants = worldData.merchants || {};
+    if (merchants[merchantId]) {
+      return createMerchant(merchants[merchantId]);
+    }
+
+    // Fall back to shops settings (fallback storage)
     const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
-    return shopsSettings[merchantId] || null;
+    if (shopsSettings[merchantId]) {
+      return createMerchant(shopsSettings[merchantId]);
+    }
+
+    return null;
   }
 
   /**
    * Get all merchants
+   * Merges from cache, worldData.merchants, and shops settings
    * @returns {object[]}
    */
   getAllMerchants() {
-    // Get from cache
-    const cachedMerchants = Array.from(this._merchantCache.values());
-    if (cachedMerchants.length > 0) return cachedMerchants;
+    const allMerchants = new Map();
 
-    // Fall back to settings storage
+    // Get from cache first
+    for (const [id, merchant] of this._merchantCache) {
+      allMerchants.set(id, merchant);
+    }
+
+    // Add from worldData.merchants if not in cache
+    const worldData = game.settings.get(MODULE_ID, "worldData") || {};
+    const merchants = worldData.merchants || {};
+    for (const [id, merchantData] of Object.entries(merchants)) {
+      if (!allMerchants.has(id)) {
+        allMerchants.set(id, createMerchant(merchantData));
+      }
+    }
+
+    // Add from shops settings if not already present
     const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
-    return Object.values(shopsSettings);
+    for (const [id, shopData] of Object.entries(shopsSettings)) {
+      if (!allMerchants.has(id)) {
+        allMerchants.set(id, createMerchant(shopData));
+      }
+    }
+
+    return Array.from(allMerchants.values());
   }
 
   /**
