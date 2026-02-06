@@ -111,19 +111,73 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   async _preFirstRender(context, options) {
     await super._preFirstRender(context, options);
 
+    console.log(`${MODULE_ID} | ShopEditor._preFirstRender - shopId: ${this.shopId}`);
+
     // Load shop data or create default
     if (this.shopId) {
       const handler = getMerchantHandler();
-      this._shop = handler?.getMerchant(this.shopId);
-      if (!this._shop) {
-        throw new Error(`Shop not found: ${this.shopId}`);
+      console.log(`${MODULE_ID} | ShopEditor - handler available: ${!!handler}`);
+
+      let shopData = handler?.getMerchant(this.shopId);
+      console.log(`${MODULE_ID} | ShopEditor - shop from handler: ${shopData?.name || 'not found'}`);
+
+      // Also try direct settings lookup if not found via handler
+      if (!shopData) {
+        const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
+        shopData = shopsSettings[this.shopId];
+        console.log(`${MODULE_ID} | ShopEditor - shop from settings: ${shopData?.name || 'not found'}`);
       }
-      // Create a working copy
-      this._shop = foundry.utils.deepClone(this._shop);
+
+      // Also try worldData.merchants
+      if (!shopData) {
+        const worldData = game.settings.get(MODULE_ID, "worldData") || {};
+        shopData = worldData.merchants?.[this.shopId];
+        console.log(`${MODULE_ID} | ShopEditor - shop from worldData: ${shopData?.name || 'not found'}`);
+      }
+
+      if (!shopData) {
+        console.warn(`${MODULE_ID} | Shop not found: ${this.shopId}, creating new shop`);
+        this._shop = this._createDefaultShop();
+        // Don't throw - just create a new shop
+      } else {
+        // Create a working copy and ensure all required fields exist
+        this._shop = this._ensureShopDefaults(foundry.utils.deepClone(shopData));
+      }
     } else {
       // Create new shop with defaults
       this._shop = this._createDefaultShop();
     }
+
+    console.log(`${MODULE_ID} | ShopEditor - final shop:`, this._shop?.name, this._shop?.id);
+  }
+
+  /**
+   * Ensure shop has all required default values
+   * @param {object} shop - Shop data
+   * @returns {object} Shop with defaults applied
+   */
+  _ensureShopDefaults(shop) {
+    // Ensure critical fields have valid values
+    shop.id = shop.id || generateId();
+    shop.name = shop.name || "";
+    shop.type = shop.type || ShopType.GENERAL;
+    shop.icon = shop.icon || "icons/svg/chest.svg";
+    shop.color = shop.color || "#7b68ee";
+    shop.inventory = shop.inventory || [];
+    shop.pricing = shop.pricing || {
+      buyMultiplier: 1.0,
+      sellMultiplier: 0.5,
+      useCharisma: false,
+      charismaMultiplier: 0.02,
+      displayMode: PriceDisplayMode.GOLD_DOWN
+    };
+    shop.haggling = shop.haggling || { enabled: false };
+    shop.stockRefresh = shop.stockRefresh || { type: StockRefreshType.NEVER };
+    shop.services = shop.services || {};
+    shop.access = shop.access || {};
+    shop.buyBack = shop.buyBack || { enabled: false };
+
+    return shop;
   }
 
   /**
