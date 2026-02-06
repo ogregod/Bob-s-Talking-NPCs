@@ -278,10 +278,10 @@ export class MerchantHandler {
     const charisma = actor.system?.abilities?.cha?.mod || 0;
 
     // Get faction standings
-    const factionStandings = await game.bobsnpc?.factions?.getAllStandings(playerActorUuid) || {};
+    const factionStandings = await game.bobsnpc?.handlers?.faction?.getAllStandings?.(playerActorUuid) || {};
 
     // Get completed quests
-    const completedQuests = await game.bobsnpc?.quests?.getCompletedQuests(playerActorUuid) || [];
+    const completedQuests = await game.bobsnpc?.handlers?.quest?.getCompletedQuests?.(playerActorUuid) || [];
 
     // Get current gold
     const gold = convertToGold(actor.system?.currency || {});

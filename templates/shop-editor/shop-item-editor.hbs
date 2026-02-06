@@ -1,0 +1,176 @@
+{{!-- Shop Item Editor Template --}}
+<form class="shop-item-editor-form">
+  {{!-- Item Link Section --}}
+  <section class="item-link-section">
+    <h4>{{localize "BOBSNPC.ShopItemEditor.LinkedItem"}}</h4>
+
+    {{#if hasLinkedItem}}
+      <div class="linked-item-display">
+        <img class="item-img" src="{{linkedItem.img}}" alt="{{linkedItem.name}}">
+        <div class="item-info">
+          <span class="item-name">{{linkedItem.name}}</span>
+          <span class="item-details">
+            <span class="item-rarity rarity-{{linkedItem.rarity}}">{{linkedItem.rarity}}</span>
+            <span class="item-price">{{linkedItem.price}} gp</span>
+          </span>
+        </div>
+        <button type="button" class="btn-icon" data-action="clearItem" data-tooltip="{{localize 'BOBSNPC.ShopItemEditor.ClearItem'}}">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+    {{else}}
+      <div class="item-drop-zone">
+        <i class="fa-solid fa-hand-pointer"></i>
+        <p>{{localize "BOBSNPC.ShopItemEditor.DragItemHere"}}</p>
+        <button type="button" class="btn" data-action="browseItem">
+          <i class="fa-solid fa-search"></i>
+          {{localize "BOBSNPC.ShopItemEditor.BrowseItems"}}
+        </button>
+      </div>
+    {{/if}}
+  </section>
+
+  {{!-- Basic Info --}}
+  <section class="basic-info-section">
+    <h4>{{localize "BOBSNPC.ShopItemEditor.BasicInfo"}}</h4>
+
+    <div class="form-group">
+      <label>{{localize "BOBSNPC.ShopItemEditor.DisplayName"}}</label>
+      <input type="text" name="name" value="{{item.name}}" placeholder="{{#if linkedItem}}{{linkedItem.name}}{{else}}{{localize 'BOBSNPC.ShopItemEditor.EnterName'}}{{/if}}">
+      <p class="hint">{{localize "BOBSNPC.ShopItemEditor.DisplayNameHint"}}</p>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{localize "BOBSNPC.ShopItemEditor.Quantity"}}</label>
+        <div class="quantity-controls">
+          <input type="number" name="quantity" value="{{#unless isUnlimited}}{{item.quantity}}{{/unless}}" min="0" step="1" {{#if isUnlimited}}disabled{{/if}}>
+          <label class="checkbox-inline">
+            <input type="checkbox" name="unlimited" {{#if isUnlimited}}checked{{/if}}>
+            {{localize "BOBSNPC.ShopItemEditor.Unlimited"}}
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>{{localize "BOBSNPC.ShopItemEditor.MaxQuantity"}}</label>
+        <input type="number" name="maxQuantity" value="{{item.maxQuantity}}" min="-1" step="1">
+        <p class="hint">{{localize "BOBSNPC.ShopItemEditor.MaxQuantityHint"}}</p>
+      </div>
+    </div>
+  </section>
+
+  {{!-- Pricing --}}
+  <section class="pricing-section">
+    <h4>{{localize "BOBSNPC.ShopItemEditor.Pricing"}}</h4>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{localize "BOBSNPC.ShopItemEditor.BasePrice"}}</label>
+        <div class="input-with-suffix">
+          <input type="number" name="basePrice" value="{{displayPrice}}" min="0" step="0.1">
+          <span class="suffix">gp</span>
+        </div>
+        <p class="hint">{{localize "BOBSNPC.ShopItemEditor.BasePriceHint"}}</p>
+      </div>
+
+      <div class="form-group">
+        <label>{{localize "BOBSNPC.ShopItemEditor.PriceOverride"}}</label>
+        <div class="input-with-suffix">
+          <input type="number" name="priceOverride" value="{{item.priceOverride}}" min="0" step="0.1" placeholder="{{localize 'BOBSNPC.ShopItemEditor.None'}}">
+          <span class="suffix">gp</span>
+        </div>
+        <p class="hint">{{localize "BOBSNPC.ShopItemEditor.PriceOverrideHint"}}</p>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{localize "BOBSNPC.ShopItemEditor.BuyMultiplier"}}</label>
+        <div class="input-with-suffix">
+          <input type="number" name="buyMultiplier" value="{{item.buyMultiplier}}" min="0" step="0.05">
+          <span class="suffix">x</span>
+        </div>
+        <p class="hint">{{localize "BOBSNPC.ShopItemEditor.BuyMultiplierHint"}}</p>
+      </div>
+
+      <div class="form-group">
+        <label>{{localize "BOBSNPC.ShopItemEditor.SellMultiplier"}}</label>
+        <div class="input-with-suffix">
+          <input type="number" name="sellMultiplier" value="{{item.sellMultiplier}}" min="0" step="0.05">
+          <span class="suffix">x</span>
+        </div>
+        <p class="hint">{{localize "BOBSNPC.ShopItemEditor.SellMultiplierHint"}}</p>
+      </div>
+    </div>
+  </section>
+
+  {{!-- Availability --}}
+  <section class="availability-section">
+    <h4>{{localize "BOBSNPC.ShopItemEditor.Availability"}}</h4>
+
+    <div class="form-row checkboxes">
+      <label class="checkbox">
+        <input type="checkbox" name="available" {{#if item.available}}checked{{/if}}>
+        {{localize "BOBSNPC.ShopItemEditor.Available"}}
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" name="hidden" {{#if item.hidden}}checked{{/if}}>
+        {{localize "BOBSNPC.ShopItemEditor.Hidden"}}
+      </label>
+    </div>
+    <p class="hint">{{localize "BOBSNPC.ShopItemEditor.AvailabilityHint"}}</p>
+  </section>
+
+  {{!-- Requirements --}}
+  <section class="requirements-section">
+    <h4>{{localize "BOBSNPC.ShopItemEditor.Requirements"}}</h4>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{localize "BOBSNPC.ShopItemEditor.MinLevel"}}</label>
+        <input type="number" name="requirements.level" value="{{requirements.level}}" min="0" max="20" step="1">
+      </div>
+
+      <div class="form-group">
+        <label>{{localize "BOBSNPC.ShopItemEditor.MinReputation"}}</label>
+        <input type="number" name="requirements.minReputation" value="{{requirements.minReputation}}" min="-100" max="100" step="1">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>{{localize "BOBSNPC.ShopItemEditor.RequiredFaction"}}</label>
+      <input type="text" name="requirements.faction" value="{{requirements.faction}}" placeholder="{{localize 'BOBSNPC.ShopItemEditor.None'}}">
+    </div>
+
+    <div class="form-group">
+      <label>{{localize "BOBSNPC.ShopItemEditor.RequiredQuest"}}</label>
+      <input type="text" name="requirements.quest" value="{{requirements.quest}}" placeholder="{{localize 'BOBSNPC.ShopItemEditor.None'}}">
+      <p class="hint">{{localize "BOBSNPC.ShopItemEditor.RequiredQuestHint"}}</p>
+    </div>
+  </section>
+
+  {{!-- Category --}}
+  <section class="category-section">
+    <h4>{{localize "BOBSNPC.ShopItemEditor.Category"}}</h4>
+
+    <div class="form-group">
+      <label>{{localize "BOBSNPC.ShopItemEditor.ItemCategory"}}</label>
+      <input type="text" name="category" value="{{item.category}}" placeholder="{{localize 'BOBSNPC.ShopItemEditor.DefaultCategory'}}">
+      <p class="hint">{{localize "BOBSNPC.ShopItemEditor.CategoryHint"}}</p>
+    </div>
+  </section>
+
+  {{!-- Footer --}}
+  <footer class="form-footer">
+    <button type="button" class="btn" data-action="cancel">
+      <i class="fa-solid fa-times"></i>
+      {{localize "Cancel"}}
+    </button>
+    <button type="button" class="btn primary" data-action="save">
+      <i class="fa-solid fa-check"></i>
+      {{localize "Save"}}
+    </button>
+  </footer>
+</form>
