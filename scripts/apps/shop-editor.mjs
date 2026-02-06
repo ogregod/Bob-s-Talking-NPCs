@@ -29,6 +29,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   constructor(options = {}) {
     super(options);
     this.shopId = options.shopId;
+    this.npcActorUuid = options.npcActorUuid || null; // For auto-linking when creating from NPC Config
     this._shop = null;
     this._activeTab = "basic";
     this._pendingChanges = {};
@@ -138,7 +139,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       icon: "icons/svg/chest.svg",
       color: "#7b68ee",
       bannerImage: null,
-      npcActorUuid: null,
+      npcActorUuid: this.npcActorUuid, // Auto-link if created from NPC Config
       inventory: [],
       pricing: {
         buyMultiplier: 1.0,
@@ -492,6 +493,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Save to handler
     const handler = getMerchantHandler();
+    const isNewShop = !this.shopId;
 
     if (this.shopId) {
       // Update existing shop
@@ -515,13 +517,54 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       ui.notifications.info(localize("ShopEditor.Created", { name: this._shop.name }));
     }
 
+    // If this is a new shop created from NPC Config, auto-link it to the NPC
+    if (isNewShop && this.npcActorUuid) {
+      await this._autoLinkToNpc();
+    }
+
     // Refresh shop manager if open
     const manager = Object.values(ui.windows).find(w => w.constructor.name === "ShopManager");
     if (manager) {
       await manager.render();
     }
 
+    // Refresh NPC Config if open for this NPC
+    const npcConfig = Object.values(ui.windows).find(
+      w => w.constructor.name === "NPCConfig" && w.npc?.uuid === this._shop.npcActorUuid
+    );
+    if (npcConfig) {
+      await npcConfig.render();
+    }
+
     await this.close();
+  }
+
+  /**
+   * Auto-link this shop to the NPC when created from NPC Config
+   */
+  async _autoLinkToNpc() {
+    try {
+      const npc = await fromUuid(this.npcActorUuid);
+      if (!npc) return;
+
+      // Get current config
+      const config = npc.getFlag(MODULE_ID, "config") || {};
+
+      // Update merchant service with this shop ID
+      const services = config.services || {};
+      services.merchant = services.merchant || {};
+      services.merchant.shopId = this._shop.id;
+
+      // Save back to NPC
+      await npc.setFlag(MODULE_ID, "config", {
+        ...config,
+        services
+      });
+
+      console.log(`${MODULE_ID} | Auto-linked shop "${this._shop.name}" to NPC "${npc.name}"`);
+    } catch (e) {
+      console.error(`${MODULE_ID} | Failed to auto-link shop to NPC:`, e);
+    }
   }
 
   /**

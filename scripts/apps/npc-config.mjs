@@ -555,18 +555,27 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
    * @private
    */
   async _getAvailableShops() {
-    // Get shops from journal entries or other storage
     const shops = [];
-    const journalEntries = game.journal.filter(j =>
-      j.getFlag(MODULE_ID, "shopData")
-    );
 
-    for (const journal of journalEntries) {
-      const shopData = journal.getFlag(MODULE_ID, "shopData");
-      if (shopData) {
+    // Get shops from merchant handler (which includes settings fallback)
+    const merchantHandler = game.bobsnpc?.handlers?.merchant;
+    if (merchantHandler?.getAllMerchants) {
+      const allMerchants = merchantHandler.getAllMerchants();
+      for (const merchant of allMerchants) {
         shops.push({
-          id: journal.id,
-          name: journal.name
+          id: merchant.id,
+          name: merchant.name || "Unnamed Shop"
+        });
+      }
+    }
+
+    // If no shops from handler, also try direct settings access
+    if (shops.length === 0) {
+      const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
+      for (const [id, shop] of Object.entries(shopsSettings)) {
+        shops.push({
+          id: id,
+          name: shop.name || "Unnamed Shop"
         });
       }
     }
@@ -803,12 +812,50 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       // Save to NPC
       await getNpcHandler().configureNPC(this.npc.uuid, this._config);
 
+      // Update shop's npcActorUuid if a shop is configured (bi-directional linking)
+      const shopId = this._config.services?.merchant?.shopId;
+      if (shopId) {
+        await this._linkShopToNpc(shopId);
+      }
+
       this._unsavedChanges = false;
       ui.notifications.info(localize("NPCConfig.Saved"));
       this.render();
     } catch (error) {
       console.error(`${MODULE_ID} | Error saving NPC config:`, error);
       ui.notifications.error(localize("NPCConfig.SaveError"));
+    }
+  }
+
+  /**
+   * Update a shop to link back to this NPC
+   * @param {string} shopId - Shop ID to link
+   */
+  async _linkShopToNpc(shopId) {
+    try {
+      const merchantHandler = game.bobsnpc?.handlers?.merchant;
+
+      // Try handler first
+      if (merchantHandler?.getMerchant) {
+        const shop = merchantHandler.getMerchant(shopId);
+        if (shop && shop.npcActorUuid !== this.npc.uuid) {
+          if (merchantHandler.updateMerchant) {
+            await merchantHandler.updateMerchant(shopId, { npcActorUuid: this.npc.uuid });
+          }
+        }
+      }
+
+      // Also update settings storage
+      const shops = game.settings.get(MODULE_ID, "shops") || {};
+      if (shops[shopId] && shops[shopId].npcActorUuid !== this.npc.uuid) {
+        shops[shopId].npcActorUuid = this.npc.uuid;
+        shops[shopId].updatedAt = Date.now();
+        await game.settings.set(MODULE_ID, "shops", shops);
+      }
+
+      console.log(`${MODULE_ID} | Linked shop ${shopId} to NPC ${this.npc.name}`);
+    } catch (e) {
+      console.warn(`${MODULE_ID} | Failed to link shop to NPC:`, e);
     }
   }
 
@@ -883,7 +930,8 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static async #onCreateShop(event, target) {
-    game.bobsnpc?.ui?.openShopEditor(null);
+    // Pass NPC UUID so the new shop is automatically linked
+    game.bobsnpc?.ui?.openShopEditor(null, null, this.npc.uuid);
   }
 
   static async #onOpenShopManager(event, target) {

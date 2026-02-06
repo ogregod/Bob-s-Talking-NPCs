@@ -88,7 +88,13 @@ export class MerchantHandler {
    * @returns {object|null}
    */
   getMerchant(merchantId) {
-    return this._merchantCache.get(merchantId) || null;
+    // Try cache first
+    let merchant = this._merchantCache.get(merchantId);
+    if (merchant) return merchant;
+
+    // Fall back to settings storage
+    const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
+    return shopsSettings[merchantId] || null;
   }
 
   /**
@@ -96,7 +102,13 @@ export class MerchantHandler {
    * @returns {object[]}
    */
   getAllMerchants() {
-    return Array.from(this._merchantCache.values());
+    // Get from cache
+    const cachedMerchants = Array.from(this._merchantCache.values());
+    if (cachedMerchants.length > 0) return cachedMerchants;
+
+    // Fall back to settings storage
+    const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
+    return Object.values(shopsSettings);
   }
 
   /**
@@ -106,6 +118,24 @@ export class MerchantHandler {
    */
   getMerchantForNPC(npcActorUuid) {
     return this.getAllMerchants().find(m => m.npcActorUuid === npcActorUuid) || null;
+  }
+
+  /**
+   * Get merchant by NPC's configured shop ID
+   * Falls back to finding by npcActorUuid if shopId not found
+   * @param {string} npcActorUuid - NPC actor UUID
+   * @param {string} shopId - Optional explicit shop ID from NPC config
+   * @returns {object|null}
+   */
+  getMerchantForNPCConfig(npcActorUuid, shopId = null) {
+    // If explicit shopId provided, use it
+    if (shopId) {
+      const merchant = this.getMerchant(shopId);
+      if (merchant) return merchant;
+    }
+
+    // Fall back to finding by npcActorUuid
+    return this.getMerchantForNPC(npcActorUuid);
   }
 
   // ==================== MERCHANT CRUD ====================

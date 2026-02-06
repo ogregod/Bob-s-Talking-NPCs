@@ -1405,17 +1405,18 @@ class UIAPI {
    * Open Shop Editor (GM only)
    * @param {string} shopId - Optional shop ID to edit (null for new shop)
    * @param {string} template - Optional template to use for new shops
+   * @param {string} npcActorUuid - Optional NPC actor UUID to auto-link when creating new shop
    */
-  openShopEditor(shopId = null, template = null) {
+  openShopEditor(shopId = null, template = null, npcActorUuid = null) {
     if (!game.user.isGM) {
       ui.notifications.warn(game.i18n.localize("BOBSNPC.Errors.GMOnly"));
       return;
     }
-    Hooks.call(`${MODULE_ID}.openShopEditor`, { shopId, template });
+    Hooks.call(`${MODULE_ID}.openShopEditor`, { shopId, template, npcActorUuid });
 
-    const shopEditor = new ShopEditor({ shopId, template });
+    const shopEditor = new ShopEditor({ shopId, template, npcActorUuid });
     shopEditor.render(true);
-    console.log(`${MODULE_ID} | Opening shop editor${shopId ? ` for ${shopId}` : " for new shop"}`);
+    console.log(`${MODULE_ID} | Opening shop editor${shopId ? ` for ${shopId}` : " for new shop"}${npcActorUuid ? ` linked to ${npcActorUuid}` : ""}`);
     return shopEditor;
   }
 
