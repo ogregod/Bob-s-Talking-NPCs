@@ -112,31 +112,38 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   async _preFirstRender(context, options) {
     await super._preFirstRender(context, options);
 
+    console.log(`${MODULE_ID} | ShopWindow._preFirstRender - merchantId: ${this.merchantId}`);
+
     // Load player actor
     this._playerActor = await fromUuid(this.playerActorUuid);
 
     // merchantId can be either a shop ID or an NPC actor UUID
     // First, try to load as actor UUID
     this._merchantActor = await fromUuid(this.merchantId);
+    console.log(`${MODULE_ID} | ShopWindow - fromUuid result:`, this._merchantActor?.name || "null");
 
     if (!this._merchantActor) {
       // If not an actor UUID, it might be a shop ID - get shop data and find the NPC
       const handler = getMerchantHandler();
       let shopData = handler?.getMerchant(this.merchantId);
+      console.log(`${MODULE_ID} | ShopWindow - handler.getMerchant result:`, shopData?.name || "null");
 
       // Also check settings fallback
       if (!shopData) {
         const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
         shopData = shopsSettings[this.merchantId];
+        console.log(`${MODULE_ID} | ShopWindow - settings fallback result:`, shopData?.name || "null");
       }
 
       if (shopData?.npcActorUuid) {
+        console.log(`${MODULE_ID} | ShopWindow - loading NPC from shop data: ${shopData.npcActorUuid}`);
         this._merchantActor = await fromUuid(shopData.npcActorUuid);
         // Store the shop ID for later use
         this._shopId = this.merchantId;
       }
     }
 
+    // Always ensure we have a merchant actor (even if just a fallback)
     if (!this._merchantActor) {
       console.warn(`${MODULE_ID} | Could not find merchant actor for: ${this.merchantId}`);
       // Create a fallback merchant actor representation
@@ -146,12 +153,18 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       };
     }
 
+    console.log(`${MODULE_ID} | ShopWindow - final merchantActor:`, this._merchantActor?.name);
+
     // Open shop session
-    const handler = getMerchantHandler();
-    if (handler?.openShop) {
-      const result = await handler.openShop(this.merchantId, this.playerActorUuid);
-      this._session = result?.session;
-      this._sessionId = result?.sessionId;
+    try {
+      const handler = getMerchantHandler();
+      if (handler?.openShop) {
+        const result = await handler.openShop(this.merchantId, this.playerActorUuid);
+        this._session = result?.session;
+        this._sessionId = result?.sessionId;
+      }
+    } catch (e) {
+      console.warn(`${MODULE_ID} | Could not open shop session:`, e);
     }
   }
 
@@ -184,11 +197,15 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     // Get services if available
     const services = this._tab === "services" ? this._prepareServices(merchant) : [];
 
+    // Ensure we have merchant actor data (defensive)
+    const merchantName = this._merchantActor?.name || localize("Shop.UnknownMerchant");
+    const merchantImg = this._merchantActor?.img || "icons/svg/mystery-man.svg";
+
     return {
       ...context,
       merchant: {
-        name: this._merchantActor.name,
-        portrait: this._merchantActor.img,
+        name: merchantName,
+        portrait: merchantImg,
         uuid: this.merchantId,
         goldAvailable: merchant?.gold ?? 0,
         buysItems: merchant?.buysItems ?? true,
