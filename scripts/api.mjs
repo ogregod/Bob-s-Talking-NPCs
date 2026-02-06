@@ -1291,15 +1291,19 @@ class UIAPI {
 
   /**
    * Open shop window
-   * @param {Actor} merchant - The merchant NPC
-   * @param {Actor} customer - The customer actor
+   * @param {string|Actor} merchantOrUuid - The merchant NPC actor or UUID
+   * @param {string|Actor} customerOrUuid - The customer actor or UUID
    */
-  async openShop(merchant, customer = null) {
-    Hooks.call(`${MODULE_ID}.openShop`, { merchant, customer });
+  async openShop(merchantOrUuid, customerOrUuid = null) {
+    // Resolve to UUIDs - ShopWindow expects merchantId and playerActorUuid
+    const merchantId = typeof merchantOrUuid === "string" ? merchantOrUuid : merchantOrUuid?.uuid;
+    const playerActorUuid = typeof customerOrUuid === "string" ? customerOrUuid : customerOrUuid?.uuid;
 
-    const shopWindow = new ShopWindow({ merchant, customer });
+    Hooks.call(`${MODULE_ID}.openShop`, { merchantId, playerActorUuid });
+
+    const shopWindow = new ShopWindow({ merchantId, playerActorUuid });
     shopWindow.render(true);
-    console.log(`${MODULE_ID} | Opening shop for ${merchant.name}`);
+    console.log(`${MODULE_ID} | Opening shop for ${merchantId}`);
     return shopWindow;
   }
 

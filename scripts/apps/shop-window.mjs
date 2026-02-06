@@ -130,7 +130,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
-    const merchant = getMerchantHandler().getMerchant(this.merchantId);
+    const merchant = this._getMerchant();
     const playerGold = this._getPlayerGold();
 
     // Get inventory based on tab
@@ -197,6 +197,30 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   /**
+   * Get merchant data - tries multiple lookup methods
+   * @returns {object|null}
+   * @private
+   */
+  _getMerchant() {
+    const handler = getMerchantHandler();
+    // Try by shop ID first
+    let merchant = handler?.getMerchant(this.merchantId);
+    if (!merchant) {
+      // Try by NPC UUID
+      merchant = handler?.getMerchantForNPC(this.merchantId);
+    }
+    if (!merchant && this._merchantActor) {
+      // Try getting shop ID from NPC config
+      const npcConfig = this._merchantActor.getFlag(MODULE_ID, "config");
+      const shopId = npcConfig?.services?.merchant?.shopId;
+      if (shopId) {
+        merchant = handler?.getMerchant(shopId);
+      }
+    }
+    return merchant;
+  }
+
+  /**
    * Prepare buy items from merchant inventory
    * @param {object} merchant - Merchant data
    * @returns {object[]}
@@ -245,7 +269,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       return ["weapon", "equipment", "consumable", "tool", "loot"].includes(type);
     });
 
-    const merchant = getMerchantHandler().getMerchant(this.merchantId);
+    const merchant = this._getMerchant();
     const buyMultiplier = merchant?.buyMultiplier ?? 0.5;
 
     return items.map(item => {
