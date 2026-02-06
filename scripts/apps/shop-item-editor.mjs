@@ -121,6 +121,15 @@ export class ShopItemEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     };
   }
 
+  /**
+   * Prepare context for individual template parts
+   * @override
+   */
+  _preparePartContext(partId, context) {
+    context.tab = partId;
+    return context;
+  }
+
   /** @override */
   async _onRender(context, options) {
     await super._onRender(context, options);

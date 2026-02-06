@@ -169,6 +169,15 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   /**
+   * Prepare context for individual template parts
+   * @override
+   */
+  _preparePartContext(partId, context) {
+    context.tab = partId;
+    return context;
+  }
+
+  /**
    * Get type label
    * @param {string} type - Shop type
    * @returns {string}

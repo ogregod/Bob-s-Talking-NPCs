@@ -334,6 +334,16 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   /**
+   * Prepare context for individual template parts
+   * Required by Foundry v13 ApplicationV2 for multi-part templates
+   * @override
+   */
+  _preparePartContext(partId, context) {
+    context.tab = partId;
+    return context;
+  }
+
+  /**
    * Get tab configuration
    * @returns {object[]}
    */
