@@ -112,18 +112,47 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   async _preFirstRender(context, options) {
     await super._preFirstRender(context, options);
 
-    // Load actors
-    this._merchantActor = await fromUuid(this.merchantId);
+    // Load player actor
     this._playerActor = await fromUuid(this.playerActorUuid);
 
+    // merchantId can be either a shop ID or an NPC actor UUID
+    // First, try to load as actor UUID
+    this._merchantActor = await fromUuid(this.merchantId);
+
     if (!this._merchantActor) {
-      throw new Error(localize("Errors.ActorNotFound"));
+      // If not an actor UUID, it might be a shop ID - get shop data and find the NPC
+      const handler = getMerchantHandler();
+      let shopData = handler?.getMerchant(this.merchantId);
+
+      // Also check settings fallback
+      if (!shopData) {
+        const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
+        shopData = shopsSettings[this.merchantId];
+      }
+
+      if (shopData?.npcActorUuid) {
+        this._merchantActor = await fromUuid(shopData.npcActorUuid);
+        // Store the shop ID for later use
+        this._shopId = this.merchantId;
+      }
+    }
+
+    if (!this._merchantActor) {
+      console.warn(`${MODULE_ID} | Could not find merchant actor for: ${this.merchantId}`);
+      // Create a fallback merchant actor representation
+      this._merchantActor = {
+        name: localize("Shop.UnknownMerchant"),
+        img: "icons/svg/mystery-man.svg"
+      };
     }
 
     // Open shop session
-    const result = await getMerchantHandler().openShop(this.merchantId, this.playerActorUuid);
-    this._session = result.session;
-    this._sessionId = result.sessionId;
+    const handler = getMerchantHandler();
+    if (handler?.openShop) {
+      const result = await handler.openShop(this.merchantId, this.playerActorUuid);
+      this._session = result?.session;
+      this._sessionId = result?.sessionId;
+    }
   }
 
   /** @override */
@@ -203,20 +232,44 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   _getMerchant() {
     const handler = getMerchantHandler();
-    // Try by shop ID first
+
+    // If we have a stored shop ID (from when merchantId was a shop ID), use it first
+    if (this._shopId) {
+      let merchant = handler?.getMerchant(this._shopId);
+      if (!merchant) {
+        // Check settings fallback
+        const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
+        merchant = shopsSettings[this._shopId];
+      }
+      if (merchant) return merchant;
+    }
+
+    // Try by shop ID (merchantId might be a shop ID)
     let merchant = handler?.getMerchant(this.merchantId);
     if (!merchant) {
-      // Try by NPC UUID
-      merchant = handler?.getMerchantForNPC(this.merchantId);
+      // Check settings fallback
+      const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
+      merchant = shopsSettings[this.merchantId];
     }
-    if (!merchant && this._merchantActor) {
+
+    if (!merchant) {
+      // Try by NPC UUID
+      merchant = handler?.getMerchantForNPC?.(this.merchantId);
+    }
+
+    if (!merchant && this._merchantActor?.uuid) {
       // Try getting shop ID from NPC config
-      const npcConfig = this._merchantActor.getFlag(MODULE_ID, "config");
+      const npcConfig = this._merchantActor.getFlag?.(MODULE_ID, "config");
       const shopId = npcConfig?.services?.merchant?.shopId;
       if (shopId) {
         merchant = handler?.getMerchant(shopId);
+        if (!merchant) {
+          const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
+          merchant = shopsSettings[shopId];
+        }
       }
     }
+
     return merchant;
   }
 
