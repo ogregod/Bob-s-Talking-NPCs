@@ -57,7 +57,17 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     );
 
     // Ensure array properties are actually arrays (mergeObject doesn't convert types)
-    if (!Array.isArray(this._config.roles)) this._config.roles = [];
+    // Roles might be stored as object {merchant: true} but we use array ["merchant"] in UI
+    if (!Array.isArray(this._config.roles)) {
+      if (typeof this._config.roles === "object" && this._config.roles !== null) {
+        // Convert object format to array format
+        this._config.roles = Object.entries(this._config.roles)
+          .filter(([key, value]) => value === true)
+          .map(([key]) => key);
+      } else {
+        this._config.roles = [];
+      }
+    }
     if (!Array.isArray(this._config.dialogues)) this._config.dialogues = [];
     if (!Array.isArray(this._config.factions)) this._config.factions = [];
     if (!Array.isArray(this._config.schedule?.entries)) {
