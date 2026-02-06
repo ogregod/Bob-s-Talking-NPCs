@@ -476,6 +476,13 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         return;
       }
 
+      // Handle service nodes (SHOP, BANK, etc.)
+      if (result.service) {
+        console.log(`${MODULE_ID} | Service node detected:`, result.service);
+        await this._handleServiceNode(result.service, result.node);
+        return;
+      }
+
       if (!result.node) {
         // No node returned but not ended - something went wrong
         console.warn(`${MODULE_ID} | No node returned from selectResponse but not ended`);
@@ -723,6 +730,114 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         await this.render();
         break;
     }
+  }
+
+  // ==================== Service Node Handling ====================
+
+  /**
+   * Handle a service node (SHOP, BANK, HIRE, STABLE, SERVICE)
+   * @param {object} serviceData - Service data from the dialogue handler
+   * @param {object} node - The service node
+   * @private
+   */
+  async _handleServiceNode(serviceData, node) {
+    console.log(`${MODULE_ID} | Handling service node:`, serviceData.type, serviceData.serviceType);
+
+    // Store service info for potential callback
+    this._pendingServiceNextNodeId = serviceData.nextNodeId;
+
+    try {
+      switch (serviceData.type) {
+        case "shop":
+          await this._openShopService(serviceData);
+          break;
+        case "bank":
+          await this._openBankService(serviceData);
+          break;
+        case "hire":
+          await this._openHireService(serviceData);
+          break;
+        case "stable":
+          await this._openStableService(serviceData);
+          break;
+        case "service":
+          await this._openGenericService(serviceData);
+          break;
+        default:
+          console.warn(`${MODULE_ID} | Unknown service type: ${serviceData.type}`);
+      }
+    } catch (error) {
+      console.error(`${MODULE_ID} | Error opening service:`, error);
+      ui.notifications.error(localize("Errors.ServiceFailed"));
+    }
+
+    // After opening the service, decide what to do with the dialogue
+    // For now, close the dialogue - the service window takes over
+    // In the future, we could keep it open and return to it after service closes
+    await this.close();
+  }
+
+  /**
+   * Open shop service from service node
+   * @param {object} serviceData - Service data
+   * @private
+   */
+  async _openShopService(serviceData) {
+    console.log(`${MODULE_ID} | Opening shop for NPC: ${serviceData.npcActorUuid}`);
+
+    // Get the NPC's shop ID from their configuration
+    const npc = await fromUuid(serviceData.npcActorUuid);
+    const npcConfig = npc?.getFlag(MODULE_ID, "config");
+    const shopId = npcConfig?.services?.merchant?.shopId;
+
+    if (shopId) {
+      // Open shop by shop ID
+      game.bobsnpc?.ui?.openShop(shopId, this.playerActorUuid);
+    } else {
+      // Fallback: try to open shop by NPC UUID
+      game.bobsnpc?.ui?.openShop(serviceData.npcActorUuid, this.playerActorUuid);
+    }
+  }
+
+  /**
+   * Open bank service from service node
+   * @param {object} serviceData - Service data
+   * @private
+   */
+  async _openBankService(serviceData) {
+    console.log(`${MODULE_ID} | Opening bank for NPC: ${serviceData.npcActorUuid}`);
+    game.bobsnpc?.ui?.openBank?.(serviceData.npcActorUuid, this.playerActorUuid);
+  }
+
+  /**
+   * Open hire service from service node
+   * @param {object} serviceData - Service data
+   * @private
+   */
+  async _openHireService(serviceData) {
+    console.log(`${MODULE_ID} | Opening hirelings for NPC: ${serviceData.npcActorUuid}`);
+    game.bobsnpc?.ui?.openHirelings?.(serviceData.npcActorUuid, this.playerActorUuid);
+  }
+
+  /**
+   * Open stable service from service node
+   * @param {object} serviceData - Service data
+   * @private
+   */
+  async _openStableService(serviceData) {
+    console.log(`${MODULE_ID} | Opening stable for NPC: ${serviceData.npcActorUuid}`);
+    game.bobsnpc?.ui?.openStable?.(serviceData.npcActorUuid, this.playerActorUuid);
+  }
+
+  /**
+   * Open generic service from service node
+   * @param {object} serviceData - Service data
+   * @private
+   */
+  async _openGenericService(serviceData) {
+    console.log(`${MODULE_ID} | Opening service ${serviceData.serviceType} for NPC: ${serviceData.npcActorUuid}`);
+    // Generic services would be handled by a service window
+    // For now, just log - specific services can be added as needed
   }
 
   // ==================== Helpers ====================

@@ -868,6 +868,18 @@ export class DialogueHandler {
         return { success: true, node: nextNode, message: null, ended: true };
       }
 
+      // Check for service nodes (SHOP, BANK, HIRE, STABLE, SERVICE)
+      if (this._isServiceNode(nextNode?.type)) {
+        const serviceData = this._getServiceNodeData(nextNode, context);
+        return {
+          success: true,
+          node: nextNode,
+          message: null,
+          ended: false,
+          service: serviceData
+        };
+      }
+
       // Broadcast
       this._emitSocket("responseSelected", {
         sessionId,
@@ -1169,6 +1181,58 @@ export class DialogueHandler {
     worldData.dialogueVariables[dialogueId] = worldData.dialogueVariables[dialogueId] || {};
     worldData.dialogueVariables[dialogueId][variable] = value;
     await game.settings.set(MODULE_ID, "worldData", worldData);
+  }
+
+  /**
+   * Check if a node type is a service node
+   * @param {string} nodeType - Node type
+   * @returns {boolean}
+   * @private
+   */
+  _isServiceNode(nodeType) {
+    return [
+      NodeType.SHOP,
+      NodeType.BANK,
+      NodeType.HIRE,
+      NodeType.STABLE,
+      NodeType.SERVICE
+    ].includes(nodeType);
+  }
+
+  /**
+   * Get service data from a service node
+   * @param {object} node - Service node
+   * @param {object} context - Dialogue context
+   * @returns {object} Service data for the UI to handle
+   * @private
+   */
+  _getServiceNodeData(node, context) {
+    const serviceData = {
+      type: node.type,
+      nextNodeId: node.nextNodeId,
+      npcActorUuid: context.npcActorUuid,
+      participants: context.participants
+    };
+
+    switch (node.type) {
+      case NodeType.SHOP:
+        serviceData.serviceType = node.shopType || "merchant";
+        break;
+      case NodeType.SERVICE:
+        serviceData.serviceType = node.serviceType || "repair";
+        break;
+      case NodeType.BANK:
+        serviceData.serviceType = "bank";
+        break;
+      case NodeType.HIRE:
+        serviceData.serviceType = "hire";
+        break;
+      case NodeType.STABLE:
+        serviceData.serviceType = "stable";
+        break;
+    }
+
+    return serviceData;
   }
 
   // ==================== SOCKET HANDLERS ====================
