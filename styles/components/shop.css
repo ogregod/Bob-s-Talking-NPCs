@@ -5,7 +5,8 @@
 @layer bobsnpc {
   /* ===== Shop Window Layout ===== */
   /* Two-column layout: Cart on left, Items on right */
-  .shop-window {
+  /* Target the window-content inside ApplicationV2 */
+  .shop-window .window-content {
     display: grid;
     grid-template-rows: auto auto 1fr auto;
     grid-template-columns: 300px 1fr;
@@ -16,33 +17,31 @@
       "footer footer";
     height: 100%;
     gap: 0;
+    padding: 0;
+    overflow: hidden;
   }
 
-  .shop-window > section.shop-header,
-  .shop-window > header.shop-header,
-  .shop-window > .shop-header-enhanced {
+  /* Grid area assignments for parts */
+  .shop-window .shop-header,
+  .shop-window .shop-header-enhanced {
     grid-area: header;
   }
 
-  .shop-window > .shop-tabs,
-  .shop-window > nav.shop-tabs {
+  .shop-window .shop-tabs {
     grid-area: tabs;
   }
 
-  .shop-window > .shop-cart,
-  .shop-window > aside.shop-cart {
+  .shop-window .shop-cart {
     grid-area: cart;
     border-left: none;
     border-right: 3px solid var(--bobsnpc-primary);
   }
 
-  .shop-window > .shop-inventory,
-  .shop-window > section.shop-inventory {
+  .shop-window .shop-inventory {
     grid-area: inventory;
   }
 
-  .shop-window > .shop-footer,
-  .shop-window > footer.shop-footer {
+  .shop-window .shop-footer {
     grid-area: footer;
   }
 
