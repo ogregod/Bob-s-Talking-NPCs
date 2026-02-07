@@ -33,11 +33,17 @@
   grid-area: cart !important;
   border-left: none !important;
   border-right: 3px solid var(--bobsnpc-primary, #7c4dff) !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .shop-window .shop-inventory {
   grid-area: inventory !important;
   overflow-y: auto !important;
+  height: 100% !important;
+  min-height: 0 !important;
 }
 
 .shop-window .shop-footer {
