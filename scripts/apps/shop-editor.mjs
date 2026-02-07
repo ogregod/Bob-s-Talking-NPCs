@@ -47,7 +47,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
   /** @override */
   static DEFAULT_OPTIONS = {
-    id: "bobsnpc-shop-editor",
+    // Note: id is set dynamically via the 'id' getter based on shopId
     classes: ["bobsnpc", "shop-editor"],
     tag: "div",
     window: {
@@ -264,14 +264,18 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
   /** @override */
   async _prepareContext(options) {
+    console.log(`${MODULE_ID} | ShopEditor._prepareContext START - this._shop:`, this._shop?.name, this._shop?.id);
+
     const context = await super._prepareContext(options);
 
     if (!this._shop) {
+      console.error(`${MODULE_ID} | ShopEditor._prepareContext - NO SHOP DATA!`);
       return { ...context, error: "Shop not found" };
     }
 
     // Ensure shop has valid defaults before building context
     this._shop = this._ensureShopDefaults(this._shop);
+    console.log(`${MODULE_ID} | ShopEditor._prepareContext - after defaults - color:`, this._shop.color);
 
     // Enrich inventory items with full item data
     const enrichedInventory = await this._enrichInventory(this._shop.inventory || []);
