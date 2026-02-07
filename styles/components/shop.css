@@ -442,7 +442,9 @@
   .inventory-grid {
     display: flex;
     flex-direction: column;
-    gap: var(--bobsnpc-spacing-sm);
+    gap: 8px;
+    padding: 0;
+    margin: 0;
   }
 
   /* ===== List-Style Item Rows ===== */
@@ -451,13 +453,15 @@
     display: grid;
     grid-template-columns: 60px 1fr auto auto;
     align-items: center;
-    gap: var(--bobsnpc-spacing-md);
-    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    gap: 12px;
+    padding: 8px 12px;
+    min-height: 76px;
     background: var(--bobsnpc-bg-elevated);
     border: 2px solid var(--bobsnpc-border-color);
     border-radius: var(--bobsnpc-border-radius-md);
     transition: all var(--bobsnpc-transition-normal);
     cursor: pointer;
+    box-sizing: border-box;
   }
 
   .shop-item:hover {
