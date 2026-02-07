@@ -361,10 +361,10 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       return;
     }
 
-    // Open the shop window
+    // Open the shop window - pass merchantId (which is the shop ID)
     const { ShopWindow } = await import("./shop-window.mjs");
     const shopWindow = new ShopWindow({
-      shopId: shop.id,
+      merchantId: shop.id,
       playerActorUuid
     });
     shopWindow.render(true);
@@ -386,6 +386,20 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       console.error(`${MODULE_ID} | No shopId found for edit action`);
       ui.notifications.error(localize("ShopManager.ShopNotFound"));
       return;
+    }
+
+    // Check if there's already an editor open for this shop
+    const existingEditorId = `bobsnpc-shop-editor-${shopId}`;
+    const existingEditor = Object.values(ui.windows).find(w => w.id === existingEditorId);
+    if (existingEditor) {
+      existingEditor.bringToTop();
+      return;
+    }
+
+    // Close any "new shop" editor that might be open
+    const newShopEditor = Object.values(ui.windows).find(w => w.id === "bobsnpc-shop-editor-new");
+    if (newShopEditor) {
+      await newShopEditor.close();
     }
 
     const { ShopEditor } = await import("./shop-editor.mjs");

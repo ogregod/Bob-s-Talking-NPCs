@@ -36,6 +36,15 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     this._inventoryChanges = [];
   }
 
+  /**
+   * Unique application ID per shop
+   * This ensures each shop gets its own editor window
+   * @override
+   */
+  get id() {
+    return `bobsnpc-shop-editor-${this.shopId || 'new'}`;
+  }
+
   /** @override */
   static DEFAULT_OPTIONS = {
     id: "bobsnpc-shop-editor",
@@ -165,7 +174,8 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     shop.name = shop.name || "";
     shop.type = shop.type || ShopType.GENERAL;
     shop.icon = shop.icon || "icons/svg/chest.svg";
-    shop.color = shop.color || "#7b68ee";
+    // Ensure color is a valid hex color (empty string breaks color input)
+    shop.color = (shop.color && shop.color.startsWith("#")) ? shop.color : "#7b68ee";
     shop.inventory = shop.inventory || [];
     shop.pricing = shop.pricing || {
       buyMultiplier: 1.0,
@@ -874,11 +884,28 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       return;
     }
 
+    // Get a player actor for preview
+    let playerActorUuid = null;
+    if (game.user.character) {
+      playerActorUuid = game.user.character.uuid;
+    } else {
+      const ownedActor = game.actors.find(a => a.isOwner && a.type === "character");
+      if (ownedActor) {
+        playerActorUuid = ownedActor.uuid;
+      }
+    }
+
+    if (!playerActorUuid) {
+      ui.notifications.warn(localize("ShopManager.NoPlayerActor"));
+      return;
+    }
+
     // Open the shop window in preview mode
     try {
       const { ShopWindow } = await import("./shop-window.mjs");
       const preview = new ShopWindow({
-        shopId: this._shop.id,
+        merchantId: this._shop.id,
+        playerActorUuid,
         previewMode: true,
         previewData: this._shop
       });
