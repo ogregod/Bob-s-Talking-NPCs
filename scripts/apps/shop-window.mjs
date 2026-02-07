@@ -178,7 +178,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     // Get inventory based on tab
     let items = [];
     if (this._tab === "buy") {
-      items = this._prepareBuyItems(merchant);
+      items = await this._prepareBuyItems(merchant);
     } else if (this._tab === "sell") {
       items = this._prepareSellItems();
     }
@@ -255,11 +255,12 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       playerItems: this._tab === "sell" ? items : [],
       hasPlayerItems: this._tab === "sell" && items.length > 0,
       // Cart
-      cart: this._prepareCart(merchant),
+      cartItems: await this._prepareCart(merchant),
       cartTotal,
       cartTotalFormatted: formatCurrency(cartTotal * 100),
       canAfford: playerGold >= cartTotal,
       cartItemCount: this._cart.size,
+      cartEmpty: this._cart.size === 0,
       // Sell cart
       sellCart: this._prepareSellCart(merchant),
       sellTotal,
@@ -410,25 +411,39 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   /**
    * Prepare buy items from merchant inventory
    * @param {object} merchant - Merchant data
-   * @returns {object[]}
+   * @returns {Promise<object[]>}
    * @private
    */
-  _prepareBuyItems(merchant) {
+  async _prepareBuyItems(merchant) {
     if (!merchant?.inventory) return [];
 
     const playerGold = this._getPlayerGold();
+    const items = [];
 
-    return merchant.inventory.map(item => {
+    for (const item of merchant.inventory) {
       const inCart = this._cart.get(item.id) || 0;
       const price = this._calculateBuyPrice(item, merchant);
       const quantity = item.quantity ?? -1;
       const soldOut = !item.unlimited && quantity !== -1 && quantity <= 0;
 
-      return {
+      // Fetch actual item image from UUID if available
+      let itemImg = item.img;
+      if (item.itemUuid && !itemImg) {
+        try {
+          const linkedItem = await fromUuid(item.itemUuid);
+          if (linkedItem) {
+            itemImg = linkedItem.img;
+          }
+        } catch (e) {
+          console.warn(`Could not load item image for ${item.itemUuid}:`, e);
+        }
+      }
+
+      items.push({
         id: item.id,
         uuid: item.itemUuid,
         name: item.name,
-        img: this._getDefaultItemImage(item),
+        img: itemImg || this._getDefaultItemImage(item),
         price,
         priceFormatted: formatCurrency(price * 100),
         originalPrice: item.basePrice !== price ? item.basePrice : null,
@@ -449,8 +464,10 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         canAfford: playerGold >= price,
         limitedStock: !item.unlimited && quantity !== -1 && quantity > 0 && quantity <= 5,
         typeLabel: item.typeLabel || item.type || "Item"
-      };
-    });
+      });
+    }
+
+    return items;
   }
 
   /**
@@ -644,10 +661,10 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   /**
    * Prepare cart for display
    * @param {object} merchant - Merchant data
-   * @returns {object[]}
+   * @returns {Promise<object[]>}
    * @private
    */
-  _prepareCart(merchant) {
+  async _prepareCart(merchant) {
     const cartItems = [];
 
     for (const [itemId, quantity] of this._cart.entries()) {
@@ -656,10 +673,23 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
       const price = this._calculateBuyPrice(item, merchant);
 
+      // Fetch actual item image from UUID if available
+      let itemImg = item.img;
+      if (item.itemUuid && !itemImg) {
+        try {
+          const linkedItem = await fromUuid(item.itemUuid);
+          if (linkedItem) {
+            itemImg = linkedItem.img;
+          }
+        } catch (e) {
+          console.warn(`Could not load item image for ${item.itemUuid}:`, e);
+        }
+      }
+
       cartItems.push({
         id: itemId,
         name: item.name,
-        img: this._getDefaultItemImage(item),
+        img: itemImg || this._getDefaultItemImage(item),
         quantity,
         unitPrice: price,
         price,
