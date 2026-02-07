@@ -347,6 +347,67 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   /**
+   * Get default image for an item based on its type/category
+   * @param {object} item - Item data
+   * @returns {string} Image path
+   * @private
+   */
+  _getDefaultItemImage(item) {
+    // If item has a valid image, use it
+    if (item.img && item.img !== "icons/svg/item-bag.svg" && item.img !== "") {
+      return item.img;
+    }
+
+    // Default images by category
+    const categoryDefaults = {
+      weapons: "icons/weapons/swords/sword-guard-steel.webp",
+      armor: "icons/equipment/chest/breastplate-layered-steel.webp",
+      potions: "icons/consumables/potions/potion-bottle-corked-red.webp",
+      scrolls: "icons/sundries/scrolls/scroll-runed-brown-purple.webp",
+      consumables: "icons/sundries/misc/bag-leather-brown-tan.webp",
+      gear: "icons/equipment/back/backpack-leather-tan.webp",
+      tools: "icons/tools/smithing/hammer-double-yellow.webp",
+      misc: "icons/sundries/misc/sack-leather-brown.webp",
+      wondrous: "icons/equipment/neck/amulet-round-glow-blue.webp",
+      jewelry: "icons/equipment/finger/ring-gold-gem-red.webp",
+      food: "icons/consumables/food/meat-roasted-leg-brown.webp",
+      ammunition: "icons/weapons/ammunition/arrows-bodkin-leather.webp",
+      clothing: "icons/equipment/back/cloak-heavy-purple.webp"
+    };
+
+    // Default images by item type (for DnD 5e)
+    const typeDefaults = {
+      weapon: "icons/weapons/swords/sword-guard-steel.webp",
+      equipment: "icons/equipment/chest/breastplate-layered-steel.webp",
+      consumable: "icons/consumables/potions/potion-bottle-corked-red.webp",
+      tool: "icons/tools/smithing/hammer-double-yellow.webp",
+      loot: "icons/sundries/misc/sack-leather-brown.webp",
+      container: "icons/sundries/misc/chest-wood-gold.webp",
+      spell: "icons/magic/light/explosion-star-glow-silhouette.webp",
+      feat: "icons/svg/book.svg",
+      class: "icons/svg/combat.svg",
+      subclass: "icons/svg/combat.svg",
+      background: "icons/svg/book.svg",
+      race: "icons/svg/mystery-man.svg"
+    };
+
+    // Try category first
+    const category = item.category?.toLowerCase() || "";
+    if (categoryDefaults[category]) {
+      return categoryDefaults[category];
+    }
+
+    // Try item type
+    const type = item.type?.toLowerCase() || "";
+    if (typeDefaults[type]) {
+      return typeDefaults[type];
+    }
+
+    // Ultimate fallback
+    return "icons/svg/item-bag.svg";
+  }
+
+  /**
    * Prepare buy items from merchant inventory
    * @param {object} merchant - Merchant data
    * @returns {object[]}
@@ -367,7 +428,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         id: item.id,
         uuid: item.itemUuid,
         name: item.name,
-        img: item.img,
+        img: this._getDefaultItemImage(item),
         price,
         priceFormatted: formatCurrency(price),
         originalPrice: item.basePrice !== price ? item.basePrice : null,
@@ -598,12 +659,14 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       cartItems.push({
         id: itemId,
         name: item.name,
-        img: item.img,
+        img: this._getDefaultItemImage(item),
         quantity,
+        unitPrice: price,
         price,
         priceFormatted: formatCurrency(price),
         total: price * quantity,
-        totalFormatted: formatCurrency(price * quantity)
+        totalFormatted: formatCurrency(price * quantity),
+        atMax: !item.unlimited && item.quantity !== -1 && quantity >= item.quantity
       });
     }
 
