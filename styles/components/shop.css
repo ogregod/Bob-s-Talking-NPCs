@@ -3,19 +3,18 @@
  */
 
 /* ===== Shop Window Layout (outside @layer for higher specificity) ===== */
-/* Ensure the application frame uses full height */
-.shop-window {
+/* Force the application to use full height */
+.shop-window.application {
   display: flex !important;
   flex-direction: column !important;
+  height: 100% !important;
 }
 
-.shop-window > .window-content {
+/* Window content must fill available space and use grid */
+.shop-window .window-content,
+.shop-window > .window-content,
+.shop-window.application > .window-content {
   flex: 1 1 auto !important;
-  min-height: 0 !important;
-}
-
-/* Two-column layout: Cart on left, Items on right */
-.shop-window .window-content {
   display: grid !important;
   grid-template-rows: auto auto 1fr auto !important;
   grid-template-columns: 300px 1fr !important;
@@ -25,6 +24,8 @@
     "cart inventory"
     "footer footer" !important;
   height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
   gap: 0 !important;
   padding: 0 !important;
   overflow: hidden !important;
@@ -33,22 +34,27 @@
 
 /* Grid area assignments for parts */
 .shop-window .shop-header,
-.shop-window .shop-header-enhanced {
+.shop-window .shop-header-enhanced,
+.shop-window header.shop-header-enhanced {
   grid-area: header !important;
 }
 
-.shop-window .shop-tabs {
+.shop-window .shop-tabs,
+.shop-window nav.shop-tabs {
   grid-area: tabs !important;
 }
 
-.shop-window .shop-cart {
+.shop-window .shop-cart,
+.shop-window aside.shop-cart {
   grid-area: cart !important;
   border-left: none !important;
   border-right: 3px solid var(--bobsnpc-primary, #7c4dff) !important;
   height: 100% !important;
   min-height: 0 !important;
+  max-height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
+  overflow: hidden !important;
 }
 
 .shop-window .shop-inventory,
@@ -56,28 +62,35 @@
   grid-area: inventory !important;
   display: flex !important;
   flex-direction: column !important;
-  overflow-y: auto !important;
   height: 100% !important;
   min-height: 0 !important;
+  max-height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
   align-self: stretch !important;
   background: var(--bobsnpc-bg-primary, #1a1a2e) !important;
   padding: 12px !important;
   box-sizing: border-box !important;
 }
 
-.shop-window .shop-footer {
+.shop-window .shop-footer,
+.shop-window footer.shop-footer {
   grid-area: footer !important;
 }
 
-/* List-style inventory items (outside layer) */
-.shop-window .inventory-grid {
+/* Inventory grid must fill available space in shop-inventory */
+.shop-window .inventory-grid,
+.shop-window .shop-inventory .inventory-grid {
   display: flex !important;
   flex-direction: column !important;
   gap: 8px !important;
   flex: 1 1 auto !important;
   min-height: 0 !important;
+  height: auto !important;
+  overflow: visible !important;
 }
 
+/* Individual shop items */
 .shop-window .shop-item {
   display: grid !important;
   grid-template-columns: 60px 1fr auto auto !important;
@@ -86,6 +99,7 @@
   padding: 8px 12px !important;
   min-height: 76px !important;
   box-sizing: border-box !important;
+  flex-shrink: 0 !important;
 }
 
 @layer bobsnpc {
@@ -481,9 +495,11 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: var(--bobsnpc-spacing-md);
     background: var(--bobsnpc-bg-primary);
     height: 100%;
+    max-height: 100%;
     min-height: 0;
     box-sizing: border-box;
   }
@@ -497,6 +513,7 @@
     margin: 0;
     flex: 1 1 auto;
     min-height: 0;
+    height: auto;
   }
 
   /* ===== List-Style Item Rows ===== */

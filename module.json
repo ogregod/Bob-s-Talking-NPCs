@@ -2,7 +2,7 @@
   "id": "bobs-talking-npcs",
   "title": "Bob's Talking NPCs",
   "description": "The complete NPC interaction system - quests, dialogue, merchants, factions, relationships, banking, hirelings, mounts, crime, services, properties, and more.",
-  "version": "0.3.81",
+  "version": "0.3.82",
   "compatibility": {
     "minimum": 13,
     "verified": 13,
