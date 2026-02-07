@@ -201,8 +201,32 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const merchantName = this._merchantActor?.name || localize("Shop.UnknownMerchant");
     const merchantImg = this._merchantActor?.img || "icons/svg/mystery-man.svg";
 
+    // Get price modifier info
+    const priceMultiplier = merchant?.priceMultiplier ?? 1;
+    const priceModifier = priceMultiplier !== 1 ? priceMultiplier : null;
+    const priceModifierPercent = priceModifier ? Math.abs(Math.round((priceMultiplier - 1) * 100)) : 0;
+    const discountPercent = priceModifier && priceModifier < 1 ? Math.round((1 - priceMultiplier) * 100) : 0;
+
+    // Generate merchant greeting
+    const merchantGreeting = this._getMerchantGreeting();
+
     return {
       ...context,
+      // Header data
+      shopName: merchant?.name || merchantName,
+      shopIcon: merchant?.icon || "fa-store",
+      shopColor: merchant?.color || "#7c4dff",
+      merchantName,
+      merchantPortrait: merchantImg,
+      merchantGreeting,
+      priceModifier,
+      priceModifierPercent,
+      discountPercent,
+      reputationDiscount: merchant?.reputationDiscount || null,
+      hagglingEnabled: merchant?.haggling?.enabled ?? false,
+      playerGold: Math.floor(playerGold),
+
+      // Legacy merchant object for compatibility
       merchant: {
         name: merchantName,
         portrait: merchantImg,
@@ -217,22 +241,33 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         gold: playerGold,
         goldFormatted: formatCurrency(playerGold)
       },
+      // Tabs
+      activeTab: this._tab,
       tab: this._tab,
       category: this._category,
       searchQuery: this._searchQuery,
       sortBy: this._sortBy,
       sortAsc: this._sortAsc,
       categories,
+      // Items
       items,
+      hasItems: items.length > 0,
+      playerItems: this._tab === "sell" ? items : [],
+      hasPlayerItems: this._tab === "sell" && items.length > 0,
+      // Cart
       cart: this._prepareCart(merchant),
       cartTotal,
       cartTotalFormatted: formatCurrency(cartTotal),
       canAfford: playerGold >= cartTotal,
+      cartItemCount: this._cart.size,
+      // Sell cart
       sellCart: this._prepareSellCart(merchant),
       sellTotal,
       sellTotalFormatted: formatCurrency(sellTotal),
+      // Services
       services,
       hasServices: services.length > 0,
+      // Settings
       settings: {
         hagglingEnabled: game.settings.get(MODULE_ID, "hagglingEnabled"),
         charismaAffectsPrices: game.settings.get(MODULE_ID, "charismaAffectsPrices")
@@ -240,6 +275,27 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       isGM: game.user.isGM,
       theme: game.settings.get(MODULE_ID, "theme") || "dark"
     };
+  }
+
+  /**
+   * Get a random merchant greeting message
+   * @returns {string}
+   * @private
+   */
+  _getMerchantGreeting() {
+    const greetings = [
+      "Welcome, friend!",
+      "Browse my wares!",
+      "Fine goods today!",
+      "What can I get you?",
+      "Special deals today!",
+      "Quality merchandise!",
+      "Come, take a look!",
+      "Best prices in town!",
+      "Greetings, traveler!",
+      "Looking to buy?"
+    ];
+    return greetings[Math.floor(Math.random() * greetings.length)];
   }
 
   /**
@@ -299,9 +355,13 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   _prepareBuyItems(merchant) {
     if (!merchant?.inventory) return [];
 
+    const playerGold = this._getPlayerGold();
+
     return merchant.inventory.map(item => {
       const inCart = this._cart.get(item.id) || 0;
       const price = this._calculateBuyPrice(item, merchant);
+      const quantity = item.quantity ?? -1;
+      const soldOut = !item.unlimited && quantity !== -1 && quantity <= 0;
 
       return {
         id: item.id,
@@ -310,19 +370,44 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         img: item.img,
         price,
         priceFormatted: formatCurrency(price),
-        originalPrice: item.basePrice,
+        originalPrice: item.basePrice !== price ? item.basePrice : null,
+        discounted: item.basePrice && item.basePrice > price,
         discount: item.discount || 0,
-        quantity: item.quantity,
-        unlimited: item.unlimited,
-        inStock: item.unlimited || item.quantity > inCart,
+        quantity: item.unlimited || quantity === -1 ? null : quantity,
+        unlimited: item.unlimited || quantity === -1,
+        inStock: item.unlimited || quantity === -1 || quantity > inCart,
+        soldOut,
         inCart,
-        category: item.category,
-        categoryLabel: localize(`ItemCategory.${item.category}`),
+        category: item.category || "misc",
+        categoryLabel: localize(`ItemCategory.${item.category || "misc"}`),
         description: item.description,
-        rarity: item.rarity,
-        rarityClass: `rarity-${item.rarity || "common"}`
+        rarity: item.rarity || "common",
+        rarityLabel: this._getRarityLabel(item.rarity),
+        rarityClass: `rarity-${item.rarity || "common"}`,
+        // New properties for enhanced UI
+        canAfford: playerGold >= price,
+        limitedStock: !item.unlimited && quantity !== -1 && quantity > 0 && quantity <= 5,
+        typeLabel: item.typeLabel || item.type || "Item"
       };
     });
+  }
+
+  /**
+   * Get human-readable rarity label
+   * @param {string} rarity - Rarity key
+   * @returns {string}
+   * @private
+   */
+  _getRarityLabel(rarity) {
+    const labels = {
+      common: "Common",
+      uncommon: "Uncommon",
+      rare: "Rare",
+      veryrare: "Very Rare",
+      legendary: "Legendary",
+      artifact: "Artifact"
+    };
+    return labels[rarity] || "Common";
   }
 
   /**

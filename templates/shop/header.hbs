@@ -1,52 +1,70 @@
-{{!-- Shop Window Header --}}
-<header class="shop-header {{theme}}">
-  <div class="shop-info">
-    {{#if shopIcon}}
-      <div class="shop-icon">
-        <i class="fa-solid {{shopIcon}}" style="color: {{shopColor}}"></i>
+{{!-- Shop Window Header - Enhanced with Merchant Portrait --}}
+<header class="shop-header-enhanced {{theme}}">
+  {{!-- Merchant Portrait --}}
+  <div class="merchant-portrait">
+    {{#if merchantPortrait}}
+      <img src="{{merchantPortrait}}" alt="{{merchantName}}" />
+    {{else if shopIcon}}
+      <div class="shop-icon-fallback" style="background: {{shopColor}};">
+        <i class="fa-solid {{shopIcon}}"></i>
       </div>
+    {{else}}
+      <img src="icons/svg/mystery-man.svg" alt="Merchant" />
     {{/if}}
-    <div class="shop-details">
-      <h2 class="shop-name">{{shopName}}</h2>
-      {{#if merchantName}}
-        <span class="merchant-name">
-          <i class="fa-solid fa-user"></i>
-          {{merchantName}}
+    {{#if merchantGreeting}}
+      <div class="speech-bubble">{{merchantGreeting}}</div>
+    {{/if}}
+  </div>
+
+  {{!-- Shop Details --}}
+  <div class="shop-details-enhanced">
+    <h2 class="shop-name-large">{{shopName}}</h2>
+    {{#if merchantName}}
+      <span class="merchant-name-subtitle">
+        <i class="fa-solid fa-user"></i>
+        {{merchantName}}
+      </span>
+    {{/if}}
+
+    {{!-- Shop Badges --}}
+    <div class="shop-badges">
+      {{#if priceModifier}}
+        {{#if (gt priceModifier 1)}}
+          <span class="shop-badge markup" data-tooltip="{{localize 'BOBSNPC.Shop.PriceModifier'}}">
+            <i class="fa-solid fa-arrow-up"></i>
+            +{{priceModifierPercent}}%
+          </span>
+        {{else}}
+          <span class="shop-badge discount" data-tooltip="{{localize 'BOBSNPC.Shop.PriceModifier'}}">
+            <i class="fa-solid fa-arrow-down"></i>
+            -{{discountPercent}}%
+          </span>
+        {{/if}}
+      {{/if}}
+
+      {{#if reputationDiscount}}
+        <span class="shop-badge reputation" data-tooltip="{{localize 'BOBSNPC.Shop.ReputationDiscount'}}">
+          <i class="fa-solid fa-star"></i>
+          -{{reputationDiscount}}% Loyalty
+        </span>
+      {{/if}}
+
+      {{#if hagglingEnabled}}
+        <span class="shop-badge haggling" data-tooltip="{{localize 'BOBSNPC.Shop.HagglingAvailable'}}">
+          <i class="fa-solid fa-handshake"></i>
+          Haggling
         </span>
       {{/if}}
     </div>
   </div>
 
-  <div class="shop-meta">
-    {{#if priceModifier}}
-      <span class="price-modifier {{#if (gt priceModifier 1)}}markup{{else}}discount{{/if}}"
-            data-tooltip="{{localize 'BOBSNPC.Shop.PriceModifier'}}">
-        {{#if (gt priceModifier 1)}}
-          <i class="fa-solid fa-arrow-up"></i>
-        {{else}}
-          <i class="fa-solid fa-arrow-down"></i>
-        {{/if}}
-        {{priceModifierPercent}}%
-      </span>
-    {{/if}}
-
-    {{#if reputationDiscount}}
-      <span class="reputation-discount" data-tooltip="{{localize 'BOBSNPC.Shop.ReputationDiscount'}}">
-        <i class="fa-solid fa-flag"></i>
-        -{{reputationDiscount}}%
-      </span>
-    {{/if}}
-
-    {{#if hagglingEnabled}}
-      <span class="haggling-indicator" data-tooltip="{{localize 'BOBSNPC.Shop.HagglingAvailable'}}">
-        <i class="fa-solid fa-handshake"></i>
-      </span>
-    {{/if}}
-  </div>
-
-  <div class="player-gold">
-    <i class="fa-solid fa-coins"></i>
-    <span class="gold-amount">{{playerGold}}</span>
-    <span class="gold-label">gp</span>
+  {{!-- Player Gold Display --}}
+  <div class="player-gold-display">
+    <span class="gold-label">Your Gold</span>
+    <div class="gold-amount-large">
+      <i class="fa-solid fa-coins coin-icon"></i>
+      <span class="gold-value">{{playerGold}}</span>
+      <span class="gold-denomination">gp</span>
+    </div>
   </div>
 </header>

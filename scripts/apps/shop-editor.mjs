@@ -64,7 +64,10 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       selectIcon: ShopEditor.#onSelectIcon,
       selectBanner: ShopEditor.#onSelectBanner,
       linkNpc: ShopEditor.#onLinkNpc,
-      unlinkNpc: ShopEditor.#onUnlinkNpc
+      unlinkNpc: ShopEditor.#onUnlinkNpc,
+      previewShop: ShopEditor.#onPreviewShop,
+      duplicateShop: ShopEditor.#onDuplicateShop,
+      exportShop: ShopEditor.#onExportShop
     }
   };
 
@@ -348,9 +351,10 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
    * @returns {object[]}
    */
   _getTabs() {
+    const inventoryCount = this._shop?.inventory?.length || 0;
     return [
       { id: "basic", label: localize("ShopEditor.TabBasic"), icon: "fa-info-circle", active: this._activeTab === "basic" },
-      { id: "inventory", label: localize("ShopEditor.TabInventory"), icon: "fa-boxes", active: this._activeTab === "inventory" },
+      { id: "inventory", label: localize("ShopEditor.TabInventory"), icon: "fa-boxes", active: this._activeTab === "inventory", badge: inventoryCount > 0 ? inventoryCount : null },
       { id: "pricing", label: localize("ShopEditor.TabPricing"), icon: "fa-coins", active: this._activeTab === "pricing" },
       { id: "haggling", label: localize("ShopEditor.TabHaggling"), icon: "fa-handshake", active: this._activeTab === "haggling" },
       { id: "stock", label: localize("ShopEditor.TabStock"), icon: "fa-warehouse", active: this._activeTab === "stock" },
@@ -856,5 +860,95 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onUnlinkNpc(event, target) {
     this._shop.npcActorUuid = null;
     await this.render();
+  }
+
+  /**
+   * Preview shop as it would appear to players
+   * @param {Event} event
+   * @param {HTMLElement} target
+   */
+  static async #onPreviewShop(event, target) {
+    // Validate shop has required fields
+    if (!this._shop?.name?.trim()) {
+      ui.notifications.warn(localize("ShopEditor.SaveBeforePreview"));
+      return;
+    }
+
+    // Open the shop window in preview mode
+    try {
+      const { ShopWindow } = await import("./shop-window.mjs");
+      const preview = new ShopWindow({
+        shopId: this._shop.id,
+        previewMode: true,
+        previewData: this._shop
+      });
+      preview.render(true);
+    } catch (e) {
+      console.error(`${MODULE_ID} | Error opening shop preview:`, e);
+      ui.notifications.error(localize("ShopEditor.PreviewError"));
+    }
+  }
+
+  /**
+   * Duplicate this shop
+   * @param {Event} event
+   * @param {HTMLElement} target
+   */
+  static async #onDuplicateShop(event, target) {
+    // Create a copy of the shop with new ID
+    const duplicate = foundry.utils.deepClone(this._shop);
+    duplicate.id = generateId();
+    duplicate.name = `${duplicate.name} (Copy)`;
+    duplicate.createdAt = Date.now();
+    duplicate.updatedAt = Date.now();
+
+    // Save the duplicate
+    const handler = getMerchantHandler();
+    if (handler?.createMerchant) {
+      await handler.createMerchant(duplicate);
+    } else {
+      await this._saveShopToSettings(duplicate);
+    }
+
+    ui.notifications.info(localize("ShopEditor.Duplicated", { name: duplicate.name }));
+
+    // Refresh shop manager if open
+    const manager = Object.values(ui.windows).find(w => w.constructor.name === "ShopManager");
+    if (manager) {
+      await manager.render();
+    }
+  }
+
+  /**
+   * Export shop to JSON file
+   * @param {Event} event
+   * @param {HTMLElement} target
+   */
+  static async #onExportShop(event, target) {
+    // Validate shop has required fields
+    if (!this._shop?.name?.trim()) {
+      ui.notifications.warn(localize("ShopEditor.NameRequiredForExport"));
+      return;
+    }
+
+    // Create export data
+    const exportData = foundry.utils.deepClone(this._shop);
+
+    // Create filename
+    const filename = `shop-${exportData.name.slugify()}-${Date.now()}.json`;
+
+    // Create and download file
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    ui.notifications.info(localize("ShopEditor.Exported", { name: exportData.name }));
   }
 }

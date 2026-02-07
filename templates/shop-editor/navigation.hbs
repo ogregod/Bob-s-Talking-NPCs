@@ -1,10 +1,30 @@
 {{!-- Shop Editor Navigation --}}
 <nav class="shop-editor-nav">
+  {{!-- Quick Actions Toolbar --}}
+  <div class="quick-actions">
+    <button type="button" class="quick-action-btn" data-action="previewShop" data-tooltip="{{localize 'BOBSNPC.ShopEditor.PreviewShop'}}">
+      <i class="fa-solid fa-eye"></i>
+      <span>{{localize "BOBSNPC.ShopEditor.Preview"}}</span>
+    </button>
+    <button type="button" class="quick-action-btn" data-action="duplicateShop" data-tooltip="{{localize 'BOBSNPC.ShopEditor.DuplicateShop'}}">
+      <i class="fa-solid fa-copy"></i>
+      <span>{{localize "BOBSNPC.ShopEditor.Duplicate"}}</span>
+    </button>
+    <button type="button" class="quick-action-btn" data-action="exportShop" data-tooltip="{{localize 'BOBSNPC.ShopEditor.ExportShop'}}">
+      <i class="fa-solid fa-download"></i>
+      <span>{{localize "BOBSNPC.ShopEditor.Export"}}</span>
+    </button>
+  </div>
+
+  {{!-- Tab Navigation --}}
   <ul class="tab-list">
     {{#each tabs}}
       <li class="tab-item {{#if this.active}}active{{/if}}" data-action="switchTab" data-tab="{{this.id}}">
         <i class="fa-solid {{this.icon}}"></i>
         <span>{{this.label}}</span>
+        {{#if this.badge}}
+          <span class="tab-badge">{{this.badge}}</span>
+        {{/if}}
       </li>
     {{/each}}
   </ul>
