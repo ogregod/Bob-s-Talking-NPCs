@@ -119,11 +119,15 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       : localize("ShopEditor.TitleNew");
   }
 
-  /** @override */
-  async _preFirstRender(context, options) {
-    await super._preFirstRender(context, options);
+  /**
+   * Load shop data from storage
+   * @private
+   */
+  async _loadShopData() {
+    // Only load if not already loaded
+    if (this._shop) return;
 
-    console.log(`${MODULE_ID} | ShopEditor._preFirstRender - shopId: ${this.shopId}`);
+    console.log(`${MODULE_ID} | ShopEditor._loadShopData - shopId: ${this.shopId}`);
 
     // Load shop data or create default
     if (this.shopId) {
@@ -150,7 +154,6 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       if (!shopData) {
         console.warn(`${MODULE_ID} | Shop not found: ${this.shopId}, creating new shop`);
         this._shop = this._createDefaultShop();
-        // Don't throw - just create a new shop
       } else {
         // Create a working copy and ensure all required fields exist
         this._shop = this._ensureShopDefaults(foundry.utils.deepClone(shopData));
@@ -161,6 +164,13 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     console.log(`${MODULE_ID} | ShopEditor - final shop:`, this._shop?.name, this._shop?.id);
+  }
+
+  /** @override */
+  async _preFirstRender(context, options) {
+    await super._preFirstRender(context, options);
+    // Load shop data if not already loaded
+    await this._loadShopData();
   }
 
   /**
@@ -264,7 +274,11 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
   /** @override */
   async _prepareContext(options) {
-    console.log(`${MODULE_ID} | ShopEditor._prepareContext START - this._shop:`, this._shop?.name, this._shop?.id);
+    // Ensure shop data is loaded before preparing context
+    // This handles cases where _prepareContext runs before _preFirstRender
+    await this._loadShopData();
+
+    console.log(`${MODULE_ID} | ShopEditor._prepareContext - this._shop:`, this._shop?.name, this._shop?.id);
 
     const context = await super._prepareContext(options);
 
@@ -275,7 +289,6 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Ensure shop has valid defaults before building context
     this._shop = this._ensureShopDefaults(this._shop);
-    console.log(`${MODULE_ID} | ShopEditor._prepareContext - after defaults - color:`, this._shop.color);
 
     // Enrich inventory items with full item data
     const enrichedInventory = await this._enrichInventory(this._shop.inventory || []);
