@@ -54,16 +54,12 @@
 .shop-window .shop-inventory,
 .shop-window section.shop-inventory {
   grid-area: inventory !important;
-  grid-row: 3 / 4 !important;
-  grid-column: 2 / 3 !important;
   display: flex !important;
   flex-direction: column !important;
   overflow-y: auto !important;
   height: 100% !important;
   min-height: 0 !important;
-  max-height: none !important;
   align-self: stretch !important;
-  justify-self: stretch !important;
   background: var(--bobsnpc-bg-primary, #1a1a2e) !important;
   padding: 12px !important;
   box-sizing: border-box !important;
@@ -482,9 +478,14 @@
 
   /* ===== Inventory Area ===== */
   .shop-inventory {
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
     padding: var(--bobsnpc-spacing-md);
     background: var(--bobsnpc-bg-primary);
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
   }
 
   /* List-style inventory layout for items */
@@ -494,6 +495,8 @@
     gap: 8px;
     padding: 0;
     margin: 0;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   /* ===== List-Style Item Rows ===== */
