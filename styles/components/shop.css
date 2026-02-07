@@ -39,11 +39,20 @@
   flex-direction: column !important;
 }
 
-.shop-window .shop-inventory {
+.shop-window .shop-inventory,
+.shop-window section.shop-inventory {
   grid-area: inventory !important;
+  grid-row: 3 / 4 !important;
+  grid-column: 2 / 3 !important;
   overflow-y: auto !important;
-  height: 100% !important;
+  height: auto !important;
   min-height: 0 !important;
+  max-height: none !important;
+  align-self: stretch !important;
+  justify-self: stretch !important;
+  background: var(--bobsnpc-bg-primary, #1a1a2e) !important;
+  padding: 12px !important;
+  flex: 1 !important;
 }
 
 .shop-window .shop-footer {
