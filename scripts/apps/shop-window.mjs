@@ -71,6 +71,9 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       sort: ShopWindow.#onSort,
       addToCart: ShopWindow.#onAddToCart,
       removeFromCart: ShopWindow.#onRemoveFromCart,
+      incrementQuantity: ShopWindow.#onIncrementQuantity,
+      decrementQuantity: ShopWindow.#onDecrementQuantity,
+      clearCart: ShopWindow.#onClearCart,
       updateCartQuantity: ShopWindow.#onUpdateCartQuantity,
       addToSellCart: ShopWindow.#onAddToSellCart,
       removeFromSellCart: ShopWindow.#onRemoveFromSellCart,
@@ -870,12 +873,31 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static #onRemoveFromCart(event, target) {
     const itemId = target.dataset.itemId;
+    // Remove entire stack from cart
+    this._cart.delete(itemId);
+    this.render();
+  }
+
+  static #onIncrementQuantity(event, target) {
+    const itemId = target.dataset.itemId;
+    const current = this._cart.get(itemId) || 0;
+    this._cart.set(itemId, current + 1);
+    this.render();
+  }
+
+  static #onDecrementQuantity(event, target) {
+    const itemId = target.dataset.itemId;
     const current = this._cart.get(itemId) || 0;
     if (current <= 1) {
       this._cart.delete(itemId);
     } else {
       this._cart.set(itemId, current - 1);
     }
+    this.render();
+  }
+
+  static #onClearCart(event, target) {
+    this._cart.clear();
     this.render();
   }
 

@@ -1,4 +1,4 @@
-{{!-- Shop Editor - Inventory Tab --}}
+{{!-- Shop Editor - Inventory Tab (Enhanced) --}}
 <div class="tab-content" data-tab-content="inventory">
   <div class="inventory-header">
     <h3>{{localize "BOBSNPC.ShopEditor.Inventory"}} ({{inventoryCount}})</h3>
@@ -19,36 +19,105 @@
     {{localize "BOBSNPC.ShopEditor.DragDropHint"}}
   </div>
 
+  {{!-- Inventory Settings --}}
+  <div class="inventory-settings">
+    <label class="checkbox-inline">
+      <input type="checkbox" name="autoDeleteSoldOut" {{#if shop.autoDeleteSoldOut}}checked{{/if}}>
+      <span>Auto-remove items when sold out (quantity reaches 0)</span>
+    </label>
+  </div>
+
   {{#if hasInventory}}
-    <ul class="inventory-list">
+    <ul class="inventory-list enhanced">
       {{#each inventory}}
         <li class="inventory-item {{this.rarityClass}}" data-item-id="{{this.id}}">
+          {{!-- Item Image --}}
           <img class="item-img" src="{{this.itemImg}}" alt="{{this.itemName}}">
 
-          <div class="item-info">
+          {{!-- Item Info Column --}}
+          <div class="item-info-col">
             <span class="item-name">{{this.itemName}}</span>
-            <span class="item-type">{{this.itemType}}</span>
+            <span class="item-meta">
+              <span class="item-type">{{this.itemType}}</span>
+              {{#if this.itemRarity}}
+                <span class="item-rarity rarity-{{this.itemRarity}}">{{this.itemRarity}}</span>
+              {{/if}}
+            </span>
           </div>
 
-          <div class="item-price">
-            <i class="fa-solid fa-coins"></i>
-            <span>{{this.displayPrice}} gp</span>
+          {{!-- Price Column --}}
+          <div class="item-price-col">
+            <label>Price</label>
+            <div class="price-input-wrapper">
+              <input type="number"
+                     class="price-input"
+                     name="inventory-price-{{this.id}}"
+                     value="{{this.displayPrice}}"
+                     min="0"
+                     step="1"
+                     data-action="updateItemPrice"
+                     data-item-id="{{this.id}}">
+              <span class="currency-label">gp</span>
+            </div>
           </div>
 
-          <div class="item-quantity">
-            <label>{{localize "BOBSNPC.ShopEditor.Qty"}}:</label>
-            {{#if this.isUnlimited}}
-              <span class="unlimited">∞</span>
-            {{else}}
-              <span>{{this.quantity}}</span>
-            {{/if}}
+          {{!-- Quantity Column --}}
+          <div class="item-quantity-col">
+            <label>Qty</label>
+            <div class="quantity-controls">
+              {{#if this.isUnlimited}}
+                <button type="button"
+                        class="qty-btn toggle-unlimited active"
+                        data-action="toggleUnlimited"
+                        data-item-id="{{this.id}}"
+                        data-tooltip="Click to set limited quantity">
+                  <i class="fa-solid fa-infinity"></i>
+                </button>
+              {{else}}
+                <button type="button"
+                        class="qty-btn decrement"
+                        data-action="decrementItemQty"
+                        data-item-id="{{this.id}}"
+                        {{#if (eq this.quantity 0)}}disabled{{/if}}>
+                  <i class="fa-solid fa-minus"></i>
+                </button>
+                <input type="number"
+                       class="qty-input"
+                       name="inventory-qty-{{this.id}}"
+                       value="{{this.quantity}}"
+                       min="0"
+                       step="1"
+                       data-action="updateItemQty"
+                       data-item-id="{{this.id}}">
+                <button type="button"
+                        class="qty-btn increment"
+                        data-action="incrementItemQty"
+                        data-item-id="{{this.id}}">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+                <button type="button"
+                        class="qty-btn toggle-unlimited"
+                        data-action="toggleUnlimited"
+                        data-item-id="{{this.id}}"
+                        data-tooltip="Set to unlimited">
+                  <i class="fa-solid fa-infinity"></i>
+                </button>
+              {{/if}}
+            </div>
           </div>
 
+          {{!-- Action Buttons --}}
           <div class="item-actions">
-            <button type="button" class="action-btn edit" data-action="editItem" data-tooltip="{{localize 'BOBSNPC.ShopEditor.EditItem'}}">
+            <button type="button"
+                    class="action-btn edit"
+                    data-action="editItem"
+                    data-tooltip="{{localize 'BOBSNPC.ShopEditor.EditItem'}}">
               <i class="fa-solid fa-edit"></i>
             </button>
-            <button type="button" class="action-btn delete" data-action="removeItem" data-tooltip="{{localize 'BOBSNPC.ShopEditor.RemoveItem'}}">
+            <button type="button"
+                    class="action-btn delete"
+                    data-action="removeItem"
+                    data-tooltip="{{localize 'BOBSNPC.ShopEditor.RemoveItem'}}">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>

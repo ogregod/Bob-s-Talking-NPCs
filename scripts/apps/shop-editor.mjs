@@ -69,6 +69,11 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       addItem: ShopEditor.#onAddItem,
       removeItem: ShopEditor.#onRemoveItem,
       editItem: ShopEditor.#onEditItem,
+      incrementItemQty: ShopEditor.#onIncrementItemQty,
+      decrementItemQty: ShopEditor.#onDecrementItemQty,
+      updateItemQty: ShopEditor.#onUpdateItemQty,
+      updateItemPrice: ShopEditor.#onUpdateItemPrice,
+      toggleUnlimited: ShopEditor.#onToggleUnlimited,
       browseCompendium: ShopEditor.#onBrowseCompendium,
       selectIcon: ShopEditor.#onSelectIcon,
       selectBanner: ShopEditor.#onSelectBanner,
@@ -714,6 +719,84 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     const itemId = target.closest("[data-item-id]").dataset.itemId;
     this._shop.inventory = this._shop.inventory.filter(i => i.id !== itemId);
     await this.render();
+  }
+
+  /**
+   * Increment item quantity
+   * @param {Event} event
+   * @param {HTMLElement} target
+   */
+  static async #onIncrementItemQty(event, target) {
+    const itemId = target.dataset.itemId;
+    const item = this._shop.inventory.find(i => i.id === itemId);
+    if (item && item.quantity !== -1) {
+      item.quantity = (item.quantity || 0) + 1;
+      await this.render();
+    }
+  }
+
+  /**
+   * Decrement item quantity
+   * @param {Event} event
+   * @param {HTMLElement} target
+   */
+  static async #onDecrementItemQty(event, target) {
+    const itemId = target.dataset.itemId;
+    const item = this._shop.inventory.find(i => i.id === itemId);
+    if (item && item.quantity !== -1 && item.quantity > 0) {
+      item.quantity = item.quantity - 1;
+      await this.render();
+    }
+  }
+
+  /**
+   * Update item quantity from input
+   * @param {Event} event
+   * @param {HTMLElement} target
+   */
+  static async #onUpdateItemQty(event, target) {
+    const itemId = target.dataset.itemId;
+    const item = this._shop.inventory.find(i => i.id === itemId);
+    if (item) {
+      const newQty = parseInt(target.value) || 0;
+      item.quantity = Math.max(0, newQty);
+      // Don't re-render on every keystroke, just update the data
+    }
+  }
+
+  /**
+   * Update item price from input
+   * @param {Event} event
+   * @param {HTMLElement} target
+   */
+  static async #onUpdateItemPrice(event, target) {
+    const itemId = target.dataset.itemId;
+    const item = this._shop.inventory.find(i => i.id === itemId);
+    if (item) {
+      const newPrice = parseFloat(target.value) || 0;
+      item.basePrice = Math.max(0, newPrice);
+      // Don't re-render on every keystroke, just update the data
+    }
+  }
+
+  /**
+   * Toggle unlimited quantity for item
+   * @param {Event} event
+   * @param {HTMLElement} target
+   */
+  static async #onToggleUnlimited(event, target) {
+    const itemId = target.dataset.itemId;
+    const item = this._shop.inventory.find(i => i.id === itemId);
+    if (item) {
+      if (item.quantity === -1) {
+        // Switch from unlimited to limited (default 10)
+        item.quantity = 10;
+      } else {
+        // Switch to unlimited
+        item.quantity = -1;
+      }
+      await this.render();
+    }
   }
 
   /**

@@ -832,6 +832,230 @@
     margin-bottom: var(--bobsnpc-spacing-md);
   }
 
+  /* ===== Enhanced Inventory List ===== */
+
+  .shop-editor .inventory-settings {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    margin-bottom: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .shop-editor .inventory-settings .checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    cursor: pointer;
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .shop-editor .inventory-settings .checkbox-inline input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+
+  .shop-editor .inventory-list.enhanced {
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-editor .inventory-list.enhanced .inventory-item {
+    display: grid;
+    grid-template-columns: 40px 1fr 120px 160px auto;
+    gap: var(--bobsnpc-spacing-md);
+    align-items: center;
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    transition: border-color var(--bobsnpc-transition-fast), box-shadow var(--bobsnpc-transition-fast);
+  }
+
+  .shop-editor .inventory-list.enhanced .inventory-item:hover {
+    border-color: var(--bobsnpc-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .shop-editor .inventory-list.enhanced .item-img {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    object-fit: cover;
+    border: 1px solid var(--bobsnpc-border-color);
+  }
+
+  .shop-editor .inventory-list.enhanced .item-info-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .shop-editor .inventory-list.enhanced .item-name {
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    color: var(--bobsnpc-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .shop-editor .inventory-list.enhanced .item-meta {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .shop-editor .inventory-list.enhanced .item-rarity {
+    text-transform: capitalize;
+  }
+
+  .shop-editor .inventory-list.enhanced .item-price-col,
+  .shop-editor .inventory-list.enhanced .item-quantity-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .shop-editor .inventory-list.enhanced .item-price-col label,
+  .shop-editor .inventory-list.enhanced .item-quantity-col label {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .shop-editor .inventory-list.enhanced .price-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-editor .inventory-list.enhanced .price-input {
+    width: 80px;
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    background: var(--bobsnpc-input-bg);
+    color: var(--bobsnpc-text-primary);
+    font-size: var(--bobsnpc-font-size-sm);
+    text-align: right;
+  }
+
+  .shop-editor .inventory-list.enhanced .price-input:focus {
+    border-color: var(--bobsnpc-primary);
+    outline: none;
+  }
+
+  .shop-editor .inventory-list.enhanced .currency-label {
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .shop-editor .inventory-list.enhanced .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .shop-editor .inventory-list.enhanced .qty-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .shop-editor .inventory-list.enhanced .qty-btn:hover:not(:disabled) {
+    background: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .shop-editor .inventory-list.enhanced .qty-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .shop-editor .inventory-list.enhanced .qty-btn.toggle-unlimited {
+    background: var(--bobsnpc-bg-tertiary);
+  }
+
+  .shop-editor .inventory-list.enhanced .qty-btn.toggle-unlimited.active {
+    background: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    color: white;
+    width: auto;
+    padding: 0 var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-editor .inventory-list.enhanced .qty-btn.toggle-unlimited.active i {
+    font-size: 16px;
+  }
+
+  .shop-editor .inventory-list.enhanced .qty-input {
+    width: 50px;
+    padding: var(--bobsnpc-spacing-xs);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    background: var(--bobsnpc-input-bg);
+    color: var(--bobsnpc-text-primary);
+    font-size: var(--bobsnpc-font-size-sm);
+    text-align: center;
+  }
+
+  .shop-editor .inventory-list.enhanced .qty-input:focus {
+    border-color: var(--bobsnpc-primary);
+    outline: none;
+  }
+
+  .shop-editor .inventory-list.enhanced .item-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-editor .inventory-list.enhanced .action-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-muted);
+    cursor: pointer;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .shop-editor .inventory-list.enhanced .action-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .shop-editor .inventory-list.enhanced .action-btn.edit:hover {
+    background: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .shop-editor .inventory-list.enhanced .action-btn.delete:hover {
+    background: var(--bobsnpc-error);
+    border-color: var(--bobsnpc-error);
+    color: white;
+  }
+
   /* Currency Grid */
   .shop-editor .currency-grid {
     display: grid;
