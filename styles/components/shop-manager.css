@@ -224,6 +224,12 @@
     border-color: var(--bobsnpc-error);
   }
 
+  .shop-entry .action-btn.open:hover {
+    background: var(--bobsnpc-success);
+    color: white;
+    border-color: var(--bobsnpc-success);
+  }
+
   /* No Shops */
   .no-shops {
     display: flex;

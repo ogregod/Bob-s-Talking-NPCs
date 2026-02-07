@@ -49,6 +49,7 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
     },
     actions: {
       createShop: ShopManager.#onCreateShop,
+      openShop: ShopManager.#onOpenShop,
       editShop: ShopManager.#onEditShop,
       deleteShop: ShopManager.#onDeleteShop,
       duplicateShop: ShopManager.#onDuplicateShop,
@@ -319,6 +320,46 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
     await this.render();
 
     ui.notifications.info(localize("ShopManager.ShopCreated", { name: shop.name }));
+  }
+
+  /**
+   * Open a shop (view as player would see it)
+   * @param {Event} event
+   * @param {HTMLElement} target
+   */
+  static async #onOpenShop(event, target) {
+    const shopId = target.closest("[data-shop-id]").dataset.shopId;
+    const shop = this._getShop(shopId);
+
+    if (!shop) {
+      ui.notifications.error(localize("ShopManager.ShopNotFound"));
+      return;
+    }
+
+    // Get the current user's character or first owned character
+    let playerActorUuid = null;
+    if (game.user.character) {
+      playerActorUuid = game.user.character.uuid;
+    } else {
+      // Find first owned character actor
+      const ownedActor = game.actors.find(a => a.isOwner && a.type === "character");
+      if (ownedActor) {
+        playerActorUuid = ownedActor.uuid;
+      }
+    }
+
+    if (!playerActorUuid) {
+      ui.notifications.warn(localize("ShopManager.NoPlayerActor"));
+      return;
+    }
+
+    // Open the shop window
+    const { ShopWindow } = await import("./shop-window.mjs");
+    const shopWindow = new ShopWindow({
+      shopId: shop.id,
+      playerActorUuid
+    });
+    shopWindow.render(true);
   }
 
   /**
