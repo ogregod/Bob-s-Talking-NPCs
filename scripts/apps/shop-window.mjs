@@ -239,7 +239,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         name: this._playerActor?.name,
         uuid: this.playerActorUuid,
         gold: playerGold,
-        goldFormatted: formatCurrency(playerGold)
+        goldFormatted: formatCurrency(playerGold * 100)
       },
       // Tabs
       activeTab: this._tab,
@@ -257,13 +257,13 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       // Cart
       cart: this._prepareCart(merchant),
       cartTotal,
-      cartTotalFormatted: formatCurrency(cartTotal),
+      cartTotalFormatted: formatCurrency(cartTotal * 100),
       canAfford: playerGold >= cartTotal,
       cartItemCount: this._cart.size,
       // Sell cart
       sellCart: this._prepareSellCart(merchant),
       sellTotal,
-      sellTotalFormatted: formatCurrency(sellTotal),
+      sellTotalFormatted: formatCurrency(sellTotal * 100),
       // Services
       services,
       hasServices: services.length > 0,
@@ -430,7 +430,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         name: item.name,
         img: this._getDefaultItemImage(item),
         price,
-        priceFormatted: formatCurrency(price),
+        priceFormatted: formatCurrency(price * 100),
         originalPrice: item.basePrice !== price ? item.basePrice : null,
         discounted: item.basePrice && item.basePrice > price,
         discount: item.discount || 0,
@@ -500,7 +500,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         name: item.name,
         img: item.img,
         price: sellPrice,
-        priceFormatted: formatCurrency(sellPrice),
+        priceFormatted: formatCurrency(sellPrice * 100),
         basePrice,
         quantity,
         availableToSell: quantity - inSellCart,
@@ -663,9 +663,9 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         quantity,
         unitPrice: price,
         price,
-        priceFormatted: formatCurrency(price),
+        priceFormatted: formatCurrency(price * 100),
         total: price * quantity,
-        totalFormatted: formatCurrency(price * quantity),
+        totalFormatted: formatCurrency(price * quantity * 100),
         atMax: !item.unlimited && item.quantity !== -1 && quantity >= item.quantity
       });
     }
@@ -716,9 +716,9 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         img: item.img,
         quantity,
         price,
-        priceFormatted: formatCurrency(price),
+        priceFormatted: formatCurrency(price * 100),
         total: price * quantity,
-        totalFormatted: formatCurrency(price * quantity)
+        totalFormatted: formatCurrency(price * quantity * 100)
       });
     }
 
@@ -758,7 +758,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
     return merchant.services.map(service => ({
       ...service,
-      priceFormatted: formatCurrency(service.price),
+      priceFormatted: formatCurrency(service.price * 100),
       icon: this._getServiceIcon(service.type)
     }));
   }
@@ -892,7 +892,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       if (result.success) {
         ui.notifications.info(localize("Shop.PurchaseComplete", {
           count: result.itemsReceived,
-          total: formatCurrency(result.totalCost)
+          total: formatCurrency(result.totalCost * 100)
         }));
         this._cart.clear();
         this.render();
@@ -918,7 +918,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       if (result.success) {
         ui.notifications.info(localize("Shop.SaleComplete", {
           count: result.itemsSold,
-          total: formatCurrency(result.totalEarned)
+          total: formatCurrency(result.totalEarned * 100)
         }));
         this._sellCart.clear();
         this.render();
