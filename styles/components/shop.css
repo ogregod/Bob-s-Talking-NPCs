@@ -45,7 +45,7 @@
   grid-row: 3 / 4 !important;
   grid-column: 2 / 3 !important;
   overflow-y: auto !important;
-  height: auto !important;
+  height: 100% !important;
   min-height: 0 !important;
   max-height: none !important;
   align-self: stretch !important;
