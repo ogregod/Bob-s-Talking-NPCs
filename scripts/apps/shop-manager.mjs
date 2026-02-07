@@ -84,12 +84,20 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const context = await super._prepareContext(options);
     const handler = getMerchantHandler();
 
+    console.log(`${MODULE_ID} | ShopManager._prepareContext - handler available:`, !!handler);
+
     // Get all shops - try handler first, fall back to settings
     let shops = handler?.getAllMerchants() || [];
+    console.log(`${MODULE_ID} | ShopManager._prepareContext - shops from handler:`, shops.length);
+
     if (shops.length === 0) {
       const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
       shops = Object.values(shopsSettings);
+      console.log(`${MODULE_ID} | ShopManager._prepareContext - shops from settings:`, shops.length);
     }
+
+    // Debug: Log shop IDs
+    console.log(`${MODULE_ID} | ShopManager._prepareContext - shop IDs:`, shops.map(s => ({ id: s.id, name: s.name })));
 
     // Apply type filter
     if (this._typeFilter && this._typeFilter !== "all") {
@@ -368,7 +376,17 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
    * @param {HTMLElement} target
    */
   static async #onEditShop(event, target) {
-    const shopId = target.closest("[data-shop-id]").dataset.shopId;
+    const shopEntry = target.closest("[data-shop-id]");
+    const shopId = shopEntry?.dataset?.shopId;
+
+    console.log(`${MODULE_ID} | ShopManager.#onEditShop - shopEntry:`, shopEntry);
+    console.log(`${MODULE_ID} | ShopManager.#onEditShop - shopId:`, shopId);
+
+    if (!shopId) {
+      console.error(`${MODULE_ID} | No shopId found for edit action`);
+      ui.notifications.error(localize("ShopManager.ShopNotFound"));
+      return;
+    }
 
     const { ShopEditor } = await import("./shop-editor.mjs");
     const editor = new ShopEditor({ shopId });
