@@ -410,6 +410,44 @@ function registerWorldSettings() {
     type: Array,
     default: []
   });
+
+  // Active service orders (approved, waiting for pickup)
+  game.settings.register(MODULE_ID, "activeServiceOrders", {
+    name: "Active Service Orders",
+    scope: "world",
+    config: false,
+    type: Array,
+    default: []
+  });
+
+  // Service duration in hours (how long repair/enchant takes)
+  game.settings.register(MODULE_ID, "repairDuration", {
+    name: "BOBSNPC.Settings.RepairDuration.Name",
+    hint: "BOBSNPC.Settings.RepairDuration.Hint",
+    scope: "world",
+    config: true,
+    type: Number,
+    default: 1,
+    range: {
+      min: 0,
+      max: 168,
+      step: 1
+    }
+  });
+
+  game.settings.register(MODULE_ID, "enchantDuration", {
+    name: "BOBSNPC.Settings.EnchantDuration.Name",
+    hint: "BOBSNPC.Settings.EnchantDuration.Hint",
+    scope: "world",
+    config: true,
+    type: Number,
+    default: 24,
+    range: {
+      min: 0,
+      max: 168,
+      step: 1
+    }
+  });
 }
 
 /**

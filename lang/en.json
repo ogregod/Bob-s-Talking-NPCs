@@ -107,6 +107,14 @@
         "Name": "NPC Schedules",
         "Hint": "Enable time-based NPC availability"
       },
+      "RepairDuration": {
+        "Name": "Repair Service Duration (hours)",
+        "Hint": "How long repair services take. Set to 0 for instant completion."
+      },
+      "EnchantDuration": {
+        "Name": "Enchantment Service Duration (hours)",
+        "Hint": "How long enchantment services take. Set to 0 for instant completion."
+      },
       "QuestTracker": {
         "Name": "Quest Tracker",
         "Hint": "Show the quest tracker HUD"
@@ -856,13 +864,32 @@
         "RepairTitle": "Item Repaired",
         "RepairComplete": "{player} had {item} repaired by {merchant}",
         "RepairRequest": "Repair Request",
+        "RepairAccepted": "Repair Order Accepted",
         "AppraiseTitle": "Item Appraised",
         "AppraiseComplete": "{merchant} appraised {item} for {player}",
         "EnchantTitle": "Item Enchanted",
         "EnchantComplete": "{player} had {item} enchanted with {enchantment} by {merchant}",
         "EnchantRequest": "Enchantment Request",
-        "RequestItem": "Item: {item}"
+        "EnchantAccepted": "Enchantment Order Accepted",
+        "RequestItem": "Item: {item}",
+        "ReadyIn": "Ready in",
+        "PickupNotice": "Return to this shop to pick up your item when it's ready."
       }
+    },
+
+    "Service": {
+      "PendingApproval": "Your request has been sent to the GM for approval.",
+      "RequestApproved": "Your service request has been approved!",
+      "RequestDenied": "Your service request was denied.",
+      "OrderNotFound": "Service order not found.",
+      "NotYourOrder": "This order does not belong to you.",
+      "NotReady": "Your item is not ready yet. Time remaining: {time}",
+      "PickedUp": "You picked up your {item}!",
+      "YourOrders": "Your Service Orders",
+      "NoOrders": "You have no pending orders.",
+      "PickUp": "Pick Up",
+      "InProgress": "In Progress",
+      "Ready": "Ready for Pickup"
     },
 
     "GM": {

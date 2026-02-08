@@ -23,7 +23,7 @@ import {
   refreshStock,
   validateMerchant
 } from "../data/merchant-model.mjs";
-import { generateId, getFlag, setFlag, localize } from "../utils/helpers.mjs";
+import { generateId, getFlag, setFlag, localize, formatCurrency } from "../utils/helpers.mjs";
 import {
   sendPurchaseMessage,
   sendSaleMessage,
@@ -32,13 +32,17 @@ import {
   sendAppraiseMessage,
   sendEnchantMessage,
   sendServiceRequestToGM,
-  sendServiceRequestResult
+  sendServiceRequestResult,
+  getPrivateWhisperTargets
 } from "../utils/chat.mjs";
 import {
   createServiceRequest,
   ServiceRequestStatus,
   ApprovalRequiredServices,
-  isRequestPending
+  isRequestPending,
+  isRequestReady,
+  getTimeUntilReady,
+  formatDuration
 } from "../data/service-request-model.mjs";
 import { emit, emitToGM, SocketEvents } from "../socket.mjs";
 
@@ -1300,42 +1304,180 @@ export class MerchantHandler {
     // Deduct gold from player
     await this._deductGold(actor, request.cost);
 
-    // Send appropriate chat message based on service type
-    if (request.type === ApprovalRequiredServices.REPAIR) {
+    // Calculate when the item will be ready
+    const durationHours = request.type === ApprovalRequiredServices.REPAIR
+      ? game.settings.get(MODULE_ID, "repairDuration")
+      : game.settings.get(MODULE_ID, "enchantDuration");
+
+    const workDurationMs = durationHours * 60 * 60 * 1000;
+    const readyAt = Date.now() + workDurationMs;
+
+    // Create an active service order (item is being worked on)
+    const serviceOrder = {
+      ...request,
+      status: ServiceRequestStatus.APPROVED,
+      processedAt: Date.now(),
+      processedBy: game.user.id,
+      workDuration: workDurationMs,
+      readyAt: readyAt
+    };
+
+    // Add to active orders
+    const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
+    activeOrders.push(serviceOrder);
+    await game.settings.set(MODULE_ID, "activeServiceOrders", activeOrders);
+
+    // Notify player of approval with pickup time
+    const readyTimeStr = durationHours > 0 ? formatDuration(workDurationMs) : "Ready now";
+
+    emit(SocketEvents.SERVICE_APPROVE, {
+      requestId,
+      playerId: request.playerId,
+      readyAt,
+      readyTimeStr
+    });
+
+    // Send chat message about the order being accepted
+    await this._sendServiceAcceptedMessage({
+      type: request.type,
+      playerName: request.playerName,
+      merchantName: request.merchantName,
+      itemName: request.itemName,
+      itemImg: request.itemImg,
+      enchantmentName: request.enchantmentName,
+      cost: request.cost,
+      readyTimeStr,
+      playerId: request.playerId
+    });
+
+    return { success: true, message: "Request approved - item is being worked on" };
+  }
+
+  /**
+   * Send a message that a service order has been accepted
+   * @private
+   */
+  async _sendServiceAcceptedMessage({ type, playerName, merchantName, itemName, itemImg, enchantmentName, cost, readyTimeStr, playerId }) {
+    const imgHtml = itemImg ? `<img src="${itemImg}" class="item-icon" alt="${itemName}">` : "";
+    const serviceIcon = type === "repair" ? "fa-wrench" : "fa-wand-magic-sparkles";
+    const serviceTitle = type === "repair"
+      ? localize("Chat.Service.RepairAccepted")
+      : localize("Chat.Service.EnchantAccepted");
+
+    const enchantmentLine = enchantmentName
+      ? `<p><strong>${localize("Enchantment.Name")}:</strong> ${enchantmentName}</p>`
+      : "";
+
+    const content = `
+      <div class="bobsnpc-chat-message service-accepted ${type}">
+        <div class="service-header">
+          <i class="fa-solid ${serviceIcon}"></i>
+          <strong>${serviceTitle}</strong>
+        </div>
+        <div class="service-details">
+          ${imgHtml}
+          <div class="service-text">
+            <p><strong>${localize("Shop.Item")}:</strong> ${itemName}</p>
+            ${enchantmentLine}
+            <p><strong>${localize("Chat.Service.Cost")}:</strong> ${formatCurrency(cost * 100)}</p>
+            <p class="ready-time"><i class="fa-solid fa-clock"></i> <strong>${localize("Chat.Service.ReadyIn")}:</strong> ${readyTimeStr}</p>
+          </div>
+        </div>
+        <p class="pickup-notice">${localize("Chat.Service.PickupNotice")}</p>
+      </div>
+    `;
+
+    await ChatMessage.create({
+      content,
+      whisper: getPrivateWhisperTargets(playerId),
+      speaker: { alias: merchantName },
+      flags: {
+        [MODULE_ID]: {
+          type: "serviceAccepted",
+          serviceType: type
+        }
+      }
+    });
+  }
+
+  /**
+   * Get a player's active service orders
+   * @param {string} playerActorUuid - Player actor UUID
+   * @returns {object[]}
+   */
+  getPlayerServiceOrders(playerActorUuid) {
+    const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
+    return activeOrders.filter(order =>
+      order.playerActorUuid === playerActorUuid &&
+      (order.status === ServiceRequestStatus.APPROVED || order.status === ServiceRequestStatus.READY)
+    ).map(order => ({
+      ...order,
+      isReady: isRequestReady(order),
+      timeRemaining: getTimeUntilReady(order),
+      timeRemainingStr: formatDuration(getTimeUntilReady(order))
+    }));
+  }
+
+  /**
+   * Pick up a completed service order
+   * @param {string} orderId - The order ID
+   * @param {string} playerActorUuid - Player actor UUID
+   * @returns {Promise<object>}
+   */
+  async pickupServiceOrder(orderId, playerActorUuid) {
+    const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
+    const orderIndex = activeOrders.findIndex(o => o.id === orderId);
+
+    if (orderIndex === -1) {
+      return { success: false, message: localize("Service.OrderNotFound") };
+    }
+
+    const order = activeOrders[orderIndex];
+
+    // Verify the player owns this order
+    if (order.playerActorUuid !== playerActorUuid) {
+      return { success: false, message: localize("Service.NotYourOrder") };
+    }
+
+    // Check if the order is ready
+    if (!isRequestReady(order)) {
+      const timeLeft = formatDuration(getTimeUntilReady(order));
+      return { success: false, message: localize("Service.NotReady", { time: timeLeft }) };
+    }
+
+    // Remove from active orders
+    activeOrders.splice(orderIndex, 1);
+    await game.settings.set(MODULE_ID, "activeServiceOrders", activeOrders);
+
+    // Send completion message
+    if (order.type === ApprovalRequiredServices.REPAIR) {
       await sendRepairMessage({
-        playerName: request.playerName,
-        merchantName: request.merchantName,
-        itemName: request.itemName,
-        itemImg: request.itemImg,
-        cost: request.cost,
-        playerId: request.playerId
+        playerName: order.playerName,
+        merchantName: order.merchantName,
+        itemName: order.itemName,
+        itemImg: order.itemImg,
+        cost: order.cost,
+        playerId: order.playerId
       });
-    } else if (request.type === ApprovalRequiredServices.ENCHANT) {
+    } else if (order.type === ApprovalRequiredServices.ENCHANT) {
       await sendEnchantMessage({
-        playerName: request.playerName,
-        merchantName: request.merchantName,
-        itemName: request.itemName,
-        itemImg: request.itemImg,
-        enchantmentName: request.enchantmentName,
-        cost: request.cost,
-        playerId: request.playerId
+        playerName: order.playerName,
+        merchantName: order.merchantName,
+        itemName: order.itemName,
+        itemImg: order.itemImg,
+        enchantmentName: order.enchantmentName,
+        cost: order.cost,
+        playerId: order.playerId
       });
     }
 
-    // Notify player of approval
-    emit(SocketEvents.SERVICE_APPROVE, {
-      requestId,
-      playerId: request.playerId
-    });
+    ui.notifications.info(localize("Service.PickedUp", { item: order.itemName }));
 
-    await sendServiceRequestResult({
-      type: request.type,
-      status: "approved",
-      itemName: request.itemName,
-      playerId: request.playerId
-    });
-
-    return { success: true, message: "Request approved and processed" };
+    return {
+      success: true,
+      message: localize("Service.PickedUp", { item: order.itemName }),
+      order
+    };
   }
 
   /**

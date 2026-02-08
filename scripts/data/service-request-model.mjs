@@ -9,10 +9,12 @@ import { generateId } from "../utils/helpers.mjs";
  * Service request status enum
  */
 export const ServiceRequestStatus = Object.freeze({
-  PENDING: "pending",
-  APPROVED: "approved",
-  DENIED: "denied",
-  EXPIRED: "expired"
+  PENDING: "pending",           // Waiting for GM approval
+  APPROVED: "approved",         // GM approved, item being worked on
+  READY: "ready",               // Work complete, ready for pickup
+  COMPLETED: "completed",       // Item picked up by player
+  DENIED: "denied",             // GM denied the request
+  EXPIRED: "expired"            // Request timed out
 });
 
 /**
@@ -63,7 +65,14 @@ export function createServiceRequest(data) {
     processedAt: data.processedAt || null,
     processedBy: data.processedBy || null,  // GM user ID who processed
 
-    // Expiration (24 hours default)
+    // Drop-off / Pick-up tracking
+    itemDroppedOff: data.itemDroppedOff || false,   // Has player dropped off item?
+    droppedOffAt: data.droppedOffAt || null,        // When was item dropped off?
+    workDuration: data.workDuration || null,        // How long the work takes (ms)
+    readyAt: data.readyAt || null,                  // When will item be ready?
+    pickedUpAt: data.pickedUpAt || null,            // When was item picked up?
+
+    // Expiration (24 hours default for pending requests)
     expiresAt: data.expiresAt || (Date.now() + 24 * 60 * 60 * 1000)
   };
 }
@@ -84,6 +93,47 @@ export function isRequestExpired(request) {
  */
 export function isRequestPending(request) {
   return request.status === ServiceRequestStatus.PENDING && !isRequestExpired(request);
+}
+
+/**
+ * Check if a service request is ready for pickup
+ * @param {object} request - Service request
+ * @returns {boolean}
+ */
+export function isRequestReady(request) {
+  if (request.status === ServiceRequestStatus.READY) return true;
+  if (request.status === ServiceRequestStatus.APPROVED && request.readyAt) {
+    return Date.now() >= request.readyAt;
+  }
+  return false;
+}
+
+/**
+ * Get time remaining until item is ready (in milliseconds)
+ * @param {object} request - Service request
+ * @returns {number|null} Milliseconds remaining, or null if ready or not applicable
+ */
+export function getTimeUntilReady(request) {
+  if (!request.readyAt || request.status !== ServiceRequestStatus.APPROVED) return null;
+  const remaining = request.readyAt - Date.now();
+  return remaining > 0 ? remaining : 0;
+}
+
+/**
+ * Format time duration for display
+ * @param {number} ms - Duration in milliseconds
+ * @returns {string}
+ */
+export function formatDuration(ms) {
+  if (!ms || ms <= 0) return "Ready now";
+
+  const hours = Math.floor(ms / (1000 * 60 * 60));
+  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  return `${minutes}m`;
 }
 
 /**

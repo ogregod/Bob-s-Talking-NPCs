@@ -20,7 +20,7 @@ function getGMUserIds() {
  * @param {string} [playerId] - Optional specific player ID
  * @returns {string[]}
  */
-function getPrivateWhisperTargets(playerId = null) {
+export function getPrivateWhisperTargets(playerId = null) {
   const targets = new Set(getGMUserIds());
   if (playerId) {
     targets.add(playerId);

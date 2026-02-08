@@ -157,6 +157,12 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
         game.bobsnpc?.ui?.openShopManager();
         break;
 
+      case "enchant":
+      case "enchantments":
+      case "enchantment":
+        game.bobsnpc?.ui?.openEnchantmentManager();
+        break;
+
       case "npc": {
         // Configure selected token's NPC
         const selectedToken = canvas.tokens?.controlled?.[0];
@@ -182,6 +188,7 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
               <tr><td><code>/bobsnpc tracker</code></td><td>Open Quest Tracker</td></tr>
               <tr><td><code>/bobsnpc npc</code></td><td>Configure selected NPC</td></tr>
               ${game.user.isGM ? '<tr><td><code>/bobsnpc shops</code></td><td>Open Shop Manager</td></tr>' : ''}
+              ${game.user.isGM ? '<tr><td><code>/bobsnpc enchantments</code></td><td>Open Enchantment Manager</td></tr>' : ''}
               ${game.user.isGM ? '<tr><td><code>/bobsnpc dashboard</code></td><td>Open GM Dashboard</td></tr>' : ''}
             </table>
             <p style="margin: 10px 0 0 0; color: #a0a0a0; font-size: 0.8em;">
@@ -200,6 +207,66 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
 
   // Prevent the message from being posted to chat
   return false;
+});
+
+/**
+ * Handle service request approve/deny buttons in chat messages
+ */
+Hooks.on("renderChatMessage", (message, html) => {
+  // Check if this is a service request message from our module
+  const flags = message.flags?.[MODULE_ID];
+  if (!flags?.type || flags.type !== "serviceRequest") return;
+
+  // Only GMs can interact with these buttons
+  if (!game.user.isGM) return;
+
+  // Wire up the approve button
+  const approveBtn = html.find ? html.find(".approve-btn") : html.querySelector?.(".approve-btn");
+  const $approveBtn = approveBtn?.length ? approveBtn : (approveBtn ? [approveBtn] : []);
+
+  for (const btn of $approveBtn) {
+    btn.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const requestId = btn.dataset.requestId;
+      if (!requestId) return;
+
+      const handler = game.bobsnpc?.handlers?.merchant;
+      if (handler) {
+        await handler.processServiceRequest(requestId, true);
+        ui.notifications.info("Service request approved");
+        // Update the message to show it's been processed
+        const newContent = message.content.replace(
+          /<div class="service-actions">[\s\S]*?<\/div>/,
+          '<div class="service-actions processed"><i class="fa-solid fa-check"></i> Approved</div>'
+        );
+        await message.update({ content: newContent });
+      }
+    });
+  }
+
+  // Wire up the deny button
+  const denyBtn = html.find ? html.find(".deny-btn") : html.querySelector?.(".deny-btn");
+  const $denyBtn = denyBtn?.length ? denyBtn : (denyBtn ? [denyBtn] : []);
+
+  for (const btn of $denyBtn) {
+    btn.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const requestId = btn.dataset.requestId;
+      if (!requestId) return;
+
+      const handler = game.bobsnpc?.handlers?.merchant;
+      if (handler) {
+        await handler.processServiceRequest(requestId, false);
+        ui.notifications.info("Service request denied");
+        // Update the message to show it's been processed
+        const newContent = message.content.replace(
+          /<div class="service-actions">[\s\S]*?<\/div>/,
+          '<div class="service-actions processed"><i class="fa-solid fa-times"></i> Denied</div>'
+        );
+        await message.update({ content: newContent });
+      }
+    });
+  }
 });
 
 /**

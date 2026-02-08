@@ -22,6 +22,7 @@ import { GMDashboard } from "./apps/gm-dashboard.mjs";
 import { TradeWindow } from "./apps/trade-window.mjs";
 import { ShopManager } from "./apps/shop-manager.mjs";
 import { ShopEditor } from "./apps/shop-editor.mjs";
+import { EnchantmentManager } from "./apps/enchantment-manager.mjs";
 
 /**
  * Singleton instances of UI applications
@@ -1422,6 +1423,27 @@ class UIAPI {
     shopEditor.render(true);
     console.log(`${MODULE_ID} | Opening shop editor${shopId ? ` for ${shopId}` : " for new shop"}${npcActorUuid ? ` linked to ${npcActorUuid}` : ""}`);
     return shopEditor;
+  }
+
+  /**
+   * Open Enchantment Manager (GM only)
+   * Manage the master list of enchantments available to shops
+   */
+  openEnchantmentManager() {
+    if (!game.user.isGM) {
+      ui.notifications.warn(game.i18n.localize("BOBSNPC.Errors.GMOnly"));
+      return;
+    }
+    Hooks.call(`${MODULE_ID}.openEnchantmentManager`);
+
+    let enchantmentManager = appInstances.get("enchantmentManager");
+    if (!enchantmentManager) {
+      enchantmentManager = new EnchantmentManager();
+      appInstances.set("enchantmentManager", enchantmentManager);
+    }
+    enchantmentManager.render(true);
+    console.log(`${MODULE_ID} | Opening enchantment manager`);
+    return enchantmentManager;
   }
 
   /**
