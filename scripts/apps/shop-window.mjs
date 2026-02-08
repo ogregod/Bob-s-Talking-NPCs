@@ -197,8 +197,9 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     // Get categories
     const categories = this._getCategories(merchant);
 
-    // Get services if available
-    const services = this._tab === "services" ? this._prepareServices(merchant) : [];
+    // Get services if available - always prepare to check hasServices
+    const services = this._prepareServices(merchant);
+    const hasServices = services.length > 0;
 
     // Ensure we have merchant actor data (defensive)
     const merchantName = this._merchantActor?.name || localize("Shop.UnknownMerchant");
@@ -270,7 +271,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       sellTotalFormatted: formatCurrency(sellTotal * 100),
       // Services
       services,
-      hasServices: services.length > 0,
+      hasServices,
       // Settings
       settings: {
         hagglingEnabled: game.settings.get(MODULE_ID, "hagglingEnabled"),
@@ -789,11 +790,67 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   _prepareServices(merchant) {
     if (!merchant?.services) return [];
 
-    return merchant.services.map(service => ({
-      ...service,
-      priceFormatted: formatCurrency(service.price * 100),
-      icon: this._getServiceIcon(service.type)
-    }));
+    const services = [];
+    const svc = merchant.services;
+
+    // Identify Service
+    if (svc.identify) {
+      services.push({
+        id: "identify",
+        type: "identify",
+        name: localize("Shop.Service.Identify"),
+        description: localize("Shop.Service.IdentifyDesc"),
+        price: svc.identifyPrice || 25,
+        priceFormatted: formatCurrency((svc.identifyPrice || 25) * 100),
+        icon: "fa-search",
+        available: true
+      });
+    }
+
+    // Repair Service
+    if (svc.repair) {
+      const repairPercent = Math.round((svc.repairPricePercent || 0.1) * 100);
+      services.push({
+        id: "repair",
+        type: "repair",
+        name: localize("Shop.Service.Repair"),
+        description: localize("Shop.Service.RepairDesc", { percent: repairPercent }),
+        price: null, // Variable based on item
+        priceFormatted: `${repairPercent}% of item value`,
+        icon: "fa-wrench",
+        available: true
+      });
+    }
+
+    // Appraise Service
+    if (svc.appraise) {
+      services.push({
+        id: "appraise",
+        type: "appraise",
+        name: localize("Shop.Service.Appraise"),
+        description: localize("Shop.Service.AppraiseDesc"),
+        price: svc.appraisePrice || 5,
+        priceFormatted: formatCurrency((svc.appraisePrice || 5) * 100),
+        icon: "fa-magnifying-glass-dollar",
+        available: true
+      });
+    }
+
+    // Enchant Service
+    if (svc.enchant) {
+      services.push({
+        id: "enchant",
+        type: "enchant",
+        name: localize("Shop.Service.Enchant"),
+        description: localize("Shop.Service.EnchantDesc"),
+        price: null, // Variable based on enchantment
+        priceFormatted: localize("Shop.Service.PriceVaries"),
+        icon: "fa-wand-magic-sparkles",
+        available: true
+      });
+    }
+
+    return services;
   }
 
   /**
@@ -1093,6 +1150,19 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
           value: item.system?.price?.value || "?"
         }));
 
+      case "enchant":
+        // Items that can be enchanted (weapons, armor, equipment)
+        return items.filter(item => {
+          const types = ["weapon", "equipment"];
+          return types.includes(item.type);
+        }).map(item => ({
+          id: item.id,
+          name: item.name,
+          img: item.img,
+          type: item.type,
+          rarity: item.system?.rarity || "common"
+        }));
+
       default:
         return [];
     }
@@ -1109,7 +1179,8 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const serviceLabels = {
       identify: localize("Shop.Service.Identify"),
       repair: localize("Shop.Service.Repair"),
-      appraise: localize("Shop.Service.Appraise")
+      appraise: localize("Shop.Service.Appraise"),
+      enchant: localize("Shop.Service.Enchant")
     };
 
     const itemOptions = items.map(item =>

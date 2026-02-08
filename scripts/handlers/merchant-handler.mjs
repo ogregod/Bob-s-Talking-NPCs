@@ -259,7 +259,7 @@ export class MerchantHandler {
   async openShop(merchantId, playerActorUuid) {
     const merchant = this.getMerchant(merchantId);
     if (!merchant) {
-      return { success: false, message: localize("BOBSNPC.ShopNotFound") };
+      return { success: false, message: localize("Shop.ShopNotFound") };
     }
 
     // Build context for access check
@@ -398,7 +398,7 @@ export class MerchantHandler {
       case PriceDisplayMode.HIDDEN:
         return "???";
       case PriceDisplayMode.ASK:
-        return localize("BOBSNPC.AskPrice");
+        return localize("Shop.AskPrice");
       case PriceDisplayMode.RANGE:
         const low = Math.floor(price * 0.8);
         const high = Math.ceil(price * 1.2);
@@ -438,12 +438,12 @@ export class MerchantHandler {
   async purchaseItems(sessionId, purchases) {
     const session = this._activeShopSessions.get(sessionId);
     if (!session) {
-      return { success: false, message: localize("BOBSNPC.SessionNotFound") };
+      return { success: false, message: localize("Shop.SessionNotFound") };
     }
 
     const merchant = this.getMerchant(session.merchantId);
     if (!merchant) {
-      return { success: false, message: localize("BOBSNPC.ShopNotFound") };
+      return { success: false, message: localize("Shop.ShopNotFound") };
     }
 
     const context = await this._buildPlayerContext(session.playerActorUuid);
@@ -465,7 +465,7 @@ export class MerchantHandler {
 
       // Check quantity
       if (shopItem.quantity !== -1 && shopItem.quantity < purchase.quantity) {
-        return { success: false, message: localize("BOBSNPC.InsufficientStock") };
+        return { success: false, message: localize("Shop.InsufficientStock") };
       }
 
       // Calculate price
@@ -483,7 +483,7 @@ export class MerchantHandler {
 
     // Check if player can afford
     if (context.gold < totalCost) {
-      return { success: false, message: localize("BOBSNPC.InsufficientFunds") };
+      return { success: false, message: localize("Shop.InsufficientFunds") };
     }
 
     // Process purchase
@@ -537,7 +537,7 @@ export class MerchantHandler {
       transaction,
       items: purchasedItems,
       totalCost,
-      message: localize("BOBSNPC.PurchaseComplete")
+      message: localize("Shop.PurchaseComplete")
     };
   }
 
@@ -550,16 +550,16 @@ export class MerchantHandler {
   async sellItems(sessionId, sales) {
     const session = this._activeShopSessions.get(sessionId);
     if (!session) {
-      return { success: false, message: localize("BOBSNPC.SessionNotFound") };
+      return { success: false, message: localize("Shop.SessionNotFound") };
     }
 
     const merchant = this.getMerchant(session.merchantId);
     if (!merchant) {
-      return { success: false, message: localize("BOBSNPC.ShopNotFound") };
+      return { success: false, message: localize("Shop.ShopNotFound") };
     }
 
     if (!merchant.buyBack.enabled) {
-      return { success: false, message: localize("BOBSNPC.ShopDoesNotBuy") };
+      return { success: false, message: localize("Shop.ShopDoesNotBuy") };
     }
 
     const context = await this._buildPlayerContext(session.playerActorUuid);
@@ -609,14 +609,14 @@ export class MerchantHandler {
     }
 
     if (itemsToSell.length === 0) {
-      return { success: false, message: localize("BOBSNPC.NoItemsToSell") };
+      return { success: false, message: localize("Shop.NoItemsToSell") };
     }
 
     // Check shop can afford (if not unlimited)
     if (!merchant.drawer.unlimited) {
       const drawerValue = convertToGold(merchant.drawer);
       if (drawerValue < totalValue) {
-        return { success: false, message: localize("BOBSNPC.ShopCannotAfford") };
+        return { success: false, message: localize("Shop.ShopCannotAfford") };
       }
     }
 
@@ -663,7 +663,7 @@ export class MerchantHandler {
       success: true,
       transaction,
       totalValue,
-      message: `${localize("BOBSNPC.SaleComplete")}: ${this._formatCurrency(totalValue)}`
+      message: `${localize("Shop.SaleComplete")}: ${this._formatCurrency(totalValue)}`
     };
   }
 
@@ -680,12 +680,12 @@ export class MerchantHandler {
   async attemptHaggle(sessionId, itemId, skill, rollTotal) {
     const session = this._activeShopSessions.get(sessionId);
     if (!session) {
-      return { success: false, message: localize("BOBSNPC.SessionNotFound") };
+      return { success: false, message: localize("Shop.SessionNotFound") };
     }
 
     const merchant = this.getMerchant(session.merchantId);
     if (!merchant || !merchant.haggling.enabled) {
-      return { success: false, message: localize("BOBSNPC.HagglingDisabled") };
+      return { success: false, message: localize("Shop.HagglingDisabled") };
     }
 
     const haggling = merchant.haggling;
@@ -702,13 +702,13 @@ export class MerchantHandler {
     if (history.lastAttempt) {
       const cooldownMs = haggling.cooldownHours * 60 * 60 * 1000;
       if (Date.now() - history.lastAttempt < cooldownMs) {
-        return { success: false, message: localize("BOBSNPC.HagglingCooldown") };
+        return { success: false, message: localize("Shop.HagglingCooldown") };
       }
     }
 
     // Check max attempts
     if (history.attempts >= haggling.maxAttempts) {
-      return { success: false, message: localize("BOBSNPC.HagglingMaxAttempts") };
+      return { success: false, message: localize("Shop.HagglingMaxAttempts") };
     }
 
     // Get DC for skill
@@ -775,8 +775,8 @@ export class MerchantHandler {
       newPrice,
       consequence,
       message: success
-        ? localize("BOBSNPC.HagglingSuccess")
-        : localize("BOBSNPC.HagglingFailed")
+        ? localize("Shop.HagglingSuccess")
+        : localize("Shop.HagglingFailed")
     };
   }
 
@@ -917,12 +917,12 @@ export class MerchantHandler {
   async useService(sessionId, service, options = {}) {
     const session = this._activeShopSessions.get(sessionId);
     if (!session) {
-      return { success: false, message: localize("BOBSNPC.SessionNotFound") };
+      return { success: false, message: localize("Shop.SessionNotFound") };
     }
 
     const merchant = this.getMerchant(session.merchantId);
     if (!merchant) {
-      return { success: false, message: localize("BOBSNPC.ShopNotFound") };
+      return { success: false, message: localize("Shop.ShopNotFound") };
     }
 
     const context = await this._buildPlayerContext(session.playerActorUuid);
@@ -935,8 +935,10 @@ export class MerchantHandler {
         return this._serviceRepair(merchant, actor, options);
       case "appraise":
         return this._serviceAppraise(merchant, actor, options);
+      case "enchant":
+        return this._serviceEnchant(merchant, actor, options);
       default:
-        return { success: false, message: localize("BOBSNPC.ServiceNotAvailable") };
+        return { success: false, message: localize("Shop.ServiceNotAvailable") };
     }
   }
 
@@ -946,19 +948,19 @@ export class MerchantHandler {
    */
   async _serviceIdentify(merchant, actor, options) {
     if (!merchant.services.identify) {
-      return { success: false, message: localize("BOBSNPC.ServiceNotAvailable") };
+      return { success: false, message: localize("Shop.ServiceNotAvailable") };
     }
 
     const item = actor.items.get(options.itemId);
     if (!item) {
-      return { success: false, message: localize("BOBSNPC.ItemNotFound") };
+      return { success: false, message: localize("Shop.ItemNotFound") };
     }
 
     const cost = merchant.services.identifyPrice;
     const gold = convertToGold(actor.system?.currency || {});
 
     if (gold < cost) {
-      return { success: false, message: localize("BOBSNPC.InsufficientFunds") };
+      return { success: false, message: localize("Shop.InsufficientFunds") };
     }
 
     await this._deductGold(actor, cost);
@@ -969,7 +971,7 @@ export class MerchantHandler {
     return {
       success: true,
       cost,
-      message: `${item.name} ${localize("BOBSNPC.HasBeenIdentified")}`
+      message: `${item.name} ${localize("Shop.HasBeenIdentified")}`
     };
   }
 
@@ -979,12 +981,12 @@ export class MerchantHandler {
    */
   async _serviceRepair(merchant, actor, options) {
     if (!merchant.services.repair) {
-      return { success: false, message: localize("BOBSNPC.ServiceNotAvailable") };
+      return { success: false, message: localize("Shop.ServiceNotAvailable") };
     }
 
     const item = actor.items.get(options.itemId);
     if (!item) {
-      return { success: false, message: localize("BOBSNPC.ItemNotFound") };
+      return { success: false, message: localize("Shop.ItemNotFound") };
     }
 
     // Calculate repair cost based on item value
@@ -993,7 +995,7 @@ export class MerchantHandler {
     const gold = convertToGold(actor.system?.currency || {});
 
     if (gold < cost) {
-      return { success: false, message: localize("BOBSNPC.InsufficientFunds") };
+      return { success: false, message: localize("Shop.InsufficientFunds") };
     }
 
     await this._deductGold(actor, cost);
@@ -1001,7 +1003,7 @@ export class MerchantHandler {
     return {
       success: true,
       cost,
-      message: `${item.name} ${localize("BOBSNPC.HasBeenRepaired")}`
+      message: `${item.name} ${localize("Shop.HasBeenRepaired")}`
     };
   }
 
@@ -1011,19 +1013,19 @@ export class MerchantHandler {
    */
   async _serviceAppraise(merchant, actor, options) {
     if (!merchant.services.appraise) {
-      return { success: false, message: localize("BOBSNPC.ServiceNotAvailable") };
+      return { success: false, message: localize("Shop.ServiceNotAvailable") };
     }
 
     const item = actor.items.get(options.itemId);
     if (!item) {
-      return { success: false, message: localize("BOBSNPC.ItemNotFound") };
+      return { success: false, message: localize("Shop.ItemNotFound") };
     }
 
     const cost = merchant.services.appraisePrice;
     const gold = convertToGold(actor.system?.currency || {});
 
     if (gold < cost) {
-      return { success: false, message: localize("BOBSNPC.InsufficientFunds") };
+      return { success: false, message: localize("Shop.InsufficientFunds") };
     }
 
     await this._deductGold(actor, cost);
@@ -1035,6 +1037,53 @@ export class MerchantHandler {
       cost,
       appraisedValue: value,
       message: `${item.name}: ${this._formatCurrency(value)}`
+    };
+  }
+
+  /**
+   * Enchant service
+   * @private
+   */
+  async _serviceEnchant(merchant, actor, options) {
+    if (!merchant.services.enchant) {
+      return { success: false, message: localize("Shop.ServiceNotAvailable") };
+    }
+
+    const item = actor.items.get(options.itemId);
+    if (!item) {
+      return { success: false, message: localize("Shop.ItemNotFound") };
+    }
+
+    // For now, enchanting is a placeholder - full implementation would need
+    // an enchantment selection UI and pricing based on the enchantment chosen
+    // This opens the door for future expansion
+
+    // Calculate base enchant cost based on item value and rarity
+    const basePrice = item.system?.price?.value || 100;
+    const rarityMultiplier = {
+      common: 1,
+      uncommon: 1.5,
+      rare: 2,
+      veryRare: 3,
+      legendary: 5,
+      artifact: 10
+    };
+    const rarity = item.system?.rarity || "common";
+    const cost = Math.round(basePrice * (rarityMultiplier[rarity] || 1));
+    const gold = convertToGold(actor.system?.currency || {});
+
+    if (gold < cost) {
+      return { success: false, message: localize("Shop.InsufficientFunds") };
+    }
+
+    await this._deductGold(actor, cost);
+
+    // Placeholder: For a full implementation, this would apply an actual enchantment
+    // For now, just notify success
+    return {
+      success: true,
+      cost,
+      message: localize("EnchantmentApplied", { item: item.name, cost: this._formatCurrency(cost) })
     };
   }
 
