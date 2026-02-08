@@ -1088,12 +1088,39 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const selectedItemId = await this._showServiceItemPicker(serviceId, eligibleItems);
     if (!selectedItemId) return;
 
+    // For enchant service, also show enchantment picker
+    let enchantmentId = null;
+    if (serviceId === "enchant") {
+      const item = this._playerActor.items.get(selectedItemId);
+      if (item) {
+        // Dynamically import the enchantment picker
+        const { EnchantmentPicker } = await import("./enchantment-picker.mjs");
+        const merchant = this._getMerchant();
+        enchantmentId = await EnchantmentPicker.pick(merchant?.id || this.merchantId, item);
+
+        if (!enchantmentId) {
+          // User cancelled enchantment selection
+          return;
+        }
+      }
+    }
+
     // Call the merchant handler to use the service
     const handler = getMerchantHandler();
-    const result = await handler.useService(this._sessionId, serviceId, { itemId: selectedItemId });
+    const serviceOptions = { itemId: selectedItemId };
+    if (enchantmentId) {
+      serviceOptions.enchantmentId = enchantmentId;
+    }
+
+    const result = await handler.useService(this._sessionId, serviceId, serviceOptions);
 
     if (result.success) {
-      ui.notifications.info(result.message || localize("Shop.ServiceComplete"));
+      // Check if it's pending GM approval
+      if (result.pending) {
+        ui.notifications.info(result.message || localize("Shop.Service.PendingApproval"));
+      } else {
+        ui.notifications.info(result.message || localize("Shop.ServiceComplete"));
+      }
       // Refresh to update gold display
       this.render();
     } else {

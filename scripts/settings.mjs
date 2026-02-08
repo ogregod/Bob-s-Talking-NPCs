@@ -392,6 +392,24 @@ function registerWorldSettings() {
     type: Object,
     default: {}
   });
+
+  // Master enchantments list
+  game.settings.register(MODULE_ID, "masterEnchantments", {
+    name: "Master Enchantments",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {}
+  });
+
+  // Pending service requests (repair, enchant)
+  game.settings.register(MODULE_ID, "pendingServiceRequests", {
+    name: "Pending Service Requests",
+    scope: "world",
+    config: false,
+    type: Array,
+    default: []
+  });
 }
 
 /**

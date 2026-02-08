@@ -52,6 +52,11 @@ export const SocketEvents = Object.freeze({
   SHOP_TRANSACTION: "shopTransaction",
   SHOP_HAGGLE: "shopHaggle",
 
+  // Service request events
+  SERVICE_REQUEST: "serviceRequest",
+  SERVICE_APPROVE: "serviceApprove",
+  SERVICE_DENY: "serviceDeny",
+
   // Bank events
   BANK_TRANSACTION: "bankTransaction",
 
@@ -251,6 +256,11 @@ function registerDefaultHandlers() {
   registerHandler(SocketEvents.CRIME_BOUNTY, handleCrimeBounty);
   registerHandler(SocketEvents.STATE_SYNC, handleStateSync);
   registerHandler(SocketEvents.REQUEST_SYNC, handleRequestSync);
+
+  // Service request handlers
+  registerHandler(SocketEvents.SERVICE_REQUEST, handleServiceRequest);
+  registerHandler(SocketEvents.SERVICE_APPROVE, handleServiceApprove);
+  registerHandler(SocketEvents.SERVICE_DENY, handleServiceDeny);
 }
 
 // ===== Dialogue Handlers =====
@@ -508,6 +518,49 @@ function handleRequestSync(payload, userId) {
   // Gather data and send back
   // Implementation depends on what data is being synced
   console.log(`${MODULE_ID} | Sync requested for ${dataType} by user ${userId}`);
+}
+
+// ===== Service Request Handlers =====
+
+function handleServiceRequest(payload, userId) {
+  // Only GM should handle service requests
+  if (!game.user.isGM) return;
+
+  const { request } = payload;
+
+  // Store the request
+  const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
+  pendingRequests.push(request);
+  game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
+
+  // Notify GM via hook (UI will handle display)
+  Hooks.call(`${MODULE_ID}.serviceRequestReceived`, request);
+
+  console.log(`${MODULE_ID} | Service request received from ${request.playerName}: ${request.type} for ${request.itemName}`);
+}
+
+function handleServiceApprove(payload, userId) {
+  const { requestId, playerId } = payload;
+
+  // If this is the player who made the request, show notification
+  if (game.user.id === playerId) {
+    Hooks.call(`${MODULE_ID}.serviceRequestApproved`, requestId);
+    ui.notifications.info(game.i18n.localize("BOBSNPC.Service.RequestApproved"));
+  }
+
+  console.log(`${MODULE_ID} | Service request ${requestId} approved`);
+}
+
+function handleServiceDeny(payload, userId) {
+  const { requestId, playerId, reason } = payload;
+
+  // If this is the player who made the request, show notification
+  if (game.user.id === playerId) {
+    Hooks.call(`${MODULE_ID}.serviceRequestDenied`, requestId, reason);
+    ui.notifications.warn(game.i18n.localize("BOBSNPC.Service.RequestDenied"));
+  }
+
+  console.log(`${MODULE_ID} | Service request ${requestId} denied`);
 }
 
 // ===== Utility Functions =====

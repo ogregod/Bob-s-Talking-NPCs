@@ -753,4 +753,626 @@
     }
   }
 
+  /* ===== Private Chat Message Styles ===== */
+  .bobsnpc-chat-message {
+    padding: 10px;
+    border-radius: 8px;
+    background: var(--bobsnpc-bg-secondary);
+    border-left: 4px solid var(--bobsnpc-primary);
+  }
+
+  .bobsnpc-chat-message.purchase {
+    border-left-color: #4caf50;
+  }
+
+  .bobsnpc-chat-message.sale {
+    border-left-color: #ff9800;
+  }
+
+  .bobsnpc-chat-message .transaction-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+
+  .bobsnpc-chat-message .transaction-parties {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+    margin-bottom: 8px;
+  }
+
+  .bobsnpc-chat-message .transaction-items {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 8px 0;
+    font-size: 0.9em;
+  }
+
+  .bobsnpc-chat-message .transaction-items li {
+    padding: 2px 0;
+  }
+
+  .bobsnpc-chat-message .transaction-total {
+    font-weight: bold;
+    text-align: right;
+    border-top: 1px solid var(--bobsnpc-border);
+    padding-top: 8px;
+  }
+
+  .bobsnpc-chat-message .service-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+
+  .bobsnpc-chat-message .service-details {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .bobsnpc-chat-message .item-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+
+  .bobsnpc-chat-message .service-text {
+    flex: 1;
+  }
+
+  .bobsnpc-chat-message .service-cost {
+    color: var(--bobsnpc-warning);
+  }
+
+  .bobsnpc-chat-message.service-request .service-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .bobsnpc-chat-message .approve-btn {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .bobsnpc-chat-message .deny-btn {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .bobsnpc-chat-message.service-result.approved {
+    border-left-color: #4caf50;
+  }
+
+  .bobsnpc-chat-message.service-result.denied {
+    border-left-color: #f44336;
+  }
+
+  /* ===== Service Approval Dialog ===== */
+  .service-approval-content {
+    padding: 10px;
+  }
+
+  .service-approval-content .approval-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .service-approval-content .request-count {
+    background: var(--bobsnpc-primary);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    margin-left: 8px;
+  }
+
+  .service-approval-content .header-actions {
+    display: flex;
+    gap: 4px;
+  }
+
+  .service-approval-content .header-actions button {
+    background: none;
+    border: 1px solid var(--bobsnpc-border);
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .service-approval-content .requests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .service-approval-content .request-card {
+    background: var(--bobsnpc-bg-secondary);
+    border-radius: 8px;
+    padding: 12px;
+    border-left: 4px solid var(--bobsnpc-primary);
+  }
+
+  .service-approval-content .request-card.repair {
+    border-left-color: #ff9800;
+  }
+
+  .service-approval-content .request-card.enchant {
+    border-left-color: #9c27b0;
+  }
+
+  .service-approval-content .request-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .service-approval-content .service-type {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: bold;
+  }
+
+  .service-approval-content .request-time {
+    font-size: 0.8em;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .service-approval-content .request-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .service-approval-content .item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+  }
+
+  .service-approval-content .item-name {
+    font-weight: bold;
+  }
+
+  .service-approval-content .enchantment-name {
+    display: block;
+    font-size: 0.9em;
+    color: #9c27b0;
+  }
+
+  .service-approval-content .request-info {
+    font-size: 0.9em;
+    margin-bottom: 8px;
+  }
+
+  .service-approval-content .info-row {
+    margin: 4px 0;
+  }
+
+  .service-approval-content .info-row.cost {
+    color: var(--bobsnpc-warning);
+    font-weight: bold;
+  }
+
+  .service-approval-content .request-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .service-approval-content .approve-btn {
+    background: #4caf50;
+    color: white;
+  }
+
+  .service-approval-content .deny-btn {
+    background: #f44336;
+    color: white;
+  }
+
+  .service-approval-content .no-requests {
+    text-align: center;
+    padding: 40px;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .service-approval-content .no-requests i {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  /* ===== Enchantment Manager ===== */
+  .enchantment-manager-content {
+    padding: 10px;
+  }
+
+  .enchantment-manager-content .manager-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .enchantment-manager-content .enchantment-count {
+    color: var(--bobsnpc-text-muted);
+    font-weight: normal;
+  }
+
+  .enchantment-manager-content .header-actions {
+    display: flex;
+    gap: 4px;
+  }
+
+  .enchantment-manager-content .add-btn {
+    background: var(--bobsnpc-primary);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .enchantment-manager-content .enchantment-form-container {
+    background: var(--bobsnpc-bg-secondary);
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .enchantment-manager-content .form-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .enchantment-manager-content .form-group {
+    flex: 1;
+  }
+
+  .enchantment-manager-content .form-group label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.9em;
+  }
+
+  .enchantment-manager-content .form-group input,
+  .enchantment-manager-content .form-group select,
+  .enchantment-manager-content .form-group textarea {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid var(--bobsnpc-border);
+    border-radius: 4px;
+    background: var(--bobsnpc-bg-primary);
+    color: var(--bobsnpc-text);
+  }
+
+  .enchantment-manager-content .form-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  .enchantment-manager-content .enchantment-group {
+    margin-bottom: 16px;
+  }
+
+  .enchantment-manager-content .group-header {
+    background: var(--bobsnpc-bg-tertiary);
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+
+  .enchantment-manager-content .enchantment-card {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--bobsnpc-bg-secondary);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 4px solid var(--bobsnpc-border);
+  }
+
+  .enchantment-manager-content .enchantment-card.rarity-uncommon {
+    border-left-color: #1eff00;
+  }
+
+  .enchantment-manager-content .enchantment-card.rarity-rare {
+    border-left-color: #0070dd;
+  }
+
+  .enchantment-manager-content .enchantment-card.rarity-veryRare {
+    border-left-color: #a335ee;
+  }
+
+  .enchantment-manager-content .enchantment-card.rarity-legendary {
+    border-left-color: #ff8000;
+  }
+
+  .enchantment-manager-content .enchantment-icon {
+    font-size: 24px;
+    width: 40px;
+    text-align: center;
+    color: var(--bobsnpc-primary);
+  }
+
+  .enchantment-manager-content .enchantment-info {
+    flex: 1;
+  }
+
+  .enchantment-manager-content .enchantment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  .enchantment-manager-content .enchantment-name {
+    font-weight: bold;
+  }
+
+  .enchantment-manager-content .enchantment-cost {
+    color: var(--bobsnpc-warning);
+  }
+
+  .enchantment-manager-content .enchantment-desc {
+    font-size: 0.9em;
+    color: var(--bobsnpc-text-muted);
+    margin: 4px 0;
+  }
+
+  .enchantment-manager-content .enchantment-effects {
+    font-size: 0.85em;
+    color: #9c27b0;
+  }
+
+  .enchantment-manager-content .enchantment-meta {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .enchantment-manager-content .rarity-badge {
+    font-size: 0.75em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--bobsnpc-bg-tertiary);
+  }
+
+  .enchantment-manager-content .enchantment-actions {
+    display: flex;
+    gap: 4px;
+  }
+
+  .enchantment-manager-content .edit-btn,
+  .enchantment-manager-content .delete-btn {
+    background: none;
+    border: 1px solid var(--bobsnpc-border);
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .enchantment-manager-content .delete-btn:hover {
+    background: #f44336;
+    color: white;
+    border-color: #f44336;
+  }
+
+  /* ===== Enchantment Picker ===== */
+  .enchantment-picker-content {
+    padding: 10px;
+  }
+
+  .enchantment-picker-content .picker-header {
+    margin-bottom: 16px;
+  }
+
+  .enchantment-picker-content .item-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bobsnpc-bg-secondary);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .enchantment-picker-content .item-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+  }
+
+  .enchantment-picker-content .item-name {
+    font-weight: bold;
+    display: block;
+  }
+
+  .enchantment-picker-content .item-rarity {
+    font-size: 0.85em;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .enchantment-picker-content .picker-instruction {
+    font-size: 0.9em;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .enchantment-picker-content .enchantment-options {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .enchantment-picker-content .enchantment-option {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px;
+    background: var(--bobsnpc-bg-secondary);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .enchantment-picker-content .enchantment-option:hover {
+    border-color: var(--bobsnpc-border);
+  }
+
+  .enchantment-picker-content .enchantment-option.selected {
+    border-color: var(--bobsnpc-primary);
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .enchantment-picker-content .option-icon {
+    font-size: 24px;
+    color: var(--bobsnpc-primary);
+  }
+
+  .enchantment-picker-content .option-info {
+    flex: 1;
+  }
+
+  .enchantment-picker-content .option-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .enchantment-picker-content .option-name {
+    font-weight: bold;
+  }
+
+  .enchantment-picker-content .option-cost {
+    color: var(--bobsnpc-warning);
+    font-weight: bold;
+  }
+
+  .enchantment-picker-content .option-desc {
+    font-size: 0.9em;
+    color: var(--bobsnpc-text-muted);
+    margin: 4px 0;
+  }
+
+  .enchantment-picker-content .option-effects {
+    font-size: 0.85em;
+    color: #9c27b0;
+  }
+
+  .enchantment-picker-content .option-select {
+    font-size: 20px;
+    color: var(--bobsnpc-primary);
+  }
+
+  .enchantment-picker-content .selection-summary {
+    background: var(--bobsnpc-bg-secondary);
+    padding: 12px;
+    border-radius: 8px;
+    margin: 12px 0;
+  }
+
+  .enchantment-picker-content .picker-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .enchantment-picker-content .confirm-btn {
+    background: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .enchantment-picker-content .no-enchantments {
+    text-align: center;
+    padding: 40px;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Shop Editor Enchantment Selection ===== */
+  .enchantment-selection {
+    margin-top: 16px;
+  }
+
+  .enchantment-selection h4 {
+    margin-bottom: 12px;
+  }
+
+  .enchantment-selection .enchantment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 8px;
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: 4px;
+  }
+
+  .enchantment-selection .enchantment-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: var(--bobsnpc-bg-secondary);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .enchantment-selection .enchantment-option:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .enchantment-selection .enchantment-option.enabled {
+    background: var(--bobsnpc-bg-hover);
+    border-left: 3px solid var(--bobsnpc-primary);
+  }
+
+  .enchantment-selection .ench-name {
+    font-weight: bold;
+  }
+
+  .enchantment-selection .ench-type {
+    font-size: 0.85em;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .enchantment-selection .ench-cost {
+    margin-left: auto;
+    color: var(--bobsnpc-warning);
+  }
+
+  .enchantment-selection .no-enchantments {
+    padding: 16px;
+    text-align: center;
+    color: var(--bobsnpc-text-muted);
+  }
+
 } /* End @layer bobsnpc */

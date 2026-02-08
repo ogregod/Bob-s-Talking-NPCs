@@ -1,0 +1,80 @@
+{{!-- Enchantment Picker --}}
+<div class="enchantment-picker-content {{theme}}">
+  <div class="picker-header">
+    <div class="item-preview">
+      <img src="{{item.img}}" alt="{{item.name}}" class="item-image">
+      <div class="item-info">
+        <span class="item-name">{{item.name}}</span>
+        <span class="item-rarity rarity-{{item.rarity}}">{{item.rarityLabel}}</span>
+      </div>
+    </div>
+    <p class="picker-instruction">{{localize "BOBSNPC.Enchantment.AvailableAt"}}</p>
+  </div>
+
+  {{#if hasEnchantments}}
+    <div class="enchantment-options">
+      {{#each enchantments}}
+        <div class="enchantment-option {{#if this.isSelected}}selected{{/if}}"
+             data-action="selectEnchantment"
+             data-enchantment-id="{{this.id}}">
+          <div class="option-icon">
+            <i class="fa-solid {{this.icon}}"></i>
+          </div>
+          <div class="option-info">
+            <div class="option-header">
+              <span class="option-name">{{this.name}}</span>
+              <span class="option-cost">{{this.costFormatted}}</span>
+            </div>
+            <p class="option-desc">{{this.description}}</p>
+            {{#if this.effectsList}}
+              <p class="option-effects">
+                <i class="fa-solid fa-sparkles"></i>
+                {{this.effectsList}}
+              </p>
+            {{/if}}
+            <div class="option-meta">
+              <span class="rarity-badge {{this.rarity}}">{{this.rarityLabel}}</span>
+              <span class="type-badge">{{this.typeLabel}}</span>
+            </div>
+          </div>
+          <div class="option-select">
+            {{#if this.isSelected}}
+              <i class="fa-solid fa-check-circle"></i>
+            {{else}}
+              <i class="fa-regular fa-circle"></i>
+            {{/if}}
+          </div>
+        </div>
+      {{/each}}
+    </div>
+
+    {{#if hasSelection}}
+      <div class="selection-summary">
+        <div class="summary-info">
+          <span class="summary-label">{{localize "BOBSNPC.Enchantment.TotalCost" cost=selectedEnchantment.costFormatted}}</span>
+        </div>
+      </div>
+    {{/if}}
+
+    <div class="picker-actions">
+      <button type="button" class="confirm-btn" data-action="confirm" {{#unless hasSelection}}disabled{{/unless}}>
+        <i class="fa-solid fa-check"></i>
+        {{localize "BOBSNPC.OK"}}
+      </button>
+      <button type="button" class="cancel-btn" data-action="cancel">
+        <i class="fa-solid fa-times"></i>
+        {{localize "BOBSNPC.Cancel"}}
+      </button>
+    </div>
+  {{else}}
+    <div class="no-enchantments">
+      <i class="fa-solid fa-wand-sparkles"></i>
+      <p>{{localize "BOBSNPC.Enchantment.NoEnchantments"}}</p>
+      <p class="hint">{{localize "BOBSNPC.Enchantment.NoEnchantmentsHint"}}</p>
+      <button type="button" class="cancel-btn" data-action="cancel">
+        <i class="fa-solid fa-times"></i>
+        {{localize "BOBSNPC.Cancel"}}
+      </button>
+    </div>
+  {{/if}}
+</div>

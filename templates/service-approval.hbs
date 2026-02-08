@@ -1,0 +1,81 @@
+{{!-- Service Approval Dialog --}}
+<div class="service-approval-content {{theme}}">
+  <div class="approval-header">
+    <h3>
+      <i class="fa-solid fa-clipboard-check"></i>
+      {{localize "BOBSNPC.GM.PendingRequests"}}
+      {{#if hasRequests}}
+        <span class="request-count">{{requestCount}}</span>
+      {{/if}}
+    </h3>
+    <div class="header-actions">
+      <button type="button" class="refresh-btn" data-action="refreshRequests" data-tooltip="Refresh">
+        <i class="fa-solid fa-refresh"></i>
+      </button>
+      <button type="button" class="cleanup-btn" data-action="cleanupExpired" data-tooltip="Clean up expired">
+        <i class="fa-solid fa-broom"></i>
+      </button>
+    </div>
+  </div>
+
+  {{#if hasRequests}}
+    <div class="requests-list">
+      {{#each requests}}
+        <div class="request-card {{this.type}}" data-request-id="{{this.id}}">
+          <div class="request-header">
+            <div class="service-type">
+              <i class="fa-solid {{this.serviceIcon}}"></i>
+              <span>{{this.serviceLabel}}</span>
+            </div>
+            <span class="request-time">{{this.timeAgo}}</span>
+          </div>
+
+          <div class="request-body">
+            <div class="request-item">
+              <img src="{{this.itemImg}}" alt="{{this.itemName}}" class="item-icon">
+              <div class="item-details">
+                <span class="item-name">{{this.itemName}}</span>
+                {{#if this.enchantmentName}}
+                  <span class="enchantment-name">
+                    <i class="fa-solid fa-wand-sparkles"></i>
+                    {{this.enchantmentName}}
+                  </span>
+                {{/if}}
+              </div>
+            </div>
+
+            <div class="request-info">
+              <div class="info-row">
+                <span class="label">{{localize "BOBSNPC.GM.RequestFrom" player=this.playerName}}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">{{localize "BOBSNPC.Shop.Merchant"}}:</span>
+                <span class="value">{{this.merchantName}}</span>
+              </div>
+              <div class="info-row cost">
+                <span class="label">{{localize "BOBSNPC.Chat.Service.Cost"}}:</span>
+                <span class="value">{{this.costFormatted}}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="request-actions">
+            <button type="button" class="approve-btn" data-action="approveRequest" data-request-id="{{this.id}}">
+              <i class="fa-solid fa-check"></i>
+              {{localize "BOBSNPC.GM.ApproveRequest"}}
+            </button>
+            <button type="button" class="deny-btn" data-action="denyRequest" data-request-id="{{this.id}}">
+              <i class="fa-solid fa-times"></i>
+              {{localize "BOBSNPC.GM.DenyRequest"}}
+            </button>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  {{else}}
+    <div class="no-requests">
+      <i class="fa-solid fa-inbox"></i>
+      <p>{{localize "BOBSNPC.GM.NoPendingRequests"}}</p>
+    </div>
+  {{/if}}
+</div>

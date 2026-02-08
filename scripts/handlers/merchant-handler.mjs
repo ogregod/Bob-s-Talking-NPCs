@@ -24,6 +24,23 @@ import {
   validateMerchant
 } from "../data/merchant-model.mjs";
 import { generateId, getFlag, setFlag, localize } from "../utils/helpers.mjs";
+import {
+  sendPurchaseMessage,
+  sendSaleMessage,
+  sendIdentifyMessage,
+  sendRepairMessage,
+  sendAppraiseMessage,
+  sendEnchantMessage,
+  sendServiceRequestToGM,
+  sendServiceRequestResult
+} from "../utils/chat.mjs";
+import {
+  createServiceRequest,
+  ServiceRequestStatus,
+  ApprovalRequiredServices,
+  isRequestPending
+} from "../data/service-request-model.mjs";
+import { emit, emitToGM, SocketEvents } from "../socket.mjs";
 
 /**
  * Storage keys
@@ -532,6 +549,19 @@ export class MerchantHandler {
 
     Hooks.callAll("bobsNPCPurchase", merchant, session.playerActorUuid, purchasedItems, totalCost);
 
+    // Send private chat message
+    await sendPurchaseMessage({
+      playerName: actor.name,
+      merchantName: merchant.name || "Merchant",
+      items: itemsToPurchase.map(p => ({
+        name: p.shopItem.name,
+        quantity: p.quantity,
+        price: p.unitPrice
+      })),
+      total: totalCost,
+      playerId: game.user?.id
+    });
+
     return {
       success: true,
       transaction,
@@ -658,6 +688,19 @@ export class MerchantHandler {
     }
 
     Hooks.callAll("bobsNPCSale", merchant, session.playerActorUuid, itemsToSell, totalValue);
+
+    // Send private chat message
+    await sendSaleMessage({
+      playerName: actor.name,
+      merchantName: merchant.name || "Merchant",
+      items: itemsToSell.map(s => ({
+        name: s.item.name,
+        quantity: s.quantity,
+        price: s.unitPrice
+      })),
+      total: totalValue,
+      playerId: game.user?.id
+    });
 
     return {
       success: true,
@@ -956,7 +999,7 @@ export class MerchantHandler {
       return { success: false, message: localize("Shop.ItemNotFound") };
     }
 
-    const cost = merchant.services.identifyPrice;
+    const cost = merchant.services.identifyPrice || 25;
     const gold = convertToGold(actor.system?.currency || {});
 
     if (gold < cost) {
@@ -968,6 +1011,16 @@ export class MerchantHandler {
     // Mark item as identified (system-specific)
     await item.update({ "system.identified": true });
 
+    // Send private chat message
+    await sendIdentifyMessage({
+      playerName: actor.name,
+      merchantName: merchant.name || "Merchant",
+      itemName: item.name,
+      itemImg: item.img,
+      cost,
+      playerId: game.user?.id
+    });
+
     return {
       success: true,
       cost,
@@ -976,7 +1029,7 @@ export class MerchantHandler {
   }
 
   /**
-   * Repair service
+   * Repair service - requires GM approval
    * @private
    */
   async _serviceRepair(merchant, actor, options) {
@@ -991,19 +1044,57 @@ export class MerchantHandler {
 
     // Calculate repair cost based on item value
     const basePrice = item.system?.price?.value || 0;
-    const cost = basePrice * merchant.services.repairPricePercent;
+    const cost = Math.round(basePrice * (merchant.services.repairPricePercent || 0.1));
     const gold = convertToGold(actor.system?.currency || {});
 
     if (gold < cost) {
       return { success: false, message: localize("Shop.InsufficientFunds") };
     }
 
-    await this._deductGold(actor, cost);
+    // Create service request for GM approval
+    const request = createServiceRequest({
+      type: ApprovalRequiredServices.REPAIR,
+      merchantId: merchant.id,
+      merchantName: merchant.name || "Merchant",
+      playerActorUuid: actor.uuid,
+      playerActorId: actor.id,
+      playerName: actor.name,
+      playerId: game.user?.id,
+      itemId: item.id,
+      itemUuid: item.uuid,
+      itemName: item.name,
+      itemImg: item.img,
+      itemType: item.type,
+      cost
+    });
+
+    // Store the request
+    const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
+    pendingRequests.push(request);
+    await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
+
+    // Send notification to GM
+    await sendServiceRequestToGM({
+      type: "repair",
+      playerName: actor.name,
+      merchantName: merchant.name || "Merchant",
+      itemName: item.name,
+      itemImg: item.img,
+      cost,
+      requestId: request.id
+    });
+
+    // Notify via socket if not GM
+    if (!game.user.isGM) {
+      emitToGM(SocketEvents.SERVICE_REQUEST, { request });
+    }
 
     return {
       success: true,
+      pending: true,
+      requestId: request.id,
       cost,
-      message: `${item.name} ${localize("Shop.HasBeenRepaired")}`
+      message: localize("Shop.Service.PendingApproval")
     };
   }
 
@@ -1021,7 +1112,7 @@ export class MerchantHandler {
       return { success: false, message: localize("Shop.ItemNotFound") };
     }
 
-    const cost = merchant.services.appraisePrice;
+    const cost = merchant.services.appraisePrice || 5;
     const gold = convertToGold(actor.system?.currency || {});
 
     if (gold < cost) {
@@ -1032,6 +1123,17 @@ export class MerchantHandler {
 
     const value = item.system?.price?.value || 0;
 
+    // Send private chat message
+    await sendAppraiseMessage({
+      playerName: actor.name,
+      merchantName: merchant.name || "Merchant",
+      itemName: item.name,
+      itemImg: item.img,
+      appraisedValue: value,
+      cost,
+      playerId: game.user?.id
+    });
+
     return {
       success: true,
       cost,
@@ -1041,7 +1143,7 @@ export class MerchantHandler {
   }
 
   /**
-   * Enchant service
+   * Enchant service - requires GM approval
    * @private
    */
   async _serviceEnchant(merchant, actor, options) {
@@ -1054,37 +1156,214 @@ export class MerchantHandler {
       return { success: false, message: localize("Shop.ItemNotFound") };
     }
 
-    // For now, enchanting is a placeholder - full implementation would need
-    // an enchantment selection UI and pricing based on the enchantment chosen
-    // This opens the door for future expansion
+    // Get enchantment from options (should be selected from enchantment picker)
+    const enchantmentId = options.enchantmentId;
+    const enchantmentHandler = game.bobsnpc?.handlers?.enchantment;
 
-    // Calculate base enchant cost based on item value and rarity
-    const basePrice = item.system?.price?.value || 100;
-    const rarityMultiplier = {
-      common: 1,
-      uncommon: 1.5,
-      rare: 2,
-      veryRare: 3,
-      legendary: 5,
-      artifact: 10
-    };
-    const rarity = item.system?.rarity || "common";
-    const cost = Math.round(basePrice * (rarityMultiplier[rarity] || 1));
+    let enchantment = null;
+    let cost = 0;
+
+    if (enchantmentId && enchantmentHandler) {
+      enchantment = enchantmentHandler.getEnchantment(enchantmentId);
+      if (!enchantment) {
+        return { success: false, message: localize("Enchantment.NotFound") };
+      }
+
+      // Calculate cost based on enchantment and item rarity
+      const { calculateEnchantmentCost } = await import("../data/enchantment-model.mjs");
+      const priceModifier = merchant.services?.enchantmentPriceModifier || 1;
+      cost = calculateEnchantmentCost(enchantment, item.system?.rarity || "common", priceModifier);
+    } else {
+      // Fallback: Calculate base cost based on item value and rarity
+      const basePrice = item.system?.price?.value || 100;
+      const rarityMultiplier = {
+        common: 1,
+        uncommon: 1.5,
+        rare: 2,
+        veryRare: 3,
+        legendary: 5,
+        artifact: 10
+      };
+      const rarity = item.system?.rarity || "common";
+      cost = Math.round(basePrice * (rarityMultiplier[rarity] || 1));
+    }
+
     const gold = convertToGold(actor.system?.currency || {});
 
     if (gold < cost) {
       return { success: false, message: localize("Shop.InsufficientFunds") };
     }
 
-    await this._deductGold(actor, cost);
+    // Create service request for GM approval
+    const request = createServiceRequest({
+      type: ApprovalRequiredServices.ENCHANT,
+      merchantId: merchant.id,
+      merchantName: merchant.name || "Merchant",
+      playerActorUuid: actor.uuid,
+      playerActorId: actor.id,
+      playerName: actor.name,
+      playerId: game.user?.id,
+      itemId: item.id,
+      itemUuid: item.uuid,
+      itemName: item.name,
+      itemImg: item.img,
+      itemType: item.type,
+      enchantmentId: enchantmentId || null,
+      enchantmentName: enchantment?.name || "Custom Enchantment",
+      cost
+    });
 
-    // Placeholder: For a full implementation, this would apply an actual enchantment
-    // For now, just notify success
+    // Store the request
+    const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
+    pendingRequests.push(request);
+    await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
+
+    // Send notification to GM
+    await sendServiceRequestToGM({
+      type: "enchant",
+      playerName: actor.name,
+      merchantName: merchant.name || "Merchant",
+      itemName: item.name,
+      itemImg: item.img,
+      enchantmentName: enchantment?.name || "Custom Enchantment",
+      cost,
+      requestId: request.id
+    });
+
+    // Notify via socket if not GM
+    if (!game.user.isGM) {
+      emitToGM(SocketEvents.SERVICE_REQUEST, { request });
+    }
+
     return {
       success: true,
+      pending: true,
+      requestId: request.id,
       cost,
-      message: localize("EnchantmentApplied", { item: item.name, cost: this._formatCurrency(cost) })
+      message: localize("Shop.Service.PendingApproval")
     };
+  }
+
+  /**
+   * Process a service request (called by GM to approve)
+   * @param {string} requestId - Request ID
+   * @param {boolean} approved - Whether the request is approved
+   * @param {string} [reason] - Reason for denial
+   * @returns {Promise<object>}
+   */
+  async processServiceRequest(requestId, approved, reason = null) {
+    if (!game.user.isGM) {
+      return { success: false, message: "Only GMs can process service requests" };
+    }
+
+    // Find and remove the request
+    const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
+    const requestIndex = pendingRequests.findIndex(r => r.id === requestId);
+
+    if (requestIndex === -1) {
+      return { success: false, message: "Request not found" };
+    }
+
+    const request = pendingRequests[requestIndex];
+    pendingRequests.splice(requestIndex, 1);
+    await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
+
+    if (!approved) {
+      // Notify player of denial
+      emit(SocketEvents.SERVICE_DENY, {
+        requestId,
+        playerId: request.playerId,
+        reason
+      });
+
+      await sendServiceRequestResult({
+        type: request.type,
+        status: "denied",
+        itemName: request.itemName,
+        playerId: request.playerId
+      });
+
+      return { success: true, message: "Request denied" };
+    }
+
+    // Process the approved request
+    const actor = await fromUuid(request.playerActorUuid);
+    if (!actor) {
+      return { success: false, message: "Player actor not found" };
+    }
+
+    const merchant = this.getMerchant(request.merchantId);
+    if (!merchant) {
+      return { success: false, message: "Merchant not found" };
+    }
+
+    // Deduct gold from player
+    await this._deductGold(actor, request.cost);
+
+    // Send appropriate chat message based on service type
+    if (request.type === ApprovalRequiredServices.REPAIR) {
+      await sendRepairMessage({
+        playerName: request.playerName,
+        merchantName: request.merchantName,
+        itemName: request.itemName,
+        itemImg: request.itemImg,
+        cost: request.cost,
+        playerId: request.playerId
+      });
+    } else if (request.type === ApprovalRequiredServices.ENCHANT) {
+      await sendEnchantMessage({
+        playerName: request.playerName,
+        merchantName: request.merchantName,
+        itemName: request.itemName,
+        itemImg: request.itemImg,
+        enchantmentName: request.enchantmentName,
+        cost: request.cost,
+        playerId: request.playerId
+      });
+    }
+
+    // Notify player of approval
+    emit(SocketEvents.SERVICE_APPROVE, {
+      requestId,
+      playerId: request.playerId
+    });
+
+    await sendServiceRequestResult({
+      type: request.type,
+      status: "approved",
+      itemName: request.itemName,
+      playerId: request.playerId
+    });
+
+    return { success: true, message: "Request approved and processed" };
+  }
+
+  /**
+   * Get pending service requests (GM only)
+   * @returns {object[]}
+   */
+  getPendingServiceRequests() {
+    if (!game.user.isGM) return [];
+    const requests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
+    return requests.filter(r => isRequestPending(r));
+  }
+
+  /**
+   * Clean up expired service requests
+   * @returns {Promise<number>} Number of requests cleaned up
+   */
+  async cleanupExpiredRequests() {
+    if (!game.user.isGM) return 0;
+
+    const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
+    const activeRequests = pendingRequests.filter(r => isRequestPending(r));
+    const expiredCount = pendingRequests.length - activeRequests.length;
+
+    if (expiredCount > 0) {
+      await game.settings.set(MODULE_ID, "pendingServiceRequests", activeRequests);
+    }
+
+    return expiredCount;
   }
 
   // ==================== CURRENCY HELPERS ====================

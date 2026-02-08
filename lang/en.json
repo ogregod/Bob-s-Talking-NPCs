@@ -813,8 +813,12 @@
         "AppraiseDesc": "Get an expert assessment of an item's true value",
         "Enchant": "Enchantment Service",
         "EnchantDesc": "Apply magical enchantments to weapons, armor, or other items",
-        "PriceVaries": "Price varies"
+        "PriceVaries": "Price varies",
+        "PendingApproval": "Your request has been sent to the GM for approval.",
+        "RequestApproved": "Your service request has been approved!",
+        "RequestDenied": "Your service request was denied."
       },
+      "Merchant": "Merchant",
       "SoldOut": "Sold Out",
       "ViewDetails": "View Details",
       "AddToCart": "Add to Cart",
@@ -835,6 +839,77 @@
       "NotAccepted": "This merchant does not accept this item",
       "NoItemsToSell": "You have no items to sell",
       "NoBuybackItems": "No items available for buyback"
+    },
+
+    "Chat": {
+      "Transaction": {
+        "Purchase": "Purchase",
+        "Sale": "Sale",
+        "Total": "Total",
+        "Earned": "Earned"
+      },
+      "Service": {
+        "Cost": "Cost",
+        "Worth": "Worth",
+        "IdentifyTitle": "Item Identified",
+        "IdentifyComplete": "{player} had {item} identified by {merchant}",
+        "RepairTitle": "Item Repaired",
+        "RepairComplete": "{player} had {item} repaired by {merchant}",
+        "RepairRequest": "Repair Request",
+        "AppraiseTitle": "Item Appraised",
+        "AppraiseComplete": "{merchant} appraised {item} for {player}",
+        "EnchantTitle": "Item Enchanted",
+        "EnchantComplete": "{player} had {item} enchanted with {enchantment} by {merchant}",
+        "EnchantRequest": "Enchantment Request",
+        "RequestItem": "Item: {item}"
+      }
+    },
+
+    "GM": {
+      "ServiceRequest": "Service Request",
+      "ApproveRequest": "Approve",
+      "DenyRequest": "Deny",
+      "RequestFrom": "Request from {player}",
+      "PendingRequests": "Pending Service Requests",
+      "NoPendingRequests": "No pending requests",
+      "RequestDetails": "Request Details",
+      "ApprovalRequired": "GM Approval Required"
+    },
+
+    "Enchantment": {
+      "Manager": "Enchantment Manager",
+      "Add": "Add Enchantment",
+      "Edit": "Edit Enchantment",
+      "Delete": "Delete Enchantment",
+      "Name": "Name",
+      "Description": "Description",
+      "Type": "Item Type",
+      "BaseCost": "Base Cost",
+      "Effects": "Effects",
+      "Requirements": "Requirements",
+      "SelectEnchantment": "Select Enchantment",
+      "AvailableAt": "Available enchantments at this shop:",
+      "TotalCost": "Total Cost: {cost}",
+      "NoEnchantments": "No enchantments configured",
+      "NoEnchantmentsHint": "The GM needs to set up available enchantments for this shop.",
+      "ConfirmDelete": "Are you sure you want to delete this enchantment?",
+      "Saved": "Enchantment saved",
+      "Deleted": "Enchantment deleted",
+      "Types": {
+        "weapon": "Weapon",
+        "armor": "Armor",
+        "ring": "Ring",
+        "amulet": "Amulet",
+        "wondrous": "Wondrous Item",
+        "any": "Any"
+      },
+      "Rarity": {
+        "common": "Common",
+        "uncommon": "Uncommon",
+        "rare": "Rare",
+        "veryRare": "Very Rare",
+        "legendary": "Legendary"
+      }
     },
 
     "ShopTypes": {
@@ -1050,7 +1125,8 @@
       "AppraisePrice": "Appraise Price",
       "EnchantService": "Enchant Service",
       "OfferEnchant": "Offer Enchanting",
-      "EnchantHint": "Configure enchanting prices separately",
+      "EnchantPriceModifier": "Price Modifier",
+      "EnchantHint": "Select which enchantments this shop can provide. Requires GM approval.",
 
       "Tabs": {
         "Basic": "Basic",

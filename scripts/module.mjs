@@ -31,6 +31,9 @@ import { GMDashboard } from "./apps/gm-dashboard.mjs";
 import { TradeWindow } from "./apps/trade-window.mjs";
 import { ShopManager } from "./apps/shop-manager.mjs";
 import { ShopEditor } from "./apps/shop-editor.mjs";
+import { ServiceApprovalDialog } from "./apps/service-approval-dialog.mjs";
+import { EnchantmentManager } from "./apps/enchantment-manager.mjs";
+import { EnchantmentPicker } from "./apps/enchantment-picker.mjs";
 
 // Export UI applications for external use
 export {
@@ -46,7 +49,10 @@ export {
   GMDashboard,
   TradeWindow,
   ShopManager,
-  ShopEditor
+  ShopEditor,
+  ServiceApprovalDialog,
+  EnchantmentManager,
+  EnchantmentPicker
 };
 
 /**

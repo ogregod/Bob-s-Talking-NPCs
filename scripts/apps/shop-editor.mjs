@@ -359,6 +359,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
       // Services tab
       services: this._shop.services,
+      availableEnchantments: this._prepareEnchantmentsList(),
 
       // Access tab
       access: this._shop.access,
@@ -440,6 +441,31 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     return enriched;
+  }
+
+  /**
+   * Prepare enchantments list for services tab
+   * @returns {object[]}
+   * @private
+   */
+  _prepareEnchantmentsList() {
+    const enchantmentHandler = game.bobsnpc?.handlers?.enchantment;
+    if (!enchantmentHandler) return [];
+
+    const allEnchantments = enchantmentHandler.getAllEnchantments();
+    const enabledIds = this._shop?.services?.availableEnchantments || [];
+
+    return allEnchantments.map(ench => ({
+      id: ench.id,
+      name: ench.name,
+      description: ench.description,
+      baseCost: ench.baseCost,
+      type: ench.type,
+      typeLabel: localize(`Enchantment.Types.${ench.type}`),
+      rarity: ench.rarity,
+      icon: ench.icon,
+      enabled: enabledIds.includes(ench.id)
+    }));
   }
 
   /** @override */

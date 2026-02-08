@@ -18,6 +18,10 @@ import { CrimeHandler } from "./handlers/crime-handler.mjs";
 import { HirelingHandler } from "./handlers/hireling-handler.mjs";
 import { PropertyHandler } from "./handlers/property-handler.mjs";
 import { NPCHandler } from "./handlers/npc-handler.mjs";
+import { EnchantmentHandler } from "./handlers/enchantment-handler.mjs";
+
+// Import service approval hooks
+import { registerServiceApprovalHooks } from "./apps/service-approval-dialog.mjs";
 
 /**
  * Handler instances
@@ -305,6 +309,7 @@ function initializeHandlers() {
     handlers.hireling = new HirelingHandler();
     handlers.property = new PropertyHandler();
     handlers.npc = new NPCHandler();
+    handlers.enchantment = new EnchantmentHandler();
 
     // Initialize each handler
     for (const [name, handler] of Object.entries(handlers)) {
@@ -317,6 +322,9 @@ function initializeHandlers() {
     if (game.bobsnpc) {
       game.bobsnpc.handlers = handlers;
     }
+
+    // Register service approval hooks for GM notifications
+    registerServiceApprovalHooks();
 
     console.log(`${MODULE_ID} | Handlers initialized`);
   } catch (error) {

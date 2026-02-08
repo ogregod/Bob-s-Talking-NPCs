@@ -1,0 +1,162 @@
+{{!-- Enchantment Manager --}}
+<div class="enchantment-manager-content {{theme}}">
+  <div class="manager-header">
+    <h3>
+      <i class="fa-solid fa-wand-sparkles"></i>
+      {{localize "BOBSNPC.Enchantment.Manager"}}
+      <span class="enchantment-count">({{enchantmentCount}})</span>
+    </h3>
+    <div class="header-actions">
+      <button type="button" class="add-btn" data-action="addEnchantment">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.Enchantment.Add"}}
+      </button>
+      <button type="button" class="export-btn" data-action="exportEnchantments" data-tooltip="Export">
+        <i class="fa-solid fa-download"></i>
+      </button>
+      <button type="button" class="import-btn" data-action="importEnchantments" data-tooltip="Import">
+        <i class="fa-solid fa-upload"></i>
+      </button>
+      <button type="button" class="reset-btn" data-action="resetDefaults" data-tooltip="Reset to Defaults">
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="manager-body">
+    {{#if isEditing}}
+      {{!-- Edit Form --}}
+      <div class="enchantment-form-container">
+        <h4>
+          {{#if (eq editingEnchantment null)}}
+            {{localize "BOBSNPC.Enchantment.Add"}}
+          {{else}}
+            {{localize "BOBSNPC.Enchantment.Edit"}}: {{editingEnchantment.name}}
+          {{/if}}
+        </h4>
+
+        <form class="enchantment-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ench-name">{{localize "BOBSNPC.Enchantment.Name"}}</label>
+              <input type="text" id="ench-name" name="name"
+                     value="{{editingEnchantment.name}}" required>
+            </div>
+            <div class="form-group">
+              <label for="ench-icon">Icon (FontAwesome)</label>
+              <input type="text" id="ench-icon" name="icon"
+                     value="{{#if editingEnchantment.icon}}{{editingEnchantment.icon}}{{else}}fa-wand-sparkles{{/if}}"
+                     placeholder="fa-wand-sparkles">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ench-desc">{{localize "BOBSNPC.Enchantment.Description"}}</label>
+            <textarea id="ench-desc" name="description" rows="2">{{editingEnchantment.description}}</textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ench-type">{{localize "BOBSNPC.Enchantment.Type"}}</label>
+              <select id="ench-type" name="type">
+                {{#each typeOptions}}
+                  <option value="{{this.value}}" {{#if (eq ../editingEnchantment.type this.value)}}selected{{/if}}>
+                    {{this.label}}
+                  </option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ench-rarity">Rarity</label>
+              <select id="ench-rarity" name="rarity">
+                {{#each rarityOptions}}
+                  <option value="{{this.value}}" {{#if (eq ../editingEnchantment.rarity this.value)}}selected{{/if}}>
+                    {{this.label}}
+                  </option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ench-cost">{{localize "BOBSNPC.Enchantment.BaseCost"}} (gp)</label>
+              <input type="number" id="ench-cost" name="baseCost" min="0"
+                     value="{{#if editingEnchantment.baseCost}}{{editingEnchantment.baseCost}}{{else}}100{{/if}}">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ench-effects">{{localize "BOBSNPC.Enchantment.Effects"}} (one per line)</label>
+            <textarea id="ench-effects" name="effects" rows="3"
+                      placeholder="Enter each effect on a new line...">{{#each editingEnchantment.effects}}{{this}}
+{{/each}}</textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="save-btn" data-action="saveEnchantment">
+              <i class="fa-solid fa-save"></i>
+              {{localize "BOBSNPC.Save"}}
+            </button>
+            <button type="button" class="cancel-btn" data-action="cancelEdit">
+              <i class="fa-solid fa-times"></i>
+              {{localize "BOBSNPC.Cancel"}}
+            </button>
+          </div>
+        </form>
+      </div>
+    {{else}}
+      {{!-- Enchantment List --}}
+      {{#if hasEnchantments}}
+        <div class="enchantment-list">
+          {{#each groupedEnchantments}}
+            <div class="enchantment-group">
+              <h4 class="group-header">{{this.typeLabel}}</h4>
+              <div class="group-items">
+                {{#each this.enchantments}}
+                  <div class="enchantment-card rarity-{{this.rarity}}" data-enchantment-id="{{this.id}}">
+                    <div class="enchantment-icon">
+                      <i class="fa-solid {{this.icon}}"></i>
+                    </div>
+                    <div class="enchantment-info">
+                      <div class="enchantment-header">
+                        <span class="enchantment-name">{{this.name}}</span>
+                        <span class="enchantment-cost">{{this.baseCost}} gp</span>
+                      </div>
+                      <p class="enchantment-desc">{{this.description}}</p>
+                      {{#if this.effectsList}}
+                        <p class="enchantment-effects">
+                          <i class="fa-solid fa-sparkles"></i>
+                          {{this.effectsList}}
+                        </p>
+                      {{/if}}
+                      <div class="enchantment-meta">
+                        <span class="rarity-badge {{this.rarity}}">{{this.rarityLabel}}</span>
+                      </div>
+                    </div>
+                    <div class="enchantment-actions">
+                      <button type="button" class="edit-btn" data-action="editEnchantment"
+                              data-enchantment-id="{{this.id}}" data-tooltip="Edit">
+                        <i class="fa-solid fa-edit"></i>
+                      </button>
+                      <button type="button" class="delete-btn" data-action="deleteEnchantment"
+                              data-enchantment-id="{{this.id}}" data-tooltip="Delete">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="no-enchantments">
+          <i class="fa-solid fa-wand-sparkles"></i>
+          <p>{{localize "BOBSNPC.Enchantment.NoEnchantments"}}</p>
+          <button type="button" class="add-btn" data-action="addEnchantment">
+            <i class="fa-solid fa-plus"></i>
+            {{localize "BOBSNPC.Enchantment.Add"}}
+          </button>
+        </div>
+      {{/if}}
+    {{/if}}
+  </div>
+</div>
