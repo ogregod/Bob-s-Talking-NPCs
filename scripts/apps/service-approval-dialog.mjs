@@ -1,11 +1,13 @@
 /**
  * Bob's Talking NPCs - Service Approval Dialog
  * GM interface for approving/denying service requests (repair, enchant)
+ * Also manages active service orders (adjust time, mark ready)
  */
 
 const MODULE_ID = "bobs-talking-npcs";
 
 import { localize, formatCurrency } from "../utils/helpers.mjs";
+import { formatDuration } from "../data/service-request-model.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -19,11 +21,13 @@ function getMerchantHandler() {
 /**
  * Service Approval Dialog
  * Shows pending service requests to GMs for approval
+ * Also allows managing active orders
  */
 export class ServiceApprovalDialog extends HandlebarsApplicationMixin(ApplicationV2) {
   constructor(options = {}) {
     super(options);
     this._hookId = null;
+    this._activeTab = "pending"; // "pending" or "active"
   }
 
   /** @override */
@@ -34,20 +38,24 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
     window: {
       frame: true,
       positioned: true,
-      title: "BOBSNPC.GM.PendingRequests",
+      title: "BOBSNPC.GM.ServiceManagement",
       icon: "fa-solid fa-clipboard-check",
       minimizable: true,
       resizable: true
     },
     position: {
-      width: 500,
-      height: 400
+      width: 550,
+      height: 500
     },
     actions: {
       approveRequest: ServiceApprovalDialog.#onApproveRequest,
       denyRequest: ServiceApprovalDialog.#onDenyRequest,
       refreshRequests: ServiceApprovalDialog.#onRefreshRequests,
-      cleanupExpired: ServiceApprovalDialog.#onCleanupExpired
+      cleanupExpired: ServiceApprovalDialog.#onCleanupExpired,
+      switchTab: ServiceApprovalDialog.#onSwitchTab,
+      markReady: ServiceApprovalDialog.#onMarkReady,
+      adjustTime: ServiceApprovalDialog.#onAdjustTime,
+      cancelOrder: ServiceApprovalDialog.#onCancelOrder
     }
   };
 
@@ -61,7 +69,7 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
 
   /** @override */
   get title() {
-    return localize("GM.PendingRequests");
+    return localize("GM.ServiceManagement");
   }
 
   /** @override */
@@ -79,9 +87,9 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
     const context = await super._prepareContext(options);
 
     const handler = getMerchantHandler();
-    const requests = handler?.getPendingServiceRequests() || [];
 
-    // Prepare request data for display
+    // Pending requests
+    const requests = handler?.getPendingServiceRequests() || [];
     const preparedRequests = requests.map(request => {
       const timeAgo = this._formatTimeAgo(request.requestedAt);
       const serviceIcon = request.type === "repair" ? "fa-wrench" : "fa-wand-magic-sparkles";
@@ -98,11 +106,47 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
       };
     });
 
+    // Active orders (all orders from all players)
+    const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
+    const preparedActiveOrders = activeOrders.map(order => {
+      const serviceIcon = order.type === "repair" ? "fa-wrench" : "fa-wand-magic-sparkles";
+      const serviceLabel = order.type === "repair"
+        ? localize("Shop.Service.Repair")
+        : localize("Shop.Service.Enchant");
+
+      const now = Date.now();
+      const isReady = order.readyAt <= now;
+      const timeRemaining = isReady ? 0 : order.readyAt - now;
+      const timeRemainingStr = isReady ? localize("Service.ReadyNow") : formatDuration(timeRemaining);
+
+      // Calculate time until ready as a date
+      const readyDate = new Date(order.readyAt);
+      const readyDateStr = readyDate.toLocaleString();
+
+      return {
+        ...order,
+        serviceIcon,
+        serviceLabel,
+        costFormatted: formatCurrency(order.cost * 100),
+        isReady,
+        timeRemaining,
+        timeRemainingStr,
+        readyDateStr,
+        statusClass: isReady ? "ready" : "in-progress"
+      };
+    });
+
     return {
       ...context,
+      activeTab: this._activeTab,
+      isPendingTab: this._activeTab === "pending",
+      isActiveTab: this._activeTab === "active",
       requests: preparedRequests,
       hasRequests: preparedRequests.length > 0,
       requestCount: preparedRequests.length,
+      activeOrders: preparedActiveOrders,
+      hasActiveOrders: preparedActiveOrders.length > 0,
+      activeOrderCount: preparedActiveOrders.length,
       theme: game.settings.get(MODULE_ID, "theme") || "dark"
     };
   }
@@ -135,16 +179,26 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
 
   // ==================== Actions ====================
 
+  static async #onSwitchTab(event, target) {
+    const tab = target.dataset.tab;
+    if (tab) {
+      this._activeTab = tab;
+      this.render();
+    }
+  }
+
   static async #onApproveRequest(event, target) {
     const requestId = target.dataset.requestId;
     if (!requestId) return;
 
     const handler = getMerchantHandler();
-    const result = await handler?.processServiceRequest(requestId, true);
+
+    // Use the new dialog that allows setting custom time
+    const result = await handler?.showServiceApprovalDialog(requestId);
 
     if (result?.success) {
       ui.notifications.info(result.message);
-    } else {
+    } else if (result?.message && result.message !== "Dialog closed") {
       ui.notifications.error(result?.message || "Failed to approve request");
     }
 
@@ -212,6 +266,135 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
       ui.notifications.info("No expired requests to clean up");
     }
 
+    this.render();
+  }
+
+  static async #onMarkReady(event, target) {
+    const orderId = target.dataset.orderId;
+    if (!orderId) return;
+
+    // Update the order to be ready now
+    const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
+    const orderIndex = activeOrders.findIndex(o => o.id === orderId);
+
+    if (orderIndex === -1) {
+      ui.notifications.error("Order not found");
+      return;
+    }
+
+    activeOrders[orderIndex].readyAt = Date.now();
+    await game.settings.set(MODULE_ID, "activeServiceOrders", activeOrders);
+
+    ui.notifications.info(localize("GM.OrderMarkedReady"));
+    this.render();
+  }
+
+  static async #onAdjustTime(event, target) {
+    const orderId = target.dataset.orderId;
+    if (!orderId) return;
+
+    const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
+    const order = activeOrders.find(o => o.id === orderId);
+
+    if (!order) {
+      ui.notifications.error("Order not found");
+      return;
+    }
+
+    // Calculate current remaining time in hours
+    const now = Date.now();
+    const remainingMs = Math.max(0, order.readyAt - now);
+    const remainingHours = (remainingMs / (60 * 60 * 1000)).toFixed(1);
+
+    const content = `
+      <form class="bobsnpc-adjust-time-dialog">
+        <p><strong>${localize("GM.AdjustTime.Item")}:</strong> ${order.itemName}</p>
+        <p><strong>${localize("GM.AdjustTime.CurrentTime")}:</strong> ${remainingHours} ${localize("Service.Approval.Hours")}</p>
+        <hr>
+        <div class="form-group">
+          <label for="new-time">${localize("GM.AdjustTime.NewTime")}</label>
+          <div class="form-fields">
+            <input type="number" name="newTime" value="${remainingHours}" min="0" step="0.5" style="width: 80px;">
+            <span>${localize("Service.Approval.Hours")}</span>
+          </div>
+          <p class="hint">${localize("GM.AdjustTime.Hint")}</p>
+        </div>
+      </form>
+    `;
+
+    const self = this;
+    new Dialog({
+      title: localize("GM.AdjustTime.Title"),
+      content,
+      buttons: {
+        save: {
+          icon: '<i class="fas fa-save"></i>',
+          label: localize("Save"),
+          callback: async (html) => {
+            const newHours = parseFloat(html.find('[name="newTime"]').val()) || 0;
+            const newReadyAt = Date.now() + (newHours * 60 * 60 * 1000);
+
+            const orders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
+            const idx = orders.findIndex(o => o.id === orderId);
+            if (idx !== -1) {
+              orders[idx].readyAt = newReadyAt;
+              await game.settings.set(MODULE_ID, "activeServiceOrders", orders);
+              ui.notifications.info(localize("GM.AdjustTime.Updated"));
+              self.render();
+            }
+          }
+        },
+        cancel: {
+          icon: '<i class="fas fa-times"></i>',
+          label: localize("Cancel")
+        }
+      },
+      default: "save"
+    }, {
+      classes: ["bobsnpc", "adjust-time-dialog"],
+      width: 350
+    }).render(true);
+  }
+
+  static async #onCancelOrder(event, target) {
+    const orderId = target.dataset.orderId;
+    if (!orderId) return;
+
+    const confirmed = await Dialog.confirm({
+      title: localize("GM.CancelOrder.Title"),
+      content: `<p>${localize("GM.CancelOrder.Confirm")}</p>`
+    });
+
+    if (!confirmed) return;
+
+    const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
+    const orderIndex = activeOrders.findIndex(o => o.id === orderId);
+
+    if (orderIndex === -1) {
+      ui.notifications.error("Order not found");
+      return;
+    }
+
+    const order = activeOrders[orderIndex];
+
+    // Restore item to player
+    const actor = await fromUuid(order.playerActorUuid);
+    if (actor && order.itemData) {
+      const handler = getMerchantHandler();
+      await handler?._restoreItemFromEscrow(actor, order.itemData);
+    }
+
+    // Refund gold
+    if (actor) {
+      const currentGold = actor.system?.currency?.gp || 0;
+      await actor.update({ "system.currency.gp": currentGold + order.cost });
+    }
+
+    // Remove from active orders
+    activeOrders.splice(orderIndex, 1);
+    await game.settings.set(MODULE_ID, "activeServiceOrders", activeOrders);
+
+    ui.notifications.info(localize("GM.CancelOrder.Cancelled", { item: order.itemName }));
     this.render();
   }
 
