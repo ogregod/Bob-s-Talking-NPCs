@@ -915,6 +915,7 @@
       "EnchantmentFailed": "The enchantment on {item} has failed",
       "PickupError": "An error occurred during pickup",
       "ItemDroppedOff": "{item} has been dropped off for service",
+      "ItemReturned": "{item} has been returned to your inventory",
       "NoActiveOrders": "You have no active service orders at this shop",
       "ReadyForPickup": "Ready for pickup",
       "InProgress": "Currently being worked on",
@@ -935,6 +936,19 @@
       "Type": {
         "Repair": "Repair",
         "Enchant": "Enchantment"
+      },
+      "Approval": {
+        "Title": "Service Request Approval",
+        "Player": "Player",
+        "Merchant": "Merchant",
+        "Cost": "Cost",
+        "Duration": "Completion Time",
+        "Hours": "hours",
+        "DurationHint": "Set to 0 for instant completion. The player can pick up the item after this time.",
+        "DenyReason": "Denial Reason (optional)",
+        "DenyReasonPlaceholder": "Why is this request being denied?",
+        "Approve": "Approve",
+        "Deny": "Deny"
       }
     },
 
@@ -1003,7 +1017,8 @@
       "ActivationCosts": {
         "none": "None",
         "charges_day": "Charges per Day",
-        "uses_rest": "Uses per Rest",
+        "uses_short": "Uses per Short Rest",
+        "uses_long": "Uses per Long Rest",
         "at_will": "At Will"
       },
       "RechargeTypes": {

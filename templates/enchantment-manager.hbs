@@ -36,59 +36,216 @@
         </h4>
 
         <form class="enchantment-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="ench-name">{{localize "BOBSNPC.Enchantment.Name"}}</label>
-              <input type="text" id="ench-name" name="name"
-                     value="{{editingEnchantment.name}}" required>
-            </div>
-            <div class="form-group">
-              <label for="ench-icon">Icon (FontAwesome)</label>
-              <input type="text" id="ench-icon" name="icon"
-                     value="{{#if editingEnchantment.icon}}{{editingEnchantment.icon}}{{else}}fa-wand-sparkles{{/if}}"
-                     placeholder="fa-wand-sparkles">
-            </div>
-          </div>
+          {{!-- Section: Basic Info --}}
+          <fieldset class="form-section">
+            <legend><i class="fa-solid fa-info-circle"></i> Basic Information</legend>
 
-          <div class="form-group">
-            <label for="ench-desc">{{localize "BOBSNPC.Enchantment.Description"}}</label>
-            <textarea id="ench-desc" name="description" rows="2">{{editingEnchantment.description}}</textarea>
-          </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ench-name">{{localize "BOBSNPC.Enchantment.Name"}}</label>
+                <input type="text" id="ench-name" name="name"
+                       value="{{editingEnchantment.name}}" required>
+              </div>
+              <div class="form-group">
+                <label for="ench-icon">Icon (FontAwesome)</label>
+                <input type="text" id="ench-icon" name="icon"
+                       value="{{#if editingEnchantment.icon}}{{editingEnchantment.icon}}{{else}}fa-wand-sparkles{{/if}}"
+                       placeholder="fa-wand-sparkles">
+              </div>
+            </div>
 
-          <div class="form-row">
             <div class="form-group">
-              <label for="ench-type">{{localize "BOBSNPC.Enchantment.Type"}}</label>
-              <select id="ench-type" name="type">
-                {{#each typeOptions}}
-                  <option value="{{this.value}}" {{#if (eq ../editingEnchantment.type this.value)}}selected{{/if}}>
-                    {{this.label}}
-                  </option>
-                {{/each}}
-              </select>
+              <label for="ench-desc">{{localize "BOBSNPC.Enchantment.Description"}}</label>
+              <textarea id="ench-desc" name="description" rows="2">{{editingEnchantment.description}}</textarea>
             </div>
-            <div class="form-group">
-              <label for="ench-rarity">Rarity</label>
-              <select id="ench-rarity" name="rarity">
-                {{#each rarityOptions}}
-                  <option value="{{this.value}}" {{#if (eq ../editingEnchantment.rarity this.value)}}selected{{/if}}>
-                    {{this.label}}
-                  </option>
-                {{/each}}
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="ench-cost">{{localize "BOBSNPC.Enchantment.BaseCost"}} (gp)</label>
-              <input type="number" id="ench-cost" name="baseCost" min="0"
-                     value="{{#if editingEnchantment.baseCost}}{{editingEnchantment.baseCost}}{{else}}100{{/if}}">
-            </div>
-          </div>
 
-          <div class="form-group">
-            <label for="ench-effects">{{localize "BOBSNPC.Enchantment.Effects"}} (one per line)</label>
-            <textarea id="ench-effects" name="effects" rows="3"
-                      placeholder="Enter each effect on a new line...">{{#each editingEnchantment.effects}}{{this}}
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ench-type">{{localize "BOBSNPC.Enchantment.Type"}}</label>
+                <select id="ench-type" name="type">
+                  {{#each typeOptions}}
+                    <option value="{{this.value}}" {{#if (eq ../editingEnchantment.type this.value)}}selected{{/if}}>
+                      {{this.label}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ench-rarity">Rarity</label>
+                <select id="ench-rarity" name="rarity">
+                  {{#each rarityOptions}}
+                    <option value="{{this.value}}" {{#if (eq ../editingEnchantment.rarity this.value)}}selected{{/if}}>
+                      {{this.label}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ench-cost">{{localize "BOBSNPC.Enchantment.BaseCost"}} (gp)</label>
+                <input type="number" id="ench-cost" name="baseCost" min="0"
+                       value="{{#if editingEnchantment.baseCost}}{{editingEnchantment.baseCost}}{{else}}100{{/if}}">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="ench-effects">{{localize "BOBSNPC.Enchantment.Effects"}} (one per line, for display only)</label>
+              <textarea id="ench-effects" name="effects" rows="2"
+                        placeholder="Enter each effect description on a new line...">{{#each editingEnchantment.effects}}{{this}}
 {{/each}}</textarea>
-          </div>
+            </div>
+          </fieldset>
+
+          {{!-- Section: Fail Mechanics --}}
+          <fieldset class="form-section">
+            <legend><i class="fa-solid fa-skull-crossbones"></i> {{localize "BOBSNPC.Enchantment.FailRate"}}</legend>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ench-fail-rate">{{localize "BOBSNPC.Enchantment.FailRate"}} (%)</label>
+                <input type="number" id="ench-fail-rate" name="failRate" min="0" max="100"
+                       value="{{#if editingEnchantment.failRate}}{{editingEnchantment.failRate}}{{else}}0{{/if}}">
+              </div>
+              <div class="form-group">
+                <label for="ench-fail-consequence">{{localize "BOBSNPC.Enchantment.FailConsequence"}}</label>
+                <select id="ench-fail-consequence" name="failConsequence">
+                  {{#each failConsequenceOptions}}
+                    <option value="{{this.value}}" {{#if (eq ../editingEnchantment.failConsequence this.value)}}selected{{/if}}>
+                      {{this.label}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ench-cursed-id">{{localize "BOBSNPC.Enchantment.CursedEnchantment"}}</label>
+                <select id="ench-cursed-id" name="cursedEnchantmentId">
+                  <option value="">-- None --</option>
+                  {{#each curseOptions}}
+                    <option value="{{this.value}}" {{#if (eq ../editingEnchantment.cursedEnchantmentId this.value)}}selected{{/if}}>
+                      {{this.label}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          {{!-- Section: Activation --}}
+          <fieldset class="form-section">
+            <legend><i class="fa-solid fa-bolt"></i> {{localize "BOBSNPC.Enchantment.Activation.Type"}}</legend>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ench-activation-type">{{localize "BOBSNPC.Enchantment.Activation.Type"}}</label>
+                <select id="ench-activation-type" name="activationType">
+                  {{#each activationTypeOptions}}
+                    <option value="{{this.value}}" {{#if (eq ../editingEnchantment.activationType this.value)}}selected{{/if}}>
+                      {{this.label}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ench-activation-cost">{{localize "BOBSNPC.Enchantment.Activation.Cost"}}</label>
+                <select id="ench-activation-cost" name="activationCost">
+                  {{#each activationCostOptions}}
+                    <option value="{{this.value}}" {{#if (eq ../editingEnchantment.activationCost this.value)}}selected{{/if}}>
+                      {{this.label}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ench-charges">{{localize "BOBSNPC.Enchantment.Activation.Charges"}}</label>
+                <input type="number" id="ench-charges" name="charges" min="0"
+                       value="{{#if editingEnchantment.charges}}{{editingEnchantment.charges}}{{else}}0{{/if}}">
+              </div>
+              <div class="form-group">
+                <label for="ench-recharge">{{localize "BOBSNPC.Enchantment.Activation.RechargeType"}}</label>
+                <select id="ench-recharge" name="rechargeType">
+                  {{#each rechargeTypeOptions}}
+                    <option value="{{this.value}}" {{#if (eq ../editingEnchantment.rechargeType this.value)}}selected{{/if}}>
+                      {{this.label}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          {{!-- Section: Duration --}}
+          <fieldset class="form-section">
+            <legend><i class="fa-solid fa-clock"></i> {{localize "BOBSNPC.Enchantment.Duration.Type"}}</legend>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ench-duration-type">{{localize "BOBSNPC.Enchantment.Duration.Type"}}</label>
+                <select id="ench-duration-type" name="durationType">
+                  {{#each durationTypeOptions}}
+                    <option value="{{this.value}}" {{#if (eq ../editingEnchantment.durationType this.value)}}selected{{/if}}>
+                      {{this.label}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ench-duration-value">{{localize "BOBSNPC.Enchantment.Duration.Value"}}</label>
+                <input type="number" id="ench-duration-value" name="durationValue" min="0"
+                       value="{{#if editingEnchantment.durationValue}}{{editingEnchantment.durationValue}}{{else}}0{{/if}}">
+              </div>
+              <div class="form-group">
+                <label for="ench-work-duration">{{localize "BOBSNPC.Enchantment.WorkDuration"}}</label>
+                <input type="number" id="ench-work-duration" name="workDurationHours" min="0" step="0.5"
+                       value="{{editingEnchantment.workDurationHours}}"
+                       placeholder="Use default">
+              </div>
+            </div>
+          </fieldset>
+
+          {{!-- Section: Mechanical Effects --}}
+          <fieldset class="form-section mechanical-effects-section">
+            <legend><i class="fa-solid fa-cogs"></i> {{localize "BOBSNPC.Enchantment.Effects.Title"}}</legend>
+
+            <div class="effects-list">
+              {{#if hasMechanicalEffects}}
+                {{#each mechanicalEffects}}
+                  <div class="effect-item" data-effect-index="{{this.index}}">
+                    <div class="effect-summary">
+                      <span class="effect-type">{{this.typeLabel}}</span>
+                      {{#if this.showValue}}
+                        <span class="effect-value">+{{this.value}}</span>
+                      {{/if}}
+                      {{#if this.showDice}}
+                        <span class="effect-dice">{{this.diceCount}}d{{this.diceSize}}</span>
+                      {{/if}}
+                      {{#if this.damageTypeLabel}}
+                        <span class="effect-damage-type">{{this.damageTypeLabel}}</span>
+                      {{/if}}
+                      {{#if this.abilityLabel}}
+                        <span class="effect-ability">{{this.abilityLabel}}</span>
+                      {{/if}}
+                      {{#if this.skillLabel}}
+                        <span class="effect-skill">{{this.skillLabel}}</span>
+                      {{/if}}
+                    </div>
+                    <button type="button" class="remove-effect-btn" data-action="removeMechanicalEffect"
+                            data-effect-index="{{this.index}}" data-tooltip="{{localize 'BOBSNPC.Enchantment.Effects.Remove'}}">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                {{/each}}
+              {{else}}
+                <p class="no-effects">No mechanical effects configured. Click "Add Effect" to add D&amp;D 5e effects.</p>
+              {{/if}}
+            </div>
+
+            <button type="button" class="add-effect-btn" data-action="addMechanicalEffect">
+              <i class="fa-solid fa-plus"></i>
+              {{localize "BOBSNPC.Enchantment.Effects.Add"}}
+            </button>
+          </fieldset>
 
           <div class="form-actions">
             <button type="button" class="save-btn" data-action="saveEnchantment">
@@ -129,6 +286,16 @@
                       {{/if}}
                       <div class="enchantment-meta">
                         <span class="rarity-badge {{this.rarity}}">{{this.rarityLabel}}</span>
+                        {{#if this.hasFailRate}}
+                          <span class="fail-badge" data-tooltip="Fail Rate: {{this.failRate}}%">
+                            <i class="fa-solid fa-skull"></i> {{this.failRate}}%
+                          </span>
+                        {{/if}}
+                        {{#if this.hasMechanicalEffects}}
+                          <span class="effects-badge" data-tooltip="Has mechanical effects">
+                            <i class="fa-solid fa-cogs"></i>
+                          </span>
+                        {{/if}}
                       </div>
                     </div>
                     <div class="enchantment-actions">

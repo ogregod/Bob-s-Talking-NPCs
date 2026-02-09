@@ -1185,6 +1185,228 @@
     border-color: #f44336;
   }
 
+  /* Enhanced Enchantment Form */
+  .enchantment-manager-content .form-section {
+    border: 1px solid var(--bobsnpc-border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: var(--bobsnpc-bg-secondary);
+  }
+
+  .enchantment-manager-content .form-section legend {
+    font-weight: bold;
+    padding: 0 8px;
+    font-size: 0.95em;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .enchantment-manager-content .form-section legend i {
+    margin-right: 6px;
+  }
+
+  /* Fail badge in card list */
+  .enchantment-manager-content .fail-badge {
+    background: #f44336;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .enchantment-manager-content .effects-badge {
+    background: var(--bobsnpc-primary);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+  }
+
+  /* Mechanical Effects Section */
+  .enchantment-manager-content .mechanical-effects-section .effects-list {
+    background: var(--bobsnpc-bg);
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 12px;
+    min-height: 60px;
+  }
+
+  .enchantment-manager-content .effect-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bobsnpc-bg-secondary);
+    border: 1px solid var(--bobsnpc-border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+  }
+
+  .enchantment-manager-content .effect-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .enchantment-manager-content .effect-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .enchantment-manager-content .effect-type {
+    font-weight: bold;
+    color: var(--bobsnpc-primary);
+  }
+
+  .enchantment-manager-content .effect-value,
+  .enchantment-manager-content .effect-dice {
+    background: var(--bobsnpc-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+  }
+
+  .enchantment-manager-content .effect-damage-type,
+  .enchantment-manager-content .effect-ability,
+  .enchantment-manager-content .effect-skill {
+    font-style: italic;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .enchantment-manager-content .remove-effect-btn {
+    background: none;
+    border: 1px solid var(--bobsnpc-border);
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .enchantment-manager-content .remove-effect-btn:hover {
+    background: #f44336;
+    color: white;
+    border-color: #f44336;
+  }
+
+  .enchantment-manager-content .add-effect-btn {
+    background: var(--bobsnpc-primary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .enchantment-manager-content .add-effect-btn:hover {
+    filter: brightness(1.1);
+  }
+
+  .enchantment-manager-content .no-effects {
+    color: var(--bobsnpc-text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: 12px;
+    margin: 0;
+  }
+
+  /* ===== Service Approval Dialog ===== */
+  .bobsnpc-approval-dialog {
+    padding: 10px;
+  }
+
+  .bobsnpc-approval-dialog .request-summary {
+    margin-bottom: 16px;
+  }
+
+  .bobsnpc-approval-dialog .request-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bobsnpc-bg-secondary);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .bobsnpc-approval-dialog .item-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+
+  .bobsnpc-approval-dialog .item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .bobsnpc-approval-dialog .item-details strong {
+    font-size: 1.1em;
+  }
+
+  .bobsnpc-approval-dialog .service-type {
+    color: var(--bobsnpc-primary);
+    font-size: 0.9em;
+  }
+
+  .bobsnpc-approval-dialog .enchantment {
+    color: var(--bobsnpc-text-muted);
+    font-size: 0.85em;
+    font-style: italic;
+  }
+
+  .bobsnpc-approval-dialog .request-meta p {
+    margin: 4px 0;
+  }
+
+  .bobsnpc-approval-dialog .form-group {
+    margin-bottom: 12px;
+  }
+
+  .bobsnpc-approval-dialog .form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  .bobsnpc-approval-dialog .form-fields {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bobsnpc-approval-dialog .hint {
+    font-size: 0.85em;
+    color: var(--bobsnpc-text-muted);
+    margin-top: 4px;
+  }
+
+  /* ===== Effect Dialog ===== */
+  .bobsnpc-effect-dialog .form-group {
+    margin-bottom: 12px;
+  }
+
+  .bobsnpc-effect-dialog .form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  .bobsnpc-effect-dialog select,
+  .bobsnpc-effect-dialog input {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid var(--bobsnpc-border);
+    border-radius: 4px;
+  }
+
   /* ===== Enchantment Picker ===== */
   .enchantment-picker-content {
     padding: 10px;

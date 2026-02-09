@@ -1290,9 +1290,11 @@ export class MerchantHandler {
    * @param {string} requestId - Request ID
    * @param {boolean} approved - Whether the request is approved
    * @param {string} [reason] - Reason for denial
+   * @param {object} [options] - Additional options
+   * @param {number} [options.customDurationHours] - Custom duration in hours (overrides default)
    * @returns {Promise<object>}
    */
-  async processServiceRequest(requestId, approved, reason = null) {
+  async processServiceRequest(requestId, approved, reason = null, options = {}) {
     if (!game.user.isGM) {
       return { success: false, message: "Only GMs can process service requests" };
     }
@@ -1310,6 +1312,13 @@ export class MerchantHandler {
     await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
 
     if (!approved) {
+      // Restore item to player since we're denying the request
+      const actor = await fromUuid(request.playerActorUuid);
+      if (actor && request.itemData) {
+        await this._restoreItemFromEscrow(actor, request.itemData);
+        ui.notifications.info(localize("Service.ItemReturned", { item: request.itemName }));
+      }
+
       // Notify player of denial
       emit(SocketEvents.SERVICE_DENY, {
         requestId,
@@ -1342,9 +1351,15 @@ export class MerchantHandler {
     await this._deductGold(actor, request.cost);
 
     // Calculate when the item will be ready
-    const durationHours = request.type === ApprovalRequiredServices.REPAIR
-      ? game.settings.get(MODULE_ID, "repairDuration")
-      : game.settings.get(MODULE_ID, "enchantDuration");
+    // Use custom duration if provided, otherwise use settings
+    let durationHours;
+    if (options.customDurationHours !== undefined) {
+      durationHours = options.customDurationHours;
+    } else {
+      durationHours = request.type === ApprovalRequiredServices.REPAIR
+        ? game.settings.get(MODULE_ID, "repairDuration")
+        : game.settings.get(MODULE_ID, "enchantDuration");
+    }
 
     const workDurationMs = durationHours * 60 * 60 * 1000;
     const readyAt = Date.now() + workDurationMs;
@@ -1388,6 +1403,99 @@ export class MerchantHandler {
     });
 
     return { success: true, message: "Request approved - item is being worked on" };
+  }
+
+  /**
+   * Show a dialog for GM to approve/deny a service request with options
+   * @param {string} requestId - Request ID
+   * @returns {Promise<object>}
+   */
+  async showServiceApprovalDialog(requestId) {
+    if (!game.user.isGM) {
+      return { success: false, message: "Only GMs can process service requests" };
+    }
+
+    const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
+    const request = pendingRequests.find(r => r.id === requestId);
+
+    if (!request) {
+      return { success: false, message: "Request not found" };
+    }
+
+    // Get default duration based on type
+    const defaultDuration = request.type === ApprovalRequiredServices.REPAIR
+      ? game.settings.get(MODULE_ID, "repairDuration")
+      : game.settings.get(MODULE_ID, "enchantDuration");
+
+    const serviceType = request.type === ApprovalRequiredServices.REPAIR
+      ? localize("Service.Type.Repair")
+      : localize("Service.Type.Enchant");
+
+    const content = `
+      <form class="bobsnpc-approval-dialog">
+        <div class="request-summary">
+          <div class="request-item">
+            <img src="${request.itemImg || 'icons/svg/item-bag.svg'}" alt="${request.itemName}" class="item-image">
+            <div class="item-details">
+              <strong>${request.itemName}</strong>
+              <span class="service-type">${serviceType}</span>
+              ${request.enchantmentName ? `<span class="enchantment">${request.enchantmentName}</span>` : ''}
+            </div>
+          </div>
+          <div class="request-meta">
+            <p><strong>${localize("Service.Approval.Player")}:</strong> ${request.playerName}</p>
+            <p><strong>${localize("Service.Approval.Merchant")}:</strong> ${request.merchantName}</p>
+            <p><strong>${localize("Service.Approval.Cost")}:</strong> ${formatCurrency(request.cost * 100)}</p>
+          </div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <label for="duration-hours">${localize("Service.Approval.Duration")}</label>
+          <div class="form-fields">
+            <input type="number" id="duration-hours" name="durationHours"
+                   value="${defaultDuration}" min="0" step="0.5" style="width: 80px;">
+            <span>${localize("Service.Approval.Hours")}</span>
+          </div>
+          <p class="hint">${localize("Service.Approval.DurationHint")}</p>
+        </div>
+        <div class="form-group">
+          <label for="deny-reason">${localize("Service.Approval.DenyReason")}</label>
+          <input type="text" id="deny-reason" name="denyReason" placeholder="${localize("Service.Approval.DenyReasonPlaceholder")}">
+        </div>
+      </form>
+    `;
+
+    return new Promise((resolve) => {
+      new Dialog({
+        title: localize("Service.Approval.Title"),
+        content,
+        buttons: {
+          approve: {
+            icon: '<i class="fas fa-check"></i>',
+            label: localize("Service.Approval.Approve"),
+            callback: async (html) => {
+              const durationHours = parseFloat(html.find('[name="durationHours"]').val()) || 0;
+              const result = await this.processServiceRequest(requestId, true, null, { customDurationHours: durationHours });
+              resolve(result);
+            }
+          },
+          deny: {
+            icon: '<i class="fas fa-times"></i>',
+            label: localize("Service.Approval.Deny"),
+            callback: async (html) => {
+              const reason = html.find('[name="denyReason"]').val() || null;
+              const result = await this.processServiceRequest(requestId, false, reason);
+              resolve(result);
+            }
+          }
+        },
+        default: "approve",
+        close: () => resolve({ success: false, message: "Dialog closed" })
+      }, {
+        classes: ["bobsnpc", "service-approval-dialog"],
+        width: 400
+      }).render(true);
+    });
   }
 
   /**
