@@ -894,13 +894,33 @@
 
     "GM": {
       "ServiceRequest": "Service Request",
+      "ServiceManagement": "Service Management",
       "ApproveRequest": "Approve",
       "DenyRequest": "Deny",
       "RequestFrom": "Request from {player}",
-      "PendingRequests": "Pending Service Requests",
+      "PendingRequests": "Pending Requests",
       "NoPendingRequests": "No pending requests",
       "RequestDetails": "Request Details",
-      "ApprovalRequired": "GM Approval Required"
+      "ApprovalRequired": "GM Approval Required",
+      "ActiveOrders": "Active Orders",
+      "NoActiveOrders": "No active orders",
+      "Player": "Player",
+      "ReadyAt": "Ready at",
+      "MarkReady": "Mark Ready",
+      "OrderMarkedReady": "Order marked as ready for pickup",
+      "AdjustTime": {
+        "Title": "Adjust Completion Time",
+        "Item": "Item",
+        "CurrentTime": "Current time remaining",
+        "NewTime": "New time remaining",
+        "Hint": "Set to 0 to make the order ready immediately.",
+        "Updated": "Order time updated"
+      },
+      "CancelOrder": {
+        "Title": "Cancel Order",
+        "Confirm": "Are you sure you want to cancel this order? The item will be returned to the player and the gold refunded.",
+        "Cancelled": "{item} order cancelled and refunded"
+      }
     },
 
     "Service": {

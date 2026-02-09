@@ -997,10 +997,191 @@
     color: var(--bobsnpc-text-muted);
   }
 
-  .service-approval-content .no-requests i {
+  .service-approval-content .no-requests i,
+  .service-approval-content .no-orders i {
     font-size: 48px;
     display: block;
     margin-bottom: 16px;
+  }
+
+  .service-approval-content .no-orders {
+    text-align: center;
+    padding: 40px;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* Tab Navigation */
+  .service-approval-content .tab-navigation {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+    border-bottom: 2px solid var(--bobsnpc-border);
+    padding-bottom: 0;
+  }
+
+  .service-approval-content .tab-btn {
+    padding: 10px 16px;
+    background: var(--bobsnpc-bg-secondary);
+    border: 1px solid var(--bobsnpc-border);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--bobsnpc-text-muted);
+    transition: all 0.2s ease;
+  }
+
+  .service-approval-content .tab-btn:hover {
+    background: var(--bobsnpc-bg);
+    color: var(--bobsnpc-text);
+  }
+
+  .service-approval-content .tab-btn.active {
+    background: var(--bobsnpc-bg);
+    color: var(--bobsnpc-primary);
+    border-color: var(--bobsnpc-primary);
+    font-weight: bold;
+  }
+
+  .service-approval-content .tab-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+
+  .service-approval-content .tab-badge.pending {
+    background: #ff9800;
+    color: white;
+  }
+
+  .service-approval-content .tab-badge.active {
+    background: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  /* Active Orders List */
+  .service-approval-content .orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .service-approval-content .order-card {
+    background: var(--bobsnpc-bg-secondary);
+    border: 1px solid var(--bobsnpc-border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .service-approval-content .order-card.ready {
+    border-color: #4caf50;
+    background: rgba(76, 175, 80, 0.1);
+  }
+
+  .service-approval-content .order-card.in-progress {
+    border-left: 4px solid #2196f3;
+  }
+
+  .service-approval-content .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .service-approval-content .order-status {
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .service-approval-content .order-status.ready {
+    color: #4caf50;
+    font-weight: bold;
+  }
+
+  .service-approval-content .order-status.in-progress {
+    color: #2196f3;
+  }
+
+  .service-approval-content .order-body {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .service-approval-content .order-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .service-approval-content .order-info {
+    flex: 1;
+  }
+
+  .service-approval-content .order-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .service-approval-content .ready-btn {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .service-approval-content .ready-btn:hover {
+    filter: brightness(1.1);
+  }
+
+  .service-approval-content .adjust-btn {
+    background: #2196f3;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .service-approval-content .adjust-btn:hover {
+    filter: brightness(1.1);
+  }
+
+  .service-approval-content .cancel-btn {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .service-approval-content .cancel-btn:hover {
+    filter: brightness(1.1);
+  }
+
+  /* Adjust Time Dialog */
+  .bobsnpc-adjust-time-dialog {
+    padding: 10px;
+  }
+
+  .bobsnpc-adjust-time-dialog .form-fields {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   /* ===== Enchantment Manager ===== */
