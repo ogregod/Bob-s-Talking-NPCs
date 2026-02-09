@@ -60,17 +60,31 @@ export function createServiceRequest(data) {
     // Cost
     cost: data.cost || 0,
 
+    // ITEM ESCROW: Full item data backup
+    itemData: data.itemData || null,          // item.toObject() - complete item backup for restoration
+
+    // Queue position tracking
+    queuePosition: data.queuePosition ?? 0,   // Position in merchant's queue
+
     // Timestamps
     requestedAt: data.requestedAt || Date.now(),
     processedAt: data.processedAt || null,
-    processedBy: data.processedBy || null,  // GM user ID who processed
+    processedBy: data.processedBy || null,    // GM user ID who processed
 
     // Drop-off / Pick-up tracking
-    itemDroppedOff: data.itemDroppedOff || false,   // Has player dropped off item?
-    droppedOffAt: data.droppedOffAt || null,        // When was item dropped off?
-    workDuration: data.workDuration || null,        // How long the work takes (ms)
-    readyAt: data.readyAt || null,                  // When will item be ready?
-    pickedUpAt: data.pickedUpAt || null,            // When was item picked up?
+    itemDroppedOff: data.itemDroppedOff || false,
+    droppedOffAt: data.droppedOffAt || null,
+    workDuration: data.workDuration || null,
+    readyAt: data.readyAt || null,
+    pickedUpAt: data.pickedUpAt || null,
+
+    // Fail tracking (for enchantments)
+    failRollResult: data.failRollResult ?? null,      // null = not rolled yet, number = roll result
+    enchantmentFailed: data.enchantmentFailed ?? false,
+    failConsequence: data.failConsequence || null,    // "none", "destroyed", "cursed"
+
+    // Result item data (after enchantment applied, before pickup)
+    resultItemData: data.resultItemData || null,
 
     // Expiration (24 hours default for pending requests)
     expiresAt: data.expiresAt || (Date.now() + 24 * 60 * 60 * 1000)

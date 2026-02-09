@@ -29,22 +29,165 @@ export const EnchantmentRarity = Object.freeze({
 });
 
 /**
+ * Enchantment fail consequences
+ */
+export const FailConsequence = Object.freeze({
+  NONE: "none",           // Item returned unenchanted
+  DESTROYED: "destroyed", // Item is destroyed
+  CURSED: "cursed"        // Item becomes cursed
+});
+
+/**
+ * Activation types for enchantments
+ */
+export const ActivationType = Object.freeze({
+  PASSIVE: "passive",      // Always active when equipped
+  ACTION: "action",        // Requires action to activate
+  BONUS_ACTION: "bonus",   // Requires bonus action
+  REACTION: "reaction",    // Triggered by reaction
+  FREE: "free"             // Free action
+});
+
+/**
+ * Activation cost types
+ */
+export const ActivationCost = Object.freeze({
+  NONE: "none",                   // No cost (passive/at-will)
+  CHARGES_DAY: "charges_day",     // X charges per day
+  USES_SHORT_REST: "uses_short",  // X uses per short rest
+  USES_LONG_REST: "uses_long",    // X uses per long rest
+  AT_WILL: "at_will"              // Unlimited uses (but requires activation)
+});
+
+/**
+ * Duration types
+ */
+export const DurationType = Object.freeze({
+  PERMANENT: "permanent",         // Always active
+  CONCENTRATION: "concentration", // Requires concentration
+  ROUNDS: "rounds",
+  MINUTES: "minutes",
+  HOURS: "hours"
+});
+
+/**
+ * Mechanical effect types for Active Effects
+ */
+export const MechanicalEffectType = Object.freeze({
+  DAMAGE_BONUS: "damage_bonus",      // +Xd6 fire, etc.
+  ATTACK_BONUS: "attack_bonus",      // +1, +2, +3
+  AC_BONUS: "ac_bonus",
+  SAVE_BONUS: "save_bonus",
+  ABILITY_BONUS: "ability_bonus",
+  RESISTANCE: "resistance",
+  IMMUNITY: "immunity",
+  SPEED_BONUS: "speed_bonus",
+  SKILL_BONUS: "skill_bonus",
+  HP_BONUS: "hp_bonus",
+  CUSTOM: "custom"
+});
+
+/**
+ * Damage types for D&D 5e
+ */
+export const DamageType = Object.freeze({
+  FIRE: "fire",
+  COLD: "cold",
+  LIGHTNING: "lightning",
+  THUNDER: "thunder",
+  ACID: "acid",
+  POISON: "poison",
+  NECROTIC: "necrotic",
+  RADIANT: "radiant",
+  PSYCHIC: "psychic",
+  FORCE: "force",
+  SLASHING: "slashing",
+  PIERCING: "piercing",
+  BLUDGEONING: "bludgeoning"
+});
+
+/**
+ * Recharge types for charges
+ */
+export const RechargeType = Object.freeze({
+  DAWN: "dawn",
+  SHORT_REST: "shortRest",
+  LONG_REST: "longRest"
+});
+
+/**
  * Create a new enchantment
  * @param {object} data - Enchantment data
  * @returns {object}
  */
 export function createEnchantment(data) {
   return {
+    // Basic info
     id: data.id || generateId(),
     name: data.name || "Unknown Enchantment",
     description: data.description || "",
-    type: data.type || EnchantmentItemType.ANY,       // What items it can apply to
+    type: data.type || EnchantmentItemType.ANY,
     rarity: data.rarity || EnchantmentRarity.UNCOMMON,
-    baseCost: data.baseCost || 100,                   // Base cost in gold
-    effects: data.effects || [],                       // Array of effect descriptions
-    requirements: data.requirements || [],             // Prerequisites
+    baseCost: data.baseCost || 100,
+    effects: data.effects || [],              // Text descriptions for display
+    requirements: data.requirements || [],
     icon: data.icon || "fa-wand-sparkles",
-    active: data.active !== false                      // Whether it's available for use
+    active: data.active !== false,
+
+    // Fail mechanics
+    failRate: data.failRate ?? 0,             // 0-100 percentage
+    failConsequence: data.failConsequence || FailConsequence.NONE,
+    cursedEnchantmentId: data.cursedEnchantmentId || null,
+
+    // Activation configuration
+    activationType: data.activationType || ActivationType.PASSIVE,
+    activationCost: data.activationCost || ActivationCost.NONE,
+    charges: data.charges ?? 0,
+    rechargeType: data.rechargeType || RechargeType.DAWN,
+
+    // Duration configuration
+    durationType: data.durationType || DurationType.PERMANENT,
+    durationValue: data.durationValue ?? 0,
+
+    // Target configuration
+    targetType: data.targetType || "self",    // self, touch, ranged
+    targetRange: data.targetRange ?? 0,       // Range in feet for ranged
+
+    // Mechanical effects (translated to Active Effects)
+    mechanicalEffects: data.mechanicalEffects || [],
+    // Each mechanicalEffect: {
+    //   type: MechanicalEffectType,
+    //   value: number or string,
+    //   damageType: DamageType (optional),
+    //   diceCount: number (optional for damage),
+    //   diceSize: number (optional for damage),
+    //   ability: string (optional for ability/save bonuses),
+    //   skill: string (optional for skill bonuses),
+    //   customKey: string (optional for custom effects),
+    //   customMode: number (optional, CONST.ACTIVE_EFFECT_MODES)
+    // }
+
+    // Work duration (how long enchanting takes)
+    workDurationHours: data.workDurationHours ?? null  // null = use global setting
+  };
+}
+
+/**
+ * Create a mechanical effect object
+ * @param {object} data - Effect data
+ * @returns {object}
+ */
+export function createMechanicalEffect(data) {
+  return {
+    type: data.type || MechanicalEffectType.ATTACK_BONUS,
+    value: data.value ?? 0,
+    damageType: data.damageType || null,
+    diceCount: data.diceCount ?? 0,
+    diceSize: data.diceSize ?? 6,
+    ability: data.ability || null,      // str, dex, con, int, wis, cha
+    skill: data.skill || null,          // acr, ani, arc, ath, dec, his, ins, itm, inv, med, nat, prc, prf, per, rel, slt, ste, sur
+    customKey: data.customKey || null,
+    customMode: data.customMode ?? 2    // CONST.ACTIVE_EFFECT_MODES.ADD
   };
 }
 
@@ -143,7 +286,11 @@ export const DEFAULT_ENCHANTMENTS = [
     rarity: EnchantmentRarity.UNCOMMON,
     baseCost: 500,
     effects: ["+1d6 fire damage on hit"],
-    icon: "fa-fire"
+    icon: "fa-fire",
+    failRate: 5,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.DAMAGE_BONUS, diceCount: 1, diceSize: 6, damageType: DamageType.FIRE }
+    ]
   },
   {
     id: "frost",
@@ -153,7 +300,11 @@ export const DEFAULT_ENCHANTMENTS = [
     rarity: EnchantmentRarity.UNCOMMON,
     baseCost: 500,
     effects: ["+1d6 cold damage on hit"],
-    icon: "fa-snowflake"
+    icon: "fa-snowflake",
+    failRate: 5,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.DAMAGE_BONUS, diceCount: 1, diceSize: 6, damageType: DamageType.COLD }
+    ]
   },
   {
     id: "shock",
@@ -163,7 +314,41 @@ export const DEFAULT_ENCHANTMENTS = [
     rarity: EnchantmentRarity.UNCOMMON,
     baseCost: 500,
     effects: ["+1d6 lightning damage on hit"],
-    icon: "fa-bolt"
+    icon: "fa-bolt",
+    failRate: 5,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.DAMAGE_BONUS, diceCount: 1, diceSize: 6, damageType: DamageType.LIGHTNING }
+    ]
+  },
+  {
+    id: "weapon-plus-1",
+    name: "+1 Weapon",
+    description: "A magically enhanced weapon with +1 to attack and damage rolls.",
+    type: EnchantmentItemType.WEAPON,
+    rarity: EnchantmentRarity.UNCOMMON,
+    baseCost: 1000,
+    effects: ["+1 to attack and damage rolls"],
+    icon: "fa-plus",
+    failRate: 3,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.ATTACK_BONUS, value: 1 },
+      { type: MechanicalEffectType.DAMAGE_BONUS, value: 1 }
+    ]
+  },
+  {
+    id: "weapon-plus-2",
+    name: "+2 Weapon",
+    description: "A magically enhanced weapon with +2 to attack and damage rolls.",
+    type: EnchantmentItemType.WEAPON,
+    rarity: EnchantmentRarity.RARE,
+    baseCost: 4000,
+    effects: ["+2 to attack and damage rolls"],
+    icon: "fa-plus",
+    failRate: 10,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.ATTACK_BONUS, value: 2 },
+      { type: MechanicalEffectType.DAMAGE_BONUS, value: 2 }
+    ]
   },
   {
     id: "keen",
@@ -173,7 +358,9 @@ export const DEFAULT_ENCHANTMENTS = [
     rarity: EnchantmentRarity.RARE,
     baseCost: 1000,
     effects: ["Critical hit range increased by 1 (19-20)"],
-    icon: "fa-crosshairs"
+    icon: "fa-crosshairs",
+    failRate: 10,
+    mechanicalEffects: []  // Custom effect, needs special handling
   },
   {
     id: "vorpal",
@@ -183,19 +370,40 @@ export const DEFAULT_ENCHANTMENTS = [
     rarity: EnchantmentRarity.LEGENDARY,
     baseCost: 10000,
     effects: ["On a natural 20, target must make DC 15 CON save or be decapitated"],
-    icon: "fa-skull"
+    icon: "fa-skull",
+    failRate: 25,
+    failConsequence: FailConsequence.DESTROYED,
+    mechanicalEffects: []  // Special effect
   },
 
   // Armor Enchantments
   {
-    id: "fortification",
-    name: "Fortification",
-    description: "The armor is reinforced with magical protection, providing resistance to critical hits.",
+    id: "armor-plus-1",
+    name: "+1 Armor",
+    description: "Magically enhanced armor providing +1 to AC.",
+    type: EnchantmentItemType.ARMOR,
+    rarity: EnchantmentRarity.UNCOMMON,
+    baseCost: 1000,
+    effects: ["+1 to AC"],
+    icon: "fa-shield",
+    failRate: 3,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.AC_BONUS, value: 1 }
+    ]
+  },
+  {
+    id: "armor-plus-2",
+    name: "+2 Armor",
+    description: "Magically enhanced armor providing +2 to AC.",
     type: EnchantmentItemType.ARMOR,
     rarity: EnchantmentRarity.RARE,
-    baseCost: 1500,
-    effects: ["25% chance to negate critical hit damage"],
-    icon: "fa-shield-halved"
+    baseCost: 4000,
+    effects: ["+2 to AC"],
+    icon: "fa-shield",
+    failRate: 10,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.AC_BONUS, value: 2 }
+    ]
   },
   {
     id: "shadow",
@@ -205,7 +413,11 @@ export const DEFAULT_ENCHANTMENTS = [
     rarity: EnchantmentRarity.UNCOMMON,
     baseCost: 750,
     effects: ["+2 bonus to Stealth checks"],
-    icon: "fa-moon"
+    icon: "fa-moon",
+    failRate: 5,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.SKILL_BONUS, skill: "ste", value: 2 }
+    ]
   },
   {
     id: "fire-resistance",
@@ -215,7 +427,11 @@ export const DEFAULT_ENCHANTMENTS = [
     rarity: EnchantmentRarity.UNCOMMON,
     baseCost: 600,
     effects: ["Resistance to fire damage"],
-    icon: "fa-fire-flame-curved"
+    icon: "fa-fire-flame-curved",
+    failRate: 5,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.RESISTANCE, damageType: DamageType.FIRE }
+    ]
   },
   {
     id: "cold-resistance",
@@ -225,7 +441,11 @@ export const DEFAULT_ENCHANTMENTS = [
     rarity: EnchantmentRarity.UNCOMMON,
     baseCost: 600,
     effects: ["Resistance to cold damage"],
-    icon: "fa-temperature-low"
+    icon: "fa-temperature-low",
+    failRate: 5,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.RESISTANCE, damageType: DamageType.COLD }
+    ]
   },
 
   // Ring/Amulet Enchantments
@@ -237,17 +457,25 @@ export const DEFAULT_ENCHANTMENTS = [
     rarity: EnchantmentRarity.UNCOMMON,
     baseCost: 500,
     effects: ["+1 to AC"],
-    icon: "fa-shield"
+    icon: "fa-shield",
+    failRate: 5,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.AC_BONUS, value: 1 }
+    ]
   },
   {
-    id: "spell-storing",
-    name: "Spell Storing",
-    description: "The item can store a spell to be released later.",
+    id: "resistance-saves",
+    name: "Resistance",
+    description: "The ring grants a bonus to saving throws.",
     type: EnchantmentItemType.RING,
     rarity: EnchantmentRarity.RARE,
     baseCost: 2000,
-    effects: ["Can store one spell of 3rd level or lower"],
-    icon: "fa-hand-sparkles"
+    effects: ["+1 to all saving throws"],
+    icon: "fa-hand-fist",
+    failRate: 10,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.SAVE_BONUS, ability: "all", value: 1 }
+    ]
   },
   {
     id: "health",
@@ -257,29 +485,41 @@ export const DEFAULT_ENCHANTMENTS = [
     rarity: EnchantmentRarity.UNCOMMON,
     baseCost: 800,
     effects: ["+5 maximum hit points"],
-    icon: "fa-heart"
+    icon: "fa-heart",
+    failRate: 5,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.HP_BONUS, value: 5 }
+    ]
+  },
+  {
+    id: "strength",
+    name: "Giant Strength",
+    description: "The amulet grants the wearer enhanced strength.",
+    type: EnchantmentItemType.AMULET,
+    rarity: EnchantmentRarity.RARE,
+    baseCost: 3000,
+    effects: ["+2 to Strength"],
+    icon: "fa-dumbbell",
+    failRate: 10,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.ABILITY_BONUS, ability: "str", value: 2 }
+    ]
   },
 
   // Wondrous Item Enchantments
   {
-    id: "feather-falling",
-    name: "Feather Falling",
-    description: "The item allows the wearer to fall slowly and safely.",
+    id: "speed",
+    name: "Speed",
+    description: "The item quickens the wearer's movements.",
     type: EnchantmentItemType.WONDROUS,
     rarity: EnchantmentRarity.UNCOMMON,
-    baseCost: 500,
-    effects: ["Fall at a rate of 60 feet per round, taking no falling damage"],
-    icon: "fa-feather"
-  },
-  {
-    id: "water-breathing",
-    name: "Water Breathing",
-    description: "The item allows the wearer to breathe underwater.",
-    type: EnchantmentItemType.WONDROUS,
-    rarity: EnchantmentRarity.UNCOMMON,
-    baseCost: 400,
-    effects: ["Can breathe underwater"],
-    icon: "fa-water"
+    baseCost: 750,
+    effects: ["+10 feet movement speed"],
+    icon: "fa-wind",
+    failRate: 5,
+    mechanicalEffects: [
+      { type: MechanicalEffectType.SPEED_BONUS, value: 10 }
+    ]
   },
   {
     id: "darkvision",
@@ -289,6 +529,8 @@ export const DEFAULT_ENCHANTMENTS = [
     rarity: EnchantmentRarity.UNCOMMON,
     baseCost: 500,
     effects: ["Darkvision 60 feet"],
-    icon: "fa-eye"
+    icon: "fa-eye",
+    failRate: 5,
+    mechanicalEffects: []  // Special handling for sense
   }
 ];
