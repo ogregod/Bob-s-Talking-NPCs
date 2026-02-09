@@ -23,6 +23,7 @@ import { TradeWindow } from "./apps/trade-window.mjs";
 import { ShopManager } from "./apps/shop-manager.mjs";
 import { ShopEditor } from "./apps/shop-editor.mjs";
 import { EnchantmentManager } from "./apps/enchantment-manager.mjs";
+import { ServiceOrdersWindow } from "./apps/service-orders.mjs";
 
 /**
  * Singleton instances of UI applications
@@ -1444,6 +1445,21 @@ class UIAPI {
     enchantmentManager.render(true);
     console.log(`${MODULE_ID} | Opening enchantment manager`);
     return enchantmentManager;
+  }
+
+  /**
+   * Open Service Orders window for a player
+   * View active service orders and pick up ready items
+   * @param {string} playerActorUuid - Player actor UUID
+   * @param {string} merchantId - Optional merchant ID to filter orders
+   * @returns {ServiceOrdersWindow}
+   */
+  openServiceOrders(playerActorUuid, merchantId = null) {
+    Hooks.call(`${MODULE_ID}.openServiceOrders`, { playerActorUuid, merchantId });
+
+    const window = ServiceOrdersWindow.open(playerActorUuid, merchantId);
+    console.log(`${MODULE_ID} | Opening service orders for ${playerActorUuid}`);
+    return window;
   }
 
   /**

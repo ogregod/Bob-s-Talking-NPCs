@@ -44,6 +44,7 @@ import {
   getTimeUntilReady,
   formatDuration
 } from "../data/service-request-model.mjs";
+import { FailConsequence } from "../data/enchantment-model.mjs";
 import { emit, emitToGM, SocketEvents } from "../socket.mjs";
 
 /**
@@ -1034,6 +1035,7 @@ export class MerchantHandler {
 
   /**
    * Repair service - requires GM approval
+   * Implements item escrow: item is removed from player and stored in request
    * @private
    */
   async _serviceRepair(merchant, actor, options) {
@@ -1055,7 +1057,15 @@ export class MerchantHandler {
       return { success: false, message: localize("Shop.InsufficientFunds") };
     }
 
-    // Create service request for GM approval
+    // ITEM ESCROW: Store full item data before removing
+    const itemData = item.toObject();
+
+    // Get queue position for this merchant
+    const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
+    const merchantOrders = activeOrders.filter(o => o.merchantId === merchant.id);
+    const queuePosition = merchantOrders.length + 1;
+
+    // Create service request for GM approval with item data
     const request = createServiceRequest({
       type: ApprovalRequiredServices.REPAIR,
       merchantId: merchant.id,
@@ -1069,6 +1079,8 @@ export class MerchantHandler {
       itemName: item.name,
       itemImg: item.img,
       itemType: item.type,
+      itemData: itemData, // Full item backup for restoration
+      queuePosition,
       cost
     });
 
@@ -1077,13 +1089,17 @@ export class MerchantHandler {
     pendingRequests.push(request);
     await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
 
+    // ITEM ESCROW: Remove item from player inventory
+    await item.delete();
+    console.log(`${MODULE_ID} | Item "${itemData.name}" escrowed for repair service`);
+
     // Send notification to GM
     await sendServiceRequestToGM({
       type: "repair",
       playerName: actor.name,
       merchantName: merchant.name || "Merchant",
-      itemName: item.name,
-      itemImg: item.img,
+      itemName: itemData.name,
+      itemImg: itemData.img,
       cost,
       requestId: request.id
     });
@@ -1093,11 +1109,14 @@ export class MerchantHandler {
       emitToGM(SocketEvents.SERVICE_REQUEST, { request });
     }
 
+    ui.notifications.info(localize("Service.ItemDroppedOff", { item: itemData.name }));
+
     return {
       success: true,
       pending: true,
       requestId: request.id,
       cost,
+      queuePosition,
       message: localize("Shop.Service.PendingApproval")
     };
   }
@@ -1148,6 +1167,7 @@ export class MerchantHandler {
 
   /**
    * Enchant service - requires GM approval
+   * Implements item escrow: item is removed from player and stored in request
    * @private
    */
   async _serviceEnchant(merchant, actor, options) {
@@ -1198,7 +1218,15 @@ export class MerchantHandler {
       return { success: false, message: localize("Shop.InsufficientFunds") };
     }
 
-    // Create service request for GM approval
+    // ITEM ESCROW: Store full item data before removing
+    const itemData = item.toObject();
+
+    // Get queue position for this merchant
+    const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
+    const merchantOrders = activeOrders.filter(o => o.merchantId === merchant.id);
+    const queuePosition = merchantOrders.length + 1;
+
+    // Create service request for GM approval with item data and enchantment info
     const request = createServiceRequest({
       type: ApprovalRequiredServices.ENCHANT,
       merchantId: merchant.id,
@@ -1212,6 +1240,8 @@ export class MerchantHandler {
       itemName: item.name,
       itemImg: item.img,
       itemType: item.type,
+      itemData: itemData, // Full item backup for restoration
+      queuePosition,
       enchantmentId: enchantmentId || null,
       enchantmentName: enchantment?.name || "Custom Enchantment",
       cost
@@ -1222,13 +1252,17 @@ export class MerchantHandler {
     pendingRequests.push(request);
     await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
 
+    // ITEM ESCROW: Remove item from player inventory
+    await item.delete();
+    console.log(`${MODULE_ID} | Item "${itemData.name}" escrowed for enchantment service`);
+
     // Send notification to GM
     await sendServiceRequestToGM({
       type: "enchant",
       playerName: actor.name,
       merchantName: merchant.name || "Merchant",
-      itemName: item.name,
-      itemImg: item.img,
+      itemName: itemData.name,
+      itemImg: itemData.img,
       enchantmentName: enchantment?.name || "Custom Enchantment",
       cost,
       requestId: request.id
@@ -1239,11 +1273,14 @@ export class MerchantHandler {
       emitToGM(SocketEvents.SERVICE_REQUEST, { request });
     }
 
+    ui.notifications.info(localize("Service.ItemDroppedOff", { item: itemData.name }));
+
     return {
       success: true,
       pending: true,
       requestId: request.id,
       cost,
+      queuePosition,
       message: localize("Shop.Service.PendingApproval")
     };
   }
@@ -1420,6 +1457,7 @@ export class MerchantHandler {
 
   /**
    * Pick up a completed service order
+   * Restores item from escrow and applies enchantments if applicable
    * @param {string} orderId - The order ID
    * @param {string} playerActorUuid - Player actor UUID
    * @returns {Promise<object>}
@@ -1445,39 +1483,261 @@ export class MerchantHandler {
       return { success: false, message: localize("Service.NotReady", { time: timeLeft }) };
     }
 
-    // Remove from active orders
-    activeOrders.splice(orderIndex, 1);
-    await game.settings.set(MODULE_ID, "activeServiceOrders", activeOrders);
+    // Get the player actor
+    const actor = await fromUuid(playerActorUuid);
+    if (!actor) {
+      return { success: false, message: localize("Service.ActorNotFound") };
+    }
 
-    // Send completion message
+    // Check if we have item data to restore
+    if (!order.itemData) {
+      // Remove from active orders
+      activeOrders.splice(orderIndex, 1);
+      await game.settings.set(MODULE_ID, "activeServiceOrders", activeOrders);
+      return { success: false, message: localize("Service.ItemDataMissing") };
+    }
+
+    let resultItem = null;
+    let enchantmentFailed = false;
+    let failConsequence = null;
+
     if (order.type === ApprovalRequiredServices.REPAIR) {
+      // REPAIR: Simply restore the item
+      resultItem = await this._restoreItemFromEscrow(actor, order.itemData);
+
       await sendRepairMessage({
         playerName: order.playerName,
         merchantName: order.merchantName,
-        itemName: order.itemName,
-        itemImg: order.itemImg,
+        itemName: resultItem.name,
+        itemImg: resultItem.img,
         cost: order.cost,
         playerId: order.playerId
       });
     } else if (order.type === ApprovalRequiredServices.ENCHANT) {
-      await sendEnchantMessage({
-        playerName: order.playerName,
-        merchantName: order.merchantName,
-        itemName: order.itemName,
-        itemImg: order.itemImg,
-        enchantmentName: order.enchantmentName,
-        cost: order.cost,
-        playerId: order.playerId
-      });
+      // ENCHANT: Check for failure, then apply enchantment
+      const enchantmentHandler = game.bobsnpc?.handlers?.enchantment;
+      let enchantment = null;
+
+      if (order.enchantmentId && enchantmentHandler) {
+        enchantment = enchantmentHandler.getEnchantment(order.enchantmentId);
+      }
+
+      // Roll for enchantment failure if not already rolled
+      if (order.failRollResult === null && enchantment && enchantment.failRate > 0) {
+        const failRoll = Math.random() * 100;
+        order.failRollResult = failRoll;
+        order.enchantmentFailed = failRoll < enchantment.failRate;
+
+        if (order.enchantmentFailed) {
+          order.failConsequence = enchantment.failConsequence || FailConsequence.NONE;
+        }
+      }
+
+      enchantmentFailed = order.enchantmentFailed || false;
+      failConsequence = order.failConsequence;
+
+      if (enchantmentFailed) {
+        // Handle failed enchantment
+        const failResult = await this._handleFailedEnchantment(actor, order, enchantment);
+        resultItem = failResult.item;
+
+        // Send failure message
+        await this._sendEnchantmentFailureMessage({
+          playerName: order.playerName,
+          merchantName: order.merchantName,
+          itemName: order.itemName,
+          itemImg: order.itemImg,
+          enchantmentName: order.enchantmentName,
+          failConsequence,
+          playerId: order.playerId
+        });
+      } else {
+        // Success: Apply enchantment to item
+        resultItem = await this._applyEnchantmentAndRestore(actor, order, enchantment);
+
+        await sendEnchantMessage({
+          playerName: order.playerName,
+          merchantName: order.merchantName,
+          itemName: resultItem.name,
+          itemImg: resultItem.img,
+          enchantmentName: order.enchantmentName,
+          cost: order.cost,
+          playerId: order.playerId
+        });
+      }
     }
 
-    ui.notifications.info(localize("Service.PickedUp", { item: order.itemName }));
+    // Remove from active orders
+    activeOrders.splice(orderIndex, 1);
+    await game.settings.set(MODULE_ID, "activeServiceOrders", activeOrders);
+
+    const message = enchantmentFailed
+      ? localize("Service.EnchantmentFailed", { item: order.itemName })
+      : localize("Service.PickedUp", { item: resultItem?.name || order.itemName });
+
+    ui.notifications.info(message);
 
     return {
       success: true,
-      message: localize("Service.PickedUp", { item: order.itemName }),
-      order
+      message,
+      order,
+      item: resultItem,
+      enchantmentFailed,
+      failConsequence
     };
+  }
+
+  /**
+   * Restore an item from escrow to player inventory
+   * @param {Actor} actor - The player actor
+   * @param {object} itemData - The stored item data
+   * @returns {Promise<Item>}
+   * @private
+   */
+  async _restoreItemFromEscrow(actor, itemData) {
+    const [newItem] = await actor.createEmbeddedDocuments("Item", [itemData]);
+    console.log(`${MODULE_ID} | Restored item "${newItem.name}" from escrow`);
+    return newItem;
+  }
+
+  /**
+   * Apply enchantment to item and restore to player inventory
+   * @param {Actor} actor - The player actor
+   * @param {object} order - The service order
+   * @param {object} enchantment - The enchantment to apply
+   * @returns {Promise<Item>}
+   * @private
+   */
+  async _applyEnchantmentAndRestore(actor, order, enchantment) {
+    const enchantmentHandler = game.bobsnpc?.handlers?.enchantment;
+    const itemData = foundry.utils.deepClone(order.itemData);
+
+    // Update item name to include enchantment
+    if (enchantment) {
+      itemData.name = `${itemData.name} (${enchantment.name})`;
+
+      // Upgrade rarity if enchantment rarity is higher
+      const rarityOrder = ["common", "uncommon", "rare", "veryRare", "legendary", "artifact"];
+      const itemRarityIndex = rarityOrder.indexOf(itemData.system?.rarity || "common");
+      const enchantRarityIndex = rarityOrder.indexOf(enchantment.rarity || "common");
+
+      if (enchantRarityIndex > itemRarityIndex && itemData.system) {
+        itemData.system.rarity = enchantment.rarity;
+      }
+
+      // Add enchantment metadata to item flags
+      if (!itemData.flags) itemData.flags = {};
+      itemData.flags[MODULE_ID] = {
+        ...itemData.flags[MODULE_ID],
+        enchanted: true,
+        enchantmentId: enchantment.id,
+        enchantmentName: enchantment.name,
+        enchantedAt: Date.now(),
+        enchantedBy: order.merchantName
+      };
+    }
+
+    // Create the item in player inventory
+    const [newItem] = await actor.createEmbeddedDocuments("Item", [itemData]);
+    console.log(`${MODULE_ID} | Created enchanted item "${newItem.name}"`);
+
+    // Apply Active Effect to the item if enchantment has mechanical effects
+    if (enchantment && enchantmentHandler && enchantment.mechanicalEffects?.length > 0) {
+      await enchantmentHandler.applyEnchantmentToItem(newItem, enchantment);
+    }
+
+    return newItem;
+  }
+
+  /**
+   * Handle a failed enchantment
+   * @param {Actor} actor - The player actor
+   * @param {object} order - The service order
+   * @param {object} enchantment - The enchantment that failed
+   * @returns {Promise<{item: Item|null}>}
+   * @private
+   */
+  async _handleFailedEnchantment(actor, order, enchantment) {
+    const failConsequence = order.failConsequence || FailConsequence.NONE;
+
+    switch (failConsequence) {
+      case FailConsequence.DESTROYED:
+        // Item is destroyed - don't restore it
+        console.log(`${MODULE_ID} | Item "${order.itemName}" destroyed due to failed enchantment`);
+        return { item: null };
+
+      case FailConsequence.CURSED:
+        // Apply curse enchantment instead
+        if (enchantment?.cursedEnchantmentId) {
+          const enchantmentHandler = game.bobsnpc?.handlers?.enchantment;
+          const curseEnchantment = enchantmentHandler?.getEnchantment(enchantment.cursedEnchantmentId);
+
+          if (curseEnchantment) {
+            const item = await this._applyEnchantmentAndRestore(actor, order, curseEnchantment);
+            console.log(`${MODULE_ID} | Applied curse "${curseEnchantment.name}" to item "${order.itemName}"`);
+            return { item };
+          }
+        }
+        // If no curse defined, fall through to return unenchanted
+        // falls through
+
+      case FailConsequence.NONE:
+      default:
+        // Return item unenchanted
+        const item = await this._restoreItemFromEscrow(actor, order.itemData);
+        console.log(`${MODULE_ID} | Returned unenchanted item "${order.itemName}" after failed enchantment`);
+        return { item };
+    }
+  }
+
+  /**
+   * Send a message about an enchantment failure
+   * @private
+   */
+  async _sendEnchantmentFailureMessage({ playerName, merchantName, itemName, itemImg, enchantmentName, failConsequence, playerId }) {
+    const imgHtml = itemImg ? `<img src="${itemImg}" class="item-icon" alt="${itemName}">` : "";
+
+    let consequenceText;
+    switch (failConsequence) {
+      case FailConsequence.DESTROYED:
+        consequenceText = localize("Enchantment.Failure.Destroyed", { item: itemName });
+        break;
+      case FailConsequence.CURSED:
+        consequenceText = localize("Enchantment.Failure.Cursed", { item: itemName });
+        break;
+      case FailConsequence.NONE:
+      default:
+        consequenceText = localize("Enchantment.Failure.ReturnedUnenchanted", { item: itemName });
+    }
+
+    const content = `
+      <div class="bobsnpc-chat-message service-failed enchant">
+        <div class="service-header failure">
+          <i class="fa-solid fa-skull-crossbones"></i>
+          <strong>${localize("Enchantment.Failure.Title")}</strong>
+        </div>
+        <div class="service-details">
+          ${imgHtml}
+          <div class="service-text">
+            <p><strong>${localize("Shop.Item")}:</strong> ${itemName}</p>
+            <p><strong>${localize("Enchantment.Name")}:</strong> ${enchantmentName}</p>
+            <p class="consequence">${consequenceText}</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    await ChatMessage.create({
+      content,
+      whisper: getPrivateWhisperTargets(playerId),
+      speaker: { alias: merchantName },
+      flags: {
+        [MODULE_ID]: {
+          type: "enchantmentFailed",
+          failConsequence
+        }
+      }
+    });
   }
 
   /**

@@ -903,6 +903,41 @@
       "ApprovalRequired": "GM Approval Required"
     },
 
+    "Service": {
+      "YourOrders": "Your Service Orders",
+      "ViewOrders": "View Orders",
+      "OrderNotFound": "Order not found",
+      "NotYourOrder": "This order doesn't belong to you",
+      "NotReady": "Order not ready - {time} remaining",
+      "ActorNotFound": "Player actor not found",
+      "ItemDataMissing": "Item data is missing from order",
+      "PickedUp": "{item} has been picked up",
+      "EnchantmentFailed": "The enchantment on {item} has failed",
+      "PickupError": "An error occurred during pickup",
+      "ItemDroppedOff": "{item} has been dropped off for service",
+      "NoActiveOrders": "You have no active service orders at this shop",
+      "ReadyForPickup": "Ready for pickup",
+      "InProgress": "Currently being worked on",
+      "Ready": "Ready",
+      "Pending": "Pending",
+      "Refresh": "Refresh",
+      "PickUp": "Pick Up",
+      "NotReady": "Not Ready",
+      "PickingUp": "Picking up...",
+      "OrdersRefreshed": "Orders refreshed",
+      "ReadyNow": "Ready now!",
+      "NoPlayer": "No player actor selected",
+      "QueuePosition": "Queue position: #{position}",
+      "Status": {
+        "Ready": "Ready for Pickup",
+        "InProgress": "In Progress"
+      },
+      "Type": {
+        "Repair": "Repair",
+        "Enchant": "Enchantment"
+      }
+    },
+
     "Enchantment": {
       "Manager": "Enchantment Manager",
       "Add": "Add Enchantment",
@@ -936,7 +971,98 @@
         "rare": "Rare",
         "veryRare": "Very Rare",
         "legendary": "Legendary"
-      }
+      },
+      "NotFound": "Enchantment not found",
+      "Failure": {
+        "Title": "Enchantment Failed!",
+        "Destroyed": "{item} was destroyed in the failed enchantment attempt!",
+        "Cursed": "{item} has become cursed!",
+        "ReturnedUnenchanted": "{item} was returned unenchanted."
+      },
+      "FailRate": "Fail Rate",
+      "FailConsequence": "Fail Consequence",
+      "FailConsequences": {
+        "none": "Return Unenchanted",
+        "destroyed": "Item Destroyed",
+        "cursed": "Apply Curse"
+      },
+      "CursedEnchantment": "Cursed Enchantment",
+      "Activation": {
+        "Type": "Activation Type",
+        "Cost": "Activation Cost",
+        "Charges": "Charges",
+        "RechargeType": "Recharge"
+      },
+      "ActivationTypes": {
+        "passive": "Passive (Always Active)",
+        "action": "Action",
+        "bonus": "Bonus Action",
+        "reaction": "Reaction",
+        "free": "Free Action"
+      },
+      "ActivationCosts": {
+        "none": "None",
+        "charges_day": "Charges per Day",
+        "uses_rest": "Uses per Rest",
+        "at_will": "At Will"
+      },
+      "RechargeTypes": {
+        "dawn": "At Dawn",
+        "shortRest": "Short Rest",
+        "longRest": "Long Rest"
+      },
+      "Duration": {
+        "Type": "Duration Type",
+        "Value": "Duration Value"
+      },
+      "DurationTypes": {
+        "permanent": "Permanent",
+        "concentration": "Concentration",
+        "rounds": "Rounds",
+        "minutes": "Minutes",
+        "hours": "Hours"
+      },
+      "Effects": {
+        "Title": "Mechanical Effects",
+        "Add": "Add Effect",
+        "Remove": "Remove",
+        "Type": "Effect Type",
+        "Value": "Value",
+        "DamageType": "Damage Type",
+        "Ability": "Ability",
+        "Skill": "Skill",
+        "DiceCount": "Dice Count",
+        "DiceSize": "Dice Size"
+      },
+      "EffectTypes": {
+        "damage_bonus": "Damage Bonus",
+        "attack_bonus": "Attack Bonus",
+        "ac_bonus": "AC Bonus",
+        "save_bonus": "Save Bonus",
+        "ability_bonus": "Ability Bonus",
+        "resistance": "Resistance",
+        "immunity": "Immunity",
+        "speed_bonus": "Speed Bonus",
+        "skill_bonus": "Skill Bonus",
+        "hp_bonus": "HP Bonus",
+        "custom": "Custom"
+      },
+      "DamageTypes": {
+        "fire": "Fire",
+        "cold": "Cold",
+        "lightning": "Lightning",
+        "thunder": "Thunder",
+        "acid": "Acid",
+        "poison": "Poison",
+        "necrotic": "Necrotic",
+        "radiant": "Radiant",
+        "psychic": "Psychic",
+        "force": "Force",
+        "slashing": "Slashing",
+        "piercing": "Piercing",
+        "bludgeoning": "Bludgeoning"
+      },
+      "WorkDuration": "Work Duration (hours)"
     },
 
     "ShopTypes": {

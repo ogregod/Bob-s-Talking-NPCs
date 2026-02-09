@@ -1375,4 +1375,291 @@
     color: var(--bobsnpc-text-muted);
   }
 
+  /* ===== Service Orders Window ===== */
+  .service-orders-container {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .service-orders-container .orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--bobsnpc-border);
+  }
+
+  .service-orders-container .orders-summary {
+    display: flex;
+    gap: 12px;
+  }
+
+  .service-orders-container .ready-badge,
+  .service-orders-container .pending-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.9em;
+  }
+
+  .service-orders-container .ready-badge {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+  }
+
+  .service-orders-container .pending-badge {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+  }
+
+  .service-orders-container .refresh-btn {
+    background: none;
+    border: 1px solid var(--bobsnpc-border);
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--bobsnpc-text);
+  }
+
+  .service-orders-container .refresh-btn:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .service-orders-container .orders-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .service-orders-container .order-card {
+    background: var(--bobsnpc-bg-secondary);
+    border-radius: 8px;
+    padding: 12px;
+    border-left: 4px solid var(--bobsnpc-primary);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .service-orders-container .order-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .service-orders-container .order-card.ready {
+    border-left-color: #4caf50;
+    background: linear-gradient(90deg, rgba(76, 175, 80, 0.1), transparent);
+  }
+
+  .service-orders-container .order-card.pending {
+    border-left-color: #ff9800;
+  }
+
+  .service-orders-container .order-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .service-orders-container .item-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid var(--bobsnpc-border);
+  }
+
+  .service-orders-container .item-info {
+    flex: 1;
+  }
+
+  .service-orders-container .item-name {
+    margin: 0 0 4px 0;
+    font-size: 1.1em;
+    color: var(--bobsnpc-text);
+  }
+
+  .service-orders-container .service-type {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9em;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .service-orders-container .enchantment-name {
+    color: #9c27b0;
+  }
+
+  .service-orders-container .order-details {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 10px;
+    font-size: 0.85em;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .service-orders-container .order-details i {
+    margin-right: 4px;
+  }
+
+  .service-orders-container .order-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .service-orders-container .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+
+  .service-orders-container .status-badge.ready {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+  }
+
+  .service-orders-container .status-badge.pending {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+  }
+
+  .service-orders-container .time-remaining {
+    font-size: 0.9em;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .service-orders-container .order-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .service-orders-container .pickup-btn {
+    background: var(--bobsnpc-primary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95em;
+    transition: background 0.2s;
+  }
+
+  .service-orders-container .pickup-btn:hover:not(:disabled) {
+    background: var(--bobsnpc-primary-dark, #5c3daf);
+  }
+
+  .service-orders-container .pickup-btn:disabled {
+    background: var(--bobsnpc-bg-tertiary);
+    color: var(--bobsnpc-text-muted);
+    cursor: not-allowed;
+  }
+
+  .service-orders-container .no-orders {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--bobsnpc-text-muted);
+    text-align: center;
+  }
+
+  .service-orders-container .no-orders i {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .service-orders-container .no-orders p {
+    margin: 0;
+    font-size: 1.1em;
+  }
+
+  /* ===== View Orders Button (Shop Header) ===== */
+  .player-gold-display .view-orders-btn {
+    position: absolute;
+    bottom: -8px;
+    right: 0;
+    background: var(--bobsnpc-primary);
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75em;
+    transition: transform 0.2s;
+  }
+
+  .player-gold-display .view-orders-btn:hover {
+    transform: scale(1.05);
+  }
+
+  .player-gold-display .order-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-weight: bold;
+  }
+
+  .player-gold-display {
+    position: relative;
+  }
+
+  /* ===== Enchantment Failure Message ===== */
+  .bobsnpc-chat-message.service-failed {
+    border-left-color: #f44336;
+  }
+
+  .bobsnpc-chat-message.service-failed .service-header.failure {
+    color: #f44336;
+  }
+
+  .bobsnpc-chat-message.service-failed .consequence {
+    background: rgba(244, 67, 54, 0.1);
+    padding: 8px;
+    border-radius: 4px;
+    color: #f44336;
+    font-weight: bold;
+  }
+
+  /* ===== Service Accepted Message ===== */
+  .bobsnpc-chat-message.service-accepted {
+    border-left-color: #4caf50;
+  }
+
+  .bobsnpc-chat-message.service-accepted .ready-time {
+    background: rgba(76, 175, 80, 0.1);
+    padding: 6px 10px;
+    border-radius: 4px;
+    color: #4caf50;
+  }
+
+  .bobsnpc-chat-message.service-accepted .pickup-notice {
+    font-style: italic;
+    color: var(--bobsnpc-text-muted);
+    font-size: 0.9em;
+    margin-top: 8px;
+  }
+
 } /* End @layer bobsnpc */

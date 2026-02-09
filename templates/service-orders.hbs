@@ -1,0 +1,90 @@
+<div class="service-orders-container">
+  <div class="orders-header">
+    <div class="orders-summary">
+      {{#if hasOrders}}
+        <span class="ready-badge" title="{{localize "Service.ReadyForPickup"}}">
+          <i class="fa-solid fa-check-circle"></i>
+          {{readyCount}} {{localize "Service.Ready"}}
+        </span>
+        <span class="pending-badge" title="{{localize "Service.InProgress"}}">
+          <i class="fa-solid fa-clock"></i>
+          {{pendingCount}} {{localize "Service.Pending"}}
+        </span>
+      {{/if}}
+    </div>
+    <button type="button" class="refresh-btn" data-action="refresh" title="{{localize "Service.Refresh"}}">
+      <i class="fa-solid fa-sync"></i>
+    </button>
+  </div>
+
+  {{#if hasOrders}}
+    <ul class="orders-list">
+      {{#each orders}}
+        <li class="order-card {{statusClass}}" data-order-id="{{id}}">
+          <div class="order-item">
+            <img class="item-img" src="{{itemImg}}" alt="{{itemName}}" />
+            <div class="item-info">
+              <h4 class="item-name">{{itemName}}</h4>
+              <div class="service-type">
+                <i class="fa-solid {{typeIcon}}"></i>
+                <span>{{typeLabel}}</span>
+                {{#if enchantmentName}}
+                  <span class="enchantment-name">&mdash; {{enchantmentName}}</span>
+                {{/if}}
+              </div>
+            </div>
+          </div>
+
+          <div class="order-details">
+            <div class="merchant-info">
+              <i class="fa-solid fa-store"></i>
+              <span>{{merchantName}}</span>
+            </div>
+            {{#if queueInfo}}
+              <div class="queue-position">
+                <i class="fa-solid fa-list-ol"></i>
+                <span>{{queueInfo}}</span>
+              </div>
+            {{/if}}
+          </div>
+
+          <div class="order-status">
+            <span class="status-badge {{statusClass}}">
+              {{#if isReady}}
+                <i class="fa-solid fa-check-circle"></i>
+              {{else}}
+                <i class="fa-solid fa-hourglass-half"></i>
+              {{/if}}
+              {{statusLabel}}
+            </span>
+            <span class="time-remaining">
+              {{#unless isReady}}
+                <i class="fa-solid fa-clock"></i>
+              {{/unless}}
+              {{timeRemainingStr}}
+            </span>
+          </div>
+
+          <div class="order-actions">
+            {{#if isReady}}
+              <button type="button" class="pickup-btn" data-action="pickupOrder">
+                <i class="fa-solid fa-hand"></i>
+                {{localize "Service.PickUp"}}
+              </button>
+            {{else}}
+              <button type="button" class="pickup-btn" disabled>
+                <i class="fa-solid fa-clock"></i>
+                {{localize "Service.NotReady"}}
+              </button>
+            {{/if}}
+          </div>
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <div class="no-orders">
+      <i class="fa-solid fa-inbox"></i>
+      <p>{{localize "Service.NoActiveOrders"}}</p>
+    </div>
+  {{/if}}
+</div>

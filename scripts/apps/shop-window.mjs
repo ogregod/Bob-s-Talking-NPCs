@@ -81,6 +81,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       sell: ShopWindow.#onSell,
       haggle: ShopWindow.#onHaggle,
       useService: ShopWindow.#onUseService,
+      viewOrders: ShopWindow.#onViewOrders,
       close: ShopWindow.#onCloseShop
     }
   };
@@ -214,6 +215,14 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     // Generate merchant greeting
     const merchantGreeting = this._getMerchantGreeting();
 
+    // Get active service orders for this player at this shop
+    const merchantHandler = getMerchantHandler();
+    const activeOrders = merchantHandler?.getPlayerServiceOrders(this.playerActorUuid) || [];
+    const shopOrders = activeOrders.filter(o => o.merchantId === (this._shopId || this.merchantId));
+    const hasActiveOrders = shopOrders.length > 0;
+    const activeOrderCount = shopOrders.length;
+    const readyOrderCount = shopOrders.filter(o => o.isReady).length;
+
     return {
       ...context,
       // Header data
@@ -229,6 +238,9 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       reputationDiscount: merchant?.reputationDiscount || null,
       hagglingEnabled: merchant?.haggling?.enabled ?? false,
       playerGold: Math.floor(playerGold),
+      hasActiveOrders,
+      activeOrderCount,
+      readyOrderCount,
 
       // Legacy merchant object for compatibility
       merchant: {
@@ -1246,6 +1258,21 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         default: "use"
       }).render(true);
     });
+  }
+
+  /**
+   * Handle viewing service orders
+   * Opens the service orders window for this shop
+   */
+  static async #onViewOrders(event, target) {
+    if (!this.playerActorUuid) {
+      ui.notifications.warn(localize("Service.NoPlayer"));
+      return;
+    }
+
+    // Open the service orders window
+    const merchantId = this._shopId || this.merchantId;
+    game.bobsnpc?.ui?.openServiceOrders(this.playerActorUuid, merchantId);
   }
 
   static async #onCloseShop(event, target) {

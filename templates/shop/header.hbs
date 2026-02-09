@@ -66,5 +66,11 @@
       <span class="gold-value">{{playerGold}}</span>
       <span class="gold-denomination">gp</span>
     </div>
+    {{#if hasActiveOrders}}
+      <button type="button" class="view-orders-btn" data-action="viewOrders" title="{{localize 'BOBSNPC.Service.ViewOrders'}}">
+        <i class="fa-solid fa-clipboard-list"></i>
+        <span class="order-count">{{activeOrderCount}}</span>
+      </button>
+    {{/if}}
   </div>
 </header>
