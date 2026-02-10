@@ -505,7 +505,7 @@
   }
 
   /* List-style inventory layout for items */
-  .inventory-grid {
+  .shop-window .inventory-grid {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -594,7 +594,7 @@
   .shop-item.rarity-legendary:hover { background: linear-gradient(90deg, rgba(255, 152, 0, 0.2) 0%, var(--bobsnpc-bg-hover) 30%); }
 
   /* ===== Item Image (List Style) ===== */
-  .item-image {
+  .shop-item .item-image {
     position: relative;
     width: 60px;
     height: 60px;
@@ -607,7 +607,7 @@
     overflow: hidden;
   }
 
-  .item-image img {
+  .shop-item .item-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -619,7 +619,7 @@
   }
 
   /* Stock indicator - positioned within the image for list view */
-  .item-stock {
+  .shop-item .item-stock {
     position: absolute;
     bottom: 2px;
     right: 2px;
@@ -632,7 +632,7 @@
   }
 
   /* ===== Item Badges ===== */
-  .item-badge {
+  .shop-item .item-badge {
     position: absolute;
     padding: 4px 8px;
     border-radius: var(--bobsnpc-border-radius-sm);
@@ -643,7 +643,7 @@
     z-index: 2;
   }
 
-  .item-badge.sale {
+  .shop-item .item-badge.sale {
     top: var(--bobsnpc-spacing-sm);
     left: var(--bobsnpc-spacing-sm);
     background: var(--bobsnpc-error);
@@ -657,14 +657,14 @@
     100% { transform: scale(1) rotate(0deg); }
   }
 
-  .item-badge.new {
+  .shop-item .item-badge.new {
     top: var(--bobsnpc-spacing-sm);
     right: var(--bobsnpc-spacing-sm);
     background: var(--bobsnpc-info);
     color: white;
   }
 
-  .item-badge.limited {
+  .shop-item .item-badge.limited {
     bottom: var(--bobsnpc-spacing-sm);
     left: var(--bobsnpc-spacing-sm);
     background: var(--bobsnpc-warning);
@@ -672,7 +672,7 @@
   }
 
   /* ===== Affordability Indicator (List Style - on image) ===== */
-  .affordability-indicator {
+  .shop-item .affordability-indicator {
     position: absolute;
     top: 2px;
     left: 2px;
@@ -686,17 +686,17 @@
     z-index: 3;
   }
 
-  .affordability-indicator.can-afford {
+  .shop-item .affordability-indicator.can-afford {
     background: var(--bobsnpc-success);
     color: white;
   }
 
-  .affordability-indicator.cannot-afford {
+  .shop-item .affordability-indicator.cannot-afford {
     background: var(--bobsnpc-error);
     color: white;
   }
 
-  .sold-out-overlay {
+  .shop-item .sold-out-overlay {
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.75);
@@ -712,12 +712,12 @@
     z-index: 5;
   }
 
-  .sold-out-overlay i {
+  .shop-item .sold-out-overlay i {
     font-size: 24px;
   }
 
   /* ===== Item Info (List Style) ===== */
-  .item-info {
+  .shop-item .item-info {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -725,7 +725,7 @@
     flex: 1;
   }
 
-  .item-name {
+  .shop-item .item-name {
     font-size: var(--bobsnpc-font-size-base);
     font-weight: var(--bobsnpc-font-weight-semibold);
     color: var(--bobsnpc-text-primary);
@@ -734,13 +734,13 @@
     text-overflow: ellipsis;
   }
 
-  .item-type {
+  .shop-item .item-type {
     font-size: var(--bobsnpc-font-size-xs);
     color: var(--bobsnpc-text-muted);
   }
 
   /* ===== Category Tags with Colors ===== */
-  .item-category-tag {
+  .shop-item .item-category-tag {
     display: inline-flex;
     align-items: center;
     gap: var(--bobsnpc-spacing-xs);
@@ -752,41 +752,41 @@
     width: fit-content;
   }
 
-  .item-category-tag.weapons {
+  .shop-item .item-category-tag.weapons {
     background: rgba(244, 67, 54, 0.15);
     color: #f44336;
   }
-  .item-category-tag.armor {
+  .shop-item .item-category-tag.armor {
     background: rgba(33, 150, 243, 0.15);
     color: #2196f3;
   }
-  .item-category-tag.potions {
+  .shop-item .item-category-tag.potions {
     background: rgba(156, 39, 176, 0.15);
     color: #9c27b0;
   }
-  .item-category-tag.scrolls {
+  .shop-item .item-category-tag.scrolls {
     background: rgba(255, 193, 7, 0.15);
     color: #ffc107;
   }
-  .item-category-tag.consumables {
+  .shop-item .item-category-tag.consumables {
     background: rgba(76, 175, 80, 0.15);
     color: #4caf50;
   }
-  .item-category-tag.gear {
+  .shop-item .item-category-tag.gear {
     background: rgba(121, 85, 72, 0.15);
     color: #795548;
   }
-  .item-category-tag.tools {
+  .shop-item .item-category-tag.tools {
     background: rgba(96, 125, 139, 0.15);
     color: #607d8b;
   }
-  .item-category-tag.misc {
+  .shop-item .item-category-tag.misc {
     background: rgba(158, 158, 158, 0.15);
     color: #9e9e9e;
   }
 
   /* ===== Item Price (List Style) ===== */
-  .item-price {
+  .shop-item .item-price {
     display: flex;
     align-items: center;
     gap: var(--bobsnpc-spacing-sm);
@@ -795,20 +795,20 @@
     border: none;
   }
 
-  .price-display {
+  .shop-item .price-display {
     display: flex;
     align-items: center;
     gap: var(--bobsnpc-spacing-xs);
   }
 
-  .original-price {
+  .shop-item .original-price {
     text-decoration: line-through;
     color: var(--bobsnpc-text-muted);
     font-size: var(--bobsnpc-font-size-sm);
     margin-right: var(--bobsnpc-spacing-xs);
   }
 
-  .current-price {
+  .shop-item .current-price {
     display: flex;
     align-items: center;
     gap: var(--bobsnpc-spacing-xs);
@@ -817,31 +817,31 @@
     color: var(--bobsnpc-text-primary);
   }
 
-  .current-price i {
+  .shop-item .current-price i {
     color: #ffd700;
   }
 
-  .current-price.discounted {
+  .shop-item .current-price.discounted {
     color: var(--bobsnpc-success);
   }
 
-  .current-price.cannot-afford {
+  .shop-item .current-price.cannot-afford {
     color: var(--bobsnpc-error);
   }
 
-  .sell-price .current-price {
+  .shop-item .sell-price .current-price {
     color: var(--bobsnpc-warning);
   }
 
   /* ===== Large Add to Cart Button ===== */
-  .item-actions {
+  .shop-item .item-actions {
     display: flex;
     justify-content: flex-end;
     gap: var(--bobsnpc-spacing-xs);
     padding: 0;
   }
 
-  .item-btn {
+  .shop-item .item-btn {
     padding: var(--bobsnpc-spacing-xs);
     background: var(--bobsnpc-bg-tertiary);
     border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
@@ -851,13 +851,13 @@
     transition: all var(--bobsnpc-transition-fast);
   }
 
-  .item-btn:hover {
+  .shop-item .item-btn:hover {
     background: var(--bobsnpc-bg-hover);
     color: var(--bobsnpc-text-primary);
   }
 
   /* Add-to-cart button (list style) */
-  .add-to-cart-btn {
+  .shop-item .add-to-cart-btn {
     width: 40px;
     height: 40px;
     display: flex;
@@ -873,30 +873,30 @@
     flex-shrink: 0;
   }
 
-  .add-to-cart-btn:hover:not(:disabled) {
+  .shop-item .add-to-cart-btn:hover:not(:disabled) {
     background: var(--bobsnpc-primary-light);
     transform: scale(1.05);
   }
 
-  .add-to-cart-btn:active:not(:disabled) {
+  .shop-item .add-to-cart-btn:active:not(:disabled) {
     transform: scale(0.95);
   }
 
-  .add-to-cart-btn:disabled {
+  .shop-item .add-to-cart-btn:disabled {
     background: var(--bobsnpc-bg-tertiary);
     color: var(--bobsnpc-text-muted);
     cursor: not-allowed;
     transform: none;
   }
 
-  .item-btn.add-btn:hover {
+  .shop-item .item-btn.add-btn:hover {
     background: var(--bobsnpc-success);
     border-color: var(--bobsnpc-success);
     color: white;
   }
 
   /* Rarity badge styling */
-  .item-rarity {
+  .shop-item .item-rarity {
     position: absolute;
     top: var(--bobsnpc-spacing-xs);
     left: var(--bobsnpc-spacing-xs);
@@ -909,13 +909,13 @@
     z-index: 2;
   }
 
-  .item-rarity.rarity-common { background: #9e9e9e; color: white; }
-  .item-rarity.rarity-uncommon { background: #4caf50; color: white; }
-  .item-rarity.rarity-rare { background: #2196f3; color: white; }
-  .item-rarity.rarity-veryrare { background: #9c27b0; color: white; }
-  .item-rarity.rarity-legendary { background: #ff9800; color: white; }
+  .shop-item .item-rarity.rarity-common { background: #9e9e9e; color: white; }
+  .shop-item .item-rarity.rarity-uncommon { background: #4caf50; color: white; }
+  .shop-item .item-rarity.rarity-rare { background: #2196f3; color: white; }
+  .shop-item .item-rarity.rarity-veryrare { background: #9c27b0; color: white; }
+  .shop-item .item-rarity.rarity-legendary { background: #ff9800; color: white; }
 
-  .not-accepted {
+  .shop-item .not-accepted {
     color: var(--bobsnpc-error);
     font-size: var(--bobsnpc-font-size-lg);
   }
@@ -1508,11 +1508,11 @@
     .shop-item.rarity-veryrare,
     .shop-item.rarity-rare,
     .shop-item.just-added,
-    .item-badge.sale,
-    .gold-amount-large .coin-icon,
-    .total-amount i,
-    .speech-bubble,
-    .item-image img {
+    .shop-item .item-badge.sale,
+    .shop-window .gold-amount-large .coin-icon,
+    .shop-window .total-amount i,
+    .shop-window .speech-bubble,
+    .shop-item .item-image img {
       animation: none !important;
       transition: none !important;
     }
@@ -1521,17 +1521,17 @@
       transform: none;
     }
 
-    .add-to-cart-btn:hover:not(:disabled) {
+    .shop-item .add-to-cart-btn:hover:not(:disabled) {
       transform: none;
     }
 
-    .checkout-btn:hover:not(:disabled) {
+    .shop-window .checkout-btn:hover:not(:disabled) {
       transform: none;
     }
   }
 
   /* Screen reader only text */
-  .sr-only {
+  .shop-window .sr-only {
     position: absolute;
     width: 1px;
     height: 1px;

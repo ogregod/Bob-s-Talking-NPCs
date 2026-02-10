@@ -142,7 +142,7 @@
     margin-top: var(--bobsnpc-spacing-sm);
   }
 
-  .item-list {
+  .dialogue-items .item-list {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -151,7 +151,7 @@
     gap: var(--bobsnpc-spacing-sm);
   }
 
-  .item-entry {
+  .dialogue-items .item-entry {
     display: flex;
     align-items: center;
     gap: var(--bobsnpc-spacing-xs);
@@ -160,7 +160,7 @@
     border-radius: var(--bobsnpc-border-radius-sm);
   }
 
-  .item-img {
+  .dialogue-items .item-img {
     width: 24px;
     height: 24px;
     border-radius: var(--bobsnpc-border-radius-sm);

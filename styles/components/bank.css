@@ -46,45 +46,45 @@
     color: var(--bobsnpc-text-secondary);
   }
 
-  .bank-summary {
+  .bank-window .bank-summary {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: var(--bobsnpc-spacing-xs);
   }
 
-  .summary-item {
+  .bank-window .summary-item {
     display: flex;
     align-items: center;
     gap: var(--bobsnpc-spacing-sm);
   }
 
-  .summary-label {
+  .bank-window .summary-label {
     font-size: var(--bobsnpc-font-size-sm);
     color: var(--bobsnpc-text-muted);
   }
 
-  .summary-value {
+  .bank-window .summary-value {
     font-size: var(--bobsnpc-font-size-lg);
     font-weight: var(--bobsnpc-font-weight-semibold);
   }
 
-  .summary-value.gold {
+  .bank-window .summary-value.gold {
     color: var(--bobsnpc-warning);
   }
 
-  .summary-item.debt .summary-value {
+  .bank-window .summary-item.debt .summary-value {
     color: var(--bobsnpc-error);
   }
 
-  .player-wallet {
+  .bank-window .player-wallet {
     padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
     background: var(--bobsnpc-bg-tertiary);
     border-radius: var(--bobsnpc-border-radius-sm);
     font-size: var(--bobsnpc-font-size-sm);
   }
 
-  .wallet-amount {
+  .bank-window .wallet-amount {
     font-weight: var(--bobsnpc-font-weight-semibold);
     color: var(--bobsnpc-warning);
   }
