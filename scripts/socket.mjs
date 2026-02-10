@@ -56,6 +56,8 @@ export const SocketEvents = Object.freeze({
   SERVICE_REQUEST: "serviceRequest",
   SERVICE_APPROVE: "serviceApprove",
   SERVICE_DENY: "serviceDeny",
+  SERVICE_PICKUP: "servicePickup",
+  SERVICE_PICKUP_RESULT: "servicePickupResult",
 
   // Bank events
   BANK_TRANSACTION: "bankTransaction",
@@ -261,6 +263,8 @@ function registerDefaultHandlers() {
   registerHandler(SocketEvents.SERVICE_REQUEST, handleServiceRequest);
   registerHandler(SocketEvents.SERVICE_APPROVE, handleServiceApprove);
   registerHandler(SocketEvents.SERVICE_DENY, handleServiceDeny);
+  registerHandler(SocketEvents.SERVICE_PICKUP, handleServicePickup);
+  registerHandler(SocketEvents.SERVICE_PICKUP_RESULT, handleServicePickupResult);
 }
 
 // ===== Dialogue Handlers =====
@@ -561,6 +565,101 @@ function handleServiceDeny(payload, userId) {
   }
 
   console.log(`${MODULE_ID} | Service request ${requestId} denied`);
+}
+
+/**
+ * Handle service pickup request from player
+ * GM processes the pickup and sends result back
+ */
+async function handleServicePickup(payload, userId) {
+  // Only GM should process pickup requests
+  if (!game.user.isGM) return;
+
+  const { orderId, playerActorUuid, playerId } = payload;
+
+  console.log(`${MODULE_ID} | Processing pickup request for order ${orderId} from player ${playerId}`);
+
+  const handler = game.bobsnpc?.handlers?.merchant;
+  if (!handler) {
+    emit(SocketEvents.SERVICE_PICKUP_RESULT, {
+      success: false,
+      message: "Handler not available",
+      playerId,
+      orderId
+    });
+    return;
+  }
+
+  try {
+    // Process the pickup on GM side (this will update settings)
+    const result = await handler._processPickupAsGM(orderId, playerActorUuid);
+
+    // Send result back to the player
+    emit(SocketEvents.SERVICE_PICKUP_RESULT, {
+      ...result,
+      playerId,
+      orderId
+    });
+  } catch (error) {
+    console.error(`${MODULE_ID} | Error processing pickup:`, error);
+    emit(SocketEvents.SERVICE_PICKUP_RESULT, {
+      success: false,
+      message: error.message,
+      playerId,
+      orderId
+    });
+  }
+}
+
+/**
+ * Handle pickup result sent back from GM
+ */
+function handleServicePickupResult(payload, userId) {
+  const { success, message, playerId, orderId } = payload;
+
+  // Only the requesting player should process this
+  if (game.user.id !== playerId) return;
+
+  // Store the result for the waiting promise
+  const pendingPickup = pendingPickups.get(orderId);
+  if (pendingPickup) {
+    pendingPickup.resolve({ success, message });
+    pendingPickups.delete(orderId);
+  }
+}
+
+/**
+ * Map to store pending pickup promises
+ */
+const pendingPickups = new Map();
+
+/**
+ * Request a pickup from the GM and wait for result
+ * @param {string} orderId
+ * @param {string} playerActorUuid
+ * @returns {Promise<object>}
+ */
+export function requestPickupFromGM(orderId, playerActorUuid) {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      pendingPickups.delete(orderId);
+      reject(new Error("Pickup request timed out"));
+    }, 30000); // 30 second timeout
+
+    pendingPickups.set(orderId, {
+      resolve: (result) => {
+        clearTimeout(timeout);
+        resolve(result);
+      }
+    });
+
+    // Send request to GM
+    emit(SocketEvents.SERVICE_PICKUP, {
+      orderId,
+      playerActorUuid,
+      playerId: game.user.id
+    }, { processLocal: false });
+  });
 }
 
 // ===== Utility Functions =====

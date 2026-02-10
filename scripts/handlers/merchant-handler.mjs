@@ -45,7 +45,7 @@ import {
   formatDuration
 } from "../data/service-request-model.mjs";
 import { FailConsequence } from "../data/enchantment-model.mjs";
-import { emit, emitToGM, SocketEvents } from "../socket.mjs";
+import { emit, emitToGM, SocketEvents, requestPickupFromGM } from "../socket.mjs";
 
 /**
  * Storage keys
@@ -1571,6 +1571,32 @@ export class MerchantHandler {
    * @returns {Promise<object>}
    */
   async pickupServiceOrder(orderId, playerActorUuid) {
+    // If not GM, route through socket so GM handles the settings update
+    if (!game.user.isGM) {
+      try {
+        const result = await requestPickupFromGM(orderId, playerActorUuid);
+        if (result.success) {
+          ui.notifications.info(result.message);
+        }
+        return result;
+      } catch (error) {
+        console.error(`${MODULE_ID} | Pickup request failed:`, error);
+        return { success: false, message: error.message };
+      }
+    }
+
+    // GM can process directly
+    return this._processPickupAsGM(orderId, playerActorUuid);
+  }
+
+  /**
+   * Process a pickup order as GM (handles settings update)
+   * Called directly by GM or via socket from player
+   * @param {string} orderId
+   * @param {string} playerActorUuid
+   * @returns {Promise<object>}
+   */
+  async _processPickupAsGM(orderId, playerActorUuid) {
     const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
     const orderIndex = activeOrders.findIndex(o => o.id === orderId);
 

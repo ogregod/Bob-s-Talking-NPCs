@@ -217,6 +217,30 @@ export class EnchantmentHandler {
   // ==================== PER-SHOP ENCHANTMENTS ====================
 
   /**
+   * Normalize availableEnchantments to array format
+   * Handles both array format (legacy) and object format (from form checkboxes)
+   * @param {Array|object} data - The availableEnchantments data
+   * @returns {string[]} Array of enchantment IDs
+   * @private
+   */
+  _normalizeEnchantmentIds(data) {
+    if (!data) return [];
+
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    if (typeof data === "object") {
+      // Convert object format to array of IDs where value is truthy
+      return Object.entries(data)
+        .filter(([, enabled]) => enabled)
+        .map(([id]) => id);
+    }
+
+    return [];
+  }
+
+  /**
    * Get enchantments available at a specific shop
    * @param {string} merchantId - Merchant/shop ID
    * @returns {object[]}
@@ -225,7 +249,7 @@ export class EnchantmentHandler {
     const merchant = game.bobsnpc?.handlers?.merchant?.getMerchant(merchantId);
     if (!merchant) return [];
 
-    const availableIds = merchant.services?.availableEnchantments || [];
+    const availableIds = this._normalizeEnchantmentIds(merchant.services?.availableEnchantments);
     const enchantments = [];
 
     for (const id of availableIds) {
@@ -291,7 +315,7 @@ export class EnchantmentHandler {
     const merchant = merchantHandler.getMerchant(merchantId);
     if (!merchant) return false;
 
-    const currentIds = merchant.services?.availableEnchantments || [];
+    const currentIds = this._normalizeEnchantmentIds(merchant.services?.availableEnchantments);
     if (currentIds.includes(enchantmentId)) return true; // Already added
 
     await merchantHandler.updateMerchant(merchantId, {
@@ -317,7 +341,7 @@ export class EnchantmentHandler {
     const merchant = merchantHandler.getMerchant(merchantId);
     if (!merchant) return false;
 
-    const currentIds = merchant.services?.availableEnchantments || [];
+    const currentIds = this._normalizeEnchantmentIds(merchant.services?.availableEnchantments);
     const updatedIds = currentIds.filter(id => id !== enchantmentId);
 
     await merchantHandler.updateMerchant(merchantId, {

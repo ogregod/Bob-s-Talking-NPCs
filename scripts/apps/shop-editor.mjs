@@ -453,7 +453,19 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!enchantmentHandler) return [];
 
     const allEnchantments = enchantmentHandler.getAllEnchantments();
-    const enabledIds = this._shop?.services?.availableEnchantments || [];
+    const availableData = this._shop?.services?.availableEnchantments;
+
+    // Handle both array and object formats for enabled enchantments
+    const isEnabled = (enchId) => {
+      if (!availableData) return false;
+      if (Array.isArray(availableData)) {
+        return availableData.includes(enchId);
+      }
+      if (typeof availableData === "object") {
+        return !!availableData[enchId];
+      }
+      return false;
+    };
 
     return allEnchantments.map(ench => ({
       id: ench.id,
@@ -464,7 +476,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       typeLabel: localize(`Enchantment.Types.${ench.type}`),
       rarity: ench.rarity,
       icon: ench.icon,
-      enabled: enabledIds.includes(ench.id)
+      enabled: isEnabled(ench.id)
     }));
   }
 
