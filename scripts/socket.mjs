@@ -522,7 +522,7 @@ function handleRequestSync(payload, userId) {
 
 // ===== Service Request Handlers =====
 
-function handleServiceRequest(payload, userId) {
+async function handleServiceRequest(payload, userId) {
   // Only GM should handle service requests
   if (!game.user.isGM) return;
 
@@ -531,7 +531,7 @@ function handleServiceRequest(payload, userId) {
   // Store the request
   const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
   pendingRequests.push(request);
-  game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
+  await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
 
   // Notify GM via hook (UI will handle display)
   Hooks.call(`${MODULE_ID}.serviceRequestReceived`, request);

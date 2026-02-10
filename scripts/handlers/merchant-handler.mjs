@@ -1084,10 +1084,15 @@ export class MerchantHandler {
       cost
     });
 
-    // Store the request
-    const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
-    pendingRequests.push(request);
-    await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
+    // Store the request - GM stores directly, players go through socket
+    if (game.user.isGM) {
+      const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
+      pendingRequests.push(request);
+      await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
+    } else {
+      // Send to GM via socket - GM will store the request
+      emitToGM(SocketEvents.SERVICE_REQUEST, { request });
+    }
 
     // ITEM ESCROW: Remove item from player inventory
     await item.delete();
@@ -1103,11 +1108,6 @@ export class MerchantHandler {
       cost,
       requestId: request.id
     });
-
-    // Notify via socket if not GM
-    if (!game.user.isGM) {
-      emitToGM(SocketEvents.SERVICE_REQUEST, { request });
-    }
 
     ui.notifications.info(localize("Service.ItemDroppedOff", { item: itemData.name }));
 
@@ -1247,10 +1247,15 @@ export class MerchantHandler {
       cost
     });
 
-    // Store the request
-    const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
-    pendingRequests.push(request);
-    await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
+    // Store the request - GM stores directly, players go through socket
+    if (game.user.isGM) {
+      const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
+      pendingRequests.push(request);
+      await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
+    } else {
+      // Send to GM via socket - GM will store the request
+      emitToGM(SocketEvents.SERVICE_REQUEST, { request });
+    }
 
     // ITEM ESCROW: Remove item from player inventory
     await item.delete();
@@ -1267,11 +1272,6 @@ export class MerchantHandler {
       cost,
       requestId: request.id
     });
-
-    // Notify via socket if not GM
-    if (!game.user.isGM) {
-      emitToGM(SocketEvents.SERVICE_REQUEST, { request });
-    }
 
     ui.notifications.info(localize("Service.ItemDroppedOff", { item: itemData.name }));
 
