@@ -877,21 +877,6 @@
       }
     },
 
-    "Service": {
-      "PendingApproval": "Your request has been sent to the GM for approval.",
-      "RequestApproved": "Your service request has been approved!",
-      "RequestDenied": "Your service request was denied.",
-      "OrderNotFound": "Service order not found.",
-      "NotYourOrder": "This order does not belong to you.",
-      "NotReady": "Your item is not ready yet. Time remaining: {time}",
-      "PickedUp": "You picked up your {item}!",
-      "YourOrders": "Your Service Orders",
-      "NoOrders": "You have no pending orders.",
-      "PickUp": "Pick Up",
-      "InProgress": "In Progress",
-      "Ready": "Ready for Pickup"
-    },
-
     "GM": {
       "ServiceRequest": "Service Request",
       "ServiceManagement": "Service Management",
@@ -927,6 +912,11 @@
     },
 
     "Service": {
+      "Title": "Services",
+      "PendingApproval": "Your request has been sent to the GM for approval.",
+      "RequestApproved": "Your service request has been approved!",
+      "RequestDenied": "Your service request was denied.",
+      "NoOrders": "You have no pending orders.",
       "YourOrders": "Your Service Orders",
       "ViewOrders": "View Orders",
       "OrderNotFound": "Order not found",
@@ -946,12 +936,26 @@
       "Pending": "Pending",
       "Refresh": "Refresh",
       "PickUp": "Pick Up",
-      "NotReady": "Not Ready",
       "PickingUp": "Picking up...",
       "OrdersRefreshed": "Orders refreshed",
       "ReadyNow": "Ready now!",
       "NoPlayer": "No player actor selected",
       "QueuePosition": "Queue position: #{position}",
+      "Repair": "Repair",
+      "Training": "Training",
+      "Enchanting": "Enchanting",
+      "Transportation": "Transportation",
+      "Information": "Information",
+      "Inn": "Inn & Lodging",
+      "RepairAll": "Repair All",
+      "TimeRequired": "Time Required",
+      "Skill": "Skill",
+      "Tool": "Tool",
+      "Language": "Language",
+      "Destination": "Destination",
+      "TravelTime": "Travel Time",
+      "Rumor": "Rumor",
+      "Room": "Room",
       "Status": {
         "Ready": "Ready for Pickup",
         "InProgress": "In Progress"
@@ -959,6 +963,21 @@
       "Type": {
         "Repair": "Repair",
         "Enchant": "Enchantment"
+      },
+      "RoomQuality": {
+        "Poor": "Poor",
+        "Modest": "Modest",
+        "Comfortable": "Comfortable",
+        "Wealthy": "Wealthy",
+        "Luxurious": "Luxurious"
+      },
+      "Messages": {
+        "Repaired": "Items repaired",
+        "TrainingComplete": "Training complete! Learned {skill}",
+        "EnchantmentComplete": "Enchantment complete!",
+        "Traveled": "Traveled to {destination}",
+        "RumorPurchased": "Rumor acquired",
+        "RoomRented": "Room rented for {duration}"
       },
       "Approval": {
         "Title": "Service Request Approval",
@@ -1758,40 +1777,6 @@
         "Completed": "Trade completed with {player}",
         "Cancelled": "Trade cancelled",
         "Declined": "{player} declined the trade"
-      }
-    },
-
-    "Service": {
-      "Title": "Services",
-      "Repair": "Repair",
-      "Training": "Training",
-      "Enchanting": "Enchanting",
-      "Transportation": "Transportation",
-      "Information": "Information",
-      "Inn": "Inn & Lodging",
-      "RepairAll": "Repair All",
-      "TimeRequired": "Time Required",
-      "Skill": "Skill",
-      "Tool": "Tool",
-      "Language": "Language",
-      "Destination": "Destination",
-      "TravelTime": "Travel Time",
-      "Rumor": "Rumor",
-      "Room": "Room",
-      "RoomQuality": {
-        "Poor": "Poor",
-        "Modest": "Modest",
-        "Comfortable": "Comfortable",
-        "Wealthy": "Wealthy",
-        "Luxurious": "Luxurious"
-      },
-      "Messages": {
-        "Repaired": "Items repaired",
-        "TrainingComplete": "Training complete! Learned {skill}",
-        "EnchantmentComplete": "Enchantment complete!",
-        "Traveled": "Traveled to {destination}",
-        "RumorPurchased": "Rumor acquired",
-        "RoomRented": "Room rented for {duration}"
       }
     },
 
