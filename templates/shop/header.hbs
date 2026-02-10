@@ -73,4 +73,14 @@
       </button>
     {{/if}}
   </div>
+
+  {{!-- GM Service Management Button --}}
+  {{#if isGM}}
+    <div class="gm-actions">
+      <button type="button" class="gm-services-btn" data-action="openServiceManagement" title="{{localize 'BOBSNPC.GM.ServiceManagement'}}">
+        <i class="fa-solid fa-clipboard-check"></i>
+        <span>{{localize "BOBSNPC.GM.ManageServices"}}</span>
+      </button>
+    </div>
+  {{/if}}
 </header>

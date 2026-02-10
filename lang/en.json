@@ -895,6 +895,7 @@
     "GM": {
       "ServiceRequest": "Service Request",
       "ServiceManagement": "Service Management",
+      "ManageServices": "Manage Services",
       "ApproveRequest": "Approve",
       "DenyRequest": "Deny",
       "RequestFrom": "Request from {player}",

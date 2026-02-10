@@ -2065,4 +2065,42 @@
     margin-top: 8px;
   }
 
+  /* ===== GM Actions in Shop Header ===== */
+  .shop-header-enhanced {
+    position: relative;
+  }
+
+  .shop-header-enhanced .gm-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+  }
+
+  .shop-header-enhanced .gm-services-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #7c4dff 0%, #5e35b1 100%);
+    border: 1px solid rgba(124, 77, 255, 0.5);
+    border-radius: 6px;
+    color: white;
+    font-size: 0.85em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .shop-header-enhanced .gm-services-btn:hover {
+    background: linear-gradient(135deg, #9575cd 0%, #7c4dff 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(124, 77, 255, 0.4);
+  }
+
+  .shop-header-enhanced .gm-services-btn i {
+    font-size: 0.9em;
+  }
+
 } /* End @layer bobsnpc */

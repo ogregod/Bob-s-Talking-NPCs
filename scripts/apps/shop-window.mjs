@@ -82,6 +82,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       haggle: ShopWindow.#onHaggle,
       useService: ShopWindow.#onUseService,
       viewOrders: ShopWindow.#onViewOrders,
+      openServiceManagement: ShopWindow.#onOpenServiceManagement,
       close: ShopWindow.#onCloseShop
     }
   };
@@ -1273,6 +1274,18 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     // Open the service orders window
     const merchantId = this._shopId || this.merchantId;
     game.bobsnpc?.ui?.openServiceOrders(this.playerActorUuid, merchantId);
+  }
+
+  /**
+   * Handle opening service management (GM only)
+   * Opens the service approval/management dialog
+   */
+  static async #onOpenServiceManagement(event, target) {
+    if (!game.user.isGM) return;
+
+    // Dynamically import to avoid circular dependency
+    const { ServiceApprovalDialog } = await import("./service-approval-dialog.mjs");
+    ServiceApprovalDialog.open();
   }
 
   static async #onCloseShop(event, target) {

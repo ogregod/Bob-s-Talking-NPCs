@@ -163,6 +163,12 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
         game.bobsnpc?.ui?.openEnchantmentManager();
         break;
 
+      case "services":
+      case "orders":
+      case "queue":
+        ServiceApprovalDialog.open();
+        break;
+
       case "npc": {
         // Configure selected token's NPC
         const selectedToken = canvas.tokens?.controlled?.[0];
@@ -189,6 +195,7 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
               <tr><td><code>/bobsnpc npc</code></td><td>Configure selected NPC</td></tr>
               ${game.user.isGM ? '<tr><td><code>/bobsnpc shops</code></td><td>Open Shop Manager</td></tr>' : ''}
               ${game.user.isGM ? '<tr><td><code>/bobsnpc enchantments</code></td><td>Open Enchantment Manager</td></tr>' : ''}
+              ${game.user.isGM ? '<tr><td><code>/bobsnpc services</code></td><td>Manage Service Orders</td></tr>' : ''}
               ${game.user.isGM ? '<tr><td><code>/bobsnpc dashboard</code></td><td>Open GM Dashboard</td></tr>' : ''}
             </table>
             <p style="margin: 10px 0 0 0; color: #a0a0a0; font-size: 0.8em;">
@@ -232,14 +239,26 @@ Hooks.on("renderChatMessage", (message, html) => {
 
       const handler = game.bobsnpc?.handlers?.merchant;
       if (handler) {
-        await handler.processServiceRequest(requestId, true);
-        ui.notifications.info("Service request approved");
-        // Update the message to show it's been processed
-        const newContent = message.content.replace(
-          /<div class="service-actions">[\s\S]*?<\/div>/,
-          '<div class="service-actions processed"><i class="fa-solid fa-check"></i> Approved</div>'
-        );
-        await message.update({ content: newContent });
+        // Use the approval dialog so GM can set custom time
+        const result = await handler.showServiceApprovalDialog(requestId);
+
+        if (result?.success) {
+          ui.notifications.info(result.message);
+          // Update the message to show it's been processed
+          const newContent = message.content.replace(
+            /<div class="service-actions">[\s\S]*?<\/div>/,
+            '<div class="service-actions processed"><i class="fa-solid fa-check"></i> Approved</div>'
+          );
+          await message.update({ content: newContent });
+        } else if (result?.message === "denied") {
+          // User chose to deny from the dialog
+          const newContent = message.content.replace(
+            /<div class="service-actions">[\s\S]*?<\/div>/,
+            '<div class="service-actions processed"><i class="fa-solid fa-times"></i> Denied</div>'
+          );
+          await message.update({ content: newContent });
+        }
+        // If dialog was closed without action, don't update the message
       }
     });
   }
