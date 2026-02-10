@@ -62,7 +62,8 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     },
     position: {
       width: 800,
-      height: 650
+      height: 650,
+      top: 50
     },
     actions: {
       setTab: ShopWindow.#onSetTab,

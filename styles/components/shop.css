@@ -3,11 +3,12 @@
  */
 
 /* ===== Shop Window Layout (outside @layer for higher specificity) ===== */
-/* Force the application to use full height */
+/* Force the application to use full height but constrain to viewport */
 .shop-window.application {
   display: flex !important;
   flex-direction: column !important;
   height: 100% !important;
+  max-height: calc(100vh - 60px) !important;
 }
 
 /* Window content must fill available space and use grid */
