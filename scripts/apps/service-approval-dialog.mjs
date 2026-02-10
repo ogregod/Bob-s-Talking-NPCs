@@ -7,7 +7,12 @@
 const MODULE_ID = "bobs-talking-npcs";
 
 import { localize, formatCurrency } from "../utils/helpers.mjs";
-import { formatDuration } from "../data/service-request-model.mjs";
+import {
+  formatDuration,
+  GameTimeUnits,
+  getCurrentGameTime,
+  toGameTimeSeconds
+} from "../data/service-request-model.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -108,20 +113,23 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
 
     // Active orders (all orders from all players)
     const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
+    const currentGameTime = getCurrentGameTime();
+
     const preparedActiveOrders = activeOrders.map(order => {
       const serviceIcon = order.type === "repair" ? "fa-wrench" : "fa-wand-magic-sparkles";
       const serviceLabel = order.type === "repair"
         ? localize("Shop.Service.Repair")
         : localize("Shop.Service.Enchant");
 
-      const now = Date.now();
-      const isReady = order.readyAt <= now;
-      const timeRemaining = isReady ? 0 : order.readyAt - now;
+      // Use game time for checking readiness
+      const readyAtGameTime = order.readyAtGameTime ?? 0;
+      const isReady = currentGameTime >= readyAtGameTime;
+      const timeRemaining = isReady ? 0 : readyAtGameTime - currentGameTime;
       const timeRemainingStr = isReady ? localize("Service.ReadyNow") : formatDuration(timeRemaining);
 
-      // Calculate time until ready as a date
-      const readyDate = new Date(order.readyAt);
-      const readyDateStr = readyDate.toLocaleString();
+      // Show game time remaining in days/hours format
+      const remainingDays = Math.floor(timeRemaining / GameTimeUnits.DAY);
+      const remainingHours = Math.floor((timeRemaining % GameTimeUnits.DAY) / GameTimeUnits.HOUR);
 
       return {
         ...order,
@@ -131,7 +139,8 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
         isReady,
         timeRemaining,
         timeRemainingStr,
-        readyDateStr,
+        remainingDays,
+        remainingHours,
         statusClass: isReady ? "ready" : "in-progress"
       };
     });
@@ -273,7 +282,7 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
     const orderId = target.dataset.orderId;
     if (!orderId) return;
 
-    // Update the order to be ready now
+    // Update the order to be ready now (using current game time)
     const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
     const orderIndex = activeOrders.findIndex(o => o.id === orderId);
 
@@ -282,7 +291,8 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
       return;
     }
 
-    activeOrders[orderIndex].readyAt = Date.now();
+    // Set ready time to current game time (making it immediately ready)
+    activeOrders[orderIndex].readyAtGameTime = getCurrentGameTime();
     await game.settings.set(MODULE_ID, "activeServiceOrders", activeOrders);
 
     ui.notifications.info(localize("GM.OrderMarkedReady"));
@@ -301,23 +311,28 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
       return;
     }
 
-    // Calculate current remaining time in hours
-    const now = Date.now();
-    const remainingMs = Math.max(0, order.readyAt - now);
-    const remainingHours = (remainingMs / (60 * 60 * 1000)).toFixed(1);
+    // Calculate current remaining time in game time
+    const currentGameTime = getCurrentGameTime();
+    const readyAtGameTime = order.readyAtGameTime ?? 0;
+    const remainingSeconds = Math.max(0, readyAtGameTime - currentGameTime);
+    const remainingDays = Math.floor(remainingSeconds / GameTimeUnits.DAY);
+    const remainingHours = Math.floor((remainingSeconds % GameTimeUnits.DAY) / GameTimeUnits.HOUR);
+    const remainingStr = formatDuration(remainingSeconds);
 
     const content = `
       <form class="bobsnpc-adjust-time-dialog">
         <p><strong>${localize("GM.AdjustTime.Item")}:</strong> ${order.itemName}</p>
-        <p><strong>${localize("GM.AdjustTime.CurrentTime")}:</strong> ${remainingHours} ${localize("Service.Approval.Hours")}</p>
+        <p><strong>${localize("GM.AdjustTime.CurrentTime")}:</strong> ${remainingStr}</p>
         <hr>
         <div class="form-group">
-          <label for="new-time">${localize("GM.AdjustTime.NewTime")}</label>
-          <div class="form-fields">
-            <input type="number" name="newTime" value="${remainingHours}" min="0" step="0.5" style="width: 80px;">
+          <label>${localize("GM.AdjustTime.NewGameTime")}</label>
+          <div class="form-fields" style="display: flex; gap: 10px; align-items: center;">
+            <input type="number" name="newDays" value="${remainingDays}" min="0" step="1" style="width: 60px;">
+            <span>${localize("Service.Approval.Days")}</span>
+            <input type="number" name="newHours" value="${remainingHours}" min="0" max="23" step="1" style="width: 60px;">
             <span>${localize("Service.Approval.Hours")}</span>
           </div>
-          <p class="hint">${localize("GM.AdjustTime.Hint")}</p>
+          <p class="hint">${localize("GM.AdjustTime.GameTimeHint")}</p>
         </div>
       </form>
     `;
@@ -331,13 +346,16 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
           icon: '<i class="fas fa-save"></i>',
           label: localize("Save"),
           callback: async (html) => {
-            const newHours = parseFloat(html.find('[name="newTime"]').val()) || 0;
-            const newReadyAt = Date.now() + (newHours * 60 * 60 * 1000);
+            const newDays = parseInt(html.find('[name="newDays"]').val()) || 0;
+            const newHours = parseInt(html.find('[name="newHours"]').val()) || 0;
+            const newDurationSeconds = toGameTimeSeconds(newDays, newHours);
+            const newReadyAtGameTime = getCurrentGameTime() + newDurationSeconds;
 
             const orders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
             const idx = orders.findIndex(o => o.id === orderId);
             if (idx !== -1) {
-              orders[idx].readyAt = newReadyAt;
+              orders[idx].readyAtGameTime = newReadyAtGameTime;
+              orders[idx].workDuration = newDurationSeconds;
               await game.settings.set(MODULE_ID, "activeServiceOrders", orders);
               ui.notifications.info(localize("GM.AdjustTime.Updated"));
               self.render();
@@ -352,7 +370,7 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
       default: "save"
     }, {
       classes: ["bobsnpc", "adjust-time-dialog"],
-      width: 350
+      width: 400
     }).render(true);
   }
 

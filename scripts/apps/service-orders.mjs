@@ -112,11 +112,14 @@ export class ServiceOrdersWindow extends HandlebarsApplicationMixin(ApplicationV
       };
     });
 
-    // Sort: ready first, then by ready time
+    // Sort: ready first, then by ready time (using game time)
     preparedOrders.sort((a, b) => {
       if (a.isReady && !b.isReady) return -1;
       if (!a.isReady && b.isReady) return 1;
-      return (a.readyAt || 0) - (b.readyAt || 0);
+      // Sort by game time ready, falling back to legacy readyAt
+      const aReady = a.readyAtGameTime ?? a.readyAt ?? 0;
+      const bReady = b.readyAtGameTime ?? b.readyAt ?? 0;
+      return aReady - bReady;
     });
 
     context.orders = preparedOrders;

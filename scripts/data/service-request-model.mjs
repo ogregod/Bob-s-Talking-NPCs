@@ -1,9 +1,20 @@
 /**
  * Bob's Talking NPCs - Service Request Model
  * Data structure for GM-approved service requests (repair, enchant)
+ * Uses in-game time for service durations
  */
 
 import { generateId } from "../utils/helpers.mjs";
+
+/**
+ * Time constants for game time calculations (in seconds)
+ */
+export const GameTimeUnits = Object.freeze({
+  MINUTE: 60,
+  HOUR: 60 * 60,
+  DAY: 24 * 60 * 60,
+  WEEK: 7 * 24 * 60 * 60
+});
 
 /**
  * Service request status enum
@@ -74,8 +85,10 @@ export function createServiceRequest(data) {
     // Drop-off / Pick-up tracking
     itemDroppedOff: data.itemDroppedOff || false,
     droppedOffAt: data.droppedOffAt || null,
-    workDuration: data.workDuration || null,
-    readyAt: data.readyAt || null,
+    workDuration: data.workDuration || null,           // Duration in game time seconds
+    readyAt: data.readyAt || null,                     // Legacy: real time timestamp (deprecated)
+    readyAtGameTime: data.readyAtGameTime || null,     // Game time in seconds when ready
+    startedAtGameTime: data.startedAtGameTime || null, // Game time in seconds when work started
     pickedUpAt: data.pickedUpAt || null,
 
     // Fail tracking (for enchantments)
@@ -111,43 +124,115 @@ export function isRequestPending(request) {
 
 /**
  * Check if a service request is ready for pickup
+ * Uses in-game time (game.time.worldTime)
  * @param {object} request - Service request
  * @returns {boolean}
  */
 export function isRequestReady(request) {
   if (request.status === ServiceRequestStatus.READY) return true;
-  if (request.status === ServiceRequestStatus.APPROVED && request.readyAt) {
-    return Date.now() >= request.readyAt;
+  if (request.status === ServiceRequestStatus.APPROVED) {
+    // Prefer game time if available
+    if (request.readyAtGameTime !== null && request.readyAtGameTime !== undefined) {
+      const currentGameTime = game?.time?.worldTime ?? 0;
+      return currentGameTime >= request.readyAtGameTime;
+    }
+    // Fallback to real time for legacy requests
+    if (request.readyAt) {
+      return Date.now() >= request.readyAt;
+    }
   }
   return false;
 }
 
 /**
- * Get time remaining until item is ready (in milliseconds)
+ * Get time remaining until item is ready (in game time seconds)
  * @param {object} request - Service request
- * @returns {number|null} Milliseconds remaining, or null if ready or not applicable
+ * @returns {number|null} Seconds remaining in game time, or null if ready or not applicable
  */
 export function getTimeUntilReady(request) {
-  if (!request.readyAt || request.status !== ServiceRequestStatus.APPROVED) return null;
-  const remaining = request.readyAt - Date.now();
-  return remaining > 0 ? remaining : 0;
+  if (request.status !== ServiceRequestStatus.APPROVED) return null;
+
+  // Prefer game time if available
+  if (request.readyAtGameTime !== null && request.readyAtGameTime !== undefined) {
+    const currentGameTime = game?.time?.worldTime ?? 0;
+    const remaining = request.readyAtGameTime - currentGameTime;
+    return remaining > 0 ? remaining : 0;
+  }
+
+  // Fallback to real time for legacy requests (convert ms to seconds for consistency)
+  if (request.readyAt) {
+    const remaining = request.readyAt - Date.now();
+    return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
+  }
+
+  return null;
 }
 
 /**
- * Format time duration for display
- * @param {number} ms - Duration in milliseconds
+ * Format game time duration for display
+ * @param {number} seconds - Duration in game time seconds
  * @returns {string}
  */
-export function formatDuration(ms) {
-  if (!ms || ms <= 0) return "Ready now";
+export function formatDuration(seconds) {
+  if (!seconds || seconds <= 0) return "Ready now";
 
-  const hours = Math.floor(ms / (1000 * 60 * 60));
-  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+  const days = Math.floor(seconds / GameTimeUnits.DAY);
+  const hours = Math.floor((seconds % GameTimeUnits.DAY) / GameTimeUnits.HOUR);
+  const minutes = Math.floor((seconds % GameTimeUnits.HOUR) / GameTimeUnits.MINUTE);
 
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-  return `${minutes}m`;
+  const parts = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0 && days === 0) parts.push(`${minutes}m`); // Only show minutes if less than a day
+
+  return parts.length > 0 ? parts.join(" ") : "< 1m";
+}
+
+/**
+ * Format game time duration in a verbose way
+ * @param {number} seconds - Duration in game time seconds
+ * @returns {string}
+ */
+export function formatDurationVerbose(seconds) {
+  if (!seconds || seconds <= 0) return "Ready now";
+
+  const days = Math.floor(seconds / GameTimeUnits.DAY);
+  const hours = Math.floor((seconds % GameTimeUnits.DAY) / GameTimeUnits.HOUR);
+  const minutes = Math.floor((seconds % GameTimeUnits.HOUR) / GameTimeUnits.MINUTE);
+
+  const parts = [];
+  if (days > 0) parts.push(`${days} day${days !== 1 ? "s" : ""}`);
+  if (hours > 0) parts.push(`${hours} hour${hours !== 1 ? "s" : ""}`);
+  if (minutes > 0 && days === 0) parts.push(`${minutes} minute${minutes !== 1 ? "s" : ""}`);
+
+  return parts.length > 0 ? parts.join(", ") : "Less than a minute";
+}
+
+/**
+ * Convert days/hours to game time seconds
+ * @param {number} days - Number of days
+ * @param {number} hours - Number of hours
+ * @returns {number} Total duration in game time seconds
+ */
+export function toGameTimeSeconds(days = 0, hours = 0) {
+  return (days * GameTimeUnits.DAY) + (hours * GameTimeUnits.HOUR);
+}
+
+/**
+ * Get the current game time
+ * @returns {number} Current world time in seconds
+ */
+export function getCurrentGameTime() {
+  return game?.time?.worldTime ?? 0;
+}
+
+/**
+ * Calculate ready time from current game time plus duration
+ * @param {number} durationSeconds - Duration in game time seconds
+ * @returns {number} Game time when item will be ready
+ */
+export function calculateReadyGameTime(durationSeconds) {
+  return getCurrentGameTime() + durationSeconds;
 }
 
 /**

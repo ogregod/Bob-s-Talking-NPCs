@@ -108,12 +108,12 @@
         "Hint": "Enable time-based NPC availability"
       },
       "RepairDuration": {
-        "Name": "Repair Service Duration (hours)",
-        "Hint": "How long repair services take. Set to 0 for instant completion."
+        "Name": "Repair Service Duration (days)",
+        "Hint": "Default in-game days for repair services. Set to 0 for instant completion. GMs can adjust per request."
       },
       "EnchantDuration": {
-        "Name": "Enchantment Service Duration (hours)",
-        "Hint": "How long enchantment services take. Set to 0 for instant completion."
+        "Name": "Enchantment Service Duration (days)",
+        "Hint": "Default in-game days for enchantment services. Set to 0 for instant completion. GMs can adjust per request."
       },
       "QuestTracker": {
         "Name": "Quest Tracker",
@@ -914,7 +914,9 @@
         "Item": "Item",
         "CurrentTime": "Current time remaining",
         "NewTime": "New time remaining",
+        "NewGameTime": "New time remaining (in-game)",
         "Hint": "Set to 0 to make the order ready immediately.",
+        "GameTimeHint": "Time is measured in in-game days and hours. Advance the world clock to complete orders.",
         "Updated": "Order time updated"
       },
       "CancelOrder": {
@@ -964,8 +966,11 @@
         "Merchant": "Merchant",
         "Cost": "Cost",
         "Duration": "Completion Time",
+        "GameTimeDuration": "In-Game Time Required",
+        "Days": "days",
         "Hours": "hours",
         "DurationHint": "Set to 0 for instant completion. The player can pick up the item after this time.",
+        "GameTimeHint": "Time is measured in in-game days/hours. Advance the world clock to complete orders.",
         "DenyReason": "Denial Reason (optional)",
         "DenyReasonPlaceholder": "Why is this request being denied?",
         "Approve": "Approve",

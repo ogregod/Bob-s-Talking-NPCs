@@ -42,7 +42,11 @@ import {
   isRequestPending,
   isRequestReady,
   getTimeUntilReady,
-  formatDuration
+  formatDuration,
+  GameTimeUnits,
+  getCurrentGameTime,
+  calculateReadyGameTime,
+  toGameTimeSeconds
 } from "../data/service-request-model.mjs";
 import { FailConsequence } from "../data/enchantment-model.mjs";
 import { emit, emitToGM, SocketEvents, requestPickupFromGM } from "../socket.mjs";
@@ -1291,7 +1295,8 @@ export class MerchantHandler {
    * @param {boolean} approved - Whether the request is approved
    * @param {string} [reason] - Reason for denial
    * @param {object} [options] - Additional options
-   * @param {number} [options.customDurationHours] - Custom duration in hours (overrides default)
+   * @param {number} [options.durationDays] - Duration in game days
+   * @param {number} [options.durationHours] - Duration in game hours
    * @returns {Promise<object>}
    */
   async processServiceRequest(requestId, approved, reason = null, options = {}) {
@@ -1350,19 +1355,22 @@ export class MerchantHandler {
     // Deduct gold from player
     await this._deductGold(actor, request.cost);
 
-    // Calculate when the item will be ready
-    // Use custom duration if provided, otherwise use settings
-    let durationHours;
-    if (options.customDurationHours !== undefined) {
-      durationHours = options.customDurationHours;
-    } else {
-      durationHours = request.type === ApprovalRequiredServices.REPAIR
+    // Calculate when the item will be ready (using in-game time)
+    // Use custom duration if provided, otherwise use settings (default in days)
+    let durationDays = options.durationDays ?? 0;
+    let durationHours = options.durationHours ?? 0;
+
+    // If no custom duration provided, use settings (default is in days for game time)
+    if (durationDays === 0 && durationHours === 0) {
+      durationDays = request.type === ApprovalRequiredServices.REPAIR
         ? game.settings.get(MODULE_ID, "repairDuration")
         : game.settings.get(MODULE_ID, "enchantDuration");
     }
 
-    const workDurationMs = durationHours * 60 * 60 * 1000;
-    const readyAt = Date.now() + workDurationMs;
+    // Convert to game time seconds
+    const workDurationSeconds = toGameTimeSeconds(durationDays, durationHours);
+    const currentGameTime = getCurrentGameTime();
+    const readyAtGameTime = calculateReadyGameTime(workDurationSeconds);
 
     // Create an active service order (item is being worked on)
     const serviceOrder = {
@@ -1370,8 +1378,10 @@ export class MerchantHandler {
       status: ServiceRequestStatus.APPROVED,
       processedAt: Date.now(),
       processedBy: game.user.id,
-      workDuration: workDurationMs,
-      readyAt: readyAt
+      workDuration: workDurationSeconds,           // Duration in game time seconds
+      startedAtGameTime: currentGameTime,          // Game time when work started
+      readyAtGameTime: readyAtGameTime,            // Game time when ready
+      readyAt: null                                // Deprecated: real time no longer used
     };
 
     // Add to active orders
@@ -1379,13 +1389,13 @@ export class MerchantHandler {
     activeOrders.push(serviceOrder);
     await game.settings.set(MODULE_ID, "activeServiceOrders", activeOrders);
 
-    // Notify player of approval with pickup time
-    const readyTimeStr = durationHours > 0 ? formatDuration(workDurationMs) : "Ready now";
+    // Notify player of approval with pickup time (in game time)
+    const readyTimeStr = workDurationSeconds > 0 ? formatDuration(workDurationSeconds) : "Ready now";
 
     emit(SocketEvents.SERVICE_APPROVE, {
       requestId,
       playerId: request.playerId,
-      readyAt,
+      readyAtGameTime,
       readyTimeStr
     });
 
@@ -1422,8 +1432,8 @@ export class MerchantHandler {
       return { success: false, message: "Request not found" };
     }
 
-    // Get default duration based on type
-    const defaultDuration = request.type === ApprovalRequiredServices.REPAIR
+    // Get default duration based on type (in days for game time)
+    const defaultDurationDays = request.type === ApprovalRequiredServices.REPAIR
       ? game.settings.get(MODULE_ID, "repairDuration")
       : game.settings.get(MODULE_ID, "enchantDuration");
 
@@ -1450,13 +1460,16 @@ export class MerchantHandler {
         </div>
         <hr>
         <div class="form-group">
-          <label for="duration-hours">${localize("Service.Approval.Duration")}</label>
-          <div class="form-fields">
+          <label>${localize("Service.Approval.GameTimeDuration")}</label>
+          <div class="form-fields" style="display: flex; gap: 10px; align-items: center;">
+            <input type="number" id="duration-days" name="durationDays"
+                   value="${defaultDurationDays}" min="0" step="1" style="width: 60px;">
+            <span>${localize("Service.Approval.Days")}</span>
             <input type="number" id="duration-hours" name="durationHours"
-                   value="${defaultDuration}" min="0" step="0.5" style="width: 80px;">
+                   value="0" min="0" max="23" step="1" style="width: 60px;">
             <span>${localize("Service.Approval.Hours")}</span>
           </div>
-          <p class="hint">${localize("Service.Approval.DurationHint")}</p>
+          <p class="hint">${localize("Service.Approval.GameTimeHint")}</p>
         </div>
         <div class="form-group">
           <label for="deny-reason">${localize("Service.Approval.DenyReason")}</label>
@@ -1474,8 +1487,9 @@ export class MerchantHandler {
             icon: '<i class="fas fa-check"></i>',
             label: localize("Service.Approval.Approve"),
             callback: async (html) => {
-              const durationHours = parseFloat(html.find('[name="durationHours"]').val()) || 0;
-              const result = await this.processServiceRequest(requestId, true, null, { customDurationHours: durationHours });
+              const durationDays = parseInt(html.find('[name="durationDays"]').val()) || 0;
+              const durationHours = parseInt(html.find('[name="durationHours"]').val()) || 0;
+              const result = await this.processServiceRequest(requestId, true, null, { durationDays, durationHours });
               resolve(result);
             }
           },
