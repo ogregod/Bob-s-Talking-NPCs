@@ -2824,48 +2824,52 @@
     },
 
     "NPCRole": {
-      "Merchant": {
-        "Description": "This NPC can buy and sell items to players"
-      },
-      "QuestGiver": {
-        "Description": "This NPC can offer quests to players"
-      },
-      "QuestTurnIn": {
-        "Description": "This NPC can accept completed quests"
-      },
-      "Banker": {
-        "Description": "This NPC provides banking services"
-      },
-      "StableMaster": {
-        "Description": "This NPC manages mount storage and sales"
-      },
-      "Innkeeper": {
-        "Description": "This NPC provides lodging and meals"
-      },
-      "Trainer": {
-        "Description": "This NPC can train skills or abilities"
-      },
-      "Enchanter": {
-        "Description": "This NPC provides enchanting services"
-      },
-      "Transporter": {
-        "Description": "This NPC offers fast travel services"
-      },
-      "Informant": {
-        "Description": "This NPC provides rumors and information"
-      },
-      "HirelingRecruiter": {
-        "Description": "This NPC recruits hirelings for the party"
-      },
-      "Fence": {
-        "Description": "This NPC buys stolen goods"
-      },
-      "FactionRepresentative": {
-        "Description": "This NPC represents a faction"
-      },
-      "Guard": {
-        "Description": "This NPC patrols and enforces the law"
-      }
+      "questGiver": "Quest Giver",
+      "questTurnIn": "Quest Turn-In",
+      "merchant": "Merchant",
+      "banker": "Banker",
+      "stableMaster": "Stable Master",
+      "innkeeper": "Innkeeper",
+      "trainer": "Trainer",
+      "enchanter": "Enchanter",
+      "transporter": "Transporter",
+      "informant": "Informant",
+      "hirelingRecruiter": "Hireling Recruiter",
+      "fence": "Fence",
+      "factionRepresentative": "Faction Representative",
+      "guard": "Guard",
+      "questGiver.Description": "This NPC can offer quests to players",
+      "questTurnIn.Description": "This NPC can accept completed quests",
+      "merchant.Description": "This NPC can buy and sell items to players",
+      "banker.Description": "This NPC provides banking services",
+      "stableMaster.Description": "This NPC manages mount storage and sales",
+      "innkeeper.Description": "This NPC provides lodging and meals",
+      "trainer.Description": "This NPC can train skills or abilities",
+      "enchanter.Description": "This NPC provides enchanting services",
+      "transporter.Description": "This NPC offers fast travel services",
+      "informant.Description": "This NPC provides rumors and information",
+      "hirelingRecruiter.Description": "This NPC recruits hirelings for the party",
+      "fence.Description": "This NPC buys stolen goods",
+      "factionRepresentative.Description": "This NPC represents a faction",
+      "guard.Description": "This NPC patrols and enforces the law"
+    },
+
+    "IndicatorType": {
+      "none": "None",
+      "questAvailable": "Quest Available",
+      "questTurnIn": "Quest Turn-In",
+      "questProgress": "Quest In Progress",
+      "merchant": "Merchant",
+      "trainer": "Trainer",
+      "service": "Service Available",
+      "dialogue": "Dialogue Available"
+    },
+
+    "NameDisplay": {
+      "always": "Always Show",
+      "hover": "Show on Hover",
+      "never": "Never Show",
+      "known": "When Known"
     },
 
     "WorldState": {
