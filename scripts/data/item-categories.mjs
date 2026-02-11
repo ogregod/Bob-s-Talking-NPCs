@@ -143,15 +143,17 @@ export function categorizeItem(item) {
   switch (item.type) {
     case "weapon":
       category = ItemCategory.WEAPON;
+      // Get weapon type from D&D 5e system data
+      const weaponType = system.type?.value || system.weaponType;
       // Check for firearms first (properties or name)
       if (system.properties?.fir ||
-          system.weaponType?.includes("firearm") ||
+          weaponType?.includes("firearm") ||
           item.name?.toLowerCase().includes("pistol") ||
           item.name?.toLowerCase().includes("musket") ||
           item.name?.toLowerCase().includes("rifle")) {
         subcategory = WeaponSubcategory.FIREARM;
       } else {
-        subcategory = WEAPON_TYPE_MAP[system.weaponType] || null;
+        subcategory = WEAPON_TYPE_MAP[weaponType] || null;
       }
       break;
 
