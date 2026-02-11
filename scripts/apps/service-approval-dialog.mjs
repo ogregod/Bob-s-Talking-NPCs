@@ -49,8 +49,8 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
       resizable: true
     },
     position: {
-      width: 550,
-      height: 500
+      width: 620,
+      height: 580
     },
     actions: {
       approveRequest: ServiceApprovalDialog.#onApproveRequest,

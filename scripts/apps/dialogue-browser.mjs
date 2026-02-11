@@ -43,8 +43,8 @@ export class DialogueBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       resizable: true
     },
     position: {
-      width: 500,
-      height: 450
+      width: 550,
+      height: 520
     },
     actions: {
       selectDialogue: DialogueBrowser.#onSelectDialogue,
@@ -57,7 +57,8 @@ export class DialogueBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
   /** @override */
   static PARTS = {
     content: {
-      template: `modules/${MODULE_ID}/templates/dialogue-browser.hbs`
+      template: `modules/${MODULE_ID}/templates/dialogue-browser.hbs`,
+      scrollable: [".dialogue-list"]
     }
   };
 

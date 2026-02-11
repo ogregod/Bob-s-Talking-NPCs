@@ -45,6 +45,456 @@
     border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
   }
 
+  /* ===== ApplicationV2 Layout Fixes ===== */
+  /* Ensure all bobsnpc ApplicationV2 windows have proper flex layouts for scrolling */
+
+  /* Base application container - use flex column */
+  .bobsnpc.application {
+    display: flex !important;
+    flex-direction: column !important;
+    max-height: calc(100vh - 40px) !important;
+  }
+
+  /* Window content must fill space and handle overflow */
+  .bobsnpc.application > .window-content {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Content containers should fill and scroll */
+  .bobsnpc.application .window-content > *:first-child {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Lists and scrollable areas */
+  .bobsnpc .requests-list,
+  .bobsnpc .orders-list,
+  .bobsnpc .enchantment-list,
+  .bobsnpc .enchantment-options,
+  .bobsnpc .quest-list,
+  .bobsnpc .faction-list,
+  .bobsnpc .npc-list,
+  .bobsnpc .shop-list,
+  .bobsnpc .item-list,
+  .bobsnpc .tab-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Specific application layouts */
+
+  /* Service Approval Dialog */
+  .service-approval-dialog.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .service-approval-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .service-approval-content .tab-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .service-approval-content .requests-list,
+  .service-approval-content .orders-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  /* Service Orders Window */
+  .service-orders.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .service-orders-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .service-orders-content .orders-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Enchantment Manager */
+  .enchantment-manager.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .enchantment-manager-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .enchantment-manager-content .enchantment-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .enchantment-manager-content .enchantment-form-container {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Enchantment Picker */
+  .enchantment-picker.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .enchantment-picker-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .enchantment-picker-content .enchantment-options {
+    flex: 1 1 auto;
+    min-height: 100px;
+    max-height: none;
+    overflow-y: auto;
+  }
+
+  /* Shop Editor */
+  .shop-editor.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .shop-editor-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .shop-editor-content .tab-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .shop-editor-content .inventory-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    max-height: none;
+  }
+
+  /* Shop Item Editor */
+  .shop-item-editor.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+    max-height: calc(100vh - 100px);
+  }
+
+  .shop-item-editor-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  /* Shop Manager */
+  .shop-manager.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .shop-manager-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .shop-manager-content .shop-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* NPC Config */
+  .npc-config.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .npc-config-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .npc-config-content .tab-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  /* Dialogue Node Config */
+  .dialogue-node-config.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .dialogue-node-config-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .dialogue-node-config-content .tab-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Quest Editor */
+  .quest-editor.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .quest-editor-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .quest-editor-content .tab-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Faction Editor */
+  .faction-editor.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .faction-editor-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .faction-editor-content .tab-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* GM Dashboard */
+  .gm-dashboard.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .gm-dashboard-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .gm-dashboard-content .dashboard-main {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .gm-dashboard-content .tab-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Trade Window */
+  .trade-window.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .trade-window-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .trade-window-content .trade-items {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Bank Window */
+  .bank-window.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .bank-window-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .bank-window-content .bank-vault {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Quest Log */
+  .quest-log.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .quest-log-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .quest-log-content .quest-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Quest Tracker */
+  .quest-tracker.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .quest-tracker-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .quest-tracker-content .tracked-quests {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Faction Window */
+  .faction-window.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .faction-window-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .faction-window-content .faction-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Hireling Manager */
+  .hireling-manager.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .hireling-manager-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .hireling-manager-content .hireling-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Property Manager */
+  .property-manager.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .property-manager-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .property-manager-content .property-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Dialogue Browser */
+  .dialogue-browser.application > .window-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .dialogue-browser-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .dialogue-browser-content .dialogue-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
   /* ===== Scrollbars ===== */
   .bobsnpc-app ::-webkit-scrollbar {
     width: 8px;

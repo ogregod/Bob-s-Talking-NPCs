@@ -72,7 +72,8 @@ export class QuestLog extends HandlebarsApplicationMixin(ApplicationV2) {
   /** @override */
   static PARTS = {
     sidebar: {
-      template: `modules/${MODULE_ID}/templates/quest-log/sidebar.hbs`
+      template: `modules/${MODULE_ID}/templates/quest-log/sidebar.hbs`,
+      scrollable: [".quest-list"]
     },
     details: {
       template: `modules/${MODULE_ID}/templates/quest-log/details.hbs`,

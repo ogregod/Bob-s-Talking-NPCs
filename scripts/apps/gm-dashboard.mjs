@@ -58,22 +58,28 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
       template: `modules/${MODULE_ID}/templates/gm-dashboard/tabs.hbs`
     },
     overview: {
-      template: `modules/${MODULE_ID}/templates/gm-dashboard/overview.hbs`
+      template: `modules/${MODULE_ID}/templates/gm-dashboard/overview.hbs`,
+      scrollable: [".tab-content"]
     },
     quests: {
-      template: `modules/${MODULE_ID}/templates/gm-dashboard/quests.hbs`
+      template: `modules/${MODULE_ID}/templates/gm-dashboard/quests.hbs`,
+      scrollable: [".tab-content", ".quest-list"]
     },
     npcs: {
-      template: `modules/${MODULE_ID}/templates/gm-dashboard/npcs.hbs`
+      template: `modules/${MODULE_ID}/templates/gm-dashboard/npcs.hbs`,
+      scrollable: [".tab-content", ".npc-list"]
     },
     factions: {
-      template: `modules/${MODULE_ID}/templates/gm-dashboard/factions.hbs`
+      template: `modules/${MODULE_ID}/templates/gm-dashboard/factions.hbs`,
+      scrollable: [".tab-content", ".faction-list"]
     },
     world: {
-      template: `modules/${MODULE_ID}/templates/gm-dashboard/world.hbs`
+      template: `modules/${MODULE_ID}/templates/gm-dashboard/world.hbs`,
+      scrollable: [".tab-content"]
     },
     tools: {
-      template: `modules/${MODULE_ID}/templates/gm-dashboard/tools.hbs`
+      template: `modules/${MODULE_ID}/templates/gm-dashboard/tools.hbs`,
+      scrollable: [".tab-content"]
     }
   };
 

@@ -47,10 +47,12 @@ export class TradeWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       template: `modules/${MODULE_ID}/templates/trade/header.hbs`
     },
     yourOffer: {
-      template: `modules/${MODULE_ID}/templates/trade/your-offer.hbs`
+      template: `modules/${MODULE_ID}/templates/trade/your-offer.hbs`,
+      scrollable: [".offer-items"]
     },
     theirOffer: {
-      template: `modules/${MODULE_ID}/templates/trade/their-offer.hbs`
+      template: `modules/${MODULE_ID}/templates/trade/their-offer.hbs`,
+      scrollable: [".offer-items"]
     },
     footer: {
       template: `modules/${MODULE_ID}/templates/trade/footer.hbs`

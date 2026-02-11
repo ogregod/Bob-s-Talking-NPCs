@@ -48,8 +48,8 @@ export class ServiceOrdersWindow extends HandlebarsApplicationMixin(ApplicationV
       resizable: true
     },
     position: {
-      width: 500,
-      height: 450
+      width: 550,
+      height: 520
     },
     actions: {
       pickupOrder: ServiceOrdersWindow.#onPickupOrder,

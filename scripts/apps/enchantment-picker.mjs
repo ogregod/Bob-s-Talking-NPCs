@@ -52,8 +52,8 @@ export class EnchantmentPicker extends HandlebarsApplicationMixin(ApplicationV2)
       resizable: true
     },
     position: {
-      width: 500,
-      height: 450
+      width: 550,
+      height: 550
     },
     actions: {
       selectEnchantment: EnchantmentPicker.#onSelectEnchantment,

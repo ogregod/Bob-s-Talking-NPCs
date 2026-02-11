@@ -36,8 +36,8 @@ export class ShopItemEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       resizable: true
     },
     position: {
-      width: 500,
-      height: "auto"
+      width: 550,
+      height: 580
     },
     actions: {
       save: ShopItemEditor.#onSave,
