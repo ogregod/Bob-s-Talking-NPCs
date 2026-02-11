@@ -7,6 +7,7 @@ const MODULE_ID = "bobs-talking-npcs";
 
 import { localize, formatCurrency } from "../utils/helpers.mjs";
 import { calculateEnchantmentCost } from "../data/enchantment-model.mjs";
+import { getEnchantmentType, categorizeItem, getFullCategoryDisplay } from "../data/item-categories.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -130,25 +131,13 @@ export class EnchantmentPicker extends HandlebarsApplicationMixin(ApplicationV2)
 
   /**
    * Get the enchantment type for an item
+   * Uses the new comprehensive item categorization system
    * @param {object} item
    * @returns {string}
    * @private
    */
   _getItemEnchantmentType(item) {
-    switch (item.type) {
-      case "weapon":
-        return "weapon";
-      case "equipment":
-        // Check armor type
-        if (item.system?.armor?.type) return "armor";
-        // Check if ring/amulet
-        const equipType = item.system?.type?.value;
-        if (equipType === "ring") return "ring";
-        if (equipType === "amulet" || equipType === "necklace") return "amulet";
-        return "wondrous";
-      default:
-        return "any";
-    }
+    return getEnchantmentType(item);
   }
 
   /**

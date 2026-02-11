@@ -8,6 +8,16 @@ const MODULE_ID = "bobs-talking-npcs";
 
 import { localize, formatCurrency } from "../utils/helpers.mjs";
 import { ItemCategory } from "../data/merchant-model.mjs";
+import {
+  categorizeItem,
+  getCategoryLabel,
+  getFullCategoryDisplay,
+  getAllCategories,
+  getSubcategories,
+  ItemCategory as ItemCat,
+  WeaponSubcategory,
+  ArmorSubcategory
+} from "../data/item-categories.mjs";
 
 /** Get merchant handler instance from API */
 function getMerchantHandler() {
@@ -444,17 +454,32 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       const quantity = item.quantity ?? -1;
       const soldOut = !item.unlimited && quantity !== -1 && quantity <= 0;
 
-      // Fetch actual item image from UUID if available
+      // Fetch actual item data from UUID if available
       let itemImg = item.img;
-      if (item.itemUuid && !itemImg) {
+      let linkedItem = null;
+      if (item.itemUuid) {
         try {
-          const linkedItem = await fromUuid(item.itemUuid);
-          if (linkedItem) {
+          linkedItem = await fromUuid(item.itemUuid);
+          if (linkedItem && !itemImg) {
             itemImg = linkedItem.img;
           }
         } catch (e) {
-          console.warn(`Could not load item image for ${item.itemUuid}:`, e);
+          console.warn(`Could not load item for ${item.itemUuid}:`, e);
         }
+      }
+
+      // Get category info - use linked item for proper D&D 5e categorization if available
+      let categoryInfo;
+      if (linkedItem) {
+        categoryInfo = this._getItemCategoryInfo(linkedItem);
+      } else {
+        // Fallback to stored category
+        categoryInfo = {
+          category: item.category || "misc",
+          subcategory: item.subcategory || null,
+          displayCategory: getCategoryLabel(item.category || "misc"),
+          displaySubcategory: null
+        };
       }
 
       items.push({
@@ -472,8 +497,9 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         inStock: item.unlimited || quantity === -1 || quantity > inCart,
         soldOut,
         inCart,
-        category: item.category || "misc",
-        categoryLabel: localize(`ItemCategory.${item.category || "misc"}`),
+        category: categoryInfo.category,
+        subcategory: categoryInfo.subcategory,
+        categoryLabel: getFullCategoryDisplay(categoryInfo),
         description: item.description,
         rarity: item.rarity || "common",
         rarityLabel: this._getRarityLabel(item.rarity),
@@ -481,7 +507,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         // New properties for enhanced UI
         canAfford: playerGold >= price,
         limitedStock: !item.unlimited && quantity !== -1 && quantity > 0 && quantity <= 5,
-        typeLabel: item.typeLabel || item.type || "Item"
+        typeLabel: categoryInfo.displayCategory || item.typeLabel || item.type || "Item"
       });
     }
 
@@ -529,6 +555,8 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       const inSellCart = this._sellCart.get(item.uuid) || 0;
       const quantity = item.system.quantity || 1;
 
+      const categoryInfo = this._getItemCategoryInfo(item);
+
       return {
         id: item.id,
         uuid: item.uuid,
@@ -540,8 +568,9 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         quantity,
         availableToSell: quantity - inSellCart,
         inSellCart,
-        category: this._getItemCategory(item),
-        categoryLabel: localize(`ItemCategory.${this._getItemCategory(item)}`),
+        category: categoryInfo.category,
+        subcategory: categoryInfo.subcategory,
+        categoryLabel: getFullCategoryDisplay(categoryInfo),
         rarity: item.system.rarity || "common",
         rarityClass: `rarity-${item.system.rarity || "common"}`
       };
@@ -555,19 +584,18 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
    * @private
    */
   _getItemCategory(item) {
-    switch (item.type) {
-      case "weapon": return ItemCategory.WEAPONS;
-      case "equipment":
-        if (item.system.armor?.type) return ItemCategory.ARMOR;
-        return ItemCategory.GEAR;
-      case "consumable":
-        if (item.system.consumableType === "potion") return ItemCategory.POTIONS;
-        if (item.system.consumableType === "scroll") return ItemCategory.SCROLLS;
-        return ItemCategory.CONSUMABLES;
-      case "tool": return ItemCategory.TOOLS;
-      case "loot": return ItemCategory.MISC;
-      default: return ItemCategory.MISC;
-    }
+    const info = categorizeItem(item);
+    return info.category;
+  }
+
+  /**
+   * Get full item categorization info
+   * @param {Item} item - Item document
+   * @returns {object} { category, subcategory, displayCategory, displaySubcategory }
+   * @private
+   */
+  _getItemCategoryInfo(item) {
+    return categorizeItem(item);
   }
 
   /**
@@ -671,7 +699,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
     return Array.from(categories).map(cat => ({
       id: cat,
-      label: cat === "all" ? localize("Shop.AllCategories") : localize(`ItemCategory.${cat}`),
+      label: cat === "all" ? localize("Shop.AllCategories") : getCategoryLabel(cat),
       selected: cat === this._category
     }));
   }

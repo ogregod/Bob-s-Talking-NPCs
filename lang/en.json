@@ -1125,6 +1125,82 @@
       "WorkDuration": "Work Duration (hours)"
     },
 
+    "ItemCategory": {
+      "Categories": {
+        "weapon": "Weapon",
+        "armor": "Armor",
+        "shield": "Shield",
+        "wondrousItem": "Wondrous Item",
+        "ring": "Ring",
+        "rod": "Rod",
+        "staff": "Staff",
+        "wand": "Wand",
+        "potion": "Potion",
+        "scroll": "Scroll",
+        "ammunition": "Ammunition",
+        "poison": "Poison",
+        "tool": "Tool",
+        "adventuringGear": "Adventuring Gear",
+        "container": "Container",
+        "clothing": "Clothing",
+        "trinket": "Trinket",
+        "food": "Food & Drink",
+        "tradeGood": "Trade Good",
+        "treasure": "Treasure",
+        "currency": "Currency",
+        "vehicle": "Vehicle",
+        "mount": "Mount",
+        "spellComponent": "Spell Component",
+        "focus": "Spellcasting Focus",
+        "gemstone": "Gemstone",
+        "artObject": "Art Object",
+        "loot": "Loot",
+        "misc": "Miscellaneous"
+      },
+      "Subcategories": {
+        "Weapon": {
+          "simpleMelee": "Simple Melee",
+          "simpleRanged": "Simple Ranged",
+          "martialMelee": "Martial Melee",
+          "martialRanged": "Martial Ranged",
+          "firearm": "Firearm",
+          "siege": "Siege Weapon",
+          "natural": "Natural Weapon",
+          "improvised": "Improvised"
+        },
+        "Armor": {
+          "light": "Light Armor",
+          "medium": "Medium Armor",
+          "heavy": "Heavy Armor"
+        },
+        "Focus": {
+          "arcane": "Arcane Focus",
+          "druidic": "Druidic Focus",
+          "holy": "Holy Symbol"
+        },
+        "Tool": {
+          "artisan": "Artisan's Tools",
+          "gaming": "Gaming Sets",
+          "musical": "Musical Instruments",
+          "vehicle": "Vehicles",
+          "other": "Other Tools"
+        },
+        "Vehicle": {
+          "land": "Land Vehicle",
+          "water": "Water Vehicle",
+          "air": "Air Vehicle"
+        },
+        "Container": {
+          "worn": "Worn Container",
+          "carried": "Carried Container"
+        }
+      },
+      "Format": {
+        "CategoryOnly": "{category}",
+        "WithSubcategory": "{category} ({subcategory})"
+      }
+    },
+
     "ShopTypes": {
       "GENERAL": "General Store",
       "WEAPONS": "Weapons Shop",
