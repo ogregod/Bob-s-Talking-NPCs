@@ -44,20 +44,25 @@ export class QuestTracker extends HandlebarsApplicationMixin(ApplicationV2) {
     classes: ["bobsnpc", "quest-tracker"],
     tag: "div",
     window: {
-      frame: false,
+      frame: true,
       positioned: true,
-      minimizable: false,
+      title: "BOBSNPC.QuestTracker.Title",
+      icon: "fa-solid fa-location-dot",
+      minimizable: true,
       resizable: false
     },
     position: {
-      width: 280,
+      width: 300,
       height: "auto"
     },
     actions: {
       toggleCollapse: QuestTracker.#onToggleCollapse,
       openQuestLog: QuestTracker.#onOpenQuestLog,
       cycleQuest: QuestTracker.#onCycleQuest,
-      checkObjective: QuestTracker.#onCheckObjective
+      checkObjective: QuestTracker.#onCheckObjective,
+      untrackQuest: QuestTracker.#onUntrackQuest,
+      toggleQuestExpand: QuestTracker.#onToggleQuestExpand,
+      showObjectiveLocation: QuestTracker.#onShowObjectiveLocation
     }
   };
 
@@ -301,14 +306,73 @@ export class QuestTracker extends HandlebarsApplicationMixin(ApplicationV2) {
     this.render();
   }
 
+  static async #onUntrackQuest(event, target) {
+    const questId = target.dataset.questId;
+    if (!questId) return;
+
+    const actor = game.user.character;
+    if (!actor) return;
+
+    // Get current tracked quests from actor
+    const trackedQuests = await actor.getFlag(MODULE_ID, "trackedQuests") || [];
+    const updated = trackedQuests.filter(id => id !== questId);
+    await actor.setFlag(MODULE_ID, "trackedQuests", updated);
+
+    this.render();
+  }
+
+  static #onToggleQuestExpand(event, target) {
+    const questId = target.dataset.questId;
+    if (!questId) return;
+
+    // Toggle expanded state
+    this._expandedQuests = this._expandedQuests || new Set();
+    if (this._expandedQuests.has(questId)) {
+      this._expandedQuests.delete(questId);
+    } else {
+      this._expandedQuests.add(questId);
+    }
+
+    this.render();
+  }
+
+  static async #onShowObjectiveLocation(event, target) {
+    const sceneId = target.dataset.scene;
+    const x = parseFloat(target.dataset.x);
+    const y = parseFloat(target.dataset.y);
+
+    if (!sceneId || isNaN(x) || isNaN(y)) return;
+
+    // Get the scene
+    const scene = game.scenes.get(sceneId);
+    if (!scene) {
+      ui.notifications.warn(localize("QuestTracker.SceneNotFound"));
+      return;
+    }
+
+    // If not the current scene, ask to switch
+    if (scene.id !== game.scenes.current?.id) {
+      const confirm = await Dialog.confirm({
+        title: localize("QuestTracker.SwitchScene"),
+        content: `<p>${localize("QuestTracker.SwitchSceneConfirm", { scene: scene.name })}</p>`
+      });
+
+      if (confirm) {
+        await scene.view();
+      } else {
+        return;
+      }
+    }
+
+    // Pan to location
+    canvas.animatePan({ x, y, scale: 1 });
+  }
+
   // ==================== Lifecycle ====================
 
   /** @override */
   async _onFirstRender(context, options) {
     await super._onFirstRender(context, options);
-
-    // Make draggable
-    this._makeDraggable();
 
     // Register hooks for updates
     this._registerHooks();
@@ -330,54 +394,11 @@ export class QuestTracker extends HandlebarsApplicationMixin(ApplicationV2) {
   async _onClose(options) {
     await super._onClose(options);
 
+    // Save position before closing
+    this._savePosition();
+
     this._unregisterHooks();
     QuestTracker._instance = null;
-  }
-
-  /**
-   * Make the tracker draggable
-   * @private
-   */
-  _makeDraggable() {
-    const header = this.element.querySelector(".tracker-header");
-    if (!header) return;
-
-    let isDragging = false;
-    let startX, startY, startLeft, startTop;
-
-    header.style.cursor = "move";
-
-    header.addEventListener("mousedown", (e) => {
-      if (e.target.closest("button")) return; // Don't drag when clicking buttons
-
-      isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      const pos = this.position;
-      startLeft = pos.left;
-      startTop = pos.top;
-
-      e.preventDefault();
-    });
-
-    document.addEventListener("mousemove", (e) => {
-      if (!isDragging) return;
-
-      const deltaX = e.clientX - startX;
-      const deltaY = e.clientY - startY;
-
-      this.setPosition({
-        left: Math.max(0, Math.min(window.innerWidth - 300, startLeft + deltaX)),
-        top: Math.max(0, Math.min(window.innerHeight - 100, startTop + deltaY))
-      });
-    });
-
-    document.addEventListener("mouseup", () => {
-      if (isDragging) {
-        isDragging = false;
-        this._savePosition();
-      }
-    });
   }
 
   /**

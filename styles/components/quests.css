@@ -534,29 +534,25 @@
   }
 
   /* ===== Quest Tracker Widget ===== */
+  /* Now using ApplicationV2 with frame, so widget styles are simpler */
   .quest-tracker-widget {
-    position: fixed;
-    width: 280px;
+    width: 100%;
     background: var(--bobsnpc-bg-primary);
-    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
-    border-radius: var(--bobsnpc-border-radius-md);
-    box-shadow: var(--bobsnpc-shadow-lg);
     overflow: hidden;
-    z-index: var(--bobsnpc-z-sticky);
   }
 
   .quest-tracker-widget.minimized {
-    width: auto;
-    min-width: 160px;
+    /* When minimized via collapse toggle */
   }
 
+  /* The tracker-header is now inside the window content, acts as a secondary header */
   .tracker-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: var(--bobsnpc-spacing-sm);
     background: var(--bobsnpc-bg-secondary);
-    cursor: move;
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
   }
 
   .tracker-title {
