@@ -282,17 +282,19 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       hasItems: items.length > 0,
       playerItems: this._tab === "sell" ? items : [],
       hasPlayerItems: this._tab === "sell" && items.length > 0,
-      // Cart
-      cartItems: await this._prepareCart(merchant),
-      cartTotal,
-      cartTotalFormatted: formatCurrency(cartTotal * 100),
-      canAfford: playerGold >= cartTotal,
-      cartItemCount: this._cart.size,
-      cartEmpty: this._cart.size === 0,
-      // Sell cart
+      // Cart (unified for both buy and sell tabs)
+      cartItems: this._tab === "sell" ? this._prepareSellCart(merchant) : await this._prepareCart(merchant),
+      cartTotal: this._tab === "sell" ? sellTotal : cartTotal,
+      cartTotalFormatted: this._tab === "sell" ? formatCurrency(sellTotal * 100) : formatCurrency(cartTotal * 100),
+      canAfford: this._tab === "sell" ? true : playerGold >= cartTotal,
+      cartItemCount: this._tab === "sell" ? this._sellCart.size : this._cart.size,
+      cartEmpty: this._tab === "sell" ? this._sellCart.size === 0 : this._cart.size === 0,
+      // Sell cart (for backwards compatibility)
       sellCart: this._prepareSellCart(merchant),
       sellTotal,
       sellTotalFormatted: formatCurrency(sellTotal * 100),
+      sellCartItemCount: this._sellCart.size,
+      sellCartEmpty: this._sellCart.size === 0,
       // Services
       services,
       hasServices,

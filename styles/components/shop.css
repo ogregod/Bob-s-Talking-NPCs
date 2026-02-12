@@ -666,10 +666,17 @@
   }
 
   .shop-item .item-badge.limited {
-    bottom: var(--bobsnpc-spacing-sm);
-    left: var(--bobsnpc-spacing-sm);
-    background: var(--bobsnpc-warning);
-    color: var(--bobsnpc-text-inverse);
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    background: rgba(255, 152, 0, 0.9);
+    color: white;
+    font-size: 8px;
+    padding: 2px 4px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* ===== Affordability Indicator (List Style - on image) ===== */
