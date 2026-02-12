@@ -540,18 +540,30 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   _prepareSellItems() {
     if (!this._playerActor) return [];
 
+    const merchant = this._getMerchant();
+    const defaultMultiplier = merchant?.pricing?.baseSellMultiplier ?? 0.5;
+    const typeMultipliers = merchant?.buyBack?.typeMultipliers || {};
+    const acceptedTypes = merchant?.buyBack?.itemTypes || [];
+
     const items = this._playerActor.items.filter(item => {
       // Filter out equipped items, containers, etc.
       const type = item.type;
-      return ["weapon", "equipment", "consumable", "tool", "loot"].includes(type);
-    });
+      const validTypes = ["weapon", "equipment", "consumable", "tool", "loot"];
+      if (!validTypes.includes(type)) return false;
 
-    const merchant = this._getMerchant();
-    const buyMultiplier = merchant?.buyMultiplier ?? 0.5;
+      // Check if shop accepts this type (empty array = all types)
+      if (acceptedTypes.length > 0 && !acceptedTypes.includes(type)) {
+        return false;
+      }
+
+      return true;
+    });
 
     return items.map(item => {
       const basePrice = item.system.price?.value || 0;
-      const sellPrice = Math.floor(basePrice * buyMultiplier);
+      // Use type-specific multiplier if available
+      const multiplier = typeMultipliers[item.type] ?? defaultMultiplier;
+      const sellPrice = Math.floor(basePrice * multiplier);
       const inSellCart = this._sellCart.get(item.uuid) || 0;
       const quantity = item.system.quantity || 1;
 
@@ -562,17 +574,23 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         uuid: item.uuid,
         name: item.name,
         img: item.img,
+        type: item.type,
+        typeLabel: localize(`ItemTypes.${item.type}`),
         price: sellPrice,
         priceFormatted: formatCurrency(sellPrice * 100),
+        sellPrice,
         basePrice,
         quantity,
         availableToSell: quantity - inSellCart,
         inSellCart,
+        sellable: true,  // Items that pass the filter are sellable
         category: categoryInfo.category,
         subcategory: categoryInfo.subcategory,
         categoryLabel: getFullCategoryDisplay(categoryInfo),
         rarity: item.system.rarity || "common",
-        rarityClass: `rarity-${item.system.rarity || "common"}`
+        rarityClass: `rarity-${item.system.rarity || "common"}`,
+        multiplier,
+        multiplierPercent: Math.round(multiplier * 100)
       };
     });
   }
@@ -777,14 +795,17 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   _prepareSellCart(merchant) {
     const cartItems = [];
-    const buyMultiplier = merchant?.buyMultiplier ?? 0.5;
+    const defaultMultiplier = merchant?.pricing?.baseSellMultiplier ?? 0.5;
+    const typeMultipliers = merchant?.buyBack?.typeMultipliers || {};
 
     for (const [itemUuid, quantity] of this._sellCart.entries()) {
       const item = this._playerActor?.items.find(i => i.uuid === itemUuid);
       if (!item) continue;
 
       const basePrice = item.system.price?.value || 0;
-      const price = Math.floor(basePrice * buyMultiplier);
+      // Use type-specific multiplier if available
+      const multiplier = typeMultipliers[item.type] ?? defaultMultiplier;
+      const price = Math.floor(basePrice * multiplier);
 
       cartItems.push({
         uuid: itemUuid,

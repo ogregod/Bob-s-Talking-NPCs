@@ -70,7 +70,7 @@
     </div>
   </div>
 
-  <div class="form-section">
+  <div class="form-section buyback-section">
     <h3>{{localize "BOBSNPC.ShopEditor.BuyBack"}}</h3>
 
     <div class="form-group checkbox">
@@ -78,21 +78,79 @@
         <input type="checkbox" name="buyBack.enabled" {{#if buyBack.enabled}}checked{{/if}}>
         {{localize "BOBSNPC.ShopEditor.BuyBackEnabled"}}
       </label>
+      <span class="hint">{{localize "BOBSNPC.ShopEditor.BuyBackEnabledHint"}}</span>
     </div>
 
+    {{!-- Item Type Selection --}}
+    <div class="form-group buyback-types">
+      <label>{{localize "BOBSNPC.ShopEditor.AcceptedTypes"}}</label>
+      <p class="hint">{{localize "BOBSNPC.ShopEditor.AcceptedTypesHint"}}</p>
+
+      <div class="type-checkboxes">
+        {{#each buybackTypeOptions}}
+          <label class="type-checkbox {{#if this.checked}}checked{{/if}}">
+            <input type="checkbox" name="buyBack.itemTypes" value="{{this.value}}"
+                   {{#if this.checked}}checked{{/if}}>
+            <i class="fa-solid {{this.icon}}"></i>
+            <span>{{this.label}}</span>
+          </label>
+        {{/each}}
+      </div>
+    </div>
+
+    {{!-- Per-Type Multipliers --}}
+    <div class="form-group type-multipliers">
+      <label>{{localize "BOBSNPC.ShopEditor.TypeMultipliers"}}</label>
+      <p class="hint">{{localize "BOBSNPC.ShopEditor.TypeMultipliersHint"}}</p>
+
+      <div class="multiplier-grid">
+        {{#each buybackTypeOptions}}
+          <div class="multiplier-row">
+            <span class="type-label">
+              <i class="fa-solid {{this.icon}}"></i>
+              {{this.label}}
+            </span>
+            <input type="number"
+                   name="buyBack.typeMultipliers.{{this.value}}"
+                   value="{{this.multiplier}}"
+                   step="0.05" min="0" max="2"
+                   class="multiplier-input">
+            <span class="multiplier-percent">{{this.multiplierPercent}}%</span>
+          </div>
+        {{/each}}
+      </div>
+    </div>
+
+    {{!-- Additional Options --}}
     <div class="form-row">
-      <div class="form-group half checkbox">
+      <div class="form-group third checkbox">
         <label>
           <input type="checkbox" name="buyBack.requireIdentified" {{#if buyBack.requireIdentified}}checked{{/if}}>
           {{localize "BOBSNPC.ShopEditor.RequireIdentified"}}
         </label>
       </div>
 
-      <div class="form-group half checkbox">
+      <div class="form-group third checkbox">
         <label>
           <input type="checkbox" name="buyBack.excludeEquipped" {{#if buyBack.excludeEquipped}}checked{{/if}}>
           {{localize "BOBSNPC.ShopEditor.ExcludeEquipped"}}
         </label>
+      </div>
+
+      <div class="form-group third checkbox">
+        <label>
+          <input type="checkbox" name="buyBack.excludeAttuned" {{#if buyBack.excludeAttuned}}checked{{/if}}>
+          {{localize "BOBSNPC.ShopEditor.ExcludeAttuned"}}
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="buyback-maxvalue">{{localize "BOBSNPC.ShopEditor.MaxBuyValue"}}</label>
+      <div class="input-with-hint">
+        <input type="number" id="buyback-maxvalue" name="buyBack.maxValue"
+               value="{{buyBack.maxValue}}" min="0" step="1">
+        <span class="hint">{{localize "BOBSNPC.ShopEditor.MaxBuyValueHint"}}</span>
       </div>
     </div>
   </div>

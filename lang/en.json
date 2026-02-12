@@ -1259,6 +1259,14 @@
       "CUSTOM": "Custom"
     },
 
+    "ItemTypes": {
+      "weapon": "Weapons",
+      "equipment": "Armor & Gear",
+      "consumable": "Consumables",
+      "tool": "Tools",
+      "loot": "Loot & Valuables"
+    },
+
     "StockRefreshTypes": {
       "NEVER": "Never (Manual)",
       "DAILY": "Daily",
@@ -1437,10 +1445,18 @@
       "CharismaBuyBonus": "Charisma Buy Bonus",
       "CharismaSellBonus": "Charisma Sell Bonus",
       "MaxCharismaDiscount": "Max Charisma Discount",
-      "BuyBack": "Buy Back",
-      "BuyBackEnabled": "Enable Buy Back",
+      "BuyBack": "Buying From Players",
+      "BuyBackEnabled": "Buy Items From Players",
+      "BuyBackEnabledHint": "Allow players to sell items to this shop",
+      "AcceptedTypes": "Accepted Item Types",
+      "AcceptedTypesHint": "Select which item types this shop will buy. Leave all checked to accept all types.",
+      "TypeMultipliers": "Buy Rates by Type",
+      "TypeMultipliersHint": "Set what percentage of the item's base value the shop will pay for each type.",
       "RequireIdentified": "Require Identified",
       "ExcludeEquipped": "Exclude Equipped",
+      "ExcludeAttuned": "Exclude Attuned",
+      "MaxBuyValue": "Maximum Item Value",
+      "MaxBuyValueHint": "Maximum value (in gold) of items the shop will buy. 0 = no limit.",
 
       "IdentifyService": "Identify Service",
       "OfferIdentify": "Offer Identification",

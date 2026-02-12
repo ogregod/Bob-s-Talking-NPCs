@@ -307,7 +307,15 @@ export function createMerchant(data = {}) {
       maxValue: data.buyBack?.maxValue ?? 0,  // 0 = no limit
       requireIdentified: data.buyBack?.requireIdentified ?? true,
       excludeEquipped: data.buyBack?.excludeEquipped ?? true,
-      excludeAttuned: data.buyBack?.excludeAttuned ?? true
+      excludeAttuned: data.buyBack?.excludeAttuned ?? true,
+      // Per-type sell multipliers (what shop pays for each item type)
+      typeMultipliers: {
+        weapon: data.buyBack?.typeMultipliers?.weapon ?? 0.5,
+        equipment: data.buyBack?.typeMultipliers?.equipment ?? 0.5,
+        consumable: data.buyBack?.typeMultipliers?.consumable ?? 0.4,
+        tool: data.buyBack?.typeMultipliers?.tool ?? 0.5,
+        loot: data.buyBack?.typeMultipliers?.loot ?? 0.6
+      }
     },
 
     // Services offered
@@ -792,7 +800,11 @@ export const MerchantTemplates = {
     },
     buyBack: {
       enabled: true,
-      itemTypes: ["weapon", "equipment"]
+      itemTypes: ["weapon", "equipment"],
+      typeMultipliers: {
+        weapon: 0.55,      // Blacksmith pays more for weapons
+        equipment: 0.6     // Best rates for armor
+      }
     }
   },
 
@@ -810,7 +822,10 @@ export const MerchantTemplates = {
     },
     buyBack: {
       enabled: true,
-      itemTypes: ["consumable"]
+      itemTypes: ["consumable"],
+      typeMultipliers: {
+        consumable: 0.5    // Alchemist pays better for potions
+      }
     }
   },
 
@@ -860,7 +875,16 @@ export const MerchantTemplates = {
       deceptionDC: 14,
       maximumDiscount: 0.25
     }),
-    buyBack: { enabled: true },
+    buyBack: {
+      enabled: true,
+      typeMultipliers: {
+        weapon: 0.65,      // Good rates on hot weapons
+        equipment: 0.6,
+        consumable: 0.5,
+        tool: 0.55,
+        loot: 0.75         // Best rates on gems and jewelry
+      }
+    },
     access: {
       reputationRequired: -50  // Need some notoriety
     }

@@ -607,17 +607,20 @@ export class MerchantHandler {
     let totalValue = 0;
     const itemsToSell = [];
 
+    // Ensure buyBack has required arrays (defensive for old shop data)
+    const acceptedTypes = merchant.buyBack?.itemTypes || [];
+    const excludedTypes = merchant.buyBack?.excludeTypes || [];
+
     for (const sale of sales) {
       const item = actor.items.find(i => i.uuid === sale.itemUuid || i.id === sale.itemId);
       if (!item) continue;
 
-      // Check if shop buys this type
-      if (merchant.buyBack.itemTypes.length > 0 &&
-        !merchant.buyBack.itemTypes.includes(item.type)) {
+      // Check if shop buys this type (empty array = all types accepted)
+      if (acceptedTypes.length > 0 && !acceptedTypes.includes(item.type)) {
         continue;
       }
 
-      if (merchant.buyBack.excludeTypes.includes(item.type)) {
+      if (excludedTypes.includes(item.type)) {
         continue;
       }
 
@@ -631,9 +634,11 @@ export class MerchantHandler {
         continue;
       }
 
-      // Get base price
+      // Get base price and type-specific multiplier
       const basePrice = item.system?.price?.value || 0;
-      const sellPrice = basePrice * merchant.pricing.baseSellMultiplier;
+      const typeMultiplier = merchant.buyBack?.typeMultipliers?.[item.type]
+        ?? merchant.pricing.baseSellMultiplier;
+      const sellPrice = basePrice * typeMultiplier;
 
       // Check max value
       if (merchant.buyBack.maxValue > 0 && sellPrice > merchant.buyBack.maxValue) {

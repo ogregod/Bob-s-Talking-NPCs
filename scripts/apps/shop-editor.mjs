@@ -203,7 +203,17 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     shop.stockRefresh = shop.stockRefresh || { type: StockRefreshType.NEVER };
     shop.services = shop.services || {};
     shop.access = shop.access || {};
-    shop.buyBack = shop.buyBack || { enabled: false };
+
+    // Ensure buyBack has all required fields
+    shop.buyBack = shop.buyBack || {};
+    shop.buyBack.enabled = shop.buyBack.enabled ?? false;
+    shop.buyBack.itemTypes = shop.buyBack.itemTypes || [];
+    shop.buyBack.excludeTypes = shop.buyBack.excludeTypes || [];
+    shop.buyBack.typeMultipliers = shop.buyBack.typeMultipliers || {};
+    shop.buyBack.requireIdentified = shop.buyBack.requireIdentified ?? true;
+    shop.buyBack.excludeEquipped = shop.buyBack.excludeEquipped ?? true;
+    shop.buyBack.excludeAttuned = shop.buyBack.excludeAttuned ?? true;
+    shop.buyBack.maxValue = shop.buyBack.maxValue ?? 0;
 
     return shop;
   }
@@ -365,7 +375,8 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       access: this._shop.access,
 
       // Buyback
-      buyBack: this._shop.buyBack
+      buyBack: this._shop.buyBack,
+      buybackTypeOptions: this._prepareBuybackTypeOptions()
     };
   }
 
@@ -480,6 +491,33 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     }));
   }
 
+  /**
+   * Prepare buyback item type options
+   * @returns {object[]}
+   * @private
+   */
+  _prepareBuybackTypeOptions() {
+    const itemTypes = [
+      { value: "weapon", label: localize("ItemTypes.weapon"), icon: "fa-sword" },
+      { value: "equipment", label: localize("ItemTypes.equipment"), icon: "fa-shield" },
+      { value: "consumable", label: localize("ItemTypes.consumable"), icon: "fa-flask" },
+      { value: "tool", label: localize("ItemTypes.tool"), icon: "fa-wrench" },
+      { value: "loot", label: localize("ItemTypes.loot"), icon: "fa-gem" }
+    ];
+
+    const acceptedTypes = this._shop.buyBack?.itemTypes || [];
+    const typeMultipliers = this._shop.buyBack?.typeMultipliers || {};
+    const defaultMultiplier = this._shop.pricing?.baseSellMultiplier || 0.5;
+
+    return itemTypes.map(type => ({
+      ...type,
+      // If no types specified, all are accepted
+      checked: acceptedTypes.length === 0 || acceptedTypes.includes(type.value),
+      multiplier: typeMultipliers[type.value] ?? defaultMultiplier,
+      multiplierPercent: Math.round((typeMultipliers[type.value] ?? defaultMultiplier) * 100)
+    }));
+  }
+
   /** @override */
   async _onRender(context, options) {
     await super._onRender(context, options);
@@ -517,6 +555,32 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     const name = input.name;
     let value = input.type === "checkbox" ? input.checked : input.value;
 
+    // Special handling for buyBack.itemTypes checkboxes (array of checked values)
+    if (name === "buyBack.itemTypes") {
+      this._handleBuybackTypeChange();
+      return;
+    }
+
+    // Special handling for inventory quantity fields (inventory-qty-{itemId})
+    if (name.startsWith("inventory-qty-")) {
+      const itemId = name.replace("inventory-qty-", "");
+      const item = this._shop.inventory.find(i => i.id === itemId);
+      if (item) {
+        item.quantity = Math.max(0, parseInt(value) || 0);
+      }
+      return;
+    }
+
+    // Special handling for inventory price fields (inventory-price-{itemId})
+    if (name.startsWith("inventory-price-")) {
+      const itemId = name.replace("inventory-price-", "");
+      const item = this._shop.inventory.find(i => i.id === itemId);
+      if (item) {
+        item.basePrice = Math.max(0, parseFloat(value) || 0);
+      }
+      return;
+    }
+
     // Convert numeric values
     if (input.type === "number") {
       value = parseFloat(value) || 0;
@@ -524,6 +588,29 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Update shop object using dot notation path
     foundry.utils.setProperty(this._shop, name, value);
+  }
+
+  /**
+   * Handle buyback item type checkbox changes
+   * Gathers all checked types into an array
+   * @private
+   */
+  _handleBuybackTypeChange() {
+    const checkboxes = this.element.querySelectorAll('input[name="buyBack.itemTypes"]:checked');
+    const selectedTypes = Array.from(checkboxes).map(cb => cb.value);
+
+    // Ensure buyBack object exists
+    if (!this._shop.buyBack) {
+      this._shop.buyBack = {};
+    }
+
+    // If all types are checked, store empty array (means "accept all")
+    const allTypes = ["weapon", "equipment", "consumable", "tool", "loot"];
+    if (selectedTypes.length === allTypes.length) {
+      this._shop.buyBack.itemTypes = [];
+    } else {
+      this._shop.buyBack.itemTypes = selectedTypes;
+    }
   }
 
   /**
