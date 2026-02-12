@@ -173,7 +173,12 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
         // Configure selected token's NPC
         const selectedToken = canvas.tokens?.controlled?.[0];
         if (selectedToken?.actor?.type === "npc") {
-          game.bobsnpc?.ui?.openNPCConfig(selectedToken.actor);
+          // Always use the base world actor, not synthetic token actors
+          // This ensures config is saved to the actor in game.actors and visible in dashboard
+          const baseActor = selectedToken.document.actorLink
+            ? selectedToken.actor
+            : game.actors.get(selectedToken.actor.id) || selectedToken.actor;
+          game.bobsnpc?.ui?.openNPCConfig(baseActor);
         } else {
           ui.notifications.warn("Select an NPC token first");
         }

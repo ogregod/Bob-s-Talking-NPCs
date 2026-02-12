@@ -1040,8 +1040,12 @@ function registerRenderHooks() {
       class: "bobsnpc-config",
       icon: "fas fa-comments",
       onclick: () => {
-        // Open NPC configuration via the UI API
-        game.bobsnpc?.ui?.openNPCConfig(actor);
+        // Always use the base world actor, not synthetic token actors
+        // This ensures config is saved to game.actors and visible in dashboard
+        const baseActor = actor.isToken
+          ? game.actors.get(actor.id) || actor
+          : actor;
+        game.bobsnpc?.ui?.openNPCConfig(baseActor);
       }
     });
   });
