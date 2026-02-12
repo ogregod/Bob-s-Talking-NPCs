@@ -91,6 +91,473 @@ export const ItemCategory = Object.freeze({
 });
 
 /**
+ * Service category enum - groups services by business type
+ */
+export const ServiceCategory = Object.freeze({
+  CRAFTING: "crafting",       // Blacksmith, tailor, etc.
+  MAGIC: "magic",             // Enchanting, identifying, etc.
+  LODGING: "lodging",         // Inn rooms, long rests, etc.
+  TRANSPORT: "transport",     // Stables, cart rental, etc.
+  FOOD_DRINK: "foodDrink",    // Meals, drinks, rations
+  ENTERTAINMENT: "entertainment", // Gambling, performances
+  INFORMATION: "information", // Rumors, maps, quests
+  STORAGE: "storage",         // Item storage, bank vaults
+  TRAINING: "training",       // Skill training, proficiencies
+  HEALING: "healing",         // Temple healing, curses, etc.
+  LEGAL: "legal",             // Contracts, licenses, etc.
+  MISC: "misc"                // Other services
+});
+
+/**
+ * Service type enum - specific services that can be offered
+ */
+export const ServiceType = Object.freeze({
+  // Crafting Services (Blacksmith, Tailor, Jeweler, etc.)
+  REPAIR: "repair",
+  SHARPEN: "sharpen",
+  REINFORCE: "reinforce",
+  RESIZE: "resize",
+  CUSTOM_ORDER: "customOrder",
+  ALTERATIONS: "alterations",
+  POLISH: "polish",
+  ENGRAVE: "engrave",
+
+  // Magic Services (Magic Shop, Wizard, Temple)
+  IDENTIFY: "identify",
+  ENCHANT: "enchant",
+  DISENCHANT: "disenchant",
+  RECHARGE: "recharge",
+  ATTUNE: "attune",
+  SCRIBE_SCROLL: "scribeScroll",
+  BREW_POTION: "brewPotion",
+  REMOVE_CURSE: "removeCurse",
+
+  // Appraisal Services
+  APPRAISE: "appraise",
+  AUTHENTICATE: "authenticate",
+
+  // Lodging Services (Inn, Tavern)
+  ROOM_COMMON: "roomCommon",
+  ROOM_PRIVATE: "roomPrivate",
+  ROOM_SUITE: "roomSuite",
+  LONG_REST: "longRest",
+  SHORT_REST: "shortRest",
+  BATH: "bath",
+  LAUNDRY: "laundry",
+
+  // Food & Drink Services
+  MEAL_POOR: "mealPoor",
+  MEAL_MODEST: "mealModest",
+  MEAL_COMFORTABLE: "mealComfortable",
+  MEAL_WEALTHY: "mealWealthy",
+  DRINKS: "drinks",
+  RATIONS: "rations",
+  FEAST: "feast",
+
+  // Transport Services (Stable, Docks, Caravan)
+  HORSE_RENTAL: "horseRental",
+  HORSE_PURCHASE: "horsePurchase",
+  HORSE_BOARDING: "horseBoarding",
+  CART_RENTAL: "cartRental",
+  CARRIAGE_RENTAL: "carriageRental",
+  MOUNT_CARE: "mountCare",
+  WAGON_REPAIR: "wagonRepair",
+  PASSAGE_BOOK: "passageBook",
+
+  // Storage Services (Bank, Warehouse)
+  ITEM_STORAGE: "itemStorage",
+  SAFE_DEPOSIT: "safeDeposit",
+  CURRENCY_EXCHANGE: "currencyExchange",
+  MONEY_TRANSFER: "moneyTransfer",
+
+  // Information Services
+  RUMORS: "rumors",
+  MAP_PURCHASE: "mapPurchase",
+  GUIDE_HIRE: "guideHire",
+  TRANSLATION: "translation",
+  RESEARCH: "research",
+
+  // Training Services
+  SKILL_TRAINING: "skillTraining",
+  WEAPON_TRAINING: "weaponTraining",
+  TOOL_TRAINING: "toolTraining",
+  LANGUAGE_TRAINING: "languageTraining",
+  SPARRING: "sparring",
+
+  // Healing Services (Temple, Healer)
+  HEALING: "healing",
+  CURE_DISEASE: "cureDisease",
+  CURE_POISON: "curePoison",
+  RESTORATION: "restoration",
+  RESURRECTION: "resurrection",
+  BLESSING: "blessing",
+
+  // Entertainment Services
+  GAMBLING: "gambling",
+  PERFORMANCE: "performance",
+  FORTUNE_TELLING: "fortuneTelling",
+  ARENA_FIGHT: "arenaFight",
+
+  // Legal Services
+  CONTRACT: "contract",
+  LICENSE: "license",
+  BOUNTY_POST: "bountyPost",
+  NOTARY: "notary"
+});
+
+/**
+ * Create a service definition
+ * @param {object} data - Service data
+ * @returns {object}
+ */
+export function createServiceDefinition(data = {}) {
+  return {
+    id: data.id || data.type || generateId(),
+    type: data.type || ServiceType.REPAIR,
+    category: data.category || ServiceCategory.MISC,
+    name: data.name || "",
+    description: data.description || "",
+    icon: data.icon || "fa-cog",
+
+    // Pricing
+    enabled: data.enabled ?? false,
+    basePrice: data.basePrice ?? 0,
+    priceType: data.priceType || "fixed",  // fixed, percent, perDay, perItem, variable
+    pricePercent: data.pricePercent ?? 0,  // For percent-based pricing
+    pricePerUnit: data.pricePerUnit ?? 0,  // For per-day/per-item pricing
+    currency: data.currency || "gp",
+
+    // Duration
+    hasDuration: data.hasDuration ?? false,
+    durationUnit: data.durationUnit || "hours",  // hours, days, weeks
+    baseDuration: data.baseDuration ?? 1,
+    durationOptions: data.durationOptions || [],  // [{duration, price, label}]
+
+    // Requirements
+    requiresItem: data.requiresItem ?? false,
+    validItemTypes: data.validItemTypes || [],  // Which item types can use this service
+    requiresPayment: data.requiresPayment ?? true,
+    requiresGMApproval: data.requiresGMApproval ?? false,
+
+    // Results
+    appliesEffect: data.appliesEffect || null,  // Active effect to apply
+    modifiesItem: data.modifiesItem ?? false,
+    createsItem: data.createsItem ?? false,
+    outputItemUuid: data.outputItemUuid || null,
+
+    // Availability
+    dailyLimit: data.dailyLimit ?? 0,  // 0 = unlimited
+    usesRemaining: data.usesRemaining ?? -1,
+    cooldownHours: data.cooldownHours ?? 0,
+
+    // Custom data for specific service types
+    customData: data.customData || {}
+  };
+}
+
+/**
+ * Get default services for a shop type
+ * @param {string} shopType - Shop type from ShopType enum
+ * @returns {object[]} Array of service definitions
+ */
+export function getDefaultServicesForShopType(shopType) {
+  const services = [];
+
+  switch (shopType) {
+    case ShopType.BLACKSMITH:
+      services.push(
+        createServiceDefinition({
+          type: ServiceType.REPAIR,
+          category: ServiceCategory.CRAFTING,
+          name: "Repair Item",
+          description: "Repair damaged weapons and armor",
+          icon: "fa-wrench",
+          enabled: true,
+          priceType: "percent",
+          pricePercent: 10,
+          requiresItem: true,
+          validItemTypes: ["weapon", "equipment"]
+        }),
+        createServiceDefinition({
+          type: ServiceType.SHARPEN,
+          category: ServiceCategory.CRAFTING,
+          name: "Sharpen Weapon",
+          description: "Sharpen a blade for improved performance",
+          icon: "fa-swords",
+          enabled: true,
+          basePrice: 5,
+          requiresItem: true,
+          validItemTypes: ["weapon"]
+        }),
+        createServiceDefinition({
+          type: ServiceType.CUSTOM_ORDER,
+          category: ServiceCategory.CRAFTING,
+          name: "Custom Order",
+          description: "Commission a custom piece of equipment",
+          icon: "fa-hammer",
+          enabled: true,
+          priceType: "variable",
+          requiresGMApproval: true,
+          hasDuration: true,
+          durationUnit: "days",
+          baseDuration: 7
+        })
+      );
+      break;
+
+    case ShopType.INN:
+      services.push(
+        createServiceDefinition({
+          type: ServiceType.ROOM_COMMON,
+          category: ServiceCategory.LODGING,
+          name: "Common Room",
+          description: "Sleep in the common room with other travelers",
+          icon: "fa-bed",
+          enabled: true,
+          basePrice: 0.05,
+          priceType: "perDay",
+          pricePerUnit: 0.05,
+          hasDuration: true,
+          durationUnit: "days"
+        }),
+        createServiceDefinition({
+          type: ServiceType.ROOM_PRIVATE,
+          category: ServiceCategory.LODGING,
+          name: "Private Room",
+          description: "A private room with a bed and basic amenities",
+          icon: "fa-door-closed",
+          enabled: true,
+          basePrice: 0.5,
+          priceType: "perDay",
+          pricePerUnit: 0.5,
+          hasDuration: true,
+          durationUnit: "days"
+        }),
+        createServiceDefinition({
+          type: ServiceType.ROOM_SUITE,
+          category: ServiceCategory.LODGING,
+          name: "Suite",
+          description: "Luxurious accommodations with premium amenities",
+          icon: "fa-crown",
+          enabled: true,
+          basePrice: 2,
+          priceType: "perDay",
+          pricePerUnit: 2,
+          hasDuration: true,
+          durationUnit: "days"
+        }),
+        createServiceDefinition({
+          type: ServiceType.MEAL_MODEST,
+          category: ServiceCategory.FOOD_DRINK,
+          name: "Hot Meal",
+          description: "A filling hot meal",
+          icon: "fa-utensils",
+          enabled: true,
+          basePrice: 0.03
+        }),
+        createServiceDefinition({
+          type: ServiceType.DRINKS,
+          category: ServiceCategory.FOOD_DRINK,
+          name: "Drinks",
+          description: "Ale, wine, or other beverages",
+          icon: "fa-beer-mug-empty",
+          enabled: true,
+          basePrice: 0.04
+        }),
+        createServiceDefinition({
+          type: ServiceType.LONG_REST,
+          category: ServiceCategory.LODGING,
+          name: "Long Rest",
+          description: "Rest in comfort and recover fully",
+          icon: "fa-moon",
+          enabled: true,
+          basePrice: 1,
+          hasDuration: true,
+          durationUnit: "hours",
+          baseDuration: 8
+        })
+      );
+      break;
+
+    case ShopType.STABLE:
+      services.push(
+        createServiceDefinition({
+          type: ServiceType.HORSE_BOARDING,
+          category: ServiceCategory.TRANSPORT,
+          name: "Horse Boarding",
+          description: "Stable and feed your horse",
+          icon: "fa-horse",
+          enabled: true,
+          basePrice: 0.5,
+          priceType: "perDay",
+          pricePerUnit: 0.5,
+          hasDuration: true,
+          durationUnit: "days"
+        }),
+        createServiceDefinition({
+          type: ServiceType.HORSE_RENTAL,
+          category: ServiceCategory.TRANSPORT,
+          name: "Horse Rental",
+          description: "Rent a horse for travel",
+          icon: "fa-horse-head",
+          enabled: true,
+          basePrice: 2,
+          priceType: "perDay",
+          pricePerUnit: 2,
+          hasDuration: true,
+          durationUnit: "days"
+        }),
+        createServiceDefinition({
+          type: ServiceType.CART_RENTAL,
+          category: ServiceCategory.TRANSPORT,
+          name: "Cart Rental",
+          description: "Rent a cart for hauling goods",
+          icon: "fa-trailer",
+          enabled: true,
+          basePrice: 1,
+          priceType: "perDay",
+          pricePerUnit: 1,
+          hasDuration: true,
+          durationUnit: "days"
+        }),
+        createServiceDefinition({
+          type: ServiceType.CARRIAGE_RENTAL,
+          category: ServiceCategory.TRANSPORT,
+          name: "Carriage Rental",
+          description: "Rent a carriage for comfortable travel",
+          icon: "fa-carriage",
+          enabled: true,
+          basePrice: 5,
+          priceType: "perDay",
+          pricePerUnit: 5,
+          hasDuration: true,
+          durationUnit: "days"
+        }),
+        createServiceDefinition({
+          type: ServiceType.MOUNT_CARE,
+          category: ServiceCategory.TRANSPORT,
+          name: "Mount Grooming",
+          description: "Full grooming and care for your mount",
+          icon: "fa-brush",
+          enabled: true,
+          basePrice: 1
+        })
+      );
+      break;
+
+    case ShopType.MAGIC:
+      services.push(
+        createServiceDefinition({
+          type: ServiceType.IDENTIFY,
+          category: ServiceCategory.MAGIC,
+          name: "Identify Item",
+          description: "Identify the magical properties of an item",
+          icon: "fa-magnifying-glass",
+          enabled: true,
+          basePrice: 25,
+          requiresItem: true
+        }),
+        createServiceDefinition({
+          type: ServiceType.ENCHANT,
+          category: ServiceCategory.MAGIC,
+          name: "Enchant Item",
+          description: "Apply a magical enchantment to an item",
+          icon: "fa-wand-magic-sparkles",
+          enabled: true,
+          priceType: "variable",
+          requiresItem: true,
+          validItemTypes: ["weapon", "equipment"],
+          requiresGMApproval: true,
+          hasDuration: true,
+          durationUnit: "days",
+          baseDuration: 3
+        }),
+        createServiceDefinition({
+          type: ServiceType.REMOVE_CURSE,
+          category: ServiceCategory.MAGIC,
+          name: "Remove Curse",
+          description: "Remove a curse from an item or person",
+          icon: "fa-hand-sparkles",
+          enabled: true,
+          basePrice: 100,
+          requiresGMApproval: true
+        }),
+        createServiceDefinition({
+          type: ServiceType.SCRIBE_SCROLL,
+          category: ServiceCategory.MAGIC,
+          name: "Scribe Scroll",
+          description: "Have a spell scroll created",
+          icon: "fa-scroll",
+          enabled: true,
+          priceType: "variable",
+          requiresGMApproval: true,
+          hasDuration: true,
+          durationUnit: "days"
+        })
+      );
+      break;
+
+    case ShopType.TAILOR:
+      services.push(
+        createServiceDefinition({
+          type: ServiceType.ALTERATIONS,
+          category: ServiceCategory.CRAFTING,
+          name: "Alterations",
+          description: "Adjust clothing to fit perfectly",
+          icon: "fa-scissors",
+          enabled: true,
+          basePrice: 2,
+          requiresItem: true,
+          validItemTypes: ["equipment"]
+        }),
+        createServiceDefinition({
+          type: ServiceType.REPAIR,
+          category: ServiceCategory.CRAFTING,
+          name: "Mend Clothing",
+          description: "Repair torn or damaged clothing",
+          icon: "fa-needle",
+          enabled: true,
+          priceType: "percent",
+          pricePercent: 5,
+          requiresItem: true,
+          validItemTypes: ["equipment"]
+        }),
+        createServiceDefinition({
+          type: ServiceType.CUSTOM_ORDER,
+          category: ServiceCategory.CRAFTING,
+          name: "Custom Tailoring",
+          description: "Commission custom clothing or robes",
+          icon: "fa-shirt",
+          enabled: true,
+          priceType: "variable",
+          requiresGMApproval: true,
+          hasDuration: true,
+          durationUnit: "days",
+          baseDuration: 5
+        })
+      );
+      break;
+
+    default:
+      // General services available to most shops
+      services.push(
+        createServiceDefinition({
+          type: ServiceType.APPRAISE,
+          category: ServiceCategory.MISC,
+          name: "Appraise Item",
+          description: "Get an expert appraisal of an item's value",
+          icon: "fa-coins",
+          enabled: false,
+          basePrice: 5,
+          requiresItem: true
+        })
+      );
+  }
+
+  return services;
+}
+
+/**
  * Create a shop inventory item
  * @param {object} data - Item data
  * @returns {object}
@@ -285,10 +752,20 @@ export function createMerchant(data = {}) {
     color: data.color || "#ff9800",
     bannerImage: data.bannerImage || null,
 
-    // Inventory
+    // Inventory - Storefront (visible to players)
     inventory: (data.inventory || []).map(item => createShopItem(item)),
     categories: (data.categories || []).map(cat => createShopCategory(cat)),
     useCategories: data.useCategories ?? true,
+
+    // Back Room Inventory (hidden from players, GM only)
+    backroom: {
+      enabled: data.backroom?.enabled ?? true,
+      inventory: (data.backroom?.inventory || []).map(item => createShopItem(item)),
+      // Where items go when players sell to shop
+      autoAddPurchasedItems: data.backroom?.autoAddPurchasedItems ?? true,
+      // Notes for the GM
+      notes: data.backroom?.notes || ""
+    },
 
     // Pricing
     pricing: createPricingConfig(data.pricing || {}),
