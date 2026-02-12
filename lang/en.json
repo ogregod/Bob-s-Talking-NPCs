@@ -2824,52 +2824,104 @@
     },
 
     "NPCRole": {
-      "questGiver": "Quest Giver",
-      "questTurnIn": "Quest Turn-In",
-      "merchant": "Merchant",
-      "banker": "Banker",
-      "stableMaster": "Stable Master",
-      "innkeeper": "Innkeeper",
-      "trainer": "Trainer",
-      "enchanter": "Enchanter",
-      "transporter": "Transporter",
-      "informant": "Informant",
-      "hirelingRecruiter": "Hireling Recruiter",
-      "fence": "Fence",
-      "factionRepresentative": "Faction Representative",
-      "guard": "Guard",
-      "questGiver.Description": "This NPC can offer quests to players",
-      "questTurnIn.Description": "This NPC can accept completed quests",
-      "merchant.Description": "This NPC can buy and sell items to players",
-      "banker.Description": "This NPC provides banking services",
-      "stableMaster.Description": "This NPC manages mount storage and sales",
-      "innkeeper.Description": "This NPC provides lodging and meals",
-      "trainer.Description": "This NPC can train skills or abilities",
-      "enchanter.Description": "This NPC provides enchanting services",
-      "transporter.Description": "This NPC offers fast travel services",
-      "informant.Description": "This NPC provides rumors and information",
-      "hirelingRecruiter.Description": "This NPC recruits hirelings for the party",
-      "fence.Description": "This NPC buys stolen goods",
-      "factionRepresentative.Description": "This NPC represents a faction",
-      "guard.Description": "This NPC patrols and enforces the law"
+      "questGiver": {
+        "Label": "Quest Giver",
+        "Description": "This NPC can offer quests to players"
+      },
+      "questTurnIn": {
+        "Label": "Quest Turn-In",
+        "Description": "This NPC can accept completed quests"
+      },
+      "merchant": {
+        "Label": "Merchant",
+        "Description": "This NPC can buy and sell items to players"
+      },
+      "banker": {
+        "Label": "Banker",
+        "Description": "This NPC provides banking services"
+      },
+      "stableMaster": {
+        "Label": "Stable Master",
+        "Description": "This NPC manages mount storage and sales"
+      },
+      "innkeeper": {
+        "Label": "Innkeeper",
+        "Description": "This NPC provides lodging and meals"
+      },
+      "trainer": {
+        "Label": "Trainer",
+        "Description": "This NPC can train skills or abilities"
+      },
+      "enchanter": {
+        "Label": "Enchanter",
+        "Description": "This NPC provides enchanting services"
+      },
+      "transporter": {
+        "Label": "Transporter",
+        "Description": "This NPC offers fast travel services"
+      },
+      "informant": {
+        "Label": "Informant",
+        "Description": "This NPC provides rumors and information"
+      },
+      "hirelingRecruiter": {
+        "Label": "Hireling Recruiter",
+        "Description": "This NPC recruits hirelings for the party"
+      },
+      "fence": {
+        "Label": "Fence",
+        "Description": "This NPC buys stolen goods"
+      },
+      "factionRepresentative": {
+        "Label": "Faction Representative",
+        "Description": "This NPC represents a faction"
+      },
+      "guard": {
+        "Label": "Guard",
+        "Description": "This NPC patrols and enforces the law"
+      }
     },
 
     "IndicatorType": {
-      "none": "None",
-      "questAvailable": "Quest Available",
-      "questTurnIn": "Quest Turn-In",
-      "questProgress": "Quest In Progress",
-      "merchant": "Merchant",
-      "trainer": "Trainer",
-      "service": "Service Available",
-      "dialogue": "Dialogue Available"
+      "none": {
+        "Label": "None"
+      },
+      "questAvailable": {
+        "Label": "Quest Available"
+      },
+      "questTurnIn": {
+        "Label": "Quest Turn-In"
+      },
+      "questProgress": {
+        "Label": "Quest In Progress"
+      },
+      "merchant": {
+        "Label": "Merchant"
+      },
+      "trainer": {
+        "Label": "Trainer"
+      },
+      "service": {
+        "Label": "Service Available"
+      },
+      "dialogue": {
+        "Label": "Dialogue Available"
+      }
     },
 
     "NameDisplay": {
-      "always": "Always Show",
-      "hover": "Show on Hover",
-      "never": "Never Show",
-      "known": "When Known"
+      "always": {
+        "Label": "Always Show"
+      },
+      "hover": {
+        "Label": "Show on Hover"
+      },
+      "never": {
+        "Label": "Never Show"
+      },
+      "known": {
+        "Label": "When Known"
+      }
     },
 
     "WorldState": {

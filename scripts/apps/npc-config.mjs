@@ -343,7 +343,7 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   _prepareRoleOptions() {
     return Object.values(NPCRole).map(role => ({
       value: role,
-      label: localize(`NPCRole.${role}`),
+      label: localize(`NPCRole.${role}.Label`),
       selected: this._config.roles.includes(role)
     }));
   }
@@ -356,7 +356,7 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   _prepareIndicatorOptions() {
     return Object.values(IndicatorType).map(type => ({
       value: type,
-      label: localize(`IndicatorType.${type}`),
+      label: localize(`IndicatorType.${type}.Label`),
       selected: this._config.appearance.indicator === type
     }));
   }
@@ -370,7 +370,7 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     const options = ["always", "hover", "never", "known"];
     return options.map(opt => ({
       value: opt,
-      label: localize(`NameDisplay.${opt}`),
+      label: localize(`NameDisplay.${opt}.Label`),
       selected: this._config.appearance.nameDisplay === opt
     }));
   }
@@ -383,7 +383,7 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   _prepareRolesDisplay() {
     return this._config.roles.map((role, index) => ({
       role,
-      label: localize(`NPCRole.${role}`),
+      label: localize(`NPCRole.${role}.Label`),
       icon: this._getRoleIcon(role),
       isPrimary: role === this._config.primaryRole,
       index
