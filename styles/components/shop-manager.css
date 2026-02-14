@@ -1228,4 +1228,225 @@
     color: var(--bobsnpc-text-muted);
     font-weight: var(--bobsnpc-font-weight-medium);
   }
+
+  /* ===== Back Room Tab ===== */
+
+  .shop-editor .backroom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-editor .backroom-header h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-editor .backroom-description {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-md);
+    border-left: 3px solid var(--bobsnpc-info);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-secondary);
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .shop-editor .backroom-settings {
+    margin-bottom: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border-radius: var(--bobsnpc-border-radius-md);
+  }
+
+  .shop-editor .backroom-notes {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .shop-editor .backroom-notes textarea {
+    width: 100%;
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+    padding: var(--bobsnpc-spacing-sm);
+    resize: vertical;
+  }
+
+  .shop-editor .backroom-list .backroom-item {
+    border-left: 3px solid var(--bobsnpc-warning);
+  }
+
+  .shop-editor .action-btn.storefront {
+    color: var(--bobsnpc-success);
+  }
+
+  .shop-editor .action-btn.storefront:hover {
+    background: rgba(76, 175, 80, 0.15);
+  }
+
+  .shop-editor .action-btn.backroom {
+    color: var(--bobsnpc-warning);
+  }
+
+  .shop-editor .action-btn.backroom:hover {
+    background: rgba(255, 152, 0, 0.15);
+  }
+
+  /* ===== Enhanced Services Section ===== */
+
+  .shop-editor .enhanced-services-section .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-editor .enhanced-services-section .section-header h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .shop-editor .services-editor-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-editor .service-editor-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    transition: all 0.15s ease;
+  }
+
+  .shop-editor .service-editor-entry:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .shop-editor .service-editor-entry.disabled {
+    opacity: 0.5;
+  }
+
+  .shop-editor .service-editor-entry .service-toggle .toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--bobsnpc-text-muted);
+    padding: 2px;
+  }
+
+  .shop-editor .service-editor-entry .service-toggle .toggle-btn.active {
+    color: var(--bobsnpc-success);
+  }
+
+  .shop-editor .service-editor-entry .service-icon-col {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    flex-shrink: 0;
+    font-size: 14px;
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .shop-editor .service-editor-entry .service-info-col {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .shop-editor .service-editor-entry .service-name {
+    font-weight: var(--bobsnpc-font-weight-bold);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .shop-editor .service-editor-entry .service-meta {
+    display: flex;
+    gap: var(--bobsnpc-spacing-xs);
+    font-size: 10px;
+  }
+
+  .shop-editor .service-editor-entry .service-category {
+    color: var(--bobsnpc-text-muted);
+    background: var(--bobsnpc-bg-tertiary);
+    padding: 1px 6px;
+    border-radius: 8px;
+  }
+
+  .shop-editor .service-editor-entry .service-type-badge {
+    color: var(--bobsnpc-info);
+    background: rgba(33, 150, 243, 0.1);
+    padding: 1px 6px;
+    border-radius: 8px;
+  }
+
+  .shop-editor .service-editor-entry .service-description {
+    font-size: 10px;
+    color: var(--bobsnpc-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .shop-editor .service-editor-entry .service-price-col {
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .shop-editor .service-editor-entry .service-price {
+    font-weight: var(--bobsnpc-font-weight-bold);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-warning);
+  }
+
+  .shop-editor .service-editor-entry .service-flags {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .shop-editor .service-editor-entry .service-flags .flag {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: 10px;
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .shop-editor .service-editor-entry .service-actions {
+    flex-shrink: 0;
+  }
+
+  .shop-editor .empty-services {
+    text-align: center;
+    padding: var(--bobsnpc-spacing-xl);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .shop-editor .empty-services i {
+    font-size: 32px;
+    margin-bottom: var(--bobsnpc-spacing-sm);
+    opacity: 0.4;
+  }
 }

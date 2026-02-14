@@ -18,6 +18,16 @@
     </div>
 
     <div class="form-group">
+      <label for="shop-display-mode">{{localize "BOBSNPC.ShopEditor.DisplayMode"}}</label>
+      <select id="shop-display-mode" name="displayMode">
+        {{#each displayModeOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+      <span class="hint">{{localize "BOBSNPC.ShopEditor.DisplayModeHint"}}</span>
+    </div>
+
+    <div class="form-group">
       <label for="shop-description">{{localize "BOBSNPC.ShopEditor.Description"}}</label>
       <textarea id="shop-description" name="description" rows="3" placeholder="{{localize 'BOBSNPC.ShopEditor.DescriptionPlaceholder'}}">{{shop.description}}</textarea>
     </div>

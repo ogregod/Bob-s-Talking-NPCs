@@ -1,5 +1,5 @@
 {{!-- Shop Cart Panel - Enhanced --}}
-<aside class="shop-cart {{theme}} {{#if cartEmpty}}empty{{/if}}">
+<aside class="shop-cart {{theme}} {{#if cartEmpty}}empty{{/if}} {{#if (eq activeTab 'services')}}services-active{{/if}}">
   {{!-- Gradient header with item count badge --}}
   <header class="cart-header">
     <h3>

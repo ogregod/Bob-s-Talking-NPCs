@@ -76,6 +76,20 @@ export const Currency = Object.freeze({
 });
 
 /**
+ * Shop display mode - determines how the shop window presents itself
+ * "auto" = auto-detect based on inventory/services availability
+ * "shop" = standard shop, buy tab is primary (traditional item shop)
+ * "services" = services-focused, services tab is primary (temple, arena, bank)
+ * "mixed" = show all tabs equally, no preference
+ */
+export const ShopDisplayMode = Object.freeze({
+  AUTO: "auto",
+  SHOP: "shop",
+  SERVICES: "services",
+  MIXED: "mixed"
+});
+
+/**
  * Item category enum for shop filtering
  */
 export const ItemCategory = Object.freeze({
@@ -747,6 +761,9 @@ export function createMerchant(data = {}) {
     type: data.type || ShopType.GENERAL,
     customType: data.customType || null,
 
+    // Display mode
+    displayMode: data.displayMode || ShopDisplayMode.AUTO,
+
     // Visual
     icon: data.icon || "fa-store",
     color: data.color || "#ff9800",
@@ -795,7 +812,7 @@ export function createMerchant(data = {}) {
       }
     },
 
-    // Services offered
+    // Services offered (legacy flat format for backwards compat)
     services: {
       identify: data.services?.identify ?? false,
       identifyPrice: data.services?.identifyPrice ?? 25,
@@ -804,8 +821,13 @@ export function createMerchant(data = {}) {
       enchant: data.services?.enchant ?? false,
       enchantPrices: data.services?.enchantPrices || {},
       appraise: data.services?.appraise ?? false,
-      appraisePrice: data.services?.appraisePrice ?? 10
+      appraisePrice: data.services?.appraisePrice ?? 10,
+      // Enhanced services list (new system)
+      availableEnchantments: data.services?.availableEnchantments || {}
     },
+
+    // Enhanced services (new structured service definitions)
+    servicesList: (data.servicesList || []).map(s => createServiceDefinition(s)),
 
     // Access control
     access: {
@@ -1260,7 +1282,20 @@ export const MerchantTemplates = {
       baseSellMultiplier: 0.5
     }),
     haggling: createHagglingConfig({ enabled: true }),
-    buyBack: { enabled: true }
+    buyBack: { enabled: true },
+    backroom: { enabled: true, autoAddPurchasedItems: true },
+    servicesList: [
+      createServiceDefinition({
+        type: ServiceType.APPRAISE,
+        category: ServiceCategory.MISC,
+        name: "Appraise Item",
+        description: "Get an expert appraisal of an item's value",
+        icon: "fa-coins",
+        enabled: true,
+        basePrice: 5,
+        requiresItem: true
+      })
+    ]
   },
 
   blacksmith: {
@@ -1279,10 +1314,12 @@ export const MerchantTemplates = {
       enabled: true,
       itemTypes: ["weapon", "equipment"],
       typeMultipliers: {
-        weapon: 0.55,      // Blacksmith pays more for weapons
-        equipment: 0.6     // Best rates for armor
+        weapon: 0.55,
+        equipment: 0.6
       }
-    }
+    },
+    backroom: { enabled: true, autoAddPurchasedItems: true },
+    servicesList: getDefaultServicesForShopType(ShopType.BLACKSMITH)
   },
 
   alchemist: {
@@ -1301,9 +1338,45 @@ export const MerchantTemplates = {
       enabled: true,
       itemTypes: ["consumable"],
       typeMultipliers: {
-        consumable: 0.5    // Alchemist pays better for potions
+        consumable: 0.5
       }
-    }
+    },
+    backroom: { enabled: true, autoAddPurchasedItems: true },
+    servicesList: [
+      createServiceDefinition({
+        type: ServiceType.IDENTIFY,
+        category: ServiceCategory.MAGIC,
+        name: "Identify Substance",
+        description: "Identify an unknown potion or substance",
+        icon: "fa-magnifying-glass",
+        enabled: true,
+        basePrice: 25,
+        requiresItem: true
+      }),
+      createServiceDefinition({
+        type: ServiceType.BREW_POTION,
+        category: ServiceCategory.MAGIC,
+        name: "Brew Potion",
+        description: "Commission a custom potion",
+        icon: "fa-flask-vial",
+        enabled: true,
+        priceType: "variable",
+        requiresGMApproval: true,
+        hasDuration: true,
+        durationUnit: "days",
+        baseDuration: 3
+      }),
+      createServiceDefinition({
+        type: ServiceType.APPRAISE,
+        category: ServiceCategory.MISC,
+        name: "Appraise Reagent",
+        description: "Determine the value of alchemical ingredients",
+        icon: "fa-coins",
+        enabled: true,
+        basePrice: 3,
+        requiresItem: true
+      })
+    ]
   },
 
   magic_shop: {
@@ -1333,7 +1406,9 @@ export const MerchantTemplates = {
     buyBack: {
       enabled: true,
       requireIdentified: true
-    }
+    },
+    backroom: { enabled: true, autoAddPurchasedItems: true },
+    servicesList: getDefaultServicesForShopType(ShopType.MAGIC)
   },
 
   fence: {
@@ -1355,21 +1430,45 @@ export const MerchantTemplates = {
     buyBack: {
       enabled: true,
       typeMultipliers: {
-        weapon: 0.65,      // Good rates on hot weapons
+        weapon: 0.65,
         equipment: 0.6,
         consumable: 0.5,
         tool: 0.55,
-        loot: 0.75         // Best rates on gems and jewelry
+        loot: 0.75
       }
     },
+    backroom: { enabled: true, autoAddPurchasedItems: true },
     access: {
-      reputationRequired: -50  // Need some notoriety
-    }
+      reputationRequired: -50
+    },
+    servicesList: [
+      createServiceDefinition({
+        type: ServiceType.APPRAISE,
+        category: ServiceCategory.MISC,
+        name: "Appraise Item",
+        description: "Discreet appraisal, no questions asked",
+        icon: "fa-coins",
+        enabled: true,
+        basePrice: 10,
+        requiresItem: true
+      }),
+      createServiceDefinition({
+        type: ServiceType.AUTHENTICATE,
+        category: ServiceCategory.MISC,
+        name: "Verify Authenticity",
+        description: "Check if an item is genuine or forged",
+        icon: "fa-stamp",
+        enabled: true,
+        basePrice: 15,
+        requiresItem: true
+      })
+    ]
   },
 
   inn: {
     name: "Inn & Tavern",
     type: ShopType.INN,
+    displayMode: ShopDisplayMode.MIXED,
     icon: "fa-beer-mug-empty",
     pricing: createPricingConfig({
       baseBuyMultiplier: 1.0,
@@ -1378,12 +1477,604 @@ export const MerchantTemplates = {
     services: {
       room: true,
       roomPrices: {
-        common: 5,   // sp
-        private: 20, // sp
-        suite: 100   // sp
+        common: 5,
+        private: 20,
+        suite: 100
       }
     },
-    buyBack: { enabled: false }
+    buyBack: { enabled: false },
+    backroom: { enabled: true, autoAddPurchasedItems: false },
+    servicesList: getDefaultServicesForShopType(ShopType.INN)
+  },
+
+  tailor: {
+    name: "Tailor",
+    type: ShopType.TAILOR,
+    icon: "fa-scissors",
+    pricing: createPricingConfig({
+      baseBuyMultiplier: 1.1,
+      baseSellMultiplier: 0.4
+    }),
+    haggling: createHagglingConfig({ enabled: true, persuasionDC: 13 }),
+    buyBack: {
+      enabled: true,
+      itemTypes: ["equipment"],
+      typeMultipliers: {
+        equipment: 0.45
+      }
+    },
+    backroom: { enabled: true, autoAddPurchasedItems: true },
+    servicesList: getDefaultServicesForShopType(ShopType.TAILOR)
+  },
+
+  stable: {
+    name: "Stable",
+    type: ShopType.STABLE,
+    displayMode: ShopDisplayMode.SERVICES,
+    icon: "fa-horse",
+    pricing: createPricingConfig({
+      baseBuyMultiplier: 1.0,
+      baseSellMultiplier: 0.5
+    }),
+    haggling: createHagglingConfig({ enabled: true, persuasionDC: 14 }),
+    buyBack: { enabled: false },
+    backroom: { enabled: false },
+    servicesList: getDefaultServicesForShopType(ShopType.STABLE)
+  },
+
+  temple: {
+    name: "Temple",
+    type: ShopType.CUSTOM,
+    customType: "temple",
+    displayMode: ShopDisplayMode.SERVICES,
+    icon: "fa-place-of-worship",
+    pricing: createPricingConfig({
+      baseBuyMultiplier: 1.0,
+      baseSellMultiplier: 0.3
+    }),
+    haggling: createHagglingConfig({ enabled: false }),
+    buyBack: { enabled: false },
+    backroom: { enabled: false },
+    servicesList: [
+      createServiceDefinition({
+        type: ServiceType.HEALING,
+        category: ServiceCategory.HEALING,
+        name: "Healing",
+        description: "Receive divine healing for your wounds",
+        icon: "fa-heart-pulse",
+        enabled: true,
+        basePrice: 10,
+        customData: { healAmount: "2d8+2" }
+      }),
+      createServiceDefinition({
+        type: ServiceType.CURE_DISEASE,
+        category: ServiceCategory.HEALING,
+        name: "Cure Disease",
+        description: "Remove a disease through divine intervention",
+        icon: "fa-virus-slash",
+        enabled: true,
+        basePrice: 50
+      }),
+      createServiceDefinition({
+        type: ServiceType.CURE_POISON,
+        category: ServiceCategory.HEALING,
+        name: "Neutralize Poison",
+        description: "Purge toxins from the body",
+        icon: "fa-droplet-slash",
+        enabled: true,
+        basePrice: 30
+      }),
+      createServiceDefinition({
+        type: ServiceType.REMOVE_CURSE,
+        category: ServiceCategory.MAGIC,
+        name: "Remove Curse",
+        description: "Lift a curse through prayer and ritual",
+        icon: "fa-hand-sparkles",
+        enabled: true,
+        basePrice: 100,
+        requiresGMApproval: true
+      }),
+      createServiceDefinition({
+        type: ServiceType.RESTORATION,
+        category: ServiceCategory.HEALING,
+        name: "Greater Restoration",
+        description: "Powerful divine magic to restore what was lost",
+        icon: "fa-sun",
+        enabled: true,
+        basePrice: 500,
+        requiresGMApproval: true
+      }),
+      createServiceDefinition({
+        type: ServiceType.RESURRECTION,
+        category: ServiceCategory.HEALING,
+        name: "Resurrection",
+        description: "Bring a fallen companion back from the dead",
+        icon: "fa-ankh",
+        enabled: true,
+        basePrice: 1000,
+        requiresGMApproval: true
+      }),
+      createServiceDefinition({
+        type: ServiceType.BLESSING,
+        category: ServiceCategory.HEALING,
+        name: "Blessing",
+        description: "Receive a divine blessing before your journey",
+        icon: "fa-hands-praying",
+        enabled: true,
+        basePrice: 25
+      })
+    ]
+  },
+
+  guild_hall: {
+    name: "Guild Hall",
+    type: ShopType.CUSTOM,
+    customType: "guildHall",
+    displayMode: ShopDisplayMode.MIXED,
+    icon: "fa-building-columns",
+    pricing: createPricingConfig({
+      baseBuyMultiplier: 0.9,
+      baseSellMultiplier: 0.5
+    }),
+    haggling: createHagglingConfig({ enabled: false }),
+    buyBack: { enabled: true },
+    backroom: { enabled: true, autoAddPurchasedItems: true },
+    servicesList: [
+      createServiceDefinition({
+        type: ServiceType.SKILL_TRAINING,
+        category: ServiceCategory.TRAINING,
+        name: "Skill Training",
+        description: "Train with guild experts to improve your skills",
+        icon: "fa-dumbbell",
+        enabled: true,
+        basePrice: 25,
+        priceType: "perDay",
+        pricePerUnit: 25,
+        hasDuration: true,
+        durationUnit: "days",
+        baseDuration: 7
+      }),
+      createServiceDefinition({
+        type: ServiceType.TOOL_TRAINING,
+        category: ServiceCategory.TRAINING,
+        name: "Tool Proficiency",
+        description: "Learn to use a new set of tools",
+        icon: "fa-screwdriver-wrench",
+        enabled: true,
+        basePrice: 25,
+        priceType: "perDay",
+        pricePerUnit: 25,
+        hasDuration: true,
+        durationUnit: "days",
+        baseDuration: 30
+      }),
+      createServiceDefinition({
+        type: ServiceType.SPARRING,
+        category: ServiceCategory.TRAINING,
+        name: "Sparring Practice",
+        description: "Practice combat techniques with a sparring partner",
+        icon: "fa-swords",
+        enabled: true,
+        basePrice: 5
+      }),
+      createServiceDefinition({
+        type: ServiceType.RUMORS,
+        category: ServiceCategory.INFORMATION,
+        name: "Guild Rumors",
+        description: "Hear the latest guild gossip and leads",
+        icon: "fa-ear-listen",
+        enabled: true,
+        basePrice: 2
+      }),
+      createServiceDefinition({
+        type: ServiceType.BOUNTY_POST,
+        category: ServiceCategory.LEGAL,
+        name: "Bounty Board",
+        description: "Check the bounty board for available contracts",
+        icon: "fa-scroll",
+        enabled: true,
+        basePrice: 0
+      })
+    ]
+  },
+
+  bank: {
+    name: "Bank",
+    type: ShopType.CUSTOM,
+    customType: "bank",
+    displayMode: ShopDisplayMode.SERVICES,
+    icon: "fa-landmark",
+    pricing: createPricingConfig({}),
+    haggling: createHagglingConfig({ enabled: false }),
+    buyBack: { enabled: false },
+    backroom: { enabled: false },
+    servicesList: [
+      createServiceDefinition({
+        type: ServiceType.SAFE_DEPOSIT,
+        category: ServiceCategory.STORAGE,
+        name: "Safe Deposit Box",
+        description: "Store valuables in a secure vault",
+        icon: "fa-vault",
+        enabled: true,
+        basePrice: 5,
+        priceType: "perDay",
+        pricePerUnit: 5,
+        hasDuration: true,
+        durationUnit: "days"
+      }),
+      createServiceDefinition({
+        type: ServiceType.CURRENCY_EXCHANGE,
+        category: ServiceCategory.STORAGE,
+        name: "Currency Exchange",
+        description: "Exchange currency denominations",
+        icon: "fa-money-bill-transfer",
+        enabled: true,
+        basePrice: 1,
+        priceType: "percent",
+        pricePercent: 5
+      }),
+      createServiceDefinition({
+        type: ServiceType.MONEY_TRANSFER,
+        category: ServiceCategory.STORAGE,
+        name: "Money Transfer",
+        description: "Send money to another location securely",
+        icon: "fa-money-bill-wave",
+        enabled: true,
+        basePrice: 10,
+        priceType: "percent",
+        pricePercent: 3,
+        requiresGMApproval: true
+      })
+    ]
+  },
+
+  tavern: {
+    name: "Tavern",
+    type: ShopType.INN,
+    displayMode: ShopDisplayMode.SERVICES,
+    icon: "fa-wine-glass",
+    pricing: createPricingConfig({
+      baseBuyMultiplier: 1.0,
+      baseSellMultiplier: 0.2
+    }),
+    haggling: createHagglingConfig({ enabled: false }),
+    buyBack: { enabled: false },
+    backroom: { enabled: false },
+    servicesList: [
+      createServiceDefinition({
+        type: ServiceType.MEAL_POOR,
+        category: ServiceCategory.FOOD_DRINK,
+        name: "Cheap Grub",
+        description: "Basic fare - bread, cheese, and stew",
+        icon: "fa-bread-slice",
+        enabled: true,
+        basePrice: 0.01
+      }),
+      createServiceDefinition({
+        type: ServiceType.MEAL_MODEST,
+        category: ServiceCategory.FOOD_DRINK,
+        name: "Hot Meal",
+        description: "A filling hot meal with meat and vegetables",
+        icon: "fa-utensils",
+        enabled: true,
+        basePrice: 0.03
+      }),
+      createServiceDefinition({
+        type: ServiceType.MEAL_COMFORTABLE,
+        category: ServiceCategory.FOOD_DRINK,
+        name: "Fine Dining",
+        description: "Quality meal with wine pairing",
+        icon: "fa-plate-wheat",
+        enabled: true,
+        basePrice: 0.2
+      }),
+      createServiceDefinition({
+        type: ServiceType.DRINKS,
+        category: ServiceCategory.FOOD_DRINK,
+        name: "Drinks",
+        description: "Ale, wine, mead, or spirits",
+        icon: "fa-beer-mug-empty",
+        enabled: true,
+        basePrice: 0.04
+      }),
+      createServiceDefinition({
+        type: ServiceType.FEAST,
+        category: ServiceCategory.FOOD_DRINK,
+        name: "Feast",
+        description: "Book a feast for your whole party",
+        icon: "fa-champagne-glasses",
+        enabled: true,
+        basePrice: 10,
+        requiresGMApproval: true
+      }),
+      createServiceDefinition({
+        type: ServiceType.RUMORS,
+        category: ServiceCategory.INFORMATION,
+        name: "Hear Rumors",
+        description: "Buy a round and hear the local gossip",
+        icon: "fa-ear-listen",
+        enabled: true,
+        basePrice: 1
+      }),
+      createServiceDefinition({
+        type: ServiceType.GAMBLING,
+        category: ServiceCategory.ENTERTAINMENT,
+        name: "Gambling Table",
+        description: "Try your luck at cards or dice",
+        icon: "fa-dice",
+        enabled: true,
+        basePrice: 0
+      }),
+      createServiceDefinition({
+        type: ServiceType.PERFORMANCE,
+        category: ServiceCategory.ENTERTAINMENT,
+        name: "Live Entertainment",
+        description: "Enjoy a performance by local bards",
+        icon: "fa-music",
+        enabled: true,
+        basePrice: 0.05
+      })
+    ]
+  },
+
+  jeweler: {
+    name: "Jeweler",
+    type: ShopType.JEWELRY,
+    icon: "fa-gem",
+    pricing: createPricingConfig({
+      baseBuyMultiplier: 1.3,
+      baseSellMultiplier: 0.5
+    }),
+    haggling: createHagglingConfig({ enabled: true, persuasionDC: 16 }),
+    buyBack: {
+      enabled: true,
+      itemTypes: ["loot", "equipment"],
+      typeMultipliers: {
+        loot: 0.7,
+        equipment: 0.5
+      }
+    },
+    backroom: { enabled: true, autoAddPurchasedItems: true },
+    servicesList: [
+      createServiceDefinition({
+        type: ServiceType.APPRAISE,
+        category: ServiceCategory.MISC,
+        name: "Appraise Gem",
+        description: "Determine the quality and value of a gemstone",
+        icon: "fa-gem",
+        enabled: true,
+        basePrice: 5,
+        requiresItem: true
+      }),
+      createServiceDefinition({
+        type: ServiceType.REPAIR,
+        category: ServiceCategory.CRAFTING,
+        name: "Repair Jewelry",
+        description: "Repair broken or damaged jewelry",
+        icon: "fa-wrench",
+        enabled: true,
+        priceType: "percent",
+        pricePercent: 15,
+        requiresItem: true,
+        validItemTypes: ["equipment", "loot"]
+      }),
+      createServiceDefinition({
+        type: ServiceType.ENGRAVE,
+        category: ServiceCategory.CRAFTING,
+        name: "Engraving",
+        description: "Add custom engravings to jewelry or weapons",
+        icon: "fa-pen-fancy",
+        enabled: true,
+        basePrice: 10,
+        requiresItem: true
+      }),
+      createServiceDefinition({
+        type: ServiceType.CUSTOM_ORDER,
+        category: ServiceCategory.CRAFTING,
+        name: "Commission Jewelry",
+        description: "Commission a custom piece of jewelry",
+        icon: "fa-ring",
+        enabled: true,
+        priceType: "variable",
+        requiresGMApproval: true,
+        hasDuration: true,
+        durationUnit: "days",
+        baseDuration: 5
+      })
+    ]
+  },
+
+  scribe: {
+    name: "Scribe & Bookshop",
+    type: ShopType.SCROLLS,
+    icon: "fa-book-open",
+    pricing: createPricingConfig({
+      baseBuyMultiplier: 1.2,
+      baseSellMultiplier: 0.3
+    }),
+    haggling: createHagglingConfig({ enabled: true, persuasionDC: 14 }),
+    buyBack: {
+      enabled: true,
+      itemTypes: ["consumable", "loot"],
+      typeMultipliers: {
+        consumable: 0.4,
+        loot: 0.5
+      }
+    },
+    backroom: { enabled: true, autoAddPurchasedItems: true },
+    servicesList: [
+      createServiceDefinition({
+        type: ServiceType.SCRIBE_SCROLL,
+        category: ServiceCategory.MAGIC,
+        name: "Scribe Scroll",
+        description: "Have a spell scroll copied",
+        icon: "fa-scroll",
+        enabled: true,
+        priceType: "variable",
+        requiresGMApproval: true,
+        hasDuration: true,
+        durationUnit: "days",
+        baseDuration: 2
+      }),
+      createServiceDefinition({
+        type: ServiceType.TRANSLATION,
+        category: ServiceCategory.INFORMATION,
+        name: "Translation",
+        description: "Translate documents or texts from foreign languages",
+        icon: "fa-language",
+        enabled: true,
+        basePrice: 15,
+        hasDuration: true,
+        durationUnit: "hours",
+        baseDuration: 4
+      }),
+      createServiceDefinition({
+        type: ServiceType.RESEARCH,
+        category: ServiceCategory.INFORMATION,
+        name: "Research",
+        description: "Commission research into a specific topic",
+        icon: "fa-magnifying-glass-chart",
+        enabled: true,
+        basePrice: 25,
+        priceType: "perDay",
+        pricePerUnit: 25,
+        hasDuration: true,
+        durationUnit: "days",
+        baseDuration: 3,
+        requiresGMApproval: true
+      }),
+      createServiceDefinition({
+        type: ServiceType.MAP_PURCHASE,
+        category: ServiceCategory.INFORMATION,
+        name: "Commission Map",
+        description: "Commission a map of a specific area",
+        icon: "fa-map",
+        enabled: true,
+        basePrice: 50,
+        requiresGMApproval: true,
+        hasDuration: true,
+        durationUnit: "days",
+        baseDuration: 5
+      })
+    ]
+  },
+
+  arena: {
+    name: "Arena",
+    type: ShopType.CUSTOM,
+    customType: "arena",
+    displayMode: ShopDisplayMode.SERVICES,
+    icon: "fa-shield-halved",
+    pricing: createPricingConfig({}),
+    haggling: createHagglingConfig({ enabled: false }),
+    buyBack: { enabled: false },
+    backroom: { enabled: false },
+    servicesList: [
+      createServiceDefinition({
+        type: ServiceType.ARENA_FIGHT,
+        category: ServiceCategory.ENTERTAINMENT,
+        name: "Arena Battle",
+        description: "Fight in the arena for glory and gold",
+        icon: "fa-khanda",
+        enabled: true,
+        basePrice: 10,
+        requiresGMApproval: true
+      }),
+      createServiceDefinition({
+        type: ServiceType.SPARRING,
+        category: ServiceCategory.TRAINING,
+        name: "Sparring Match",
+        description: "Practice combat against a trained opponent",
+        icon: "fa-swords",
+        enabled: true,
+        basePrice: 5
+      }),
+      createServiceDefinition({
+        type: ServiceType.WEAPON_TRAINING,
+        category: ServiceCategory.TRAINING,
+        name: "Weapon Training",
+        description: "Learn to use a new type of weapon",
+        icon: "fa-bullseye",
+        enabled: true,
+        basePrice: 25,
+        priceType: "perDay",
+        pricePerUnit: 25,
+        hasDuration: true,
+        durationUnit: "days",
+        baseDuration: 14
+      }),
+      createServiceDefinition({
+        type: ServiceType.GAMBLING,
+        category: ServiceCategory.ENTERTAINMENT,
+        name: "Bet on Fights",
+        description: "Place bets on arena combatants",
+        icon: "fa-dice",
+        enabled: true,
+        basePrice: 0
+      })
+    ]
+  },
+
+  dock_master: {
+    name: "Dock Master",
+    type: ShopType.CUSTOM,
+    customType: "docks",
+    displayMode: ShopDisplayMode.SERVICES,
+    icon: "fa-anchor",
+    pricing: createPricingConfig({
+      baseBuyMultiplier: 1.0,
+      baseSellMultiplier: 0.4
+    }),
+    haggling: createHagglingConfig({ enabled: true, persuasionDC: 15 }),
+    buyBack: { enabled: false },
+    backroom: { enabled: false },
+    servicesList: [
+      createServiceDefinition({
+        type: ServiceType.PASSAGE_BOOK,
+        category: ServiceCategory.TRANSPORT,
+        name: "Book Passage",
+        description: "Book passage on a ship to another port",
+        icon: "fa-ship",
+        enabled: true,
+        priceType: "variable",
+        requiresGMApproval: true
+      }),
+      createServiceDefinition({
+        type: ServiceType.ITEM_STORAGE,
+        category: ServiceCategory.STORAGE,
+        name: "Warehouse Storage",
+        description: "Store goods in the dockside warehouse",
+        icon: "fa-warehouse",
+        enabled: true,
+        basePrice: 1,
+        priceType: "perDay",
+        pricePerUnit: 1,
+        hasDuration: true,
+        durationUnit: "days"
+      }),
+      createServiceDefinition({
+        type: ServiceType.GUIDE_HIRE,
+        category: ServiceCategory.INFORMATION,
+        name: "Hire Guide",
+        description: "Hire a local guide who knows the waters",
+        icon: "fa-compass",
+        enabled: true,
+        basePrice: 10,
+        priceType: "perDay",
+        pricePerUnit: 10,
+        hasDuration: true,
+        durationUnit: "days"
+      }),
+      createServiceDefinition({
+        type: ServiceType.RUMORS,
+        category: ServiceCategory.INFORMATION,
+        name: "Port Rumors",
+        description: "Hear the latest news from arriving ships",
+        icon: "fa-ear-listen",
+        enabled: true,
+        basePrice: 1
+      })
+    ]
   },
 
   blank: {
@@ -1391,7 +2082,9 @@ export const MerchantTemplates = {
     type: ShopType.CUSTOM,
     pricing: createPricingConfig({}),
     haggling: createHagglingConfig({ enabled: false }),
-    buyBack: { enabled: true }
+    buyBack: { enabled: true },
+    backroom: { enabled: true, autoAddPurchasedItems: true },
+    servicesList: []
   }
 };
 

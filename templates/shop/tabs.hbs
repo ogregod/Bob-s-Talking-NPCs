@@ -1,22 +1,26 @@
 {{!-- Shop Window Tabs --}}
-<nav class="shop-tabs {{theme}}">
-  <button type="button" class="shop-tab {{#if (eq activeTab 'buy')}}active{{/if}}"
-          data-action="setTab" data-tab="buy">
-    <i class="fa-solid fa-shopping-cart"></i>
-    <span>{{localize "BOBSNPC.Shop.Buy"}}</span>
-    {{#if buyItemCount}}
-      <span class="tab-count">{{buyItemCount}}</span>
-    {{/if}}
-  </button>
+<nav class="shop-tabs {{theme}} {{#if isServicesPrimary}}services-primary{{/if}}">
+  {{#if showBuyTab}}
+    <button type="button" class="shop-tab {{#if (eq activeTab 'buy')}}active{{/if}}"
+            data-action="setTab" data-tab="buy">
+      <i class="fa-solid fa-shopping-cart"></i>
+      <span>{{localize "BOBSNPC.Shop.Buy"}}</span>
+      {{#if buyItemCount}}
+        <span class="tab-count">{{buyItemCount}}</span>
+      {{/if}}
+    </button>
+  {{/if}}
 
-  <button type="button" class="shop-tab {{#if (eq activeTab 'sell')}}active{{/if}}"
-          data-action="setTab" data-tab="sell">
-    <i class="fa-solid fa-hand-holding-dollar"></i>
-    <span>{{localize "BOBSNPC.Shop.Sell"}}</span>
-    {{#if sellItemCount}}
-      <span class="tab-count">{{sellItemCount}}</span>
-    {{/if}}
-  </button>
+  {{#if showSellTab}}
+    <button type="button" class="shop-tab {{#if (eq activeTab 'sell')}}active{{/if}}"
+            data-action="setTab" data-tab="sell">
+      <i class="fa-solid fa-hand-holding-dollar"></i>
+      <span>{{localize "BOBSNPC.Shop.Sell"}}</span>
+      {{#if sellItemCount}}
+        <span class="tab-count">{{sellItemCount}}</span>
+      {{/if}}
+    </button>
+  {{/if}}
 
   {{#if hasServices}}
     <button type="button" class="shop-tab {{#if (eq activeTab 'services')}}active{{/if}}"
@@ -54,10 +58,12 @@
     </div>
   {{/if}}
 
-  {{!-- Search --}}
-  <div class="shop-search">
-    <i class="fa-solid fa-search"></i>
-    <input type="text" name="search" placeholder="{{localize 'BOBSNPC.Shop.SearchItems'}}"
-           value="{{searchTerm}}" data-action="search" />
-  </div>
+  {{!-- Search (hide on services-only shops when on services tab) --}}
+  {{#unless isServicesOnly}}
+    <div class="shop-search">
+      <i class="fa-solid fa-search"></i>
+      <input type="text" name="search" placeholder="{{localize 'BOBSNPC.Shop.SearchItems'}}"
+             value="{{searchTerm}}" data-action="search" />
+    </div>
+  {{/unless}}
 </nav>

@@ -8,6 +8,7 @@ const MODULE_ID = "bobs-talking-npcs";
 import { localize, generateId } from "../utils/helpers.mjs";
 import {
   ShopType,
+  ShopDisplayMode,
   StockRefreshType,
   PriceDisplayMode,
   ItemRarity,
@@ -81,7 +82,15 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       unlinkNpc: ShopEditor.#onUnlinkNpc,
       previewShop: ShopEditor.#onPreviewShop,
       duplicateShop: ShopEditor.#onDuplicateShop,
-      exportShop: ShopEditor.#onExportShop
+      exportShop: ShopEditor.#onExportShop,
+      // Back Room actions
+      moveToStorefront: ShopEditor.#onMoveToStorefront,
+      moveToBackroom: ShopEditor.#onMoveToBackroom,
+      removeBackroomItem: ShopEditor.#onRemoveBackroomItem,
+      // Enhanced services actions
+      toggleService: ShopEditor.#onToggleService,
+      addService: ShopEditor.#onAddService,
+      removeService: ShopEditor.#onRemoveService
     }
   };
 
@@ -96,6 +105,10 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     inventory: {
       template: `modules/${MODULE_ID}/templates/shop-editor/tab-inventory.hbs`,
       scrollable: [".inventory-list"]
+    },
+    backroom: {
+      template: `modules/${MODULE_ID}/templates/shop-editor/tab-backroom.hbs`,
+      scrollable: [".backroom-list"]
     },
     pricing: {
       template: `modules/${MODULE_ID}/templates/shop-editor/tab-pricing.hbs`
@@ -188,6 +201,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     shop.id = shop.id || generateId();
     shop.name = shop.name || "";
     shop.type = shop.type || ShopType.GENERAL;
+    shop.displayMode = shop.displayMode || ShopDisplayMode.AUTO;
     shop.icon = shop.icon || "icons/svg/chest.svg";
     // Ensure color is a valid hex color (empty string breaks color input)
     shop.color = (shop.color && shop.color.startsWith("#")) ? shop.color : "#7b68ee";
@@ -214,6 +228,16 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     shop.buyBack.excludeEquipped = shop.buyBack.excludeEquipped ?? true;
     shop.buyBack.excludeAttuned = shop.buyBack.excludeAttuned ?? true;
     shop.buyBack.maxValue = shop.buyBack.maxValue ?? 0;
+
+    // Ensure backroom has all required fields
+    shop.backroom = shop.backroom || {};
+    shop.backroom.enabled = shop.backroom.enabled ?? true;
+    shop.backroom.inventory = shop.backroom.inventory || [];
+    shop.backroom.autoAddPurchasedItems = shop.backroom.autoAddPurchasedItems ?? true;
+    shop.backroom.notes = shop.backroom.notes || "";
+
+    // Ensure servicesList exists
+    shop.servicesList = shop.servicesList || [];
 
     return shop;
   }
@@ -341,6 +365,18 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       selected: this._shop.pricing?.displayMode === value
     }));
 
+    const displayModeOptions = Object.entries(ShopDisplayMode).map(([key, value]) => ({
+      value,
+      label: localize(`DisplayModes.${key}`),
+      selected: (this._shop.displayMode || ShopDisplayMode.AUTO) === value
+    }));
+
+    // Enrich backroom inventory
+    const enrichedBackroom = await this._enrichInventory(this._shop.backroom?.inventory || []);
+
+    // Prepare enhanced services list for display
+    const enrichedServicesList = this._prepareEnhancedServicesList();
+
     return {
       ...context,
       shop: this._shop,
@@ -349,12 +385,19 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
       // Basic tab
       typeOptions,
+      displayModeOptions,
       linkedNpc: linkedNpc ? { name: linkedNpc.name, img: linkedNpc.img } : null,
 
       // Inventory tab
       inventory: enrichedInventory,
       inventoryCount: enrichedInventory.length,
       hasInventory: enrichedInventory.length > 0,
+
+      // Back Room tab
+      backroom: this._shop.backroom,
+      backroomInventory: enrichedBackroom,
+      backroomCount: enrichedBackroom.length,
+      hasBackroomInventory: enrichedBackroom.length > 0,
 
       // Pricing tab
       priceDisplayOptions,
@@ -370,6 +413,8 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       // Services tab
       services: this._shop.services,
       availableEnchantments: this._prepareEnchantmentsList(),
+      servicesList: enrichedServicesList,
+      hasServicesList: enrichedServicesList.length > 0,
 
       // Access tab
       access: this._shop.access,
@@ -396,9 +441,11 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   _getTabs() {
     const inventoryCount = this._shop?.inventory?.length || 0;
+    const backroomCount = this._shop?.backroom?.inventory?.length || 0;
     return [
       { id: "basic", label: localize("ShopEditor.TabBasic"), icon: "fa-info-circle", active: this._activeTab === "basic" },
       { id: "inventory", label: localize("ShopEditor.TabInventory"), icon: "fa-boxes", active: this._activeTab === "inventory", badge: inventoryCount > 0 ? inventoryCount : null },
+      { id: "backroom", label: localize("ShopEditor.TabBackroom"), icon: "fa-door-closed", active: this._activeTab === "backroom", badge: backroomCount > 0 ? backroomCount : null },
       { id: "pricing", label: localize("ShopEditor.TabPricing"), icon: "fa-coins", active: this._activeTab === "pricing" },
       { id: "haggling", label: localize("ShopEditor.TabHaggling"), icon: "fa-handshake", active: this._activeTab === "haggling" },
       { id: "stock", label: localize("ShopEditor.TabStock"), icon: "fa-warehouse", active: this._activeTab === "stock" },
@@ -1202,5 +1249,177 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     URL.revokeObjectURL(url);
 
     ui.notifications.info(localize("ShopEditor.Exported", { name: exportData.name }));
+  }
+
+  // ==================== Back Room Actions ====================
+
+  /**
+   * Move an item from backroom to storefront inventory
+   */
+  static async #onMoveToStorefront(event, target) {
+    const itemId = target.closest("[data-item-id]")?.dataset.itemId;
+    if (!itemId || !this._shop.backroom?.inventory) return;
+
+    const itemIndex = this._shop.backroom.inventory.findIndex(i => i.id === itemId);
+    if (itemIndex < 0) return;
+
+    // Remove from backroom
+    const [item] = this._shop.backroom.inventory.splice(itemIndex, 1);
+
+    // Add to storefront inventory
+    this._shop.inventory.push(item);
+
+    ui.notifications.info(`Moved "${item.name}" to storefront`);
+    await this.render();
+  }
+
+  /**
+   * Move an item from storefront to backroom
+   */
+  static async #onMoveToBackroom(event, target) {
+    const itemId = target.closest("[data-item-id]")?.dataset.itemId;
+    if (!itemId) return;
+
+    const itemIndex = this._shop.inventory.findIndex(i => i.id === itemId);
+    if (itemIndex < 0) return;
+
+    // Ensure backroom exists
+    if (!this._shop.backroom) {
+      this._shop.backroom = { enabled: true, inventory: [], autoAddPurchasedItems: true, notes: "" };
+    }
+    if (!this._shop.backroom.inventory) {
+      this._shop.backroom.inventory = [];
+    }
+
+    // Remove from storefront
+    const [item] = this._shop.inventory.splice(itemIndex, 1);
+
+    // Add to backroom
+    this._shop.backroom.inventory.push(item);
+
+    ui.notifications.info(`Moved "${item.name}" to back room`);
+    await this.render();
+  }
+
+  /**
+   * Remove an item from the backroom entirely
+   */
+  static async #onRemoveBackroomItem(event, target) {
+    const itemId = target.closest("[data-item-id]")?.dataset.itemId;
+    if (!itemId || !this._shop.backroom?.inventory) return;
+
+    const itemIndex = this._shop.backroom.inventory.findIndex(i => i.id === itemId);
+    if (itemIndex < 0) return;
+
+    const item = this._shop.backroom.inventory[itemIndex];
+
+    const confirmed = await Dialog.confirm({
+      title: localize("ShopEditor.RemoveItem"),
+      content: `<p>Remove "${item.name}" from the back room?</p>`
+    });
+
+    if (!confirmed) return;
+
+    this._shop.backroom.inventory.splice(itemIndex, 1);
+    await this.render();
+  }
+
+  // ==================== Enhanced Services Actions ====================
+
+  /**
+   * Toggle an enhanced service on/off
+   */
+  static async #onToggleService(event, target) {
+    const serviceIndex = parseInt(target.dataset.serviceIndex);
+    if (isNaN(serviceIndex) || !this._shop.servicesList?.[serviceIndex]) return;
+
+    this._shop.servicesList[serviceIndex].enabled = !this._shop.servicesList[serviceIndex].enabled;
+    await this.render();
+  }
+
+  /**
+   * Add a new service to the shop
+   */
+  static async #onAddService(event, target) {
+    // Import service definitions
+    const { createServiceDefinition, ServiceType, ServiceCategory } = await import("../data/merchant-model.mjs");
+
+    // Create a default service
+    const newService = createServiceDefinition({
+      type: ServiceType.REPAIR,
+      category: ServiceCategory.MISC,
+      name: "New Service",
+      description: "Describe this service...",
+      icon: "fa-cog",
+      enabled: true,
+      basePrice: 10
+    });
+
+    if (!this._shop.servicesList) {
+      this._shop.servicesList = [];
+    }
+
+    this._shop.servicesList.push(newService);
+    await this.render();
+  }
+
+  /**
+   * Remove a service from the shop
+   */
+  static async #onRemoveService(event, target) {
+    const serviceIndex = parseInt(target.dataset.serviceIndex);
+    if (isNaN(serviceIndex) || !this._shop.servicesList?.[serviceIndex]) return;
+
+    const service = this._shop.servicesList[serviceIndex];
+    const confirmed = await Dialog.confirm({
+      title: "Remove Service",
+      content: `<p>Remove "${service.name}" from this shop?</p>`
+    });
+
+    if (!confirmed) return;
+
+    this._shop.servicesList.splice(serviceIndex, 1);
+    await this.render();
+  }
+
+  /**
+   * Prepare enhanced services list for display
+   * Groups services by category
+   * @returns {object[]}
+   * @private
+   */
+  _prepareEnhancedServicesList() {
+    if (!this._shop?.servicesList) return [];
+
+    return this._shop.servicesList.map((service, index) => ({
+      ...service,
+      index,
+      categoryLabel: localize(`ServiceCategories.${service.category}`) || service.category,
+      typeLabel: localize(`ServiceTypes.${service.type}`) || service.type,
+      priceDisplay: this._formatServicePrice(service)
+    }));
+  }
+
+  /**
+   * Format service price for display
+   * @param {object} service - Service definition
+   * @returns {string}
+   * @private
+   */
+  _formatServicePrice(service) {
+    switch (service.priceType) {
+      case "fixed":
+        return `${service.basePrice} gp`;
+      case "percent":
+        return `${service.pricePercent}% of value`;
+      case "perDay":
+        return `${service.pricePerUnit} gp/day`;
+      case "perItem":
+        return `${service.pricePerUnit} gp/item`;
+      case "variable":
+        return "Price varies";
+      default:
+        return `${service.basePrice} gp`;
+    }
   }
 }

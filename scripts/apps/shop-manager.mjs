@@ -234,7 +234,17 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       alchemist: "Potions, ingredients, and identification services",
       magic_shop: "Magical items and enchanting services",
       fence: "Black market goods, no questions asked",
-      inn: "Food, drink, and lodging",
+      inn: "Food, drink, rooms, and rest",
+      tailor: "Custom clothing, alterations, and repairs",
+      stable: "Horse boarding, rentals, and mount care",
+      temple: "Healing, blessings, and divine services",
+      guild_hall: "Training, contracts, and guild services",
+      bank: "Currency exchange, storage, and transfers",
+      tavern: "Drinks, meals, gambling, and rumors",
+      jeweler: "Gems, jewelry, appraisals, and engraving",
+      scribe: "Scrolls, translations, and research",
+      arena: "Combat, training, and wagering",
+      dock_master: "Ship passage, warehouse storage, and port services",
       blank: "Start from scratch with default settings"
     };
     return descriptions[templateKey] || "";

@@ -7,7 +7,7 @@
 const MODULE_ID = "bobs-talking-npcs";
 
 import { localize, formatCurrency } from "../utils/helpers.mjs";
-import { ItemCategory } from "../data/merchant-model.mjs";
+import { ItemCategory, ShopDisplayMode } from "../data/merchant-model.mjs";
 import {
   categorizeItem,
   getCategoryLabel,
@@ -182,6 +182,42 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     } catch (e) {
       console.warn(`${MODULE_ID} | Could not open shop session:`, e);
     }
+
+    // Determine default tab based on display mode
+    const merchant = this._getMerchant();
+    if (merchant) {
+      this._displayMode = merchant.displayMode || ShopDisplayMode.AUTO;
+      const hasInventory = merchant.inventory?.length > 0;
+      const hasServices = this._checkHasServices(merchant);
+
+      if (this._displayMode === ShopDisplayMode.SERVICES) {
+        // Services-first: default to services tab
+        this._tab = hasServices ? "services" : "buy";
+      } else if (this._displayMode === ShopDisplayMode.AUTO) {
+        // Auto-detect: if no inventory but has services, default to services
+        if (!hasInventory && hasServices) {
+          this._tab = "services";
+        }
+      }
+      // SHOP and MIXED modes keep the default "buy" tab
+    }
+  }
+
+  /**
+   * Quick check if merchant has any active services
+   * @param {object} merchant - Merchant data
+   * @returns {boolean}
+   * @private
+   */
+  _checkHasServices(merchant) {
+    // Check legacy services
+    const svc = merchant.services || {};
+    if (svc.identify || svc.repair || svc.enchant || svc.appraise) return true;
+
+    // Check enhanced services list
+    if (merchant.servicesList?.some(s => s.enabled)) return true;
+
+    return false;
   }
 
   /** @override */
@@ -213,6 +249,15 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     // Get services if available - always prepare to check hasServices
     const services = this._prepareServices(merchant);
     const hasServices = services.length > 0;
+
+    // Determine display mode
+    const displayMode = this._displayMode || merchant?.displayMode || ShopDisplayMode.AUTO;
+    const hasInventory = merchant?.inventory?.length > 0;
+    const isServicesOnly = displayMode === ShopDisplayMode.SERVICES && !hasInventory;
+    const isServicesPrimary = displayMode === ShopDisplayMode.SERVICES;
+
+    // Group services by category for services-primary layout
+    const servicesByCategory = this._groupServicesByCategory(services);
 
     // Ensure we have merchant actor data (defensive)
     const merchantName = this._merchantActor?.name || localize("Shop.UnknownMerchant");
@@ -298,6 +343,14 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       // Services
       services,
       hasServices,
+      servicesByCategory,
+      // Display mode
+      displayMode,
+      isServicesOnly,
+      isServicesPrimary,
+      hasInventory,
+      showBuyTab: !isServicesOnly,
+      showSellTab: !isServicesOnly && (merchant?.buyBack?.enabled ?? true),
       // Settings
       settings: {
         hagglingEnabled: game.settings.get(MODULE_ID, "hagglingEnabled"),
@@ -915,7 +968,109 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       });
     }
 
+    // Add enhanced services from servicesList
+    if (merchant.servicesList) {
+      for (const svcDef of merchant.servicesList) {
+        if (!svcDef.enabled) continue;
+
+        // Skip duplicates with legacy services
+        if (services.some(s => s.type === svcDef.type)) continue;
+
+        let priceFormatted;
+        switch (svcDef.priceType) {
+          case "fixed":
+            priceFormatted = formatCurrency(svcDef.basePrice * 100);
+            break;
+          case "percent":
+            priceFormatted = `${svcDef.pricePercent}% of value`;
+            break;
+          case "perDay":
+            priceFormatted = `${svcDef.pricePerUnit} gp/day`;
+            break;
+          case "variable":
+            priceFormatted = localize("Shop.Service.PriceVaries");
+            break;
+          default:
+            priceFormatted = formatCurrency(svcDef.basePrice * 100);
+        }
+
+        services.push({
+          id: svcDef.id || svcDef.type,
+          type: svcDef.type,
+          category: svcDef.category,
+          name: svcDef.name,
+          description: svcDef.description,
+          price: svcDef.basePrice || null,
+          priceFormatted,
+          icon: svcDef.icon || "fa-cog",
+          available: true,
+          requiresItem: svcDef.requiresItem,
+          requiresGMApproval: svcDef.requiresGMApproval,
+          hasDuration: svcDef.hasDuration,
+          durationUnit: svcDef.durationUnit,
+          baseDuration: svcDef.baseDuration
+        });
+      }
+    }
+
     return services;
+  }
+
+  /**
+   * Group services by their category for display
+   * @param {object[]} services - Prepared services array
+   * @returns {object[]} Array of { category, categoryLabel, categoryIcon, services }
+   * @private
+   */
+  _groupServicesByCategory(services) {
+    if (!services?.length) return [];
+
+    const categoryIcons = {
+      crafting: "fa-hammer",
+      magic: "fa-wand-sparkles",
+      lodging: "fa-bed",
+      transport: "fa-horse",
+      foodDrink: "fa-utensils",
+      entertainment: "fa-masks-theater",
+      information: "fa-book-open",
+      storage: "fa-box-archive",
+      training: "fa-dumbbell",
+      healing: "fa-heart-pulse",
+      legal: "fa-scale-balanced",
+      misc: "fa-cog"
+    };
+
+    const categoryLabels = {
+      crafting: localize("ServiceCategories.crafting"),
+      magic: localize("ServiceCategories.magic"),
+      lodging: localize("ServiceCategories.lodging"),
+      transport: localize("ServiceCategories.transport"),
+      foodDrink: localize("ServiceCategories.foodDrink"),
+      entertainment: localize("ServiceCategories.entertainment"),
+      information: localize("ServiceCategories.information"),
+      storage: localize("ServiceCategories.storage"),
+      training: localize("ServiceCategories.training"),
+      healing: localize("ServiceCategories.healing"),
+      legal: localize("ServiceCategories.legal"),
+      misc: localize("ServiceCategories.misc")
+    };
+
+    const groups = new Map();
+
+    for (const service of services) {
+      const cat = service.category || "misc";
+      if (!groups.has(cat)) {
+        groups.set(cat, {
+          category: cat,
+          categoryLabel: categoryLabels[cat] || cat,
+          categoryIcon: categoryIcons[cat] || "fa-cog",
+          services: []
+        });
+      }
+      groups.get(cat).services.push(service);
+    }
+
+    return Array.from(groups.values());
   }
 
   /**

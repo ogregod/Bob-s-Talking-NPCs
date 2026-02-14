@@ -674,6 +674,23 @@ export class MerchantHandler {
       }
     }
 
+    // Add sold items to shop's back room (if enabled)
+    if (merchant.backroom?.enabled && merchant.backroom?.autoAddPurchasedItems) {
+      for (const sale of itemsToSell) {
+        const backroomItem = createShopItem({
+          itemUuid: sale.item.uuid || null,
+          name: sale.item.name,
+          img: sale.item.img,
+          quantity: sale.quantity,
+          basePrice: sale.item.system?.price?.value || sale.unitPrice,
+          category: sale.item.type,
+          rarity: sale.item.system?.rarity || "common",
+          notes: `Purchased from ${actor.name}`
+        });
+        await this._addToBackroom(merchant.id, backroomItem);
+      }
+    }
+
     // Give gold to player
     await this._giveGold(actor, totalValue);
 
@@ -1985,6 +2002,87 @@ export class MerchantHandler {
     }
 
     await this.updateMerchant(merchantId, { transactions });
+  }
+
+  // ==================== BACK ROOM ====================
+
+  /**
+   * Add an item to a merchant's back room inventory
+   * @param {string} merchantId - Merchant ID
+   * @param {object} shopItem - Shop item data
+   * @private
+   */
+  async _addToBackroom(merchantId, shopItem) {
+    const merchant = this.getMerchant(merchantId);
+    if (!merchant) return;
+
+    const backroom = merchant.backroom || { enabled: true, inventory: [], autoAddPurchasedItems: true, notes: "" };
+    const backroomInventory = [...(backroom.inventory || []), shopItem];
+
+    await this.updateMerchant(merchantId, {
+      backroom: {
+        ...backroom,
+        inventory: backroomInventory
+      }
+    });
+  }
+
+  /**
+   * Move an item from back room to storefront
+   * @param {string} merchantId - Merchant ID
+   * @param {string} itemId - Item ID in backroom
+   * @returns {boolean} Success
+   */
+  async moveToStorefront(merchantId, itemId) {
+    const merchant = this.getMerchant(merchantId);
+    if (!merchant?.backroom?.inventory) return false;
+
+    const itemIndex = merchant.backroom.inventory.findIndex(i => i.id === itemId);
+    if (itemIndex < 0) return false;
+
+    const backroomInventory = [...merchant.backroom.inventory];
+    const [item] = backroomInventory.splice(itemIndex, 1);
+    const storefrontInventory = [...(merchant.inventory || []), item];
+
+    await this.updateMerchant(merchantId, {
+      inventory: storefrontInventory,
+      backroom: {
+        ...merchant.backroom,
+        inventory: backroomInventory
+      }
+    });
+
+    return true;
+  }
+
+  /**
+   * Move an item from storefront to back room
+   * @param {string} merchantId - Merchant ID
+   * @param {string} itemId - Item ID in storefront
+   * @returns {boolean} Success
+   */
+  async moveToBackroom(merchantId, itemId) {
+    const merchant = this.getMerchant(merchantId);
+    if (!merchant?.inventory) return false;
+
+    const itemIndex = merchant.inventory.findIndex(i => i.id === itemId);
+    if (itemIndex < 0) return false;
+
+    const storefrontInventory = [...merchant.inventory];
+    const [item] = storefrontInventory.splice(itemIndex, 1);
+
+    const backroom = merchant.backroom || { enabled: true, inventory: [], autoAddPurchasedItems: true, notes: "" };
+    const backroomInventory = [...(backroom.inventory || []), item];
+
+    await this.updateMerchant(merchantId, {
+      inventory: storefrontInventory,
+      backroom: {
+        ...backroom,
+        inventory: backroomInventory
+      }
+    });
+
+    return true;
   }
 
   // ==================== SOCKET ====================

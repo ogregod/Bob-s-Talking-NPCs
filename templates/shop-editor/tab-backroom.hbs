@@ -1,0 +1,88 @@
+{{!-- Shop Editor - Back Room Tab --}}
+<div class="tab-content" data-tab-content="backroom">
+  <div class="backroom-header">
+    <h3>
+      <i class="fa-solid fa-door-closed"></i>
+      {{localize "BOBSNPC.Backroom.Title"}} ({{backroomCount}})
+    </h3>
+  </div>
+
+  <div class="backroom-description">
+    <i class="fa-solid fa-info-circle"></i>
+    {{localize "BOBSNPC.Backroom.Description"}}
+  </div>
+
+  {{!-- Back Room Settings --}}
+  <div class="backroom-settings">
+    <label class="checkbox-inline">
+      <input type="checkbox" name="backroom.autoAddPurchasedItems" {{#if backroom.autoAddPurchasedItems}}checked{{/if}}>
+      <span>{{localize "BOBSNPC.Backroom.AutoAdd"}}</span>
+    </label>
+    <p class="hint">{{localize "BOBSNPC.Backroom.AutoAddHint"}}</p>
+  </div>
+
+  {{!-- GM Notes --}}
+  <div class="backroom-notes">
+    <label>{{localize "BOBSNPC.Backroom.Notes"}}</label>
+    <textarea name="backroom.notes"
+              rows="3"
+              placeholder="{{localize 'BOBSNPC.Backroom.NotesPlaceholder'}}">{{backroom.notes}}</textarea>
+  </div>
+
+  {{!-- Back Room Inventory --}}
+  {{#if hasBackroomInventory}}
+    <ul class="backroom-list inventory-list enhanced">
+      {{#each backroomInventory}}
+        <li class="inventory-item backroom-item {{this.rarityClass}}" data-item-id="{{this.id}}">
+          {{!-- Item Image --}}
+          <img class="item-img" src="{{this.itemImg}}" alt="{{this.itemName}}">
+
+          {{!-- Item Info --}}
+          <div class="item-info-col">
+            <span class="item-name">{{this.itemName}}</span>
+            <span class="item-meta">
+              <span class="item-type">{{this.itemType}}</span>
+              {{#if this.itemRarity}}
+                <span class="item-rarity rarity-{{this.itemRarity}}">{{this.itemRarity}}</span>
+              {{/if}}
+            </span>
+          </div>
+
+          {{!-- Price --}}
+          <div class="item-price-col">
+            <label>Price</label>
+            <span class="price-display">{{this.displayPrice}} gp</span>
+          </div>
+
+          {{!-- Quantity --}}
+          <div class="item-quantity-col">
+            <label>Qty</label>
+            <span class="qty-display">{{this.quantityDisplay}}</span>
+          </div>
+
+          {{!-- Action Buttons --}}
+          <div class="item-actions">
+            <button type="button"
+                    class="action-btn storefront"
+                    data-action="moveToStorefront"
+                    data-tooltip="{{localize 'BOBSNPC.Backroom.MoveToStorefront'}}">
+              <i class="fa-solid fa-store"></i>
+            </button>
+            <button type="button"
+                    class="action-btn delete"
+                    data-action="removeBackroomItem"
+                    data-tooltip="{{localize 'BOBSNPC.ShopEditor.RemoveItem'}}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <div class="empty-inventory">
+      <i class="fa-solid fa-door-closed"></i>
+      <p>{{localize "BOBSNPC.Backroom.EmptyBackroom"}}</p>
+      <p class="hint">{{localize "BOBSNPC.Backroom.EmptyBackroomHint"}}</p>
+    </div>
+  {{/if}}
+</div>

@@ -115,4 +115,83 @@
       </div>
     {{/if}}
   </div>
+
+  {{!-- Enhanced Services Section --}}
+  <div class="form-section enhanced-services-section">
+    <div class="section-header">
+      <h3>
+        <i class="fa-solid fa-concierge-bell"></i>
+        Enhanced Services
+      </h3>
+      <button type="button" class="btn btn-sm" data-action="addService">
+        <i class="fa-solid fa-plus"></i>
+        Add Service
+      </button>
+    </div>
+
+    <p class="hint">Configure specialized services this shop offers to customers. These appear in the Services tab of the shop window.</p>
+
+    {{#if hasServicesList}}
+      <div class="services-editor-list">
+        {{#each servicesList}}
+          <div class="service-editor-entry {{#unless this.enabled}}disabled{{/unless}}" data-service-index="{{this.index}}">
+            <div class="service-toggle">
+              <button type="button"
+                      class="toggle-btn {{#if this.enabled}}active{{/if}}"
+                      data-action="toggleService"
+                      data-service-index="{{this.index}}"
+                      data-tooltip="{{#if this.enabled}}Disable{{else}}Enable{{/if}}">
+                <i class="fa-solid {{#if this.enabled}}fa-toggle-on{{else}}fa-toggle-off{{/if}}"></i>
+              </button>
+            </div>
+
+            <div class="service-icon-col">
+              <i class="fa-solid {{this.icon}}"></i>
+            </div>
+
+            <div class="service-info-col">
+              <span class="service-name">{{this.name}}</span>
+              <span class="service-meta">
+                <span class="service-category">{{this.categoryLabel}}</span>
+                <span class="service-type-badge">{{this.typeLabel}}</span>
+              </span>
+              <span class="service-description">{{this.description}}</span>
+            </div>
+
+            <div class="service-price-col">
+              <span class="service-price">{{this.priceDisplay}}</span>
+            </div>
+
+            <div class="service-flags">
+              {{#if this.requiresItem}}
+                <span class="flag" data-tooltip="Requires an item"><i class="fa-solid fa-box"></i></span>
+              {{/if}}
+              {{#if this.requiresGMApproval}}
+                <span class="flag" data-tooltip="Requires GM approval"><i class="fa-solid fa-shield-halved"></i></span>
+              {{/if}}
+              {{#if this.hasDuration}}
+                <span class="flag" data-tooltip="Takes time"><i class="fa-solid fa-clock"></i></span>
+              {{/if}}
+            </div>
+
+            <div class="service-actions">
+              <button type="button"
+                      class="action-btn delete"
+                      data-action="removeService"
+                      data-service-index="{{this.index}}"
+                      data-tooltip="Remove service">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="empty-services">
+        <i class="fa-solid fa-concierge-bell"></i>
+        <p>No enhanced services configured</p>
+        <p class="hint">Click "Add Service" to add services, or they will be auto-populated when you select a shop type template.</p>
+      </div>
+    {{/if}}
+  </div>
 </div>
