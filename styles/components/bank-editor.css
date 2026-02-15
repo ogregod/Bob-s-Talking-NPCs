@@ -1,0 +1,299 @@
+/**
+ * Bob's Talking NPCs - Bank Editor Styles
+ */
+
+@layer bobsnpc {
+  /* ===== Editor Layout ===== */
+  .bank-editor {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* ===== Navigation ===== */
+  .bank-editor .editor-nav {
+    background: var(--bobsnpc-bg-secondary);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .bank-editor .editor-tab-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+  }
+
+  .bank-editor .editor-tab-item {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    color: var(--bobsnpc-text-secondary);
+    cursor: pointer;
+    font-size: var(--bobsnpc-font-size-sm);
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .bank-editor .editor-tab-item:hover {
+    color: var(--bobsnpc-text-primary);
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .bank-editor .editor-tab-item.active {
+    color: var(--bobsnpc-primary);
+    border-bottom-color: var(--bobsnpc-primary);
+  }
+
+  /* ===== Content ===== */
+  .bank-editor .editor-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .bank-editor .editor-tab-content {
+    max-width: 600px;
+  }
+
+  .bank-editor .editor-section {
+    margin-bottom: var(--bobsnpc-spacing-xl);
+  }
+
+  .bank-editor .editor-section h3 {
+    margin: 0 0 var(--bobsnpc-spacing-md) 0;
+    padding-bottom: var(--bobsnpc-spacing-sm);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    font-size: var(--bobsnpc-font-size-md);
+  }
+
+  .bank-editor .editor-section h4 {
+    margin: var(--bobsnpc-spacing-md) 0 var(--bobsnpc-spacing-sm) 0;
+    font-size: var(--bobsnpc-font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .bank-editor .section-desc {
+    display: block;
+    margin-bottom: var(--bobsnpc-spacing-md);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  /* ===== Form Elements ===== */
+  .bank-editor .form-group {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .bank-editor .form-group label {
+    display: block;
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-sm);
+    font-weight: var(--bobsnpc-font-weight-medium);
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .bank-editor input[type="text"],
+  .bank-editor input[type="number"],
+  .bank-editor textarea,
+  .bank-editor select {
+    width: 100%;
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-input-bg);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-input-border);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .bank-editor input[type="color"] {
+    width: 48px;
+    height: 32px;
+    padding: 2px;
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-input-border);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    background: var(--bobsnpc-input-bg);
+    cursor: pointer;
+  }
+
+  .bank-editor textarea {
+    resize: vertical;
+  }
+
+  .bank-editor .form-hint {
+    display: block;
+    margin-top: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+    line-height: 1.4;
+  }
+
+  /* Form rows */
+  .bank-editor .form-row {
+    display: flex;
+    gap: var(--bobsnpc-spacing-md);
+  }
+
+  .bank-editor .form-row .form-group {
+    flex: 1;
+  }
+
+  .bank-editor .form-row.triple .form-group {
+    flex: 1;
+  }
+
+  /* Input with suffix */
+  .bank-editor .input-with-suffix {
+    display: flex;
+    align-items: center;
+  }
+
+  .bank-editor .input-with-suffix input {
+    flex: 1;
+    border-radius: var(--bobsnpc-border-radius-sm) 0 0 var(--bobsnpc-border-radius-sm);
+  }
+
+  .bank-editor .input-suffix {
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-input-border);
+    border-left: none;
+    border-radius: 0 var(--bobsnpc-border-radius-sm) var(--bobsnpc-border-radius-sm) 0;
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+    white-space: nowrap;
+  }
+
+  /* Template row */
+  .bank-editor .template-row {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-sm);
+  }
+
+  .bank-editor .template-row select {
+    flex: 1;
+  }
+
+  /* ===== Toggle List ===== */
+  .bank-editor .toggle-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .bank-editor .toggle-item {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-elevated);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    transition: border-color var(--bobsnpc-transition-fast);
+  }
+
+  .bank-editor .toggle-item:hover {
+    border-color: var(--bobsnpc-primary);
+  }
+
+  .bank-editor .toggle-item.standalone {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .bank-editor .toggle-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .bank-editor .toggle-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bank-editor .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    font-weight: var(--bobsnpc-font-weight-medium);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .bank-editor .toggle-desc {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+    line-height: 1.4;
+  }
+
+  /* ===== Footer ===== */
+  .bank-editor .editor-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-secondary);
+    border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .bank-editor .editor-hint {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .bank-editor .footer-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+  }
+
+  .bank-editor .editor-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    font-size: var(--bobsnpc-font-size-sm);
+    transition: all var(--bobsnpc-transition-fast);
+  }
+
+  .bank-editor .editor-btn.cancel {
+    background: var(--bobsnpc-bg-elevated);
+    color: var(--bobsnpc-text-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .bank-editor .editor-btn.cancel:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .bank-editor .editor-btn.save {
+    background: var(--bobsnpc-primary);
+    color: white;
+  }
+
+  .bank-editor .editor-btn.save:hover {
+    filter: brightness(1.1);
+  }
+
+  .bank-editor .editor-btn.apply {
+    background: var(--bobsnpc-bg-elevated);
+    color: var(--bobsnpc-text-primary);
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  }
+
+  .bank-editor .editor-btn.apply:hover {
+    border-color: var(--bobsnpc-primary);
+    color: var(--bobsnpc-primary);
+  }
+}

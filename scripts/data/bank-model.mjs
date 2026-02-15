@@ -6,6 +6,7 @@
 // Define MODULE_ID locally to avoid circular dependency with module.mjs
 const MODULE_ID = "bobs-talking-npcs";
 import { generateId } from "../utils/helpers.mjs";
+import { getCurrentGameTime, GameTimeUnits, formatDuration, formatDurationVerbose } from "./service-request-model.mjs";
 
 /**
  * Account type enum
@@ -44,6 +45,23 @@ export const LoanStatus = Object.freeze({
 });
 
 /**
+ * Bank network type
+ */
+export const BankNetworkType = Object.freeze({
+  LOCAL: "local",
+  GLOBAL: "global"
+});
+
+/**
+ * Bank time periods in game-time seconds
+ */
+export const BankTimePeriods = Object.freeze({
+  week: GameTimeUnits.WEEK,
+  month: GameTimeUnits.DAY * 30,
+  year: GameTimeUnits.DAY * 365
+});
+
+/**
  * Currency types (D&D 5e standard)
  */
 export const CurrencyType = Object.freeze({
@@ -73,7 +91,7 @@ export const CurrencyRates = Object.freeze({
 export function createTransaction(data = {}) {
   return {
     id: data.id || generateId(),
-    timestamp: data.timestamp || Date.now(),
+    timestamp: data.timestamp || getCurrentGameTime(),
     type: data.type || TransactionType.DEPOSIT,
 
     // Accounts involved
@@ -166,8 +184,8 @@ export function createBankAccount(data = {}) {
     bankId: data.bankId || null,
 
     // Metadata
-    openedAt: data.openedAt || Date.now(),
-    updatedAt: data.updatedAt || Date.now()
+    openedAt: data.openedAt || getCurrentGameTime(),
+    updatedAt: data.updatedAt || getCurrentGameTime()
   };
 }
 
@@ -201,7 +219,7 @@ export function createLoan(data = {}) {
     paymentsMade: data.paymentsMade ?? 0,
 
     // Dates
-    requestedAt: data.requestedAt || Date.now(),
+    requestedAt: data.requestedAt || getCurrentGameTime(),
     approvedAt: data.approvedAt || null,
     disbursedAt: data.disbursedAt || null,
     dueDate: data.dueDate || null,
@@ -266,6 +284,13 @@ export function createBank(data = {}) {
     // Visual
     icon: data.icon || "fa-landmark",
     color: data.color || "#4caf50",
+
+    // Network
+    network: {
+      type: data.network?.type || BankNetworkType.LOCAL,
+      networkId: data.network?.networkId || null,
+      networkName: data.network?.networkName || null
+    },
 
     // Services
     services: {
@@ -341,8 +366,8 @@ export function createBank(data = {}) {
     loanIds: data.loanIds || [],
 
     // Metadata
-    createdAt: data.createdAt || Date.now(),
-    updatedAt: data.updatedAt || Date.now()
+    createdAt: data.createdAt || getCurrentGameTime(),
+    updatedAt: data.updatedAt || getCurrentGameTime()
   };
 }
 
@@ -376,7 +401,7 @@ export function createSafeDepositBox(data = {}) {
     accessLog: data.accessLog || [],
 
     // Metadata
-    rentedAt: data.rentedAt || Date.now(),
+    rentedAt: data.rentedAt || getCurrentGameTime(),
     lastAccessed: data.lastAccessed || null
   };
 }
@@ -492,7 +517,7 @@ export function deposit(account, amount, reference = "") {
       ...account,
       balance: newBalance,
       transactions: [...account.transactions, transaction.id],
-      updatedAt: Date.now()
+      updatedAt: getCurrentGameTime()
     },
     transaction
   };
@@ -583,9 +608,9 @@ export function withdraw(account, amount, bank, reference = "") {
       limits: {
         ...account.limits,
         withdrawnThisPeriod: account.limits.withdrawnThisPeriod + withdrawalAmount,
-        lastWithdrawal: Date.now()
+        lastWithdrawal: getCurrentGameTime()
       },
-      updatedAt: Date.now()
+      updatedAt: getCurrentGameTime()
     },
     transaction,
     reason: null
@@ -642,13 +667,13 @@ export function transfer(fromAccount, toAccount, amount, bank, reference = "") {
       ...fromAccount,
       balance: newFromBalance,
       transactions: [...fromAccount.transactions, transaction.id],
-      updatedAt: Date.now()
+      updatedAt: getCurrentGameTime()
     },
     toAccount: {
       ...toAccount,
       balance: newToBalance,
       transactions: [...toAccount.transactions, transaction.id],
-      updatedAt: Date.now()
+      updatedAt: getCurrentGameTime()
     },
     transaction,
     reason: null
@@ -691,7 +716,7 @@ export function makeLoanPayment(loan, paymentAmount) {
 
   if (newRemainingBalance <= 0) {
     newStatus = LoanStatus.PAID;
-    paidOffAt = Date.now();
+    paidOffAt = getCurrentGameTime();
   }
 
   return {
@@ -705,11 +730,11 @@ export function makeLoanPayment(loan, paymentAmount) {
       ...loan.payments,
       {
         id: generateId(),
-        timestamp: Date.now(),
+        timestamp: getCurrentGameTime(),
         amount: paymentAmount
       }
     ],
-    updatedAt: Date.now()
+    updatedAt: getCurrentGameTime()
   };
 }
 
@@ -734,10 +759,10 @@ export function applyInterest(account) {
     balance: newBalance,
     interest: {
       ...account.interest,
-      lastAccrual: Date.now(),
+      lastAccrual: getCurrentGameTime(),
       accruedAmount: account.interest.accruedAmount + interestEarned
     },
-    updatedAt: Date.now()
+    updatedAt: getCurrentGameTime()
   };
 }
 
@@ -811,7 +836,7 @@ export function checkLoanEligibility(bank, account, requestedAmount, context = {
   let maxAmount = loans.maxLoanAmount;
 
   // Check account age
-  const accountAgeDays = (Date.now() - account.openedAt) / (24 * 60 * 60 * 1000);
+  const accountAgeDays = (getCurrentGameTime() - account.openedAt) / (24 * 60 * 60 * 1000);
   if (context.requirements?.accountAge > 0 && accountAgeDays < context.requirements.accountAge) {
     reasons.push(`Account must be at least ${context.requirements.accountAge} days old`);
   }

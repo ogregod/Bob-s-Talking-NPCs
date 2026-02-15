@@ -1,313 +1,689 @@
-{{!-- Bank Window Content --}}
-<main class="bank-content {{theme}}">
+{{!-- Bank Window Content - Full multi-denomination, game-time aware UI --}}
+<main class="bank-content">
+
+  {{!-- ═══════════════════ ACCOUNTS TAB ═══════════════════ --}}
   {{#if (eq activeTab 'accounts')}}
-    {{!-- Accounts Overview --}}
     <section class="accounts-section">
-      <h3>{{localize "BOBSNPC.Bank.YourAccounts"}}</h3>
 
       {{#if hasAccounts}}
-        <div class="accounts-list">
+        <div class="accounts-grid">
           {{#each accounts}}
-            <div class="account-card {{#if this.isSelected}}selected{{/if}}" data-action="selectAccount" data-account-id="{{this.id}}">
-              <div class="account-header">
-                <i class="fa-solid {{this.icon}}"></i>
-                <span class="account-name">{{this.name}}</span>
-                <span class="account-type">{{this.typeLabel}}</span>
+            <div class="account-card {{this.typeClass}} {{#if this.isSelected}}selected{{/if}}"
+                 data-action="selectAccount" data-account-id="{{this.id}}">
+              <div class="account-card-header {{this.typeClass}}">
+                <div class="account-type-badge">
+                  <i class="fa-solid {{this.typeIcon}}"></i>
+                  <span>{{this.typeLabel}}</span>
+                </div>
+                <span class="account-number">#{{this.accountNumber}}</span>
               </div>
 
-              <div class="account-balance">
-                <span class="balance-amount">{{this.balance}} gp</span>
-                {{#if this.interestRate}}
-                  <span class="interest-rate" data-tooltip="{{localize 'BOBSNPC.Bank.AnnualInterest'}}">
-                    <i class="fa-solid fa-percentage"></i>
-                    {{this.interestRate}}%
+              <div class="account-card-body">
+                {{!-- Multi-denomination balance --}}
+                <div class="account-balance-breakdown">
+                  {{#if this.balance.pp}}
+                    <span class="denomination pp">
+                      <span class="denom-icon pp-icon"></span>
+                      {{this.balance.pp}}
+                    </span>
+                  {{/if}}
+                  <span class="denomination gp">
+                    <span class="denom-icon gp-icon"></span>
+                    {{this.balance.gp}}
                   </span>
-                {{/if}}
-              </div>
+                  {{#if this.balance.ep}}
+                    <span class="denomination ep">
+                      <span class="denom-icon ep-icon"></span>
+                      {{this.balance.ep}}
+                    </span>
+                  {{/if}}
+                  {{#if this.balance.sp}}
+                    <span class="denomination sp">
+                      <span class="denom-icon sp-icon"></span>
+                      {{this.balance.sp}}
+                    </span>
+                  {{/if}}
+                  {{#if this.balance.cp}}
+                    <span class="denomination cp">
+                      <span class="denom-icon cp-icon"></span>
+                      {{this.balance.cp}}
+                    </span>
+                  {{/if}}
+                </div>
 
-              {{#if this.lastTransaction}}
-                <div class="last-transaction">
-                  <span class="transaction-date">{{this.lastTransaction.date}}</span>
-                  <span class="transaction-type {{this.lastTransaction.type}}">
-                    {{this.lastTransaction.description}}
+                <div class="account-total">
+                  <i class="fa-solid fa-coins"></i>
+                  {{this.balanceFormatted}}
+                </div>
+
+                <div class="account-meta">
+                  {{#if this.hasInterest}}
+                    <span class="interest-badge" data-tooltip="{{localize 'BOBSNPC.Bank.AnnualInterest'}}">
+                      <i class="fa-solid fa-chart-line"></i>
+                      {{this.interestRate}}
+                    </span>
+                  {{/if}}
+                  <span class="last-activity">
+                    <i class="fa-solid fa-clock"></i>
+                    {{this.lastActivity}}
                   </span>
                 </div>
-              {{/if}}
+              </div>
             </div>
           {{/each}}
         </div>
 
-        {{!-- Transaction History --}}
+        {{!-- Transaction History for selected account --}}
         {{#if selectedAccount}}
-          <div class="transaction-history">
-            <h4>{{localize "BOBSNPC.Bank.RecentTransactions"}}</h4>
-            <table class="transactions-table">
-              <thead>
-                <tr>
-                  <th>{{localize "BOBSNPC.Bank.Date"}}</th>
-                  <th>{{localize "BOBSNPC.Bank.Description"}}</th>
-                  <th>{{localize "BOBSNPC.Bank.Amount"}}</th>
-                  <th>{{localize "BOBSNPC.Bank.Balance"}}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {{#each selectedAccount.transactions}}
-                  <tr class="transaction-row {{this.type}}">
-                    <td>{{this.date}}</td>
-                    <td>{{this.description}}</td>
-                    <td class="{{#if (gt this.amount 0)}}credit{{else}}debit{{/if}}">
-                      {{#if (gt this.amount 0)}}+{{/if}}{{this.amount}} gp
-                    </td>
-                    <td>{{this.balanceAfter}} gp</td>
-                  </tr>
-                {{/each}}
-              </tbody>
-            </table>
-          </div>
+          {{#if selectedAccount.hasTransactions}}
+            <div class="transaction-history">
+              <h4>
+                <i class="fa-solid fa-receipt"></i>
+                {{localize "BOBSNPC.Bank.RecentTransactions"}}
+                <span class="history-account">{{selectedAccount.name}}</span>
+              </h4>
+              <div class="transactions-table-wrapper">
+                <table class="transactions-table">
+                  <thead>
+                    <tr>
+                      <th class="col-date">{{localize "BOBSNPC.Bank.Date"}}</th>
+                      <th class="col-type"></th>
+                      <th class="col-desc">{{localize "BOBSNPC.Bank.Description"}}</th>
+                      <th class="col-amount">{{localize "BOBSNPC.Bank.Amount"}}</th>
+                      <th class="col-balance">{{localize "BOBSNPC.Bank.Balance"}}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each selectedAccount.formattedTransactions}}
+                      <tr class="transaction-row {{this.typeClass}}">
+                        <td class="col-date">{{this.dateFormatted}}</td>
+                        <td class="col-type">
+                          <i class="fa-solid {{this.typeIcon}}"></i>
+                        </td>
+                        <td class="col-desc">{{this.description}}</td>
+                        <td class="col-amount {{this.typeClass}}">{{this.amountFormatted}}</td>
+                        <td class="col-balance">{{this.balanceAfterFormatted}}</td>
+                      </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {{else}}
+            <div class="no-transactions">
+              <i class="fa-solid fa-receipt"></i>
+              <p>{{localize "BOBSNPC.Bank.NoActivity"}}</p>
+            </div>
+          {{/if}}
         {{/if}}
+
       {{else}}
-        <div class="no-accounts">
-          <i class="fa-solid fa-piggy-bank"></i>
-          <p>{{localize "BOBSNPC.Bank.NoAccounts"}}</p>
-          <button type="button" class="open-account-btn" data-action="openAccount">
-            {{localize "BOBSNPC.Bank.OpenAccount"}}
-          </button>
+        {{!-- No accounts yet --}}
+        <div class="no-accounts-splash">
+          <div class="splash-icon">
+            <i class="fa-solid fa-landmark"></i>
+          </div>
+          <h3>{{localize "BOBSNPC.Bank.WelcomeTitle"}}</h3>
+          <p>{{localize "BOBSNPC.Bank.WelcomeMessage"}}</p>
+        </div>
+      {{/if}}
+
+      {{!-- Open New Account Section --}}
+      {{#if canOpenAccount}}
+        <div class="open-account-section">
+          <h4>
+            <i class="fa-solid fa-plus-circle"></i>
+            {{localize "BOBSNPC.Bank.OpenNewAccount"}}
+          </h4>
+          <div class="account-type-cards">
+            {{#each accountTypes}}
+              <div class="account-type-card {{this.typeClass}}">
+                <div class="type-card-icon">
+                  <i class="fa-solid {{this.icon}}"></i>
+                </div>
+                <div class="type-card-info">
+                  <h5>{{this.label}}</h5>
+                  <p>{{this.description}}</p>
+                  {{#if this.interestRate}}
+                    <span class="type-card-rate">
+                      <i class="fa-solid fa-chart-line"></i>
+                      {{this.interestRate}} {{localize "BOBSNPC.Bank.Interest"}}
+                    </span>
+                  {{/if}}
+                  {{#if this.minDeposit}}
+                    <span class="type-card-min">
+                      {{localize "BOBSNPC.Bank.MinDeposit"}}: {{this.minDeposit}} gp
+                    </span>
+                  {{/if}}
+                </div>
+                <button type="button" class="type-card-btn" data-action="openAccount" data-account-type="{{this.type}}">
+                  {{localize "BOBSNPC.Bank.Open"}}
+                </button>
+              </div>
+            {{/each}}
+          </div>
         </div>
       {{/if}}
     </section>
 
+  {{!-- ═══════════════════ DEPOSIT TAB ═══════════════════ --}}
   {{else if (eq activeTab 'deposit')}}
-    {{!-- Deposit Section --}}
     <section class="deposit-section">
-      <h3>{{localize "BOBSNPC.Bank.MakeDeposit"}}</h3>
+      <div class="section-header">
+        <i class="fa-solid fa-arrow-down"></i>
+        <h3>{{localize "BOBSNPC.Bank.MakeDeposit"}}</h3>
+      </div>
 
       <div class="transaction-form">
+        {{!-- Account selector --}}
         <div class="form-group">
-          <label>{{localize "BOBSNPC.Bank.SelectAccount"}}</label>
-          <select name="depositAccount">
+          <label>
+            <i class="fa-solid fa-piggy-bank"></i>
+            {{localize "BOBSNPC.Bank.SelectAccount"}}
+          </label>
+          <select name="depositAccount" class="bank-select">
             {{#each accounts}}
-              <option value="{{this.id}}">{{this.name}} ({{this.balance}} gp)</option>
+              <option value="{{this.id}}" {{#if this.isSelected}}selected{{/if}}>
+                {{this.typeLabel}} #{{this.accountNumber}} ({{this.balanceFormatted}})
+              </option>
             {{/each}}
           </select>
         </div>
 
+        {{!-- Multi-denomination currency inputs --}}
         <div class="form-group">
-          <label>{{localize "BOBSNPC.Bank.Amount"}}</label>
-          <div class="amount-input-group">
-            <input type="number" name="depositAmount" min="1" max="{{playerGold}}" placeholder="0" />
-            <span class="currency-label">gp</span>
+          <label>
+            <i class="fa-solid fa-coins"></i>
+            {{localize "BOBSNPC.Bank.Amount"}}
+          </label>
+          <div class="currency-input-row">
+            <div class="currency-field pp">
+              <div class="currency-coin pp-coin" data-tooltip="Platinum">
+                <span>PP</span>
+              </div>
+              <input type="number" name="currency.pp" min="0" max="{{maxCurrency.pp}}" value="0" />
+            </div>
+            <div class="currency-field gp">
+              <div class="currency-coin gp-coin" data-tooltip="Gold">
+                <span>GP</span>
+              </div>
+              <input type="number" name="currency.gp" min="0" max="{{maxCurrency.gp}}" value="0" />
+            </div>
+            <div class="currency-field ep">
+              <div class="currency-coin ep-coin" data-tooltip="Electrum">
+                <span>EP</span>
+              </div>
+              <input type="number" name="currency.ep" min="0" max="{{maxCurrency.ep}}" value="0" />
+            </div>
+            <div class="currency-field sp">
+              <div class="currency-coin sp-coin" data-tooltip="Silver">
+                <span>SP</span>
+              </div>
+              <input type="number" name="currency.sp" min="0" max="{{maxCurrency.sp}}" value="0" />
+            </div>
+            <div class="currency-field cp">
+              <div class="currency-coin cp-coin" data-tooltip="Copper">
+                <span>CP</span>
+              </div>
+              <input type="number" name="currency.cp" min="0" max="{{maxCurrency.cp}}" value="0" />
+            </div>
           </div>
-          <span class="available-funds">{{localize "BOBSNPC.Bank.Available"}}: {{playerGold}} gp</span>
+
+          <div class="currency-available">
+            <span class="available-label">{{localize "BOBSNPC.Bank.Available"}}:</span>
+            <div class="wallet-denominations inline">
+              {{#if playerCurrency.pp}}
+                <span class="denomination pp"><span class="denom-icon pp-icon"></span>{{playerCurrency.pp}}</span>
+              {{/if}}
+              <span class="denomination gp"><span class="denom-icon gp-icon"></span>{{playerCurrency.gp}}</span>
+              {{#if playerCurrency.ep}}
+                <span class="denomination ep"><span class="denom-icon ep-icon"></span>{{playerCurrency.ep}}</span>
+              {{/if}}
+              {{#if playerCurrency.sp}}
+                <span class="denomination sp"><span class="denom-icon sp-icon"></span>{{playerCurrency.sp}}</span>
+              {{/if}}
+              {{#if playerCurrency.cp}}
+                <span class="denomination cp"><span class="denom-icon cp-icon"></span>{{playerCurrency.cp}}</span>
+              {{/if}}
+            </div>
+          </div>
         </div>
 
+        {{!-- Quick amount buttons --}}
         <div class="quick-amounts">
-          <button type="button" data-action="setDepositAmount" data-amount="10">10 gp</button>
-          <button type="button" data-action="setDepositAmount" data-amount="50">50 gp</button>
-          <button type="button" data-action="setDepositAmount" data-amount="100">100 gp</button>
-          <button type="button" data-action="setDepositAmount" data-amount="all">{{localize "BOBSNPC.Bank.All"}}</button>
+          <button type="button" class="quick-btn" data-action="setDepositAmount" data-amount="10">10 gp</button>
+          <button type="button" class="quick-btn" data-action="setDepositAmount" data-amount="50">50 gp</button>
+          <button type="button" class="quick-btn" data-action="setDepositAmount" data-amount="100">100 gp</button>
+          <button type="button" class="quick-btn all" data-action="setDepositAmount" data-amount="all">
+            <i class="fa-solid fa-sack-dollar"></i>
+            {{localize "BOBSNPC.Bank.All"}}
+          </button>
         </div>
 
-        <button type="button" class="primary-btn" data-action="confirmDeposit">
+        <button type="button" class="action-btn deposit-btn" data-action="confirmDeposit">
           <i class="fa-solid fa-arrow-down"></i>
           {{localize "BOBSNPC.Bank.Deposit"}}
         </button>
       </div>
     </section>
 
+  {{!-- ═══════════════════ WITHDRAW TAB ═══════════════════ --}}
   {{else if (eq activeTab 'withdraw')}}
-    {{!-- Withdraw Section --}}
     <section class="withdraw-section">
-      <h3>{{localize "BOBSNPC.Bank.MakeWithdrawal"}}</h3>
+      <div class="section-header">
+        <i class="fa-solid fa-arrow-up"></i>
+        <h3>{{localize "BOBSNPC.Bank.MakeWithdrawal"}}</h3>
+      </div>
 
       <div class="transaction-form">
+        {{!-- Account selector --}}
         <div class="form-group">
-          <label>{{localize "BOBSNPC.Bank.SelectAccount"}}</label>
-          <select name="withdrawAccount">
+          <label>
+            <i class="fa-solid fa-piggy-bank"></i>
+            {{localize "BOBSNPC.Bank.SelectAccount"}}
+          </label>
+          <select name="withdrawAccount" class="bank-select">
             {{#each accounts}}
-              <option value="{{this.id}}">{{this.name}} ({{this.balance}} gp)</option>
+              <option value="{{this.id}}" {{#if this.isSelected}}selected{{/if}}>
+                {{this.typeLabel}} #{{this.accountNumber}} ({{this.balanceFormatted}})
+              </option>
             {{/each}}
           </select>
         </div>
 
-        <div class="form-group">
-          <label>{{localize "BOBSNPC.Bank.Amount"}}</label>
-          <div class="amount-input-group">
-            <input type="number" name="withdrawAmount" min="1" placeholder="0" />
-            <span class="currency-label">gp</span>
-          </div>
-          <span class="available-funds">{{localize "BOBSNPC.Bank.AccountBalance"}}: {{selectedAccountBalance}} gp</span>
-        </div>
-
-        {{#if withdrawalFee}}
-          <div class="fee-notice">
-            <i class="fa-solid fa-info-circle"></i>
-            {{localize "BOBSNPC.Bank.WithdrawalFee"}}: {{withdrawalFee}} gp
+        {{!-- Account balance display --}}
+        {{#if accountBalance}}
+          <div class="account-balance-display">
+            <span class="balance-label">{{localize "BOBSNPC.Bank.AccountBalance"}}:</span>
+            <div class="wallet-denominations inline">
+              {{#if accountBalance.pp}}
+                <span class="denomination pp"><span class="denom-icon pp-icon"></span>{{accountBalance.pp}}</span>
+              {{/if}}
+              <span class="denomination gp"><span class="denom-icon gp-icon"></span>{{accountBalance.gp}}</span>
+              {{#if accountBalance.ep}}
+                <span class="denomination ep"><span class="denom-icon ep-icon"></span>{{accountBalance.ep}}</span>
+              {{/if}}
+              {{#if accountBalance.sp}}
+                <span class="denomination sp"><span class="denom-icon sp-icon"></span>{{accountBalance.sp}}</span>
+              {{/if}}
+              {{#if accountBalance.cp}}
+                <span class="denomination cp"><span class="denom-icon cp-icon"></span>{{accountBalance.cp}}</span>
+              {{/if}}
+            </div>
           </div>
         {{/if}}
 
-        <button type="button" class="primary-btn" data-action="confirmWithdraw">
+        {{!-- Multi-denomination currency inputs --}}
+        <div class="form-group">
+          <label>
+            <i class="fa-solid fa-coins"></i>
+            {{localize "BOBSNPC.Bank.Amount"}}
+          </label>
+          <div class="currency-input-row">
+            <div class="currency-field pp">
+              <div class="currency-coin pp-coin" data-tooltip="Platinum"><span>PP</span></div>
+              <input type="number" name="currency.pp" min="0" max="{{maxCurrency.pp}}" value="0" />
+            </div>
+            <div class="currency-field gp">
+              <div class="currency-coin gp-coin" data-tooltip="Gold"><span>GP</span></div>
+              <input type="number" name="currency.gp" min="0" max="{{maxCurrency.gp}}" value="0" />
+            </div>
+            <div class="currency-field ep">
+              <div class="currency-coin ep-coin" data-tooltip="Electrum"><span>EP</span></div>
+              <input type="number" name="currency.ep" min="0" max="{{maxCurrency.ep}}" value="0" />
+            </div>
+            <div class="currency-field sp">
+              <div class="currency-coin sp-coin" data-tooltip="Silver"><span>SP</span></div>
+              <input type="number" name="currency.sp" min="0" max="{{maxCurrency.sp}}" value="0" />
+            </div>
+            <div class="currency-field cp">
+              <div class="currency-coin cp-coin" data-tooltip="Copper"><span>CP</span></div>
+              <input type="number" name="currency.cp" min="0" max="{{maxCurrency.cp}}" value="0" />
+            </div>
+          </div>
+        </div>
+
+        {{!-- Withdrawal fee notice --}}
+        {{#if withdrawalFee}}
+          <div class="fee-notice">
+            <i class="fa-solid fa-info-circle"></i>
+            {{localize "BOBSNPC.Bank.WithdrawalFee"}}: {{withdrawalFeeFormatted}}
+          </div>
+        {{/if}}
+
+        <button type="button" class="action-btn withdraw-btn" data-action="confirmWithdraw">
           <i class="fa-solid fa-arrow-up"></i>
           {{localize "BOBSNPC.Bank.Withdraw"}}
         </button>
       </div>
     </section>
 
+  {{!-- ═══════════════════ TRANSFER TAB ═══════════════════ --}}
   {{else if (eq activeTab 'transfer')}}
-    {{!-- Transfer Section --}}
     <section class="transfer-section">
-      <h3>{{localize "BOBSNPC.Bank.TransferFunds"}}</h3>
+      <div class="section-header">
+        <i class="fa-solid fa-exchange-alt"></i>
+        <h3>{{localize "BOBSNPC.Bank.TransferFunds"}}</h3>
+      </div>
 
       <div class="transaction-form">
-        <div class="form-row">
+        <div class="transfer-accounts">
+          {{!-- From account --}}
           <div class="form-group">
-            <label>{{localize "BOBSNPC.Bank.FromAccount"}}</label>
-            <select name="transferFrom">
+            <label>
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              {{localize "BOBSNPC.Bank.FromAccount"}}
+            </label>
+            <select name="transferFrom" class="bank-select">
               {{#each accounts}}
-                <option value="{{this.id}}">{{this.name}} ({{this.balance}} gp)</option>
+                <option value="{{this.id}}" {{#if this.isSelected}}selected{{/if}}>
+                  {{this.typeLabel}} #{{this.accountNumber}} ({{this.balanceFormatted}})
+                </option>
               {{/each}}
             </select>
           </div>
 
-          <div class="transfer-arrow">
+          <div class="transfer-arrow-icon">
             <i class="fa-solid fa-arrow-right"></i>
           </div>
 
+          {{!-- To account / player --}}
           <div class="form-group">
-            <label>{{localize "BOBSNPC.Bank.ToAccount"}}</label>
-            <select name="transferTo">
-              {{#each accounts}}
-                <option value="{{this.id}}">{{this.name}}</option>
+            <label>
+              <i class="fa-solid fa-arrow-right-to-bracket"></i>
+              {{localize "BOBSNPC.Bank.ToAccount"}}
+            </label>
+            <select name="transferTo" class="bank-select">
+              {{#each transferTargets}}
+                <option value="{{this.id}}">{{this.label}}</option>
               {{/each}}
-              <optgroup label="{{localize 'BOBSNPC.Bank.OtherPlayers'}}">
-                {{#each otherPlayers}}
-                  <option value="player:{{this.id}}">{{this.name}}</option>
-                {{/each}}
-              </optgroup>
             </select>
           </div>
         </div>
 
+        {{!-- Multi-denomination currency inputs --}}
         <div class="form-group">
-          <label>{{localize "BOBSNPC.Bank.Amount"}}</label>
-          <div class="amount-input-group">
-            <input type="number" name="transferAmount" min="1" placeholder="0" />
-            <span class="currency-label">gp</span>
+          <label>
+            <i class="fa-solid fa-coins"></i>
+            {{localize "BOBSNPC.Bank.Amount"}}
+          </label>
+          <div class="currency-input-row">
+            <div class="currency-field pp">
+              <div class="currency-coin pp-coin" data-tooltip="Platinum"><span>PP</span></div>
+              <input type="number" name="currency.pp" min="0" value="0" />
+            </div>
+            <div class="currency-field gp">
+              <div class="currency-coin gp-coin" data-tooltip="Gold"><span>GP</span></div>
+              <input type="number" name="currency.gp" min="0" value="0" />
+            </div>
+            <div class="currency-field ep">
+              <div class="currency-coin ep-coin" data-tooltip="Electrum"><span>EP</span></div>
+              <input type="number" name="currency.ep" min="0" value="0" />
+            </div>
+            <div class="currency-field sp">
+              <div class="currency-coin sp-coin" data-tooltip="Silver"><span>SP</span></div>
+              <input type="number" name="currency.sp" min="0" value="0" />
+            </div>
+            <div class="currency-field cp">
+              <div class="currency-coin cp-coin" data-tooltip="Copper"><span>CP</span></div>
+              <input type="number" name="currency.cp" min="0" value="0" />
+            </div>
           </div>
         </div>
 
-        <button type="button" class="primary-btn" data-action="confirmTransfer">
+        {{!-- Transfer fee notice --}}
+        {{#if transferFee}}
+          <div class="fee-notice">
+            <i class="fa-solid fa-info-circle"></i>
+            {{localize "BOBSNPC.Bank.TransferFee"}}: {{transferFeeFormatted}}
+          </div>
+        {{/if}}
+
+        <button type="button" class="action-btn transfer-btn" data-action="confirmTransfer">
           <i class="fa-solid fa-exchange-alt"></i>
           {{localize "BOBSNPC.Bank.Transfer"}}
         </button>
       </div>
     </section>
 
+  {{!-- ═══════════════════ LOANS TAB ═══════════════════ --}}
   {{else if (eq activeTab 'loans')}}
-    {{!-- Loans Section --}}
     <section class="loans-section">
-      <h3>{{localize "BOBSNPC.Bank.Loans"}}</h3>
 
+      {{!-- Active Loans --}}
       {{#if hasActiveLoans}}
         <div class="active-loans">
-          <h4>{{localize "BOBSNPC.Bank.ActiveLoans"}}</h4>
+          <div class="section-header">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+            <h3>{{localize "BOBSNPC.Bank.ActiveLoans"}}</h3>
+          </div>
+
           {{#each activeLoans}}
-            <div class="loan-card {{#if this.overdue}}overdue{{/if}}">
-              <div class="loan-header">
-                <span class="loan-amount">{{this.principal}} gp</span>
-                <span class="loan-status {{this.status}}">{{this.statusLabel}}</span>
-              </div>
-              <div class="loan-details">
-                <div class="loan-stat">
-                  <span class="stat-label">{{localize "BOBSNPC.Bank.InterestRate"}}</span>
-                  <span class="stat-value">{{this.interestRate}}%</span>
+            <div class="loan-card {{this.statusClass}}">
+              <div class="loan-card-header">
+                <div class="loan-principal">
+                  <i class="fa-solid fa-coins"></i>
+                  <span class="loan-amount-value">{{this.principalFormatted}}</span>
+                  <span class="loan-label">{{localize "BOBSNPC.Bank.Principal"}}</span>
                 </div>
-                <div class="loan-stat">
-                  <span class="stat-label">{{localize "BOBSNPC.Bank.AmountOwed"}}</span>
-                  <span class="stat-value">{{this.totalOwed}} gp</span>
-                </div>
-                <div class="loan-stat">
-                  <span class="stat-label">{{localize "BOBSNPC.Bank.DueDate"}}</span>
-                  <span class="stat-value {{#if this.overdue}}overdue{{/if}}">{{this.dueDate}}</span>
+                <div class="loan-status-badge {{this.statusClass}}">
+                  {{#if this.isOverdue}}
+                    <i class="fa-solid fa-exclamation-triangle"></i>
+                  {{/if}}
+                  {{this.statusLabel}}
                 </div>
               </div>
-              <button type="button" class="repay-btn" data-action="repayLoan" data-loan-id="{{this.id}}">
-                {{localize "BOBSNPC.Bank.Repay"}}
-              </button>
+
+              {{!-- Progress bar --}}
+              <div class="loan-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill {{this.statusClass}}" style="width: {{this.progressWidth}}"></div>
+                </div>
+                <div class="progress-labels">
+                  <span>{{this.amountPaidFormatted}} {{localize "BOBSNPC.Bank.Paid"}}</span>
+                  <span>{{this.progressPercent}}%</span>
+                  <span>{{this.totalDueFormatted}} {{localize "BOBSNPC.Bank.Total"}}</span>
+                </div>
+              </div>
+
+              <div class="loan-details-grid">
+                <div class="loan-detail">
+                  <span class="detail-label">{{localize "BOBSNPC.Bank.InterestRate"}}</span>
+                  <span class="detail-value">{{this.interestRateFormatted}}</span>
+                </div>
+                <div class="loan-detail">
+                  <span class="detail-label">{{localize "BOBSNPC.Bank.PaymentAmount"}}</span>
+                  <span class="detail-value">{{this.paymentFormatted}}</span>
+                </div>
+                <div class="loan-detail">
+                  <span class="detail-label">{{localize "BOBSNPC.Bank.Payments"}}</span>
+                  <span class="detail-value">{{this.paymentsDisplay}}</span>
+                </div>
+                <div class="loan-detail">
+                  <span class="detail-label">{{localize "BOBSNPC.Bank.NextDue"}}</span>
+                  <span class="detail-value {{#if this.isOverdue}}overdue{{/if}}">
+                    {{#if this.isOverdue}}
+                      <i class="fa-solid fa-exclamation-triangle"></i>
+                    {{/if}}
+                    {{this.daysRemainingLabel}}
+                  </span>
+                </div>
+                <div class="loan-detail">
+                  <span class="detail-label">{{localize "BOBSNPC.Bank.Remaining"}}</span>
+                  <span class="detail-value remaining">{{this.remainingFormatted}}</span>
+                </div>
+              </div>
+
+              {{!-- Repay section --}}
+              <div class="loan-repay">
+                <div class="repay-input-group">
+                  <input type="number" name="repayAmount-{{this.id}}" min="1"
+                         value="{{this.paymentAmount}}" placeholder="{{this.paymentAmount}}" />
+                  <span class="currency-label">gp</span>
+                </div>
+                <button type="button" class="action-btn repay-btn" data-action="repayLoan" data-loan-id="{{this.id}}">
+                  <i class="fa-solid fa-money-bill-wave"></i>
+                  {{localize "BOBSNPC.Bank.MakePayment"}}
+                </button>
+              </div>
             </div>
           {{/each}}
         </div>
       {{/if}}
 
-      <div class="new-loan">
-        <h4>{{localize "BOBSNPC.Bank.RequestLoan"}}</h4>
-        <div class="transaction-form">
-          <div class="form-group">
-            <label>{{localize "BOBSNPC.Bank.LoanAmount"}}</label>
-            <div class="amount-input-group">
-              <input type="number" name="loanAmount" min="{{minLoan}}" max="{{maxLoan}}" placeholder="0" />
-              <span class="currency-label">gp</span>
-            </div>
-            <span class="loan-limits">{{localize "BOBSNPC.Bank.LoanRange"}}: {{minLoan}} - {{maxLoan}} gp</span>
-          </div>
-
-          <div class="loan-terms">
-            <p>{{localize "BOBSNPC.Bank.InterestRate"}}: <strong>{{loanInterestRate}}%</strong></p>
-            <p>{{localize "BOBSNPC.Bank.RepaymentPeriod"}}: <strong>{{repaymentPeriod}}</strong></p>
-          </div>
-
-          <button type="button" class="primary-btn" data-action="requestLoan">
+      {{!-- Request New Loan --}}
+      {{#if canRequestLoan}}
+        <div class="new-loan-section">
+          <div class="section-header">
             <i class="fa-solid fa-file-signature"></i>
-            {{localize "BOBSNPC.Bank.RequestLoan"}}
-          </button>
+            <h3>{{localize "BOBSNPC.Bank.RequestLoan"}}</h3>
+          </div>
+
+          <div class="transaction-form">
+            <div class="form-group">
+              <label>
+                <i class="fa-solid fa-coins"></i>
+                {{localize "BOBSNPC.Bank.LoanAmount"}}
+              </label>
+              <div class="amount-input-group">
+                <input type="number" name="loanAmount" min="{{minLoan}}" max="{{maxLoan}}" placeholder="0" />
+                <span class="currency-label">gp</span>
+              </div>
+              <span class="input-hint">
+                {{localize "BOBSNPC.Bank.LoanRange"}}: {{minLoan}} - {{maxLoanFormatted}}
+              </span>
+            </div>
+
+            <div class="loan-terms-preview">
+              <div class="term-item">
+                <span class="term-label">{{localize "BOBSNPC.Bank.InterestRate"}}</span>
+                <span class="term-value">{{loanInterestRate}}</span>
+              </div>
+              <div class="term-item">
+                <span class="term-label">{{localize "BOBSNPC.Bank.RepaymentPeriod"}}</span>
+                <span class="term-value">{{repaymentPeriod}}</span>
+              </div>
+            </div>
+
+            <button type="button" class="action-btn loan-btn" data-action="requestLoan">
+              <i class="fa-solid fa-file-signature"></i>
+              {{localize "BOBSNPC.Bank.RequestLoan"}}
+            </button>
+          </div>
         </div>
-      </div>
+      {{else if loansAvailable}}
+        {{#unless hasActiveLoans}}
+          <div class="no-content-message">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+            <p>{{localize "BOBSNPC.Bank.NoLoansAvailable"}}</p>
+          </div>
+        {{/unless}}
+      {{/if}}
     </section>
 
+  {{!-- ═══════════════════ STORAGE TAB ═══════════════════ --}}
   {{else if (eq activeTab 'storage')}}
-    {{!-- Safe Deposit Storage --}}
     <section class="storage-section">
-      <h3>{{localize "BOBSNPC.Bank.SafeDeposit"}}</h3>
 
-      {{#if hasStorage}}
-        <div class="storage-info">
-          <span class="storage-capacity">
-            <i class="fa-solid fa-box"></i>
-            {{storedItems}}/{{storageCapacity}} {{localize "BOBSNPC.Bank.ItemsStored"}}
-          </span>
-          <span class="storage-fee">
-            {{localize "BOBSNPC.Bank.MonthlyFee"}}: {{storageFee}} gp
-          </span>
-        </div>
+      {{#if hasBoxes}}
+        <div class="storage-boxes">
+          {{#each boxes}}
+            <div class="storage-box-card {{#if this.isExpired}}expired{{/if}} {{#if this.isExpiring}}expiring{{/if}}">
+              <div class="box-card-header">
+                <div class="box-type">
+                  <i class="fa-solid {{this.sizeIcon}}"></i>
+                  <span>{{this.sizeLabel}} {{localize "BOBSNPC.Bank.Vault"}}</span>
+                </div>
+                <div class="box-status">
+                  {{#if this.isExpired}}
+                    <span class="box-badge expired">
+                      <i class="fa-solid fa-exclamation-triangle"></i>
+                      {{localize "BOBSNPC.Bank.Expired"}}
+                    </span>
+                  {{else if this.isExpiring}}
+                    <span class="box-badge expiring">
+                      <i class="fa-solid fa-clock"></i>
+                      {{this.paidUntilFormatted}}
+                    </span>
+                  {{else}}
+                    <span class="box-badge active">
+                      <i class="fa-solid fa-check"></i>
+                      {{this.paidUntilFormatted}}
+                    </span>
+                  {{/if}}
+                </div>
+              </div>
 
-        <div class="storage-grid">
-          {{#each storageItems}}
-            <div class="storage-item" data-item-id="{{this.id}}">
-              <img src="{{this.img}}" alt="{{this.name}}" />
-              <span class="item-name">{{this.name}}</span>
-              {{#if this.quantity}}
-                <span class="item-qty">x{{this.quantity}}</span>
-              {{/if}}
-              <button type="button" class="retrieve-btn" data-action="retrieveItem" data-item-id="{{this.id}}"
-                      data-tooltip="{{localize 'BOBSNPC.Bank.Retrieve'}}">
-                <i class="fa-solid fa-hand-holding"></i>
-              </button>
+              {{!-- Capacity bar --}}
+              <div class="box-capacity">
+                <div class="capacity-bar">
+                  <div class="capacity-fill" style="width: {{this.capacityPercent}}%"></div>
+                </div>
+                <span class="capacity-label">{{this.capacityUsed}} {{localize "BOBSNPC.Bank.ItemsStored"}}</span>
+              </div>
+
+              {{!-- Stored items grid --}}
+              <div class="box-items-grid">
+                {{#each this.storedItems}}
+                  <div class="stored-item" data-tooltip="{{this.name}}">
+                    <img src="{{this.img}}" alt="{{this.name}}" />
+                    <button type="button" class="retrieve-btn"
+                            data-action="retrieveItem" data-box-id="{{../id}}" data-item-index="{{this.index}}"
+                            data-tooltip="{{localize 'BOBSNPC.Bank.Retrieve'}}">
+                      <i class="fa-solid fa-hand-holding"></i>
+                    </button>
+                  </div>
+                {{/each}}
+
+                {{!-- Empty slots for storing --}}
+                {{#if this.canStoreMore}}
+                  <div class="stored-item empty-slot" data-action="storeItem" data-box-id="{{this.id}}">
+                    <i class="fa-solid fa-plus"></i>
+                  </div>
+                {{/if}}
+              </div>
             </div>
           {{/each}}
-
-          {{#if canStoreMore}}
-            <div class="storage-slot empty" data-action="storeItem">
-              <i class="fa-solid fa-plus"></i>
-              <span>{{localize "BOBSNPC.Bank.StoreItem"}}</span>
-            </div>
-          {{/if}}
         </div>
       {{else}}
-        <div class="no-storage">
+        <div class="no-content-message">
           <i class="fa-solid fa-vault"></i>
           <p>{{localize "BOBSNPC.Bank.NoSafeDeposit"}}</p>
-          <button type="button" class="rent-storage-btn" data-action="rentStorage">
-            {{localize "BOBSNPC.Bank.RentStorage"}} ({{storageRentalCost}} gp/month)
-          </button>
+        </div>
+      {{/if}}
+
+      {{!-- Rent New Box --}}
+      {{#if canRentMore}}
+        <div class="rent-box-section">
+          <div class="section-header">
+            <i class="fa-solid fa-key"></i>
+            <h3>{{localize "BOBSNPC.Bank.RentStorage"}}</h3>
+          </div>
+
+          <div class="box-size-cards">
+            {{#each availableSizes}}
+              <div class="box-size-card">
+                <div class="size-card-icon">
+                  <i class="fa-solid {{this.icon}}"></i>
+                </div>
+                <div class="size-card-info">
+                  <h5>{{this.label}}</h5>
+                  <span class="size-capacity">
+                    <i class="fa-solid fa-box"></i>
+                    {{this.capacity}} {{localize "BOBSNPC.Bank.Slots"}}
+                  </span>
+                </div>
+                <div class="size-card-price">
+                  <span class="price-amount">{{this.priceFormatted}}</span>
+                  <span class="price-period">/{{this.period}}</span>
+                </div>
+                <button type="button" class="action-btn rent-btn" data-action="rentStorage" data-size="{{this.size}}">
+                  <i class="fa-solid fa-key"></i>
+                  {{localize "BOBSNPC.Bank.Rent"}}
+                </button>
+              </div>
+            {{/each}}
+          </div>
         </div>
       {{/if}}
     </section>

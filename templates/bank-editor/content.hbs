@@ -1,0 +1,391 @@
+{{!-- Bank Editor Content - All tabs --}}
+<main class="editor-content">
+
+  {{!-- ═══════ BASIC TAB ═══════ --}}
+  {{#if (eq activeTab 'basic')}}
+    <section class="editor-tab-content">
+      <div class="editor-section">
+        <h3>{{localize "BOBSNPC.BankEditor.BasicInfo"}}</h3>
+
+        <div class="form-group">
+          <label for="bank-name">{{localize "BOBSNPC.BankEditor.BankName"}}</label>
+          <input type="text" id="bank-name" name="name" value="{{bank.name}}" placeholder="Bank Name" />
+        </div>
+
+        <div class="form-group">
+          <label for="bank-desc">{{localize "BOBSNPC.BankEditor.Description"}}</label>
+          <textarea id="bank-desc" name="description" rows="3" placeholder="Bank description...">{{bank.description}}</textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bank-icon">{{localize "BOBSNPC.BankEditor.Icon"}}</label>
+            <select id="bank-icon" name="icon">
+              {{#each iconOptions}}
+                <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>
+                  {{this.label}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="bank-color">{{localize "BOBSNPC.BankEditor.Color"}}</label>
+            <input type="color" id="bank-color" name="color" value="{{bank.color}}" />
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-section">
+        <h3>{{localize "BOBSNPC.BankEditor.Network"}}</h3>
+
+        <div class="form-group">
+          <label for="network-type">{{localize "BOBSNPC.BankEditor.NetworkType"}}</label>
+          <select id="network-type" name="network.type">
+            {{#each networkOptions}}
+              <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>
+                {{this.label}}
+              </option>
+            {{/each}}
+          </select>
+          <span class="form-hint">Local banks operate independently. Global banks share accounts across all branches in the same network.</span>
+        </div>
+
+        {{#if isGlobal}}
+          <div class="form-group">
+            <label for="network-id">{{localize "BOBSNPC.BankEditor.NetworkId"}}</label>
+            <input type="text" id="network-id" name="network.networkId" value="{{bank.network.networkId}}" placeholder="e.g. royal-bank" />
+            <span class="form-hint">Banks with the same Network ID share accounts.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="network-name">{{localize "BOBSNPC.BankEditor.NetworkName"}}</label>
+            <input type="text" id="network-name" name="network.networkName" value="{{bank.network.networkName}}" placeholder="e.g. Royal Bank of the Realm" />
+          </div>
+        {{/if}}
+      </div>
+
+      <div class="editor-section">
+        <h3>{{localize "BOBSNPC.BankEditor.Template"}}</h3>
+        <div class="template-row">
+          <select name="template">
+            {{#each templateOptions}}
+              <option value="{{this.value}}">{{this.label}}</option>
+            {{/each}}
+          </select>
+          <button type="button" class="editor-btn apply" data-action="applyTemplate">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            Apply Template
+          </button>
+        </div>
+        <span class="form-hint">Templates configure services, rates, and fees. Your bank name and appearance will be preserved.</span>
+      </div>
+    </section>
+
+  {{!-- ═══════ SERVICES TAB ═══════ --}}
+  {{else if (eq activeTab 'services')}}
+    <section class="editor-tab-content">
+      <div class="editor-section">
+        <h3>{{localize "BOBSNPC.BankEditor.EnabledServices"}}</h3>
+
+        <div class="toggle-list">
+          <label class="toggle-item">
+            <input type="checkbox" name="services.deposits" {{#if bank.services.deposits}}checked{{/if}} />
+            <div class="toggle-info">
+              <span class="toggle-label">
+                <i class="fa-solid fa-arrow-down"></i>
+                {{localize "BOBSNPC.Bank.Deposit"}}
+              </span>
+              <span class="toggle-desc">Allow customers to deposit currency into accounts.</span>
+            </div>
+          </label>
+
+          <label class="toggle-item">
+            <input type="checkbox" name="services.withdrawals" {{#if bank.services.withdrawals}}checked{{/if}} />
+            <div class="toggle-info">
+              <span class="toggle-label">
+                <i class="fa-solid fa-arrow-up"></i>
+                {{localize "BOBSNPC.Bank.Withdraw"}}
+              </span>
+              <span class="toggle-desc">Allow customers to withdraw currency from accounts.</span>
+            </div>
+          </label>
+
+          <label class="toggle-item">
+            <input type="checkbox" name="services.transfers" {{#if bank.services.transfers}}checked{{/if}} />
+            <div class="toggle-info">
+              <span class="toggle-label">
+                <i class="fa-solid fa-exchange-alt"></i>
+                {{localize "BOBSNPC.Bank.Transfer"}}
+              </span>
+              <span class="toggle-desc">Allow transfers between accounts and to other players.</span>
+            </div>
+          </label>
+
+          <label class="toggle-item">
+            <input type="checkbox" name="services.currencyExchange" {{#if bank.services.currencyExchange}}checked{{/if}} />
+            <div class="toggle-info">
+              <span class="toggle-label">
+                <i class="fa-solid fa-coins"></i>
+                Currency Exchange
+              </span>
+              <span class="toggle-desc">Allow exchanging between coin denominations.</span>
+            </div>
+          </label>
+
+          <label class="toggle-item">
+            <input type="checkbox" name="services.loans" {{#if bank.services.loans}}checked{{/if}} />
+            <div class="toggle-info">
+              <span class="toggle-label">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                {{localize "BOBSNPC.Bank.Loans"}}
+              </span>
+              <span class="toggle-desc">Offer loans to customers with interest.</span>
+            </div>
+          </label>
+
+          <label class="toggle-item">
+            <input type="checkbox" name="services.safeDeposit" {{#if bank.services.safeDeposit}}checked{{/if}} />
+            <div class="toggle-info">
+              <span class="toggle-label">
+                <i class="fa-solid fa-vault"></i>
+                {{localize "BOBSNPC.Bank.SafeDeposit"}}
+              </span>
+              <span class="toggle-desc">Rent safe deposit boxes for item storage.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </section>
+
+  {{!-- ═══════ FEES & RATES TAB ═══════ --}}
+  {{else if (eq activeTab 'fees')}}
+    <section class="editor-tab-content">
+      <div class="editor-section">
+        <h3>Interest Rates</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="savings-rate">Savings Interest Rate</label>
+            <div class="input-with-suffix">
+              <input type="number" id="savings-rate" name="rates.savingsInterest" value="{{bank.rates.savingsInterest}}" step="0.001" min="0" max="1" />
+              <span class="input-suffix">per period</span>
+            </div>
+            <span class="form-hint">e.g. 0.01 = 1% interest per accrual period</span>
+          </div>
+
+          <div class="form-group">
+            <label for="loan-rate">Loan Interest Rate</label>
+            <div class="input-with-suffix">
+              <input type="number" id="loan-rate" name="rates.loanInterest" value="{{bank.rates.loanInterest}}" step="0.01" min="0" max="1" />
+              <span class="input-suffix">per period</span>
+            </div>
+            <span class="form-hint">e.g. 0.1 = 10% interest on loans</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-section">
+        <h3>Transaction Fees</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="deposit-fee">Deposit Fee</label>
+            <div class="input-with-suffix">
+              <input type="number" id="deposit-fee" name="fees.depositFee" value="{{bank.fees.depositFee}}" step="0.001" min="0" max="1" />
+              <span class="input-suffix">%</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="withdrawal-fee">Withdrawal Fee</label>
+            <div class="input-with-suffix">
+              <input type="number" id="withdrawal-fee" name="fees.withdrawalFee" value="{{bank.fees.withdrawalFee}}" step="0.001" min="0" max="1" />
+              <span class="input-suffix">%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="transfer-fee">Transfer Fee</label>
+            <div class="input-with-suffix">
+              <input type="number" id="transfer-fee" name="fees.transferFee" value="{{bank.fees.transferFee}}" step="0.001" min="0" max="1" />
+              <span class="input-suffix">%</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="maintenance-fee">Account Maintenance Fee</label>
+            <div class="input-with-suffix">
+              <input type="number" id="maintenance-fee" name="fees.accountMaintenanceFee" value="{{bank.fees.accountMaintenanceFee}}" step="0.1" min="0" />
+              <span class="input-suffix">gp/month</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  {{!-- ═══════ LOANS TAB ═══════ --}}
+  {{else if (eq activeTab 'loans')}}
+    <section class="editor-tab-content">
+      <div class="editor-section">
+        <h3>Loan Configuration</h3>
+
+        <label class="toggle-item standalone">
+          <input type="checkbox" name="loans.enabled" {{#if bank.loans.enabled}}checked{{/if}} />
+          <div class="toggle-info">
+            <span class="toggle-label">Enable Loans</span>
+            <span class="toggle-desc">Allow this bank to offer loans to customers.</span>
+          </div>
+        </label>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="min-loan">Minimum Loan Amount</label>
+            <div class="input-with-suffix">
+              <input type="number" id="min-loan" name="loans.minLoanAmount" value="{{bank.loans.minLoanAmount}}" min="1" />
+              <span class="input-suffix">gp</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="max-loan">Maximum Loan Amount</label>
+            <div class="input-with-suffix">
+              <input type="number" id="max-loan" name="loans.maxLoanAmount" value="{{bank.loans.maxLoanAmount}}" min="1" />
+              <span class="input-suffix">gp</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="max-term">Maximum Loan Term</label>
+            <div class="input-with-suffix">
+              <input type="number" id="max-term" name="loans.maxLoanTerm" value="{{bank.loans.maxLoanTerm}}" min="1" />
+              <span class="input-suffix">weeks</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="default-threshold">Default Threshold</label>
+            <div class="input-with-suffix">
+              <input type="number" id="default-threshold" name="loans.defaultThreshold" value="{{bank.loans.defaultThreshold}}" min="1" />
+              <span class="input-suffix">missed payments</span>
+            </div>
+            <span class="form-hint">Number of missed payments before loan defaults.</span>
+          </div>
+        </div>
+
+        <div class="toggle-list">
+          <label class="toggle-item">
+            <input type="checkbox" name="loans.requiresCollateral" {{#if bank.loans.requiresCollateral}}checked{{/if}} />
+            <div class="toggle-info">
+              <span class="toggle-label">Require Collateral</span>
+              <span class="toggle-desc">Borrowers must put up collateral items for large loans.</span>
+            </div>
+          </label>
+
+          <label class="toggle-item">
+            <input type="checkbox" name="loans.requiresGMApproval" {{#if bank.loans.requiresGMApproval}}checked{{/if}} />
+            <div class="toggle-info">
+              <span class="toggle-label">Require GM Approval</span>
+              <span class="toggle-desc">Loan requests must be approved by the GM before disbursement.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </section>
+
+  {{!-- ═══════ STORAGE TAB ═══════ --}}
+  {{else if (eq activeTab 'storage')}}
+    <section class="editor-tab-content">
+      <div class="editor-section">
+        <h3>Safe Deposit Configuration</h3>
+
+        <label class="toggle-item standalone">
+          <input type="checkbox" name="safeDeposit.enabled" {{#if bank.safeDeposit.enabled}}checked{{/if}} />
+          <div class="toggle-info">
+            <span class="toggle-label">Enable Safe Deposit Boxes</span>
+            <span class="toggle-desc">Allow customers to rent storage for items.</span>
+          </div>
+        </label>
+
+        <h4>Box Pricing</h4>
+        <div class="form-row triple">
+          <div class="form-group">
+            <label for="price-small">Small Box (10 slots)</label>
+            <div class="input-with-suffix">
+              <input type="number" id="price-small" name="safeDeposit.boxPriceSmall" value="{{bank.safeDeposit.boxPriceSmall}}" min="0" />
+              <span class="input-suffix">gp</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="price-medium">Medium Box (20 slots)</label>
+            <div class="input-with-suffix">
+              <input type="number" id="price-medium" name="safeDeposit.boxPriceMedium" value="{{bank.safeDeposit.boxPriceMedium}}" min="0" />
+              <span class="input-suffix">gp</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="price-large">Large Box (30 slots)</label>
+            <div class="input-with-suffix">
+              <input type="number" id="price-large" name="safeDeposit.boxPriceLarge" value="{{bank.safeDeposit.boxPriceLarge}}" min="0" />
+              <span class="input-suffix">gp</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="rental-period">Rental Period</label>
+            <select id="rental-period" name="safeDeposit.rentalPeriod">
+              {{#each rentalPeriodOptions}}
+                <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>
+                  {{this.label}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="max-boxes">Max Boxes Per Player</label>
+            <input type="number" id="max-boxes" name="safeDeposit.maxBoxesPerPlayer" value="{{bank.safeDeposit.maxBoxesPerPlayer}}" min="1" max="10" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+  {{!-- ═══════ ACCESS TAB ═══════ --}}
+  {{else if (eq activeTab 'access')}}
+    <section class="editor-tab-content">
+      <div class="editor-section">
+        <h3>Access Requirements</h3>
+        <span class="section-desc">Configure who can use this bank's services.</span>
+
+        <div class="form-group">
+          <label for="min-deposit">Minimum Opening Deposit</label>
+          <div class="input-with-suffix">
+            <input type="number" id="min-deposit" name="access.minimumDeposit" value="{{bank.access.minimumDeposit}}" min="0" />
+            <span class="input-suffix">gp</span>
+          </div>
+          <span class="form-hint">Set to 0 for no minimum deposit requirement.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="req-faction">Required Faction</label>
+          <input type="text" id="req-faction" name="access.requiredFaction" value="{{bank.access.requiredFaction}}" placeholder="None" />
+          <span class="form-hint">Leave empty if no faction membership is required.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="req-reputation">Required Reputation</label>
+          <input type="number" id="req-reputation" name="access.requiredReputation" value="{{bank.access.requiredReputation}}" min="0" />
+          <span class="form-hint">Minimum reputation score needed to open an account.</span>
+        </div>
+      </div>
+    </section>
+  {{/if}}
+</main>

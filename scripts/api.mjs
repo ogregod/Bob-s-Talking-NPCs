@@ -1311,15 +1311,40 @@ class UIAPI {
 
   /**
    * Open bank window
-   * @param {Actor} banker - The banker NPC
-   * @param {Actor} customer - The customer actor
+   * @param {string|Actor} bankerOrUuid - The banker NPC or UUID string
+   * @param {string|Actor} customerOrUuid - The customer actor or UUID string
    */
-  async openBank(banker, customer = null) {
-    Hooks.call(`${MODULE_ID}.openBank`, { banker, customer });
+  async openBank(bankerOrUuid, customerOrUuid = null) {
+    const npcUuid = typeof bankerOrUuid === "string" ? bankerOrUuid : bankerOrUuid?.uuid;
+    const playerActorUuid = typeof customerOrUuid === "string" ? customerOrUuid : (customerOrUuid?.uuid || game.user.character?.uuid);
 
-    const bankWindow = new BankWindow({ banker, customer });
+    if (!npcUuid || !playerActorUuid) {
+      console.warn(`${MODULE_ID} | Cannot open bank: missing NPC or player UUID`);
+      return null;
+    }
+
+    // Look up or auto-create bank for this NPC
+    const bankHandler = game.bobsnpc?.handlers?.bank;
+    let bank = bankHandler?.getBankForNPC(npcUuid);
+    if (!bank && bankHandler) {
+      // Auto-create a standard bank for this NPC
+      const npcActor = await fromUuid(npcUuid);
+      bank = await bankHandler.createBank({
+        name: npcActor?.name ? `${npcActor.name}'s Bank` : "Bank",
+        location: { npcActorUuid: npcUuid }
+      });
+    }
+
+    if (!bank) {
+      console.warn(`${MODULE_ID} | Could not find or create bank for NPC: ${npcUuid}`);
+      return null;
+    }
+
+    Hooks.call(`${MODULE_ID}.openBank`, { bankId: bank.id, playerActorUuid });
+
+    const bankWindow = new BankWindow({ bankId: bank.id, playerActorUuid });
     bankWindow.render(true);
-    console.log(`${MODULE_ID} | Opening bank for ${banker.name}`);
+    console.log(`${MODULE_ID} | Opening bank ${bank.name} for player`);
     return bankWindow;
   }
 

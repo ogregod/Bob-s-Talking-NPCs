@@ -1,0 +1,38 @@
+{{!-- Reusable Multi-Denomination Currency Input --}}
+{{!-- Usage: Include inline where needed. Reads input[name="currency.{denom}"] --}}
+<div class="currency-input-row">
+  <div class="currency-field pp">
+    <div class="currency-coin pp-coin" data-tooltip="Platinum">
+      <span>PP</span>
+    </div>
+    <input type="number" name="currency.pp" min="0" value="0" placeholder="0" />
+  </div>
+
+  <div class="currency-field gp">
+    <div class="currency-coin gp-coin" data-tooltip="Gold">
+      <span>GP</span>
+    </div>
+    <input type="number" name="currency.gp" min="0" value="0" placeholder="0" />
+  </div>
+
+  <div class="currency-field ep">
+    <div class="currency-coin ep-coin" data-tooltip="Electrum">
+      <span>EP</span>
+    </div>
+    <input type="number" name="currency.ep" min="0" value="0" placeholder="0" />
+  </div>
+
+  <div class="currency-field sp">
+    <div class="currency-coin sp-coin" data-tooltip="Silver">
+      <span>SP</span>
+    </div>
+    <input type="number" name="currency.sp" min="0" value="0" placeholder="0" />
+  </div>
+
+  <div class="currency-field cp">
+    <div class="currency-coin cp-coin" data-tooltip="Copper">
+      <span>CP</span>
+    </div>
+    <input type="number" name="currency.cp" min="0" value="0" placeholder="0" />
+  </div>
+</div>

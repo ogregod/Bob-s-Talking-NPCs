@@ -1,0 +1,12 @@
+{{!-- Bank Editor Navigation --}}
+<nav class="editor-nav">
+  <ul class="editor-tab-list">
+    {{#each tabs}}
+      <li class="editor-tab-item {{#if this.active}}active{{/if}}"
+          data-action="switchTab" data-tab="{{this.id}}">
+        <i class="fa-solid {{this.icon}}"></i>
+        <span>{{this.label}}</span>
+      </li>
+    {{/each}}
+  </ul>
+</nav>

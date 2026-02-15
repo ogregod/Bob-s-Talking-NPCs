@@ -15,6 +15,8 @@ import {
   TransactionType,
   LoanStatus,
   CurrencyType,
+  BankNetworkType,
+  BankTimePeriods,
   toCopper,
   copperToGold,
   goldToCurrency,
@@ -30,6 +32,7 @@ import {
   checkLoanEligibility,
   validateBankAccount
 } from "../data/bank-model.mjs";
+import { getCurrentGameTime, GameTimeUnits, formatDuration } from "../data/service-request-model.mjs";
 import { generateId, getFlag, setFlag, localize } from "../utils/helpers.mjs";
 
 /**
@@ -63,6 +66,11 @@ export class BankHandler {
     if (this._initialized) return;
 
     await this._loadData();
+
+    // Register game time hook for interest, loan payments, and box rentals
+    Hooks.on("updateWorldTime", (worldTime, delta) => {
+      this._onTimeAdvance(worldTime, delta);
+    });
 
     this._initialized = true;
     console.log(`${MODULE_ID} | Bank Handler initialized`);
@@ -156,8 +164,8 @@ export class BankHandler {
     const bank = createBank({
       ...data,
       id: data.id || generateId(),
-      createdAt: Date.now(),
-      updatedAt: Date.now()
+      createdAt: getCurrentGameTime(),
+      updatedAt: getCurrentGameTime()
     });
 
     this._bankCache.set(bank.id, bank);
@@ -182,7 +190,7 @@ export class BankHandler {
       ...bank,
       ...updates,
       id: bankId,
-      updatedAt: Date.now()
+      updatedAt: getCurrentGameTime()
     };
 
     this._bankCache.set(bankId, updatedBank);
@@ -223,7 +231,7 @@ export class BankHandler {
       bankId,
       playerActorUuid,
       accountId: account?.id,
-      startedAt: Date.now()
+      startedAt: getCurrentGameTime()
     });
 
     Hooks.callAll("bobsNPCBankOpened", bank, playerActorUuid);
@@ -376,14 +384,17 @@ export class BankHandler {
       return { success: false, message: localize("BOBSNPC.NotAccountOwner") };
     }
 
-    // Withdraw remaining balance
+    // Withdraw remaining balance in each denomination
     const balance = toCopper(account.balance);
     if (balance > 0) {
       const actor = await fromUuid(playerActorUuid);
       if (actor) {
-        const gold = copperToGold(balance);
-        const currentGold = actor.system?.currency?.gp || 0;
-        await actor.update({ "system.currency.gp": currentGold + gold });
+        const currentCurrency = actor.system?.currency || {};
+        const currencyUpdates = {};
+        for (const denom of ["pp", "gp", "ep", "sp", "cp"]) {
+          currencyUpdates[`system.currency.${denom}`] = (currentCurrency[denom] || 0) + (account.balance[denom] || 0);
+        }
+        await actor.update(currencyUpdates);
       }
     }
 
@@ -441,16 +452,24 @@ export class BankHandler {
       return { success: false, message: localize("BOBSNPC.InsufficientFunds") };
     }
 
+    // Normalize amount to currency object if it's a number
+    const currencyAmount = typeof amount === "number"
+      ? { cp: 0, sp: 0, ep: 0, gp: amount, pp: 0 }
+      : { cp: amount.cp || 0, sp: amount.sp || 0, ep: amount.ep || 0, gp: amount.gp || 0, pp: amount.pp || 0 };
+
     // Perform deposit
-    const result = deposit(account, amount, "Player deposit");
+    const result = deposit(account, currencyAmount, "Player deposit");
 
     // Update account
     this._accountCache.set(accountId, result.account);
 
-    // Deduct from player
-    const goldAmount = copperToGold(depositCopper);
-    const currentGold = actor.system?.currency?.gp || 0;
-    await actor.update({ "system.currency.gp": currentGold - goldAmount });
+    // Deduct each denomination from player
+    const currentCurrency = actor.system?.currency || {};
+    const currencyUpdates = {};
+    for (const denom of ["pp", "gp", "ep", "sp", "cp"]) {
+      currencyUpdates[`system.currency.${denom}`] = (currentCurrency[denom] || 0) - (currencyAmount[denom] || 0);
+    }
+    await actor.update(currencyUpdates);
 
     await this._saveData();
 
@@ -499,8 +518,13 @@ export class BankHandler {
       return { success: false, message: localize("BOBSNPC.BankNotFound") };
     }
 
+    // Normalize amount to currency object if it's a number
+    const currencyAmount = typeof amount === "number"
+      ? { cp: 0, sp: 0, ep: 0, gp: amount, pp: 0 }
+      : { cp: amount.cp || 0, sp: amount.sp || 0, ep: amount.ep || 0, gp: amount.gp || 0, pp: amount.pp || 0 };
+
     // Perform withdrawal
-    const result = withdraw(account, amount, bank, "Player withdrawal");
+    const result = withdraw(account, currencyAmount, bank, "Player withdrawal");
 
     if (!result.success) {
       return { success: false, message: result.reason };
@@ -509,12 +533,15 @@ export class BankHandler {
     // Update account
     this._accountCache.set(accountId, result.account);
 
-    // Give to player
+    // Give each denomination to player
     const actor = await fromUuid(playerActorUuid);
     if (actor) {
-      const goldAmount = copperToGold(toCopper(amount));
-      const currentGold = actor.system?.currency?.gp || 0;
-      await actor.update({ "system.currency.gp": currentGold + goldAmount });
+      const currentCurrency = actor.system?.currency || {};
+      const currencyUpdates = {};
+      for (const denom of ["pp", "gp", "ep", "sp", "cp"]) {
+        currencyUpdates[`system.currency.${denom}`] = (currentCurrency[denom] || 0) + (currencyAmount[denom] || 0);
+      }
+      await actor.update(currencyUpdates);
     }
 
     await this._saveData();
@@ -702,8 +729,8 @@ export class BankHandler {
     const updatedLoan = {
       ...loan,
       status: LoanStatus.ACTIVE,
-      approvedAt: Date.now(),
-      disbursedAt: Date.now()
+      approvedAt: getCurrentGameTime(),
+      disbursedAt: getCurrentGameTime()
     };
 
     this._loanCache.set(loanId, updatedLoan);
@@ -758,9 +785,14 @@ export class BankHandler {
     const updatedLoan = makeLoanPayment(loan, amount);
     this._loanCache.set(loanId, updatedLoan);
 
-    // Deduct from player
-    const currentGold = actor.system?.currency?.gp || 0;
-    await actor.update({ "system.currency.gp": currentGold - amount });
+    // Deduct from player (loan payments are in gold)
+    const paymentCurrency = goldToCurrency(amount);
+    const currentCurrency = actor.system?.currency || {};
+    const currencyUpdates = {};
+    for (const denom of ["pp", "gp", "ep", "sp", "cp"]) {
+      currencyUpdates[`system.currency.${denom}`] = (currentCurrency[denom] || 0) - (paymentCurrency[denom] || 0);
+    }
+    await actor.update(currencyUpdates);
 
     await this._saveData();
 
@@ -844,9 +876,14 @@ export class BankHandler {
 
     this._safeDepositCache.set(box.id, box);
 
-    // Deduct payment
-    const currentGold = actor.system?.currency?.gp || 0;
-    await actor.update({ "system.currency.gp": currentGold - price });
+    // Deduct payment (price is in gold)
+    const paymentCurrency = goldToCurrency(price);
+    const currentCurrency = actor.system?.currency || {};
+    const currencyUpdates = {};
+    for (const denom of ["pp", "gp", "ep", "sp", "cp"]) {
+      currencyUpdates[`system.currency.${denom}`] = (currentCurrency[denom] || 0) - (paymentCurrency[denom] || 0);
+    }
+    await actor.update(currencyUpdates);
 
     await this._saveData();
 
@@ -887,7 +924,7 @@ export class BankHandler {
     box.items.push({
       uuid: item.uuid,
       data: item.toObject(),
-      storedAt: Date.now()
+      storedAt: getCurrentGameTime()
     });
 
     // Delete from player inventory
@@ -895,12 +932,12 @@ export class BankHandler {
 
     // Update access log
     box.accessLog.push({
-      timestamp: Date.now(),
+      timestamp: getCurrentGameTime(),
       action: "store",
       itemName: item.name
     });
 
-    box.lastAccessed = Date.now();
+    box.lastAccessed = getCurrentGameTime();
 
     this._safeDepositCache.set(boxId, box);
     await this._saveData();
@@ -944,12 +981,12 @@ export class BankHandler {
 
     // Update access log
     box.accessLog.push({
-      timestamp: Date.now(),
+      timestamp: getCurrentGameTime(),
       action: "retrieve",
       itemName: storedItem.data.name
     });
 
-    box.lastAccessed = Date.now();
+    box.lastAccessed = getCurrentGameTime();
 
     this._safeDepositCache.set(boxId, box);
     await this._saveData();
@@ -962,23 +999,84 @@ export class BankHandler {
   }
 
   /**
-   * Calculate paid until date
-   * @param {string} period - Rental period
-   * @returns {number} Timestamp
+   * Calculate paid until date in game time seconds
+   * @param {string} period - Rental period (week, month, year)
+   * @returns {number} Game time timestamp in seconds
    * @private
    */
   _calculatePaidUntil(period) {
-    const now = Date.now();
-    switch (period) {
-      case "week":
-        return now + 7 * 24 * 60 * 60 * 1000;
-      case "month":
-        return now + 30 * 24 * 60 * 60 * 1000;
-      case "year":
-        return now + 365 * 24 * 60 * 60 * 1000;
-      default:
-        return now + 30 * 24 * 60 * 60 * 1000;
+    const now = getCurrentGameTime();
+    const duration = BankTimePeriods[period] || BankTimePeriods.month;
+    return now + duration;
+  }
+
+  // ==================== NETWORK ====================
+
+  /**
+   * Get all banks in a network
+   * @param {string} networkId - Network ID
+   * @returns {object[]}
+   */
+  getBanksInNetwork(networkId) {
+    if (!networkId) return [];
+    return this.getAllBanks().filter(b => b.network?.networkId === networkId);
+  }
+
+  /**
+   * Get accounts for player at a bank, respecting global networks
+   * @param {string} playerActorUuid - Player actor UUID
+   * @param {string} bankId - Bank ID
+   * @returns {object[]}
+   */
+  getAccountsForPlayerAtBank(playerActorUuid, bankId) {
+    const bank = this.getBank(bankId);
+    if (!bank) return [];
+
+    // For global banks, find accounts at any bank in the same network
+    if (bank.network?.type === BankNetworkType.GLOBAL && bank.network?.networkId) {
+      const networkBanks = this.getBanksInNetwork(bank.network.networkId);
+      const networkBankIds = new Set(networkBanks.map(b => b.id));
+      return Array.from(this._accountCache.values())
+        .filter(a => (a.ownerUuid === playerActorUuid || a.coOwners.includes(playerActorUuid))
+          && networkBankIds.has(a.bankId));
     }
+
+    // For local banks, only return accounts at this specific bank
+    return Array.from(this._accountCache.values())
+      .filter(a => (a.ownerUuid === playerActorUuid || a.coOwners.includes(playerActorUuid))
+        && a.bankId === bankId);
+  }
+
+  /**
+   * Get loans for player at a bank, respecting global networks
+   * @param {string} playerActorUuid - Player actor UUID
+   * @param {string} bankId - Bank ID
+   * @returns {object[]}
+   */
+  getLoansForPlayerAtBank(playerActorUuid, bankId) {
+    const bank = this.getBank(bankId);
+    if (!bank) return [];
+
+    if (bank.network?.type === BankNetworkType.GLOBAL && bank.network?.networkId) {
+      const networkBanks = this.getBanksInNetwork(bank.network.networkId);
+      const networkBankIds = new Set(networkBanks.map(b => b.id));
+      return Array.from(this._loanCache.values())
+        .filter(l => l.borrowerUuid === playerActorUuid && networkBankIds.has(l.bankId));
+    }
+
+    return Array.from(this._loanCache.values())
+      .filter(l => l.borrowerUuid === playerActorUuid && l.bankId === bankId);
+  }
+
+  /**
+   * Get safe deposit boxes for player at a bank
+   * @param {string} playerActorUuid - Player actor UUID
+   * @param {string} bankId - Bank ID
+   * @returns {object[]}
+   */
+  getSafeDepositBoxesForPlayerAtBank(playerActorUuid, bankId) {
+    return Array.from(this._safeDepositCache.values())
+      .filter(b => b.ownerUuid === playerActorUuid && b.bankId === bankId);
   }
 
   // ==================== INTEREST & MAINTENANCE ====================
@@ -1003,7 +1101,7 @@ export class BankHandler {
    * Check loan payments and apply penalties
    */
   async checkLoanPayments() {
-    const now = Date.now();
+    const now = getCurrentGameTime();
 
     for (const loan of this._loanCache.values()) {
       if (loan.status !== LoanStatus.ACTIVE) continue;
@@ -1026,6 +1124,75 @@ export class BankHandler {
     }
 
     await this._saveData();
+  }
+
+  // ==================== TIME ADVANCEMENT ====================
+
+  /**
+   * Handle game time advancement - process interest, loan payments, and box rentals
+   * @param {number} worldTime - Current world time in seconds
+   * @param {number} delta - Seconds advanced
+   * @private
+   */
+  async _onTimeAdvance(worldTime, delta) {
+    if (!game.user.isGM) return; // Only GM processes time-based events
+    if (delta <= 0) return;
+
+    let hasChanges = false;
+
+    // Process savings interest
+    for (const account of this._accountCache.values()) {
+      if (!account.interest?.enabled || !account.active) continue;
+
+      const periodSeconds = BankTimePeriods[account.interest.period] || BankTimePeriods.month;
+      const lastAccrual = account.interest.lastAccrual || account.openedAt || 0;
+
+      if (worldTime - lastAccrual >= periodSeconds) {
+        const updatedAccount = applyInterest(account);
+        if (toCopper(updatedAccount.balance) !== toCopper(account.balance)) {
+          this._accountCache.set(account.id, updatedAccount);
+          hasChanges = true;
+
+          Hooks.callAll("bobsNPCInterestApplied", updatedAccount);
+        }
+      }
+    }
+
+    // Process loan payments due
+    for (const loan of this._loanCache.values()) {
+      if (loan.status !== LoanStatus.ACTIVE) continue;
+
+      if (loan.nextPaymentDue && worldTime > loan.nextPaymentDue) {
+        const updatedLoan = {
+          ...loan,
+          missedPayments: loan.missedPayments + 1
+        };
+
+        // Check for default
+        if (updatedLoan.missedPayments >= loan.defaultThreshold) {
+          updatedLoan.status = LoanStatus.DEFAULTED;
+          Hooks.callAll("bobsNPCLoanDefaulted", updatedLoan);
+        }
+
+        this._loanCache.set(loan.id, updatedLoan);
+        hasChanges = true;
+      }
+    }
+
+    // Check safe deposit box expirations
+    for (const box of this._safeDepositCache.values()) {
+      if (box.paidUntil && worldTime > box.paidUntil && !box.expired) {
+        box.expired = true;
+        this._safeDepositCache.set(box.id, box);
+        hasChanges = true;
+
+        Hooks.callAll("bobsNPCBoxExpired", box);
+      }
+    }
+
+    if (hasChanges) {
+      await this._saveData();
+    }
   }
 
   // ==================== SOCKET ====================

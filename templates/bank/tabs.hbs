@@ -1,28 +1,33 @@
-{{!-- Bank Window Tabs --}}
-<nav class="bank-tabs {{theme}}">
+{{!-- Bank Window Tabs - Enhanced with badges --}}
+<nav class="bank-tabs">
   <button type="button" class="bank-tab {{#if (eq activeTab 'accounts')}}active{{/if}}"
           data-action="setTab" data-tab="accounts">
     <i class="fa-solid fa-piggy-bank"></i>
     <span>{{localize "BOBSNPC.Bank.Accounts"}}</span>
+    {{#if accountCount}}
+      <span class="tab-badge">{{accountCount}}</span>
+    {{/if}}
   </button>
 
-  <button type="button" class="bank-tab {{#if (eq activeTab 'deposit')}}active{{/if}}"
-          data-action="setTab" data-tab="deposit">
-    <i class="fa-solid fa-arrow-down"></i>
-    <span>{{localize "BOBSNPC.Bank.Deposit"}}</span>
-  </button>
+  {{#if hasAccounts}}
+    <button type="button" class="bank-tab {{#if (eq activeTab 'deposit')}}active{{/if}}"
+            data-action="setTab" data-tab="deposit">
+      <i class="fa-solid fa-arrow-down"></i>
+      <span>{{localize "BOBSNPC.Bank.Deposit"}}</span>
+    </button>
 
-  <button type="button" class="bank-tab {{#if (eq activeTab 'withdraw')}}active{{/if}}"
-          data-action="setTab" data-tab="withdraw">
-    <i class="fa-solid fa-arrow-up"></i>
-    <span>{{localize "BOBSNPC.Bank.Withdraw"}}</span>
-  </button>
+    <button type="button" class="bank-tab {{#if (eq activeTab 'withdraw')}}active{{/if}}"
+            data-action="setTab" data-tab="withdraw">
+      <i class="fa-solid fa-arrow-up"></i>
+      <span>{{localize "BOBSNPC.Bank.Withdraw"}}</span>
+    </button>
 
-  <button type="button" class="bank-tab {{#if (eq activeTab 'transfer')}}active{{/if}}"
-          data-action="setTab" data-tab="transfer">
-    <i class="fa-solid fa-exchange-alt"></i>
-    <span>{{localize "BOBSNPC.Bank.Transfer"}}</span>
-  </button>
+    <button type="button" class="bank-tab {{#if (eq activeTab 'transfer')}}active{{/if}}"
+            data-action="setTab" data-tab="transfer">
+      <i class="fa-solid fa-exchange-alt"></i>
+      <span>{{localize "BOBSNPC.Bank.Transfer"}}</span>
+    </button>
+  {{/if}}
 
   {{#if loansEnabled}}
     <button type="button" class="bank-tab {{#if (eq activeTab 'loans')}}active{{/if}}"
@@ -30,7 +35,7 @@
       <i class="fa-solid fa-file-invoice-dollar"></i>
       <span>{{localize "BOBSNPC.Bank.Loans"}}</span>
       {{#if hasActiveLoans}}
-        <span class="tab-badge warning">!</span>
+        <span class="tab-badge warning">{{loanCount}}</span>
       {{/if}}
     </button>
   {{/if}}
@@ -40,6 +45,9 @@
             data-action="setTab" data-tab="storage">
       <i class="fa-solid fa-vault"></i>
       <span>{{localize "BOBSNPC.Bank.Storage"}}</span>
+      {{#if storedItemCount}}
+        <span class="tab-badge">{{storedItemCount}}</span>
+      {{/if}}
     </button>
   {{/if}}
 </nav>

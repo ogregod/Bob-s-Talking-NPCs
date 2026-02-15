@@ -21,6 +21,7 @@
 @import url("./components/faction-editor.css");
 @import url("./components/dialogue-editor.css");
 @import url("./components/shop-manager.css");
+@import url("./components/bank-editor.css");
 
 /* ===== CSS Layer for V13 Compatibility ===== */
 @layer bobsnpc {

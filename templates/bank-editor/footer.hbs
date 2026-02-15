@@ -1,0 +1,21 @@
+{{!-- Bank Editor Footer --}}
+<footer class="editor-footer">
+  <div class="footer-left">
+    {{#if isNewBank}}
+      <span class="editor-hint">
+        <i class="fa-solid fa-info-circle"></i>
+        Creating new bank
+      </span>
+    {{/if}}
+  </div>
+  <div class="footer-actions">
+    <button type="button" class="editor-btn cancel" data-action="cancel">
+      <i class="fa-solid fa-times"></i>
+      {{localize "BOBSNPC.Cancel"}}
+    </button>
+    <button type="button" class="editor-btn save" data-action="save">
+      <i class="fa-solid fa-save"></i>
+      {{localize "BOBSNPC.Save"}}
+    </button>
+  </div>
+</footer>

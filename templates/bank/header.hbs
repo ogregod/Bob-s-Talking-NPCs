@@ -1,35 +1,88 @@
-{{!-- Bank Window Header --}}
-<header class="bank-header {{theme}}">
-  <div class="bank-info">
-    <div class="bank-icon">
-      <i class="fa-solid fa-landmark"></i>
+{{!-- Bank Window Header - Enhanced with multi-denomination wallet --}}
+<header class="bank-header">
+  <div class="bank-identity">
+    <div class="bank-icon-wrapper" style="--bank-color: {{bankColor}}">
+      <i class="fa-solid {{bankIcon}}"></i>
     </div>
     <div class="bank-details">
       <h2 class="bank-name">{{bankName}}</h2>
-      {{#if bankerName}}
-        <span class="banker-name">
-          <i class="fa-solid fa-user-tie"></i>
-          {{bankerName}}
-        </span>
-      {{/if}}
+      <div class="bank-meta">
+        {{#if bankerName}}
+          <span class="banker-name">
+            <i class="fa-solid fa-user-tie"></i>
+            {{bankerName}}
+          </span>
+        {{/if}}
+        {{#if isGlobal}}
+          <span class="network-badge global" data-tooltip="{{localize 'BOBSNPC.Bank.GlobalBankDesc'}}">
+            <i class="fa-solid fa-globe"></i>
+            {{#if networkName}}{{networkName}}{{else}}{{localize "BOBSNPC.Bank.GlobalNetwork"}}{{/if}}
+          </span>
+        {{else}}
+          <span class="network-badge local" data-tooltip="{{localize 'BOBSNPC.Bank.LocalBankDesc'}}">
+            <i class="fa-solid fa-map-pin"></i>
+            {{localize "BOBSNPC.Bank.LocalBank"}}
+          </span>
+        {{/if}}
+      </div>
     </div>
   </div>
 
-  <div class="bank-summary">
-    <div class="summary-item">
-      <span class="summary-label">{{localize "BOBSNPC.Bank.TotalBalance"}}</span>
-      <span class="summary-value gold">{{totalBalance}} gp</span>
+  <div class="bank-overview">
+    {{!-- Account totals --}}
+    <div class="overview-stat balance">
+      <span class="stat-label">{{localize "BOBSNPC.Bank.TotalBalance"}}</span>
+      <span class="stat-value">
+        <i class="fa-solid fa-coins"></i>
+        {{totalBalanceFormatted}}
+      </span>
     </div>
-    {{#if hasLoans}}
-      <div class="summary-item debt">
-        <span class="summary-label">{{localize "BOBSNPC.Bank.TotalDebt"}}</span>
-        <span class="summary-value">{{totalDebt}} gp</span>
+    {{#if hasDebt}}
+      <div class="overview-stat debt">
+        <span class="stat-label">{{localize "BOBSNPC.Bank.TotalDebt"}}</span>
+        <span class="stat-value debt-value">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+          {{totalDebtFormatted}}
+        </span>
       </div>
     {{/if}}
   </div>
 
+  {{!-- Player wallet - full denomination breakdown --}}
   <div class="player-wallet">
-    <span class="wallet-label">{{localize "BOBSNPC.Bank.OnHand"}}:</span>
-    <span class="wallet-amount">{{playerGold}} gp</span>
+    <span class="wallet-label">
+      <i class="fa-solid fa-wallet"></i>
+      {{localize "BOBSNPC.Bank.OnHand"}}
+    </span>
+    <div class="wallet-denominations">
+      {{#if playerCurrency.pp}}
+        <span class="denomination pp" data-tooltip="Platinum">
+          <span class="denom-icon pp-icon"></span>
+          {{playerCurrency.pp}}
+        </span>
+      {{/if}}
+      <span class="denomination gp" data-tooltip="Gold">
+        <span class="denom-icon gp-icon"></span>
+        {{playerCurrency.gp}}
+      </span>
+      {{#if playerCurrency.ep}}
+        <span class="denomination ep" data-tooltip="Electrum">
+          <span class="denom-icon ep-icon"></span>
+          {{playerCurrency.ep}}
+        </span>
+      {{/if}}
+      {{#if playerCurrency.sp}}
+        <span class="denomination sp" data-tooltip="Silver">
+          <span class="denom-icon sp-icon"></span>
+          {{playerCurrency.sp}}
+        </span>
+      {{/if}}
+      {{#if playerCurrency.cp}}
+        <span class="denomination cp" data-tooltip="Copper">
+          <span class="denom-icon cp-icon"></span>
+          {{playerCurrency.cp}}
+        </span>
+      {{/if}}
+    </div>
   </div>
 </header>
