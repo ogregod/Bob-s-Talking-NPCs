@@ -441,7 +441,9 @@ export function createNode(data = {}) {
       return {
         ...base,
         text: data.text || "",
-        shopType: data.shopType || "merchant",  // merchant, fence, stable
+        shopType: data.shopType || "merchant",  // merchant, fence, stable (legacy)
+        businessType: data.businessType || null,  // BusinessType enum value
+        shopId: data.shopId || null,  // Direct shop ID reference
         nextNodeId: data.nextNodeId || null  // After shop closes
       };
 

@@ -29,6 +29,112 @@ export const ShopType = Object.freeze({
 });
 
 /**
+ * Business category enum - groups business types by industry
+ */
+export const BusinessCategory = Object.freeze({
+  FORGE_STONE_EARTH: "forgeStoneEarth",
+  WOOD_HIDE_FIBER: "woodHideFiber",
+  ARCANE_ACADEMIC: "arcaneAcademic",
+  FOOD_PROVISIONS: "foodProvisions",
+  HOSPITALITY_TRAVEL: "hospitalityTravel",
+  CIVIC_FAITH_LAW: "civicFaithLaw",
+  ARTS_LEISURE_BODY: "artsLeisureBody",
+  ILLICIT_NICHE_MARITIME: "illicitNicheMaritime"
+});
+
+/**
+ * Business type enum - 68 specific business types
+ */
+export const BusinessType = Object.freeze({
+  // I. THE FORGE, STONE, & EARTH (Heavy Industry)
+  VILLAGE_BLACKSMITH: "villageBlacksmith",
+  MASTER_WEAPONSMITH: "masterWeaponsmith",
+  ARMORER: "armorer",
+  FARRIER: "farrier",
+  LOCKSMITH: "locksmith",
+  SMELTER_REFINERY: "smelterRefinery",
+  STONEMASON: "stonemason",
+  FINE_METALSMITH: "fineMetalsmith",
+
+  // II. THE WOOD, HIDE, & FIBER TRADES
+  CARPENTER_JOINER: "carpenterJoiner",
+  COOPER: "cooper",
+  WHEELWRIGHT: "wheelwright",
+  BOWYER: "bowyer",
+  FLETCHER: "fletcher",
+  TANNER: "tanner",
+  LEATHERWORKER: "leatherworker",
+  COBBLER: "cobbler",
+  TAILOR: "tailor",
+  WEAVER_DYER: "weaverDyer",
+  ROPEMAKER: "ropemaker",
+
+  // III. ARCANE, ACADEMIC, & SPECIALIST
+  APOTHECARY: "apothecary",
+  ALCHEMIST: "alchemist",
+  WIZARDS_TOWER: "wizardsTower",
+  SCRIBE_SCRIVENER: "scribeScrivener",
+  CARTOGRAPHER: "cartographer",
+  ENCHANTER: "enchanter",
+  ENGINEER_TINKERER: "engineerTinkerer",
+  GLASSBLOWER: "glassblower",
+  CHANDLER: "chandler",
+
+  // IV. FOOD, PROVISIONS, & GENERAL GOODS
+  GENERAL_STORE: "generalStore",
+  BUTCHER: "butcher",
+  BAKER: "baker",
+  MILLER: "miller",
+  BREWER_VINTNER: "brewerVintner",
+  FISHMONGER: "fishmonger",
+
+  // V. HOSPITALITY, TRAVEL, & BEASTS
+  INN: "inn",
+  TAVERN: "tavern",
+  STABLE_LIVERY: "stableLivery",
+  MENAGERIE: "menagerie",
+  ANIMAL_HANDLER: "animalHandler",
+  COURIER_POST: "courierPost",
+  GUIDE_RANGER_LODGE: "guideRangerLodge",
+
+  // VI. CIVIC, FAITH, & LAW
+  TOWN_HALL: "townHall",
+  BANK_EXCHANGE: "bankExchange",
+  TEMPLE_LARGE: "templeLarge",
+  SHRINE_SMALL: "shrineSmall",
+  UNDERTAKER: "undertaker",
+  JAIL_STOCKS: "jailStocks",
+
+  // VII. THE ARTS, LEISURE, & BODY
+  BARBER_SURGEON: "barberSurgeon",
+  BATHHOUSE: "bathhouse",
+  ARTISTS_STUDIO: "artistsStudio",
+  LUTHIER: "luthier",
+  JEWELER: "jeweler",
+
+  // VIII. ILLICIT, NICHE, & MARITIME
+  MERCENARY_GUILD: "mercenaryGuild",
+  PAWN_SHOP_FENCE: "pawnShopFence",
+  BROTHEL: "brothel",
+  SHIPYARD: "shipyard",
+  NAVIGATOR_HARBOR: "navigatorHarbor",
+  MINING_OFFICE: "miningOffice",
+  ASYLUM: "asylum",
+  ORPHANAGE: "orphanage",
+  LIBRARY_ARCHIVES: "libraryArchives",
+  GLASSHOUSE: "glasshouse",
+  PAPER_MAKER: "paperMaker",
+  POTTER_CERAMICS: "potterCeramics",
+  FALCONER: "falconer",
+  INTERPRETER: "interpreter",
+  MONEYLENDER: "moneylender",
+  TOWN_CRIER: "townCrier",
+
+  // Special
+  CUSTOM: "custom"
+});
+
+/**
  * Stock refresh type enum
  */
 export const StockRefreshType = Object.freeze({
@@ -119,6 +225,12 @@ export const ServiceCategory = Object.freeze({
   TRAINING: "training",       // Skill training, proficiencies
   HEALING: "healing",         // Temple healing, curses, etc.
   LEGAL: "legal",             // Contracts, licenses, etc.
+  MARITIME: "maritime",       // Shipyard, navigation, docking
+  CIVIC: "civic",             // Town hall, taxes, permits
+  BODY_CARE: "bodyCare",      // Barber, bathhouse, surgery
+  FINANCIAL: "financial",     // Loans, debt, pawn
+  ANIMAL: "animal",           // Training, breeding, falconry
+  ARTS: "arts",               // Portraits, music, commissions
   MISC: "misc"                // Other services
 });
 
@@ -216,7 +328,173 @@ export const ServiceType = Object.freeze({
   CONTRACT: "contract",
   LICENSE: "license",
   BOUNTY_POST: "bountyPost",
-  NOTARY: "notary"
+  NOTARY: "notary",
+
+  // === NEW SERVICE TYPES (Business Type Overhaul) ===
+
+  // Crafting - Forge & Metal
+  SILVERING: "silvering",
+  HAFTING: "hafting",
+  BLADE_HONING: "bladeHoning",
+  REFITTING: "refitting",
+  ARMOR_SPIKES: "armorSpikes",
+  HERALDRY: "heraldry",
+  SMELTING: "smelting",
+  REFINING: "refining",
+  SCRAP_MELTING: "scrapMelting",
+  SLAG_DISPOSAL: "slagDisposal",
+  SHOEING: "shoeing",
+  HOOF_CARE: "hoofCare",
+  KEY_CUTTING: "keyCutting",
+  LOCK_OPENING: "lockOpening",
+  STONEWORK: "stonework",
+  STATUARY: "statuary",
+  EXCAVATION: "excavation",
+  SECRET_DOORS: "secretDoors",
+  FINE_METALWORK: "fineMetalwork",
+  DISTILLERY_PARTS: "distilleryParts",
+
+  // Crafting - Wood, Hide, Fiber
+  WOODWORKING: "woodworking",
+  FURNITURE: "furniture",
+  STRUCTURAL_REPAIR: "structuralRepair",
+  RENOVATION: "renovation",
+  COOPERAGE: "cooperage",
+  HIDDEN_COMPARTMENTS: "hiddenCompartments",
+  WHEEL_REPAIR: "wheelRepair",
+  VEHICLE_UPGRADES: "vehicleUpgrades",
+  BOW_CRAFTING: "bowCrafting",
+  BOW_STRINGING: "bowStringing",
+  CUSTOM_DRAW: "customDraw",
+  FLETCHING: "fletching",
+  FLINT_KNAPPING: "flintKnapping",
+  SPECIALTY_AMMO: "specialtyAmmo",
+  TANNING: "tanning",
+  HIDE_PROCESSING: "hideProcessing",
+  LEATHERWORK: "leatherwork",
+  COBBLING: "cobbling",
+  HIDDEN_HEELS: "hiddenHeels",
+  WEAVING: "weaving",
+  DYEING: "dyeing",
+  RUG_MAKING: "rugMaking",
+  ROPE_MAKING: "ropeMaking",
+  NET_MAKING: "netMaking",
+
+  // Crafting - Specialist
+  GLASSWORK: "glasswork",
+  GLASS_CONTAINERS: "glassContainers",
+  OPTICS: "optics",
+  CANDLE_MAKING: "candleMaking",
+  WATERPROOFING: "waterproofing",
+  PAPER_MAKING: "paperMaking",
+  POTTERY: "pottery",
+  TILE_MAKING: "tileMaking",
+
+  // Arcane & Academic
+  LORE_RESEARCH: "loreResearch",
+  TELEPORTATION: "teleportation",
+  ARCANE_CONSULTATION: "arcaneConsultation",
+  SPELL_COPYING: "spellCopying",
+  LETTER_WRITING: "letterWriting",
+  FORGERY: "forgery",
+  CARTOGRAPHY: "cartography",
+  MAP_DECIPHERING: "mapDeciphering",
+  GADGET_REPAIR: "gadgetRepair",
+  TRAP_MAKING: "trapMaking",
+  INSTRUMENT_REPAIR: "instrumentRepair",
+  INSTRUMENT_TUNING: "instrumentTuning",
+
+  // Food & Provisions
+  MEAT_CUTTING: "meatCutting",
+  MEAT_PRESERVATION: "meatPreservation",
+  BAKING: "baking",
+  HARDTACK: "hardtack",
+  MILLING: "milling",
+  GRAIN_STORAGE: "grainStorage",
+  BREWING: "brewing",
+  WATER_PURIFICATION: "waterPurification",
+  VINEGAR_MAKING: "vinegarMaking",
+  FISH_SALE: "fishSale",
+  FISH_OIL: "fishOil",
+
+  // Body Care & Health
+  HAIRCUT: "haircut",
+  SHAVE: "shave",
+  DENTISTRY: "dentistry",
+  MINOR_SURGERY: "minorSurgery",
+  BATHING: "bathing",
+  MASSAGE_SERVICE: "massageService",
+  PORTRAIT: "portrait",
+  ART_RESTORATION: "artRestoration",
+  COMMISSION_ART: "commissionArt",
+  SKETCH_ARTIST: "sketchArtist",
+  BURIAL_SERVICE: "burialService",
+  EMBALMING: "embalming",
+  CREMATION: "cremation",
+  ASYLUM_CARE: "asylumCare",
+
+  // Civic & Legal
+  TAX_COLLECTION: "taxCollection",
+  LAND_DEED: "landDeed",
+  BUILDING_PERMIT: "buildingPermit",
+  FINE_PAYMENT: "finePayment",
+  BAIL: "bail",
+  LEGAL_COUNSEL: "legalCounsel",
+  PRISONER_INFO: "prisonerInfo",
+
+  // Financial
+  LOAN: "loan",
+  DEBT_COLLECTION: "debtCollection",
+  PAWN: "pawn",
+
+  // Animal & Beast
+  ANIMAL_TRAINING: "animalTraining",
+  ANIMAL_REHABILITATION: "animalRehabilitation",
+  BEAST_TAMING: "beastTaming",
+  ANIMAL_HEALING: "animalHealing",
+  FALCONRY: "falconry",
+  PEST_CONTROL: "pestControl",
+  COMPANION_SALE: "companionSale",
+  FAMILIAR_SOURCING: "familiarSourcing",
+  CARRIER_PIGEON: "carrierPigeon",
+
+  // Transport & Courier
+  COURIER_SERVICE: "courierService",
+  CARAVAN_POST: "caravanPost",
+  SECURE_TRANSPORT: "secureTransport",
+  MAGIC_MAIL: "magicMail",
+
+  // Maritime
+  SHIP_REPAIR: "shipRepair",
+  CAULKING: "caulking",
+  SALVAGE: "salvage",
+  DOCKING: "docking",
+  SEA_CHARTS: "seaCharts",
+  PILOTING: "piloting",
+  WEATHER_PREDICTION: "weatherPrediction",
+
+  // Military & Illicit
+  HIRE_MERCENARY: "hireMercenary",
+  BOUNTY_CLAIM: "bountyClaim",
+  WEAPON_PROFICIENCY: "weaponProficiency",
+  FENCING_STOLEN: "fencingStolen",
+  HIDE_SERVICE: "hideService",
+  DISGUISE_SERVICE: "disguiseService",
+  PILLOW_TALK: "pillowTalk",
+  PROCLAMATION: "proclamation",
+  ADVERTISING: "advertising",
+
+  // Mining
+  MINING_CLAIM: "miningClaim",
+  BLASTING_SUPPLIES: "blastingSupplies",
+  ORE_APPRAISAL: "oreAppraisal",
+
+  // Charity & Community
+  DONATION: "donation",
+  APPRENTICE_RECRUITMENT: "apprenticeRecruitment",
+  STREET_URCHIN_INFO: "streetUrchinInfo",
+  INTERPRETATION: "interpretation",
+  ETIQUETTE_TRAINING: "etiquetteTraining"
 });
 
 /**
@@ -759,7 +1037,10 @@ export function createMerchant(data = {}) {
     name: data.name || "Shop",
     description: data.description || "",
     type: data.type || ShopType.GENERAL,
+    businessType: data.businessType || null,
+    businessCategory: data.businessCategory || null,
     customType: data.customType || null,
+    _dataVersion: data._dataVersion || 2,
 
     // Display mode
     displayMode: data.displayMode || ShopDisplayMode.AUTO,
@@ -828,6 +1109,13 @@ export function createMerchant(data = {}) {
 
     // Enhanced services (new structured service definitions)
     servicesList: (data.servicesList || []).map(s => createServiceDefinition(s)),
+
+    // Service visibility (controls tiered display in shop window)
+    serviceVisibility: {
+      showCoreServices: data.serviceVisibility?.showCoreServices ?? true,
+      showCrossCompatible: data.serviceVisibility?.showCrossCompatible ?? true,
+      showAllServices: data.serviceVisibility?.showAllServices ?? false
+    },
 
     // Access control
     access: {
