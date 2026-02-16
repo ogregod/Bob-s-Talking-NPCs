@@ -20,6 +20,13 @@
         {{#each typeOptions}}
           <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
         {{/each}}
+        {{#each businessCategories}}
+          <optgroup label="{{this.categoryLabel}}">
+            {{#each this.businesses}}
+              <option value="{{this.type}}">{{this.name}}</option>
+            {{/each}}
+          </optgroup>
+        {{/each}}
       </select>
     </div>
 

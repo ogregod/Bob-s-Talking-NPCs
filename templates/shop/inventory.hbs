@@ -145,20 +145,22 @@
     {{/if}}
 
   {{else if (eq activeTab 'services')}}
-    {{!-- Services Tab --}}
+    {{!-- Services Tab - Tiered Display --}}
     {{#if hasServices}}
       {{#if isServicesPrimary}}
         {{!-- Enhanced categorized layout for services-primary shops --}}
-        <div class="services-catalog">
-          {{#each servicesByCategory}}
-            <div class="service-category-group">
-              <div class="category-header">
-                <i class="fa-solid {{this.categoryIcon}}"></i>
-                <h3>{{this.categoryLabel}}</h3>
+        <div class="services-catalog tiered">
+
+          {{!-- Core Services Tier --}}
+          {{#if hasCoreServices}}
+            <div class="service-tier service-tier-core">
+              <div class="tier-header">
+                <i class="fa-solid fa-star"></i>
+                <h3>{{localize "BOBSNPC.ServiceTiers.Core"}}</h3>
               </div>
               <div class="service-cards">
-                {{#each this.services}}
-                  <div class="service-card {{#unless this.available}}unavailable{{/unless}}">
+                {{#each serviceTiers.core}}
+                  <div class="service-card service-core {{#unless this.available}}unavailable{{/unless}}">
                     <div class="service-card-icon">
                       <i class="fa-solid {{this.icon}}"></i>
                     </div>
@@ -201,39 +203,235 @@
                 {{/each}}
               </div>
             </div>
-          {{/each}}
+          {{/if}}
+
+          {{!-- Cross-Compatible Services Tier --}}
+          {{#if hasCrossCompatible}}
+            <div class="service-tier service-tier-cross">
+              <div class="tier-header">
+                <i class="fa-solid fa-handshake"></i>
+                <h3>{{localize "BOBSNPC.ServiceTiers.CrossCompatible"}}</h3>
+              </div>
+              <p class="tier-hint">{{localize "BOBSNPC.ServiceTiers.CrossCompatibleDescription"}}</p>
+              <div class="service-cards">
+                {{#each serviceTiers.crossCompatible}}
+                  <div class="service-card service-cross {{#unless this.available}}unavailable{{/unless}}">
+                    <div class="service-card-icon">
+                      <i class="fa-solid {{this.icon}}"></i>
+                    </div>
+                    <div class="service-card-body">
+                      <h4 class="service-card-name">{{this.name}}</h4>
+                      {{#if this.sourceName}}
+                        <span class="service-source-tag">
+                          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                          {{localize "BOBSNPC.ServiceTiers.ViaSource" source=this.sourceName}}
+                        </span>
+                      {{/if}}
+                      <p class="service-card-desc">{{this.description}}</p>
+                      <div class="service-card-meta">
+                        {{#if this.hasDuration}}
+                          <span class="service-meta-tag duration">
+                            <i class="fa-solid fa-clock"></i>
+                            {{this.baseDuration}} {{this.durationUnit}}
+                          </span>
+                        {{/if}}
+                        {{#if this.requiresItem}}
+                          <span class="service-meta-tag requires-item">
+                            <i class="fa-solid fa-hand-holding"></i>
+                            {{localize "BOBSNPC.Shop.RequiresItem"}}
+                          </span>
+                        {{/if}}
+                      </div>
+                    </div>
+                    <div class="service-card-action">
+                      <span class="service-card-price">{{this.priceFormatted}}</span>
+                      <button type="button" class="service-card-btn" data-action="useService" data-service-id="{{this.id}}"
+                              {{#unless this.available}}disabled{{/unless}}>
+                        {{#if this.available}}
+                          {{localize "BOBSNPC.Shop.UseService"}}
+                        {{else}}
+                          {{this.unavailableReason}}
+                        {{/if}}
+                      </button>
+                    </div>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+          {{/if}}
+
+          {{!-- Custom Services Tier --}}
+          {{#if hasCustomServices}}
+            <div class="service-tier service-tier-custom">
+              <div class="tier-header">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <h3>{{localize "BOBSNPC.ServiceTiers.Custom"}}</h3>
+              </div>
+              <div class="service-cards">
+                {{#each serviceTiers.custom}}
+                  <div class="service-card service-custom {{#unless this.available}}unavailable{{/unless}}">
+                    <div class="service-card-icon">
+                      <i class="fa-solid {{this.icon}}"></i>
+                    </div>
+                    <div class="service-card-body">
+                      <h4 class="service-card-name">{{this.name}}</h4>
+                      <p class="service-card-desc">{{this.description}}</p>
+                      <div class="service-card-meta">
+                        {{#if this.hasDuration}}
+                          <span class="service-meta-tag duration">
+                            <i class="fa-solid fa-clock"></i>
+                            {{this.baseDuration}} {{this.durationUnit}}
+                          </span>
+                        {{/if}}
+                        {{#if this.requiresItem}}
+                          <span class="service-meta-tag requires-item">
+                            <i class="fa-solid fa-hand-holding"></i>
+                            {{localize "BOBSNPC.Shop.RequiresItem"}}
+                          </span>
+                        {{/if}}
+                        {{#if this.requiresGMApproval}}
+                          <span class="service-meta-tag gm-approval">
+                            <i class="fa-solid fa-shield-check"></i>
+                            {{localize "BOBSNPC.Shop.GMApproval"}}
+                          </span>
+                        {{/if}}
+                      </div>
+                    </div>
+                    <div class="service-card-action">
+                      <span class="service-card-price">{{this.priceFormatted}}</span>
+                      <button type="button" class="service-card-btn" data-action="useService" data-service-id="{{this.id}}"
+                              {{#unless this.available}}disabled{{/unless}}>
+                        {{#if this.available}}
+                          {{localize "BOBSNPC.Shop.UseService"}}
+                        {{else}}
+                          {{this.unavailableReason}}
+                        {{/if}}
+                      </button>
+                    </div>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+          {{/if}}
+
         </div>
       {{else}}
-        {{!-- Standard list layout for shops with services as secondary --}}
-        <div class="services-list">
-          {{#each services}}
-            <div class="service-entry">
-              <div class="service-icon">
-                <i class="fa-solid {{this.icon}}"></i>
+        {{!-- Standard list layout with tier sections for shops with services as secondary --}}
+        <div class="services-list tiered">
+
+          {{!-- Core Services --}}
+          {{#if hasCoreServices}}
+            <div class="service-tier-section service-tier-core">
+              <div class="tier-label">
+                <i class="fa-solid fa-star"></i>
+                <span>{{localize "BOBSNPC.ServiceTiers.Core"}}</span>
               </div>
-              <div class="service-info">
-                <h4 class="service-name">{{this.name}}</h4>
-                <p class="service-description">{{this.description}}</p>
-                {{#if this.hasDuration}}
-                  <span class="service-duration">
-                    <i class="fa-solid fa-clock"></i>
-                    {{this.baseDuration}} {{this.durationUnit}}
-                  </span>
-                {{/if}}
-              </div>
-              <div class="service-price">
-                {{this.priceFormatted}}
-              </div>
-              <button type="button" class="service-btn" data-action="useService" data-service-id="{{this.id}}"
-                      {{#unless this.available}}disabled{{/unless}}>
-                {{#if this.available}}
-                  {{localize "BOBSNPC.Shop.UseService"}}
-                {{else}}
-                  {{this.unavailableReason}}
-                {{/if}}
-              </button>
+              {{#each serviceTiers.core}}
+                <div class="service-entry">
+                  <div class="service-icon">
+                    <i class="fa-solid {{this.icon}}"></i>
+                  </div>
+                  <div class="service-info">
+                    <h4 class="service-name">{{this.name}}</h4>
+                    <p class="service-description">{{this.description}}</p>
+                    {{#if this.hasDuration}}
+                      <span class="service-duration">
+                        <i class="fa-solid fa-clock"></i>
+                        {{this.baseDuration}} {{this.durationUnit}}
+                      </span>
+                    {{/if}}
+                  </div>
+                  <div class="service-price">
+                    {{this.priceFormatted}}
+                  </div>
+                  <button type="button" class="service-btn" data-action="useService" data-service-id="{{this.id}}"
+                          {{#unless this.available}}disabled{{/unless}}>
+                    {{#if this.available}}
+                      {{localize "BOBSNPC.Shop.UseService"}}
+                    {{else}}
+                      {{this.unavailableReason}}
+                    {{/if}}
+                  </button>
+                </div>
+              {{/each}}
             </div>
-          {{/each}}
+          {{/if}}
+
+          {{!-- Cross-Compatible Services --}}
+          {{#if hasCrossCompatible}}
+            <div class="service-tier-section service-tier-cross">
+              <div class="tier-label">
+                <i class="fa-solid fa-handshake"></i>
+                <span>{{localize "BOBSNPC.ServiceTiers.CrossCompatible"}}</span>
+              </div>
+              {{#each serviceTiers.crossCompatible}}
+                <div class="service-entry">
+                  <div class="service-icon">
+                    <i class="fa-solid {{this.icon}}"></i>
+                  </div>
+                  <div class="service-info">
+                    <h4 class="service-name">{{this.name}}</h4>
+                    {{#if this.sourceName}}
+                      <span class="service-source">
+                        {{localize "BOBSNPC.ServiceTiers.ViaSource" source=this.sourceName}}
+                      </span>
+                    {{/if}}
+                    <p class="service-description">{{this.description}}</p>
+                  </div>
+                  <div class="service-price">
+                    {{this.priceFormatted}}
+                  </div>
+                  <button type="button" class="service-btn" data-action="useService" data-service-id="{{this.id}}"
+                          {{#unless this.available}}disabled{{/unless}}>
+                    {{#if this.available}}
+                      {{localize "BOBSNPC.Shop.UseService"}}
+                    {{else}}
+                      {{this.unavailableReason}}
+                    {{/if}}
+                  </button>
+                </div>
+              {{/each}}
+            </div>
+          {{/if}}
+
+          {{!-- Custom Services --}}
+          {{#if hasCustomServices}}
+            <div class="service-tier-section service-tier-custom">
+              <div class="tier-label">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>{{localize "BOBSNPC.ServiceTiers.Custom"}}</span>
+              </div>
+              {{#each serviceTiers.custom}}
+                <div class="service-entry">
+                  <div class="service-icon">
+                    <i class="fa-solid {{this.icon}}"></i>
+                  </div>
+                  <div class="service-info">
+                    <h4 class="service-name">{{this.name}}</h4>
+                    <p class="service-description">{{this.description}}</p>
+                    {{#if this.hasDuration}}
+                      <span class="service-duration">
+                        <i class="fa-solid fa-clock"></i>
+                        {{this.baseDuration}} {{this.durationUnit}}
+                      </span>
+                    {{/if}}
+                  </div>
+                  <div class="service-price">
+                    {{this.priceFormatted}}
+                  </div>
+                  <button type="button" class="service-btn" data-action="useService" data-service-id="{{this.id}}"
+                          {{#unless this.available}}disabled{{/unless}}>
+                    {{#if this.available}}
+                      {{localize "BOBSNPC.Shop.UseService"}}
+                    {{else}}
+                      {{this.unavailableReason}}
+                    {{/if}}
+                  </button>
+                </div>
+              {{/each}}
+            </div>
+          {{/if}}
+
         </div>
       {{/if}}
     {{else}}

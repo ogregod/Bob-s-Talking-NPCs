@@ -1197,6 +1197,166 @@
     opacity: 0.5;
   }
 
+  /* ===== Service Tiers ===== */
+
+  /* Tier headers (for services-primary/catalog layout) */
+  .service-tier {
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    overflow: hidden;
+  }
+
+  .tier-header {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    font-weight: var(--bobsnpc-font-weight-semibold);
+  }
+
+  .tier-header h3 {
+    margin: 0;
+    font-size: var(--bobsnpc-font-size-base);
+  }
+
+  .tier-hint {
+    margin: 0;
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-md);
+    font-size: var(--bobsnpc-font-size-sm);
+    color: var(--bobsnpc-text-muted);
+    font-style: italic;
+    border-bottom: 1px solid var(--bobsnpc-border-color);
+  }
+
+  /* Core tier - gold accent */
+  .service-tier-core .tier-header {
+    background: linear-gradient(90deg, rgba(218, 165, 32, 0.15), transparent);
+  }
+
+  .service-tier-core .tier-header i {
+    color: #DAA520;
+  }
+
+  .service-card.service-core {
+    border-left: 3px solid #DAA520;
+  }
+
+  /* Cross-compatible tier - teal accent */
+  .service-tier-cross .tier-header {
+    background: linear-gradient(90deg, rgba(70, 130, 180, 0.15), transparent);
+  }
+
+  .service-tier-cross .tier-header i {
+    color: #4682B4;
+  }
+
+  .service-card.service-cross {
+    border-left: 3px dashed #4682B4;
+  }
+
+  /* Custom tier - purple accent */
+  .service-tier-custom .tier-header {
+    background: linear-gradient(90deg, rgba(147, 112, 219, 0.15), transparent);
+  }
+
+  .service-tier-custom .tier-header i {
+    color: #9370DB;
+  }
+
+  .service-card.service-custom {
+    border-left: 3px dotted #9370DB;
+  }
+
+  /* Source attribution for cross-compatible services */
+  .service-source-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    padding: 1px 6px;
+    margin-bottom: 2px;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    background: rgba(70, 130, 180, 0.15);
+    color: #4682B4;
+  }
+
+  .service-source-tag i {
+    font-size: 9px;
+  }
+
+  /* Tier labels in list layout */
+  .service-tier-section {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .tier-label {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-xs) var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+    font-size: var(--bobsnpc-font-size-sm);
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    color: var(--bobsnpc-text-secondary);
+    border-bottom: 1px solid var(--bobsnpc-border-color);
+  }
+
+  .service-tier-section.service-tier-core .tier-label i { color: #DAA520; }
+  .service-tier-section.service-tier-cross .tier-label i { color: #4682B4; }
+  .service-tier-section.service-tier-custom .tier-label i { color: #9370DB; }
+
+  .service-tier-section .service-entry {
+    border-left: 3px solid transparent;
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  .service-tier-section.service-tier-core .service-entry { border-left-color: #DAA520; }
+  .service-tier-section.service-tier-cross .service-entry { border-left-color: #4682B4; border-left-style: dashed; }
+  .service-tier-section.service-tier-custom .service-entry { border-left-color: #9370DB; border-left-style: dotted; }
+
+  /* Source attribution in list layout */
+  .service-source {
+    display: block;
+    font-size: var(--bobsnpc-font-size-xs);
+    color: #4682B4;
+    font-style: italic;
+    margin-bottom: 2px;
+  }
+
+  /* ===== Business Personality (Header) ===== */
+
+  .business-accent-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: 3px var(--bobsnpc-spacing-md);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  .business-category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--bobsnpc-font-size-xs);
+    color: white;
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .business-category-badge i {
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .business-subtitle {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: rgba(255, 255, 255, 0.8);
+    margin-left: auto;
+    font-style: italic;
+  }
+
   /* ===== Enhanced Cart Panel (Left Side) ===== */
   .shop-cart {
     display: flex;

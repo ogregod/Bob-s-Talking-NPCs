@@ -8,6 +8,7 @@ const MODULE_ID = "bobs-talking-npcs";
 
 import { localize, formatCurrency } from "../utils/helpers.mjs";
 import { ItemCategory, ShopDisplayMode } from "../data/merchant-model.mjs";
+import { getBusinessDefinition } from "../data/business-registry.mjs";
 import {
   categorizeItem,
   getCategoryLabel,
@@ -246,9 +247,9 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     // Get categories
     const categories = this._getCategories(merchant);
 
-    // Get services if available - always prepare to check hasServices
-    const services = this._prepareServices(merchant);
-    const hasServices = services.length > 0;
+    // Get services if available - tiered structure
+    const serviceData = this._prepareServices(merchant);
+    const { services, serviceTiers, hasServices, hasCoreServices, hasCrossCompatible, hasCustomServices, businessDef } = serviceData;
 
     // Determine display mode
     const displayMode = this._displayMode || merchant?.displayMode || ShopDisplayMode.AUTO;
@@ -340,10 +341,17 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       sellTotalFormatted: formatCurrency(sellTotal * 100),
       sellCartItemCount: this._sellCart.size,
       sellCartEmpty: this._sellCart.size === 0,
-      // Services
+      // Services (flat array for backward compat)
       services,
       hasServices,
       servicesByCategory,
+      // Service tiers
+      serviceTiers,
+      hasCoreServices,
+      hasCrossCompatible,
+      hasCustomServices,
+      // Business personality
+      businessDef,
       // Display mode
       displayMode,
       isServicesOnly,
@@ -900,120 +908,221 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   /**
-   * Prepare services for display
+   * Format a service definition's price for display
+   * @param {object} service - Service definition
+   * @returns {string}
+   * @private
+   */
+  _formatServicePrice(service) {
+    switch (service.priceType) {
+      case "fixed":
+        return `${service.basePrice} gp`;
+      case "percent":
+        return `${service.pricePercent || service.basePrice || 0}% of value`;
+      case "perDay":
+        return `${service.pricePerUnit || service.basePrice || 0} gp/day`;
+      case "perItem":
+        return `${service.pricePerUnit || service.basePrice || 0} gp/item`;
+      case "variable":
+        return localize("Shop.Service.PriceVaries");
+      default:
+        return `${service.basePrice || 0} gp`;
+    }
+  }
+
+  /**
+   * Prepare a single service entry for display
+   * @param {object} svcDef - Service definition
+   * @returns {object}
+   * @private
+   */
+  _prepareServiceEntry(svcDef) {
+    return {
+      id: svcDef.id || svcDef.type,
+      type: svcDef.type,
+      category: svcDef.category,
+      name: svcDef.name,
+      description: svcDef.description,
+      price: svcDef.basePrice || null,
+      priceFormatted: this._formatServicePrice(svcDef),
+      icon: svcDef.icon || "fa-cog",
+      available: true,
+      requiresItem: svcDef.requiresItem,
+      requiresGMApproval: svcDef.requiresGMApproval,
+      hasDuration: svcDef.hasDuration,
+      durationUnit: svcDef.durationUnit,
+      baseDuration: svcDef.baseDuration,
+      categoryLabel: localize(`ServiceCategories.${svcDef.category}`) || svcDef.category,
+      typeLabel: localize(`ServiceTypes.${svcDef.type}`) || svcDef.type
+    };
+  }
+
+  /**
+   * Prepare services for display with tiered structure
+   * Returns both a flat services array (for backward compat) and tiered data
    * @param {object} merchant - Merchant data
-   * @returns {object[]}
+   * @returns {object} { services, serviceTiers, hasServices, businessDef }
    * @private
    */
   _prepareServices(merchant) {
-    if (!merchant?.services) return [];
+    if (!merchant?.services) {
+      return {
+        services: [],
+        serviceTiers: { core: [], crossCompatible: [], custom: [] },
+        hasServices: false,
+        hasCoreServices: false,
+        hasCrossCompatible: false,
+        hasCustomServices: false,
+        businessDef: null
+      };
+    }
 
-    const services = [];
+    const allServices = [];
     const svc = merchant.services;
 
-    // Identify Service
+    // --- Legacy built-in services (identify, repair, appraise, enchant) ---
+    const legacyServices = [];
+
     if (svc.identify) {
-      services.push({
+      legacyServices.push({
         id: "identify",
         type: "identify",
+        category: "magic",
         name: localize("Shop.Service.Identify"),
         description: localize("Shop.Service.IdentifyDesc"),
         price: svc.identifyPrice || 25,
         priceFormatted: formatCurrency((svc.identifyPrice || 25) * 100),
         icon: "fa-search",
-        available: true
+        available: true,
+        priceType: "fixed",
+        basePrice: svc.identifyPrice || 25
       });
     }
 
-    // Repair Service
     if (svc.repair) {
       const repairPercent = Math.round((svc.repairPricePercent || 0.1) * 100);
-      services.push({
+      legacyServices.push({
         id: "repair",
         type: "repair",
+        category: "crafting",
         name: localize("Shop.Service.Repair"),
         description: localize("Shop.Service.RepairDesc", { percent: repairPercent }),
-        price: null, // Variable based on item
+        price: null,
         priceFormatted: `${repairPercent}% of item value`,
         icon: "fa-wrench",
-        available: true
+        available: true,
+        priceType: "percent",
+        basePrice: null
       });
     }
 
-    // Appraise Service
     if (svc.appraise) {
-      services.push({
+      legacyServices.push({
         id: "appraise",
         type: "appraise",
+        category: "information",
         name: localize("Shop.Service.Appraise"),
         description: localize("Shop.Service.AppraiseDesc"),
         price: svc.appraisePrice || 5,
         priceFormatted: formatCurrency((svc.appraisePrice || 5) * 100),
         icon: "fa-magnifying-glass-dollar",
-        available: true
+        available: true,
+        priceType: "fixed",
+        basePrice: svc.appraisePrice || 5
       });
     }
 
-    // Enchant Service
     if (svc.enchant) {
-      services.push({
+      legacyServices.push({
         id: "enchant",
         type: "enchant",
+        category: "magic",
         name: localize("Shop.Service.Enchant"),
         description: localize("Shop.Service.EnchantDesc"),
-        price: null, // Variable based on enchantment
+        price: null,
         priceFormatted: localize("Shop.Service.PriceVaries"),
         icon: "fa-wand-magic-sparkles",
-        available: true
+        available: true,
+        priceType: "variable",
+        basePrice: null
       });
     }
 
-    // Add enhanced services from servicesList
+    // Track types we've already included to prevent duplicates
+    const includedTypes = new Set(legacyServices.map(s => s.type));
+
+    // --- Registry-defined tiers ---
+    const businessType = merchant.businessType;
+    const def = businessType ? getBusinessDefinition(businessType) : null;
+
+    let coreServices = [];
+    let crossCompatibleServices = [];
+
+    if (def) {
+      // Core services from registry
+      coreServices = def.coreServices
+        .filter(s => !includedTypes.has(s.type))
+        .map(s => {
+          const entry = this._prepareServiceEntry(s);
+          includedTypes.add(s.type);
+          return entry;
+        });
+
+      // Cross-compatible services from registry
+      crossCompatibleServices = def.crossCompatibleServices
+        .filter(s => !includedTypes.has(s.type))
+        .map(s => {
+          const entry = this._prepareServiceEntry(s);
+          entry.sourceName = s.sourceType
+            ? (getBusinessDefinition(s.sourceType)?.name || s.sourceType)
+            : "";
+          includedTypes.add(s.type);
+          return entry;
+        });
+    }
+
+    // Legacy services go into core tier (they're standard services for this shop)
+    coreServices = [...legacyServices, ...coreServices];
+
+    // --- Custom services from servicesList (GM-added) ---
+    const customServices = [];
     if (merchant.servicesList) {
       for (const svcDef of merchant.servicesList) {
         if (!svcDef.enabled) continue;
+        if (includedTypes.has(svcDef.type)) continue;
 
-        // Skip duplicates with legacy services
-        if (services.some(s => s.type === svcDef.type)) continue;
-
-        let priceFormatted;
-        switch (svcDef.priceType) {
-          case "fixed":
-            priceFormatted = formatCurrency(svcDef.basePrice * 100);
-            break;
-          case "percent":
-            priceFormatted = `${svcDef.pricePercent}% of value`;
-            break;
-          case "perDay":
-            priceFormatted = `${svcDef.pricePerUnit} gp/day`;
-            break;
-          case "variable":
-            priceFormatted = localize("Shop.Service.PriceVaries");
-            break;
-          default:
-            priceFormatted = formatCurrency(svcDef.basePrice * 100);
-        }
-
-        services.push({
-          id: svcDef.id || svcDef.type,
-          type: svcDef.type,
-          category: svcDef.category,
-          name: svcDef.name,
-          description: svcDef.description,
-          price: svcDef.basePrice || null,
-          priceFormatted,
-          icon: svcDef.icon || "fa-cog",
-          available: true,
-          requiresItem: svcDef.requiresItem,
-          requiresGMApproval: svcDef.requiresGMApproval,
-          hasDuration: svcDef.hasDuration,
-          durationUnit: svcDef.durationUnit,
-          baseDuration: svcDef.baseDuration
-        });
+        customServices.push(this._prepareServiceEntry(svcDef));
+        includedTypes.add(svcDef.type);
       }
     }
 
-    return services;
+    // Build flat array for backward compatibility
+    allServices.push(...coreServices, ...crossCompatibleServices, ...customServices);
+
+    // Check service visibility preferences
+    const visibility = merchant.serviceVisibility || {};
+    const showCross = visibility.showCrossCompatible !== false; // default true
+
+    return {
+      services: allServices,
+      serviceTiers: {
+        core: coreServices,
+        crossCompatible: showCross ? crossCompatibleServices : [],
+        custom: customServices
+      },
+      hasServices: allServices.length > 0,
+      hasCoreServices: coreServices.length > 0,
+      hasCrossCompatible: crossCompatibleServices.length > 0,
+      hasCustomServices: customServices.length > 0,
+      businessDef: def ? {
+        name: def.name,
+        icon: def.icon,
+        color: def.color,
+        subtitle: def.subtitle,
+        category: def.category,
+        categoryLabel: localize(`BusinessCategories.${def.category}`) || def.category
+      } : null
+    };
   }
 
   /**
@@ -1037,6 +1146,12 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       training: "fa-dumbbell",
       healing: "fa-heart-pulse",
       legal: "fa-scale-balanced",
+      maritime: "fa-anchor",
+      civic: "fa-landmark",
+      bodyCare: "fa-spa",
+      financial: "fa-coins",
+      animal: "fa-paw",
+      arts: "fa-palette",
       misc: "fa-cog"
     };
 
@@ -1052,6 +1167,12 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       training: localize("ServiceCategories.training"),
       healing: localize("ServiceCategories.healing"),
       legal: localize("ServiceCategories.legal"),
+      maritime: localize("ServiceCategories.maritime"),
+      civic: localize("ServiceCategories.civic"),
+      bodyCare: localize("ServiceCategories.bodyCare"),
+      financial: localize("ServiceCategories.financial"),
+      animal: localize("ServiceCategories.animal"),
+      arts: localize("ServiceCategories.arts"),
       misc: localize("ServiceCategories.misc")
     };
 

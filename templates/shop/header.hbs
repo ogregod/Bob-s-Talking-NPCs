@@ -18,6 +18,19 @@
 
   {{!-- Shop Details --}}
   <div class="shop-details-enhanced">
+    {{!-- Business personality accent bar --}}
+    {{#if businessDef}}
+      <div class="business-accent-bar" style="background-color: {{businessDef.color}};">
+        <span class="business-category-badge">
+          <i class="fa-solid {{businessDef.icon}}"></i>
+          {{businessDef.categoryLabel}}
+        </span>
+        {{#if businessDef.subtitle}}
+          <span class="business-subtitle">{{businessDef.subtitle}}</span>
+        {{/if}}
+      </div>
+    {{/if}}
+
     <h2 class="shop-name-large">{{shopName}}</h2>
     {{#if merchantName}}
       <span class="merchant-name-subtitle">

@@ -1217,6 +1217,8 @@ export class DialogueHandler {
     switch (node.type) {
       case NodeType.SHOP:
         serviceData.serviceType = node.shopType || "merchant";
+        serviceData.businessType = node.businessType || null;
+        serviceData.shopId = node.shopId || null;
         break;
       case NodeType.SERVICE:
         serviceData.serviceType = node.serviceType || "repair";

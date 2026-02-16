@@ -5,17 +5,53 @@
     <p class="hint">{{localize "BOBSNPC.ShopManager.TemplateHint"}}</p>
   </div>
 
-  <div class="templates-grid">
-    {{#each templates}}
-      <button type="button" class="template-card" data-action="useTemplate" data-template="{{this.key}}">
-        <div class="template-icon" style="background-color: {{this.color}}">
-          <i class="fa-solid {{this.icon}}"></i>
-        </div>
-        <div class="template-info">
-          <h4>{{this.name}}</h4>
-          <p>{{this.description}}</p>
-        </div>
-      </button>
-    {{/each}}
+  {{!-- Blank / Legacy Templates --}}
+  <div class="templates-section">
+    <div class="templates-grid legacy-templates">
+      {{#each templates}}
+        <button type="button" class="template-card" data-action="useTemplate" data-template="{{this.key}}">
+          <div class="template-icon" style="background-color: {{this.color}}">
+            <i class="fa-solid {{this.icon}}"></i>
+          </div>
+          <div class="template-info">
+            <h4>{{this.name}}</h4>
+            <p>{{this.description}}</p>
+          </div>
+        </button>
+      {{/each}}
+    </div>
   </div>
+
+  {{!-- Categorized Business Type Templates --}}
+  {{#if hasBusinessCategories}}
+    <div class="templates-section business-type-templates">
+      {{#each businessCategories}}
+        <details class="category-section">
+          <summary class="category-header" style="border-left-color: {{this.categoryColor}}">
+            <i class="fa-solid {{this.categoryIcon}}"></i>
+            <span class="category-name">{{this.categoryLabel}}</span>
+            <span class="category-count">({{this.businessCount}})</span>
+          </summary>
+          <div class="templates-grid">
+            {{#each this.businesses}}
+              <button type="button" class="template-card business-card"
+                      data-action="useBusinessTemplate"
+                      data-business-type="{{this.type}}">
+                <div class="template-icon" style="background-color: {{this.color}}">
+                  <i class="fa-solid {{this.icon}}"></i>
+                </div>
+                <div class="template-info">
+                  <h4>{{this.name}}</h4>
+                  {{#if this.subtitle}}
+                    <span class="template-subtitle">{{this.subtitle}}</span>
+                  {{/if}}
+                  <p>{{this.description}}</p>
+                </div>
+              </button>
+            {{/each}}
+          </div>
+        </details>
+      {{/each}}
+    </div>
+  {{/if}}
 </section>

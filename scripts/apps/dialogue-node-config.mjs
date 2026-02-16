@@ -17,6 +17,8 @@ import {
   Skills,
   getSkillName
 } from "../data/dialogue-model.mjs";
+import { BusinessType, BusinessCategory } from "../data/merchant-model.mjs";
+import { getBusinessesByCategory, getBusinessDefinition } from "../data/business-registry.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -185,6 +187,7 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
       hasQuestId: [NodeType.QUEST_OFFER, NodeType.QUEST_TURNIN].includes(this._node.type),
       hasBranches: this._node.type === NodeType.BRANCH,
       hasShopType: this._node.type === NodeType.SHOP,
+      ...this._prepareShopOptions(),
       hasEndType: this._node.type === NodeType.END,
       hasNextNode: ![NodeType.END, NodeType.BRANCH, NodeType.SKILL_CHECK, NodeType.QUEST_OFFER, NodeType.QUEST_TURNIN].includes(this._node.type),
 
@@ -202,6 +205,48 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
    * Prepare tab definitions
    * @private
    */
+  /**
+   * Prepare shop-specific options for SHOP node config
+   * @returns {object} Shop options context data
+   * @private
+   */
+  _prepareShopOptions() {
+    if (this._node.type !== NodeType.SHOP) return {};
+
+    // Build business type options grouped by category
+    const businessTypeOptions = [];
+    for (const [, catValue] of Object.entries(BusinessCategory)) {
+      const businesses = getBusinessesByCategory(catValue);
+      if (!businesses?.length) continue;
+
+      businessTypeOptions.push({
+        groupLabel: localize(`BusinessCategories.${catValue}`) || catValue,
+        options: businesses.map(def => ({
+          value: def.type,
+          label: def.name,
+          selected: this._node.businessType === def.type
+        }))
+      });
+    }
+
+    // Build shop picker (all existing shops)
+    const handler = game.bobsnpc?.handlers?.merchant;
+    const allShops = handler?.getAllMerchants?.() || [];
+    const shopOptions = allShops.map(shop => ({
+      value: shop.id,
+      label: shop.name,
+      selected: this._node.shopId === shop.id
+    }));
+    shopOptions.sort((a, b) => a.label.localeCompare(b.label));
+
+    return {
+      businessTypeOptions,
+      shopOptions,
+      hasShopOptions: shopOptions.length > 0,
+      hasBusinessTypeOptions: businessTypeOptions.length > 0
+    };
+  }
+
   _prepareTabs() {
     const tabs = [
       { id: "content", label: localize("DialogueEditor.TabContent"), icon: "fa-file-alt" }

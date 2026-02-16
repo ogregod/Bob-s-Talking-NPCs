@@ -116,12 +116,79 @@
     {{/if}}
   </div>
 
-  {{!-- Enhanced Services Section --}}
+  {{!-- Registry-Defined Service Tiers --}}
+  {{#if hasCoreServices}}
+  <div class="form-section service-tier-section core-tier">
+    <div class="section-header">
+      <h3>
+        <i class="fa-solid fa-star"></i>
+        {{localize "BOBSNPC.ServiceTiers.Core"}}
+      </h3>
+    </div>
+    <p class="hint">{{localize "BOBSNPC.ServiceTiers.CoreDescription"}}</p>
+    <div class="services-editor-list">
+      {{#each coreServices}}
+        <div class="service-editor-entry service-core">
+          <div class="service-icon-col">
+            <i class="fa-solid {{this.icon}}"></i>
+          </div>
+          <div class="service-info-col">
+            <span class="service-name">{{this.name}}</span>
+            <span class="service-meta">
+              <span class="service-category">{{this.categoryLabel}}</span>
+              <span class="service-type-badge">{{this.typeLabel}}</span>
+            </span>
+            <span class="service-description">{{this.description}}</span>
+          </div>
+          <div class="service-price-col">
+            <span class="service-price">{{this.priceDisplay}}</span>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if hasCrossCompatible}}
+  <div class="form-section service-tier-section cross-tier">
+    <div class="section-header">
+      <h3>
+        <i class="fa-solid fa-handshake"></i>
+        {{localize "BOBSNPC.ServiceTiers.CrossCompatible"}}
+      </h3>
+    </div>
+    <p class="hint">{{localize "BOBSNPC.ServiceTiers.CrossCompatibleDescription"}}</p>
+    <div class="services-editor-list">
+      {{#each crossCompatibleServices}}
+        <div class="service-editor-entry service-cross">
+          <div class="service-icon-col">
+            <i class="fa-solid {{this.icon}}"></i>
+          </div>
+          <div class="service-info-col">
+            <span class="service-name">{{this.name}}</span>
+            <span class="service-meta">
+              <span class="service-category">{{this.categoryLabel}}</span>
+              {{#if this.sourceName}}
+                <span class="service-source">via {{this.sourceName}}</span>
+              {{/if}}
+            </span>
+            <span class="service-description">{{this.description}}</span>
+          </div>
+          <div class="service-price-col">
+            <span class="service-price">{{this.priceDisplay}}</span>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+
+  {{!-- Custom Services Section (GM-added) --}}
   <div class="form-section enhanced-services-section">
     <div class="section-header">
       <h3>
-        <i class="fa-solid fa-concierge-bell"></i>
-        Enhanced Services
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        {{localize "BOBSNPC.ServiceTiers.Custom"}}
       </h3>
       <button type="button" class="btn btn-sm" data-action="addService">
         <i class="fa-solid fa-plus"></i>
@@ -129,7 +196,7 @@
       </button>
     </div>
 
-    <p class="hint">Configure specialized services this shop offers to customers. These appear in the Services tab of the shop window.</p>
+    <p class="hint">{{localize "BOBSNPC.ServiceTiers.CustomDescription"}}</p>
 
     {{#if hasServicesList}}
       <div class="services-editor-list">

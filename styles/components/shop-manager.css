@@ -1449,4 +1449,128 @@
     margin-bottom: var(--bobsnpc-spacing-sm);
     opacity: 0.4;
   }
+
+  /* ===== Categorized Template Picker ===== */
+
+  .business-type-templates {
+    margin-top: var(--bobsnpc-spacing-md);
+  }
+
+  .category-section {
+    border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    margin-bottom: var(--bobsnpc-spacing-sm);
+    overflow: hidden;
+  }
+
+  .category-section[open] {
+    border-color: var(--bobsnpc-primary);
+  }
+
+  .category-section > summary.category-header {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    cursor: pointer;
+    user-select: none;
+    border-left: 4px solid transparent;
+    list-style: none;
+  }
+
+  .category-section > summary.category-header::-webkit-details-marker {
+    display: none;
+  }
+
+  .category-section > summary.category-header::before {
+    content: "\f054";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 10px;
+    transition: transform var(--bobsnpc-transition-fast);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .category-section[open] > summary.category-header::before {
+    transform: rotate(90deg);
+  }
+
+  .category-section > summary.category-header:hover {
+    background: var(--bobsnpc-bg-hover);
+  }
+
+  .category-section > summary.category-header i {
+    font-size: var(--bobsnpc-font-size-lg);
+    width: 24px;
+    text-align: center;
+  }
+
+  .category-section > summary.category-header .category-name {
+    flex: 1;
+    font-weight: var(--bobsnpc-font-weight-semibold);
+    font-size: var(--bobsnpc-font-size-sm);
+  }
+
+  .category-section > summary.category-header .category-count {
+    font-size: var(--bobsnpc-font-size-xs);
+    color: var(--bobsnpc-text-muted);
+  }
+
+  .category-section > .templates-grid {
+    padding: var(--bobsnpc-spacing-sm);
+  }
+
+  .template-card.business-card .template-subtitle {
+    display: block;
+    font-size: 10px;
+    color: var(--bobsnpc-text-muted);
+    font-style: italic;
+  }
+
+  /* ===== Shop Editor - Service Tier Sections ===== */
+
+  .shop-editor .service-tier-section {
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .shop-editor .service-tier-section .section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-editor .service-tier-section .section-header h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .shop-editor .service-tier-section.core-tier .section-header h3 i { color: #DAA520; }
+  .shop-editor .service-tier-section.cross-tier .section-header h3 i { color: #4682B4; }
+
+  .shop-editor .service-tier-section .services-editor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /* Core services - gold left border */
+  .shop-editor .service-editor-entry.service-core {
+    border-left: 3px solid #DAA520;
+    background: rgba(218, 165, 32, 0.03);
+  }
+
+  /* Cross-compatible services - teal dashed border */
+  .shop-editor .service-editor-entry.service-cross {
+    border-left: 3px dashed #4682B4;
+    background: rgba(70, 130, 180, 0.03);
+  }
+
+  .shop-editor .service-editor-entry .service-source {
+    font-size: 10px;
+    color: #4682B4;
+    font-style: italic;
+  }
 }

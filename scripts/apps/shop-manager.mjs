@@ -8,9 +8,17 @@ const MODULE_ID = "bobs-talking-npcs";
 import { localize } from "../utils/helpers.mjs";
 import {
   ShopType,
+  BusinessCategory,
+  BusinessType,
   MerchantTemplates,
   createMerchantFromTemplate
 } from "../data/merchant-model.mjs";
+import {
+  getBusinessDefinition,
+  getBusinessesByCategory,
+  getAllBusinessTypes,
+  createMerchantFromBusinessType
+} from "../data/business-registry.mjs";
 
 /** Get merchant handler instance */
 function getMerchantHandler() {
@@ -56,7 +64,8 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       filterType: ShopManager.#onFilterType,
       search: ShopManager.#onSearch,
       clearSearch: ShopManager.#onClearSearch,
-      useTemplate: ShopManager.#onUseTemplate
+      useTemplate: ShopManager.#onUseTemplate,
+      useBusinessTemplate: ShopManager.#onUseBusinessTemplate
     }
   };
 
@@ -99,9 +108,11 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
     // Debug: Log shop IDs
     console.log(`${MODULE_ID} | ShopManager._prepareContext - shop IDs:`, shops.map(s => ({ id: s.id, name: s.name })));
 
-    // Apply type filter
+    // Apply type filter (matches legacy ShopType or new BusinessType)
     if (this._typeFilter && this._typeFilter !== "all") {
-      shops = shops.filter(s => s.type === this._typeFilter);
+      shops = shops.filter(s =>
+        s.type === this._typeFilter || s.businessType === this._typeFilter
+      );
     }
 
     // Apply search filter
@@ -137,17 +148,21 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       };
     }));
 
-    // Build type filter options
+    // Build type filter options with optgroup-style categories
     const typeOptions = [
-      { value: "all", label: localize("ShopManager.AllTypes"), selected: this._typeFilter === "all" },
-      ...Object.entries(ShopType).map(([key, value]) => ({
+      { value: "all", label: localize("ShopManager.AllTypes"), selected: this._typeFilter === "all" }
+    ];
+
+    // Add legacy ShopType options
+    for (const [key, value] of Object.entries(ShopType)) {
+      typeOptions.push({
         value,
         label: localize(`ShopTypes.${key}`),
         selected: this._typeFilter === value
-      }))
-    ];
+      });
+    }
 
-    // Build template options
+    // Build legacy template options (kept for backward compat)
     const templates = Object.entries(MerchantTemplates).map(([key, template]) => ({
       key,
       name: template.name,
@@ -156,6 +171,9 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       color: template.color || "#ff9800",
       description: this._getTemplateDescription(key)
     }));
+
+    // Build categorized business type templates from registry
+    const businessCategories = this._prepareCategorizedTemplates();
 
     // Calculate total shops (before filtering)
     let totalShops = handler?.getAllMerchants()?.length || 0;
@@ -172,6 +190,8 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       hasShops: enrichedShops.length > 0,
       typeOptions,
       templates,
+      businessCategories,
+      hasBusinessCategories: businessCategories.length > 0,
       searchFilter: this._searchFilter,
       isFiltered: this._searchFilter || this._typeFilter !== "all"
     };
@@ -515,6 +535,87 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
     this._searchFilter = "";
     this._typeFilter = "all";
     await this.render();
+  }
+
+  /**
+   * Use a business type template to create a shop
+   * @param {Event} event
+   * @param {HTMLElement} target
+   */
+  static async #onUseBusinessTemplate(event, target) {
+    const businessType = target.dataset.businessType;
+    if (!businessType) return;
+
+    const handler = getMerchantHandler();
+    const shopData = createMerchantFromBusinessType(businessType);
+    let shop;
+
+    if (handler?.createMerchant) {
+      shop = await handler.createMerchant(shopData);
+    } else {
+      shop = shopData;
+      await this._saveShopToSettings(shop);
+    }
+
+    // Hide template picker
+    const templateSection = this.element.querySelector(".shop-templates");
+    if (templateSection) {
+      templateSection.classList.remove("visible");
+    }
+
+    // Open editor for the new shop
+    const { ShopEditor } = await import("./shop-editor.mjs");
+    const editor = new ShopEditor({ shopId: shop.id });
+    editor.render(true);
+
+    await this.render();
+
+    ui.notifications.info(localize("ShopManager.ShopCreated", { name: shop.name }));
+  }
+
+  /**
+   * Prepare categorized business type templates from the registry
+   * @returns {object[]} Array of { category, categoryLabel, categoryIcon, categoryColor, businesses }
+   * @private
+   */
+  _prepareCategorizedTemplates() {
+    const categoryMeta = {
+      [BusinessCategory.FORGE_STONE_EARTH]: { icon: "fa-hammer", color: "#8B4513" },
+      [BusinessCategory.WOOD_HIDE_FIBER]: { icon: "fa-tree", color: "#228B22" },
+      [BusinessCategory.ARCANE_ACADEMIC]: { icon: "fa-hat-wizard", color: "#7B2D8E" },
+      [BusinessCategory.FOOD_PROVISIONS]: { icon: "fa-wheat-awn", color: "#DAA520" },
+      [BusinessCategory.HOSPITALITY_TRAVEL]: { icon: "fa-bed", color: "#4169E1" },
+      [BusinessCategory.CIVIC_FAITH_LAW]: { icon: "fa-landmark", color: "#CD853F" },
+      [BusinessCategory.ARTS_LEISURE_BODY]: { icon: "fa-palette", color: "#DB7093" },
+      [BusinessCategory.ILLICIT_NICHE_MARITIME]: { icon: "fa-skull-crossbones", color: "#2F4F4F" }
+    };
+
+    const categories = [];
+
+    for (const [catKey, catValue] of Object.entries(BusinessCategory)) {
+      const businesses = getBusinessesByCategory(catValue);
+      if (!businesses?.length) continue;
+
+      const meta = categoryMeta[catValue] || { icon: "fa-store", color: "#666" };
+
+      categories.push({
+        category: catValue,
+        categoryLabel: localize(`BusinessCategories.${catValue}`) || catKey,
+        categoryIcon: meta.icon,
+        categoryColor: meta.color,
+        businessCount: businesses.length,
+        businesses: businesses.map(def => ({
+          type: def.type,
+          name: def.name,
+          subtitle: def.subtitle || "",
+          description: def.description || "",
+          icon: def.icon || "fa-store",
+          color: def.color || meta.color
+        }))
+      });
+    }
+
+    return categories;
   }
 
   // ==================== Static Factory ====================

@@ -785,13 +785,34 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   async _openShopService(serviceData) {
     console.log(`${MODULE_ID} | Opening shop for NPC: ${serviceData.npcActorUuid}`);
 
-    // Get the NPC's shop ID from their configuration
+    // Priority 1: Direct shop ID from the dialogue node
+    if (serviceData.shopId) {
+      game.bobsnpc?.ui?.openShop(serviceData.shopId, this.playerActorUuid);
+      return;
+    }
+
+    // Priority 2: BusinessType from dialogue node - find matching shop for this NPC
+    if (serviceData.businessType) {
+      const handler = game.bobsnpc?.handlers?.merchant;
+      if (handler) {
+        const allShops = handler.getAllMerchants?.() || [];
+        const match = allShops.find(s =>
+          s.businessType === serviceData.businessType &&
+          s.npcActorUuid === serviceData.npcActorUuid
+        );
+        if (match) {
+          game.bobsnpc?.ui?.openShop(match.id, this.playerActorUuid);
+          return;
+        }
+      }
+    }
+
+    // Priority 3: Get the NPC's shop ID from their configuration
     const npc = await fromUuid(serviceData.npcActorUuid);
     const npcConfig = npc?.getFlag(MODULE_ID, "config");
     const shopId = npcConfig?.services?.merchant?.shopId;
 
     if (shopId) {
-      // Open shop by shop ID
       game.bobsnpc?.ui?.openShop(shopId, this.playerActorUuid);
     } else {
       // Fallback: try to open shop by NPC UUID

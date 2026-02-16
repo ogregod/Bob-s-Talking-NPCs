@@ -9,7 +9,27 @@
     </div>
 
     <div class="form-group">
-      <label for="shop-type">{{localize "BOBSNPC.ShopEditor.ShopType"}}</label>
+      <label for="shop-business-category">{{localize "BOBSNPC.ShopEditor.BusinessCategory"}}</label>
+      <select id="shop-business-category" name="businessCategory">
+        {{#each businessCategoryOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="shop-business-type">{{localize "BOBSNPC.ShopEditor.BusinessType"}}</label>
+      <select id="shop-business-type" name="businessType">
+        <option value="">{{localize "BOBSNPC.ShopEditor.SelectBusinessType"}}</option>
+        {{#each businessTypeOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+      <span class="hint">{{localize "BOBSNPC.ShopEditor.BusinessTypeHint"}}</span>
+    </div>
+
+    <div class="form-group">
+      <label for="shop-type">{{localize "BOBSNPC.ShopEditor.ShopType"}} (Legacy)</label>
       <select id="shop-type" name="type">
         {{#each typeOptions}}
           <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>

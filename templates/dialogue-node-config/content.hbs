@@ -196,8 +196,40 @@
     <section class="config-section">
       <h3>{{localize "DialogueEditor.ShopConfig"}}</h3>
 
+      {{!-- Direct shop picker --}}
+      {{#if hasShopOptions}}
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.DialogueEditor.SpecificShop"}}</label>
+          <select name="node.shopId">
+            <option value="">-- {{localize "BOBSNPC.DialogueEditor.AutoDetect"}} --</option>
+            {{#each shopOptions}}
+              <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+            {{/each}}
+          </select>
+          <span class="hint">{{localize "BOBSNPC.DialogueEditor.SpecificShopHint"}}</span>
+        </div>
+      {{/if}}
+
+      {{!-- Business type selector --}}
+      {{#if hasBusinessTypeOptions}}
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.DialogueEditor.BusinessType"}}</label>
+          <select name="node.businessType">
+            <option value="">-- {{localize "BOBSNPC.DialogueEditor.AnyBusinessType"}} --</option>
+            {{#each businessTypeOptions}}
+              <optgroup label="{{this.groupLabel}}">
+                {{#each this.options}}
+                  <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+                {{/each}}
+              </optgroup>
+            {{/each}}
+          </select>
+          <span class="hint">{{localize "BOBSNPC.DialogueEditor.BusinessTypeHint"}}</span>
+        </div>
+      {{/if}}
+
       <div class="form-group">
-        <label>{{localize "DialogueEditor.ShopType"}}</label>
+        <label>{{localize "DialogueEditor.ShopType"}} (Legacy)</label>
         <select name="node.shopType">
           <option value="merchant" {{#if (eq node.shopType "merchant")}}selected{{/if}}>{{localize "DialogueEditor.ShopTypeMerchant"}}</option>
           <option value="fence" {{#if (eq node.shopType "fence")}}selected{{/if}}>{{localize "DialogueEditor.ShopTypeFence"}}</option>

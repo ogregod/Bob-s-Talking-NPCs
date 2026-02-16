@@ -12,8 +12,15 @@ import {
   StockRefreshType,
   PriceDisplayMode,
   ItemRarity,
+  BusinessType,
+  BusinessCategory,
   createShopItem
 } from "../data/merchant-model.mjs";
+import {
+  BusinessTypeRegistry,
+  getBusinessDefinition,
+  getBusinessesByCategory
+} from "../data/business-registry.mjs";
 
 /** Get merchant handler instance */
 function getMerchantHandler() {
@@ -349,9 +356,29 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       selected: this._shop.type === value
     }));
 
-    console.log(`${MODULE_ID} | ShopEditor._prepareContext - typeOptions:`, typeOptions);
-    console.log(`${MODULE_ID} | ShopEditor._prepareContext - shop.type:`, this._shop.type);
-    console.log(`${MODULE_ID} | ShopEditor._prepareContext - shop.color:`, this._shop.color);
+    // Business category options
+    const businessCategoryOptions = [
+      { value: "", label: localize("ShopEditor.AllCategories"), selected: !this._shop.businessCategory },
+      ...Object.entries(BusinessCategory).map(([key, value]) => ({
+        value,
+        label: localize(`BusinessCategories.${value}`),
+        selected: this._shop.businessCategory === value
+      }))
+    ];
+
+    // Business type options (filtered by selected category if any)
+    const selectedCategory = this._shop.businessCategory || null;
+    const businessTypeOptions = [];
+    for (const [, def] of BusinessTypeRegistry) {
+      if (selectedCategory && def.category !== selectedCategory) continue;
+      businessTypeOptions.push({
+        value: def.type,
+        label: def.name,
+        category: def.category,
+        categoryLabel: def.category ? localize(`BusinessCategories.${def.category}`) : "",
+        selected: this._shop.businessType === def.type
+      });
+    }
 
     const refreshTypeOptions = Object.entries(StockRefreshType).map(([key, value]) => ({
       value,
@@ -385,6 +412,8 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
       // Basic tab
       typeOptions,
+      businessCategoryOptions,
+      businessTypeOptions,
       displayModeOptions,
       linkedNpc: linkedNpc ? { name: linkedNpc.name, img: linkedNpc.img } : null,
 
@@ -415,6 +444,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       availableEnchantments: this._prepareEnchantmentsList(),
       servicesList: enrichedServicesList,
       hasServicesList: enrichedServicesList.length > 0,
+      ...this._prepareServiceTiers(),
 
       // Access tab
       access: this._shop.access,
@@ -628,6 +658,19 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       return;
     }
 
+    // Special handling for business category change (re-filter type options)
+    if (name === "businessCategory") {
+      this._shop.businessCategory = value || null;
+      this.render();
+      return;
+    }
+
+    // Special handling for business type change (apply defaults from registry)
+    if (name === "businessType") {
+      this._onBusinessTypeChange(value);
+      return;
+    }
+
     // Convert numeric values
     if (input.type === "number") {
       value = parseFloat(value) || 0;
@@ -635,6 +678,50 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Update shop object using dot notation path
     foundry.utils.setProperty(this._shop, name, value);
+  }
+
+  /**
+   * Handle business type change - apply defaults from registry
+   * @param {string} businessType - New BusinessType value
+   * @private
+   */
+  _onBusinessTypeChange(businessType) {
+    if (!businessType) return;
+
+    const def = getBusinessDefinition(businessType);
+    if (!def) return;
+
+    this._shop.businessType = businessType;
+    this._shop.businessCategory = def.category;
+    this._shop.type = def.legacyShopType || this._shop.type;
+    this._shop.displayMode = def.displayMode || this._shop.displayMode;
+
+    // Apply registry defaults for icon and color only if they haven't been customized
+    if (this._shop.icon === "icons/svg/chest.svg" || !this._shop.icon) {
+      this._shop.icon = def.icon;
+    }
+    if (this._shop.color === "#7b68ee" || !this._shop.color) {
+      this._shop.color = def.color;
+    }
+
+    // Apply registry defaults for pricing/haggling/buyBack
+    if (def.pricing) {
+      this._shop.pricing.buyMultiplier = def.pricing.baseBuyMultiplier ?? this._shop.pricing.buyMultiplier;
+      this._shop.pricing.sellMultiplier = def.pricing.baseSellMultiplier ?? this._shop.pricing.sellMultiplier;
+    }
+    if (def.haggling) {
+      this._shop.haggling.enabled = def.haggling.enabled ?? this._shop.haggling.enabled;
+      if (def.haggling.persuasionDC) this._shop.haggling.baseDC = def.haggling.persuasionDC;
+    }
+    if (def.buyBack) {
+      this._shop.buyBack.enabled = def.buyBack.enabled ?? this._shop.buyBack.enabled;
+      if (def.buyBack.itemTypes) this._shop.buyBack.itemTypes = [...def.buyBack.itemTypes];
+    }
+    if (def.backroom) {
+      this._shop.backroom.enabled = def.backroom.enabled ?? this._shop.backroom.enabled;
+    }
+
+    this.render();
   }
 
   /**
@@ -1411,15 +1498,67 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       case "fixed":
         return `${service.basePrice} gp`;
       case "percent":
-        return `${service.pricePercent}% of value`;
+        return `${(service.pricePercent || service.basePrice || 0)}% of value`;
       case "perDay":
-        return `${service.pricePerUnit} gp/day`;
+        return `${service.pricePerUnit || service.basePrice || 0} gp/day`;
       case "perItem":
-        return `${service.pricePerUnit} gp/item`;
+        return `${service.pricePerUnit || service.basePrice || 0} gp/item`;
       case "variable":
         return "Price varies";
       default:
-        return `${service.basePrice} gp`;
+        return `${service.basePrice || 0} gp`;
     }
+  }
+
+  /**
+   * Prepare tiered service data from the business registry
+   * @returns {object} { coreServices, crossCompatibleServices, hasCoreServices, hasCrossCompatible, businessDef }
+   * @private
+   */
+  _prepareServiceTiers() {
+    const businessType = this._shop?.businessType;
+    if (!businessType) {
+      return {
+        coreServices: [],
+        crossCompatibleServices: [],
+        hasCoreServices: false,
+        hasCrossCompatible: false,
+        businessDef: null
+      };
+    }
+
+    const def = getBusinessDefinition(businessType);
+    if (!def) {
+      return {
+        coreServices: [],
+        crossCompatibleServices: [],
+        hasCoreServices: false,
+        hasCrossCompatible: false,
+        businessDef: null
+      };
+    }
+
+    const coreServices = def.coreServices.map(s => ({
+      ...s,
+      categoryLabel: localize(`ServiceCategories.${s.category}`) || s.category,
+      typeLabel: localize(`ServiceTypes.${s.type}`) || s.type,
+      priceDisplay: this._formatServicePrice(s)
+    }));
+
+    const crossCompatibleServices = def.crossCompatibleServices.map(s => ({
+      ...s,
+      categoryLabel: localize(`ServiceCategories.${s.category}`) || s.category,
+      typeLabel: localize(`ServiceTypes.${s.type}`) || s.type,
+      priceDisplay: this._formatServicePrice(s),
+      sourceName: s.sourceType ? (getBusinessDefinition(s.sourceType)?.name || s.sourceType) : ""
+    }));
+
+    return {
+      coreServices,
+      crossCompatibleServices,
+      hasCoreServices: coreServices.length > 0,
+      hasCrossCompatible: crossCompatibleServices.length > 0,
+      businessDef: { name: def.name, icon: def.icon, color: def.color, subtitle: def.subtitle }
+    };
   }
 }

@@ -10,6 +10,8 @@ import {
   createShopItem,
   createTransaction,
   ShopType,
+  BusinessType,
+  BusinessCategory,
   StockRefreshType,
   ItemRarity,
   PriceDisplayMode,
@@ -23,6 +25,10 @@ import {
   refreshStock,
   validateMerchant
 } from "../data/merchant-model.mjs";
+import {
+  getBusinessDefinition,
+  getBusinessTypeFromLegacyShopType
+} from "../data/business-registry.mjs";
 import { generateId, getFlag, setFlag, localize, formatCurrency } from "../utils/helpers.mjs";
 import {
   sendPurchaseMessage,
@@ -91,21 +97,55 @@ export class MerchantHandler {
    */
   async _loadMerchants() {
     this._merchantCache.clear();
+    let needsSave = false;
 
     // Load from worldData.merchants (primary storage)
     const worldData = game.settings.get(MODULE_ID, "worldData") || {};
     const merchants = worldData.merchants || {};
     for (const [id, merchantData] of Object.entries(merchants)) {
-      this._merchantCache.set(id, createMerchant(merchantData));
+      const merchant = createMerchant(merchantData);
+      if (this._migrateMerchant(merchant)) needsSave = true;
+      this._merchantCache.set(id, merchant);
     }
 
     // Also load from shops settings (fallback storage) if not already in cache
     const shopsSettings = game.settings.get(MODULE_ID, "shops") || {};
     for (const [id, shopData] of Object.entries(shopsSettings)) {
       if (!this._merchantCache.has(id)) {
-        this._merchantCache.set(id, createMerchant(shopData));
+        const merchant = createMerchant(shopData);
+        if (this._migrateMerchant(merchant)) needsSave = true;
+        this._merchantCache.set(id, merchant);
       }
     }
+
+    // Persist migrations
+    if (needsSave) {
+      await this._saveMerchants();
+      console.log(`${MODULE_ID} | Migrated merchants to BusinessType format`);
+    }
+  }
+
+  /**
+   * Migrate a merchant from legacy ShopType to BusinessType if needed
+   * @param {object} merchant - Merchant data object
+   * @returns {boolean} true if migration occurred
+   * @private
+   */
+  _migrateMerchant(merchant) {
+    if (merchant.businessType) return false;
+    if (!merchant.type) return false;
+
+    const businessType = getBusinessTypeFromLegacyShopType(merchant.type);
+    if (!businessType) return false;
+
+    merchant.businessType = businessType;
+    const def = getBusinessDefinition(businessType);
+    if (def) {
+      merchant.businessCategory = def.category;
+    }
+    merchant._dataVersion = 2;
+
+    return true;
   }
 
   /**
@@ -1012,7 +1052,8 @@ export class MerchantHandler {
       case "enchant":
         return this._serviceEnchant(merchant, actor, options);
       default:
-        return { success: false, message: localize("Shop.ServiceNotAvailable") };
+        // Generic service handler for all registry-defined services
+        return this._serviceGeneric(merchant, actor, service, options);
     }
   }
 
@@ -1308,6 +1349,46 @@ export class MerchantHandler {
       cost,
       queuePosition,
       message: localize("Shop.Service.PendingApproval")
+    };
+  }
+
+  /**
+   * Generic service handler for registry-defined services
+   * Handles any service not covered by specific handlers above
+   * @private
+   */
+  async _serviceGeneric(merchant, actor, serviceType, options = {}) {
+    // Find the service definition from the merchant's services list
+    const serviceDef = (merchant.servicesList || []).find(s => s.type === serviceType && s.enabled);
+    if (!serviceDef) {
+      return { success: false, message: localize("Shop.ServiceNotAvailable") };
+    }
+
+    // Calculate cost
+    let cost = serviceDef.basePrice || 0;
+    if (serviceDef.priceType === "percent" && options.itemId) {
+      const item = actor.items.get(options.itemId);
+      if (item) {
+        const itemValue = item.system?.price?.value || 0;
+        cost = Math.round(itemValue * (cost / 100 || 0.1));
+      }
+    }
+
+    // Check if player can afford it
+    if (cost > 0) {
+      const gold = convertToGold(actor.system?.currency || {});
+      if (gold < cost) {
+        return { success: false, message: localize("Shop.InsufficientFunds") };
+      }
+      await this._deductGold(actor, cost);
+    }
+
+    return {
+      success: true,
+      cost,
+      serviceType,
+      serviceName: serviceDef.name,
+      message: localize("Shop.ServiceComplete", { service: serviceDef.name, cost: this._formatCurrency(cost) })
     };
   }
 
