@@ -9,7 +9,6 @@ import {
   createMerchant,
   createShopItem,
   createTransaction,
-  ShopType,
   BusinessType,
   BusinessCategory,
   StockRefreshType,
@@ -29,6 +28,7 @@ import {
   getBusinessDefinition,
   getBusinessTypeFromLegacyShopType
 } from "../data/business-registry.mjs";
+import { getExecutor, executeService } from "../services/service-executor-registry.mjs";
 import { generateId, getFlag, setFlag, localize, formatCurrency } from "../utils/helpers.mjs";
 import {
   sendPurchaseMessage,
@@ -56,6 +56,14 @@ import {
 } from "../data/service-request-model.mjs";
 import { FailConsequence } from "../data/enchantment-model.mjs";
 import { emit, emitToGM, SocketEvents, requestPickupFromGM } from "../socket.mjs";
+
+/**
+ * Check if an executor handles its own escrow/approval flow
+ * (e.g., repair and enchant executors create their own requests)
+ */
+function _isEscrowExecutor(executor) {
+  return executor && ["repair", "enchant"].includes(executor.id);
+}
 
 /**
  * Storage keys
@@ -1042,19 +1050,162 @@ export class MerchantHandler {
     const context = await this._buildPlayerContext(session.playerActorUuid);
     const actor = context.actor;
 
-    switch (service) {
-      case "identify":
-        return this._serviceIdentify(merchant, actor, options);
-      case "repair":
-        return this._serviceRepair(merchant, actor, options);
-      case "appraise":
-        return this._serviceAppraise(merchant, actor, options);
-      case "enchant":
-        return this._serviceEnchant(merchant, actor, options);
-      default:
-        // Generic service handler for all registry-defined services
-        return this._serviceGeneric(merchant, actor, service, options);
+    // Resolve the service definition from the merchant
+    const serviceDef = this._resolveServiceDefinition(merchant, service);
+    if (!serviceDef) {
+      return { success: false, message: localize("Shop.ServiceNotAvailable") };
     }
+
+    // Resolve approval mode
+    const approvalMode = this._resolveApprovalMode(merchant, serviceDef);
+
+    // Get the executor for this service type
+    const executor = getExecutor(service);
+    if (!executor) {
+      return { success: false, message: localize("Shop.ServiceNotAvailable") };
+    }
+
+    // Build execution context
+    const execContext = {
+      actor,
+      merchant,
+      serviceDef,
+      options,
+      gameTime: game?.time?.worldTime ?? 0,
+      deductGold: this._deductGold.bind(this),
+      restoreItemFromEscrow: this._restoreItemFromEscrow.bind(this)
+    };
+
+    // If approval is required and the executor doesn't handle its own escrow,
+    // route through the general approval flow
+    if (approvalMode === "request" && !_isEscrowExecutor(executor)) {
+      return this._submitServiceRequest(merchant, actor, serviceDef, executor, options);
+    }
+
+    // Execute directly (auto-approve or executor handles its own approval)
+    return executor.execute(execContext);
+  }
+
+  /**
+   * Resolve the service definition for a given service type from the merchant
+   * @param {object} merchant - Merchant data
+   * @param {string} serviceType - Service type string
+   * @returns {object|null}
+   * @private
+   */
+  _resolveServiceDefinition(merchant, serviceType) {
+    // First check servicesList for registry-defined services
+    const fromList = (merchant.servicesList || []).find(s => s.type === serviceType && s.enabled);
+    if (fromList) return fromList;
+
+    // Check legacy service booleans (identify, repair, appraise, enchant)
+    const legacyMap = {
+      identify: { type: "identify", enabled: merchant.services?.identify, basePrice: merchant.services?.identifyPrice || 25, icon: "fa-magnifying-glass", name: "Identify" },
+      repair: { type: "repair", enabled: merchant.services?.repair, basePrice: 0, priceType: "percent", pricePercent: merchant.services?.repairPricePercent || 10, icon: "fa-wrench", name: "Repair" },
+      appraise: { type: "appraise", enabled: merchant.services?.appraise, basePrice: merchant.services?.appraisePrice || 5, icon: "fa-gem", name: "Appraise" },
+      enchant: { type: "enchant", enabled: merchant.services?.enchant, basePrice: 0, icon: "fa-wand-magic-sparkles", name: "Enchant", enchantmentPriceModifier: merchant.services?.enchantmentPriceModifier || 1 }
+    };
+
+    if (legacyMap[serviceType]?.enabled) {
+      return legacyMap[serviceType];
+    }
+
+    return null;
+  }
+
+  /**
+   * Resolve the approval mode for a service.
+   * Priority: per-service override > shop default > template default > global default > "auto"
+   * @param {object} merchant - Merchant data
+   * @param {object} serviceDef - Service definition
+   * @returns {string} "auto" or "request"
+   * @private
+   */
+  _resolveApprovalMode(merchant, serviceDef) {
+    // 1. Per-service override
+    if (serviceDef.approvalMode && serviceDef.approvalMode !== "inherit") {
+      return serviceDef.approvalMode;
+    }
+
+    // 2. Shop-wide default
+    if (merchant.defaultApprovalMode) {
+      return merchant.defaultApprovalMode;
+    }
+
+    // 3. Template default (from service database)
+    if (serviceDef.templateId) {
+      const serviceDB = game.bobsnpc?.handlers?.serviceDatabase;
+      const template = serviceDB?.getTemplate(serviceDef.templateId);
+      if (template?.defaultApprovalMode) return template.defaultApprovalMode;
+    }
+
+    // 4. Global default for this service type
+    try {
+      const globals = game.settings.get(MODULE_ID, "globalApprovalDefaults") || {};
+      if (globals[serviceDef.type]) return globals[serviceDef.type];
+    } catch (e) {
+      // Setting may not be registered yet
+    }
+
+    // 5. Default to auto
+    return "auto";
+  }
+
+  /**
+   * Submit a service request for GM approval (for non-escrow services).
+   * This is the generalized version that works with any service type.
+   * @private
+   */
+  async _submitServiceRequest(merchant, actor, serviceDef, executor, options) {
+    const cost = serviceDef.basePrice || 0;
+    const gold = convertToGold(actor.system?.currency || {});
+
+    if (cost > 0 && gold < cost) {
+      return { success: false, message: localize("Shop.InsufficientFunds") };
+    }
+
+    // Create a service request without item escrow
+    const request = createServiceRequest({
+      type: serviceDef.type,
+      merchantId: merchant.id,
+      merchantName: merchant.name || "Merchant",
+      playerActorUuid: actor.uuid,
+      playerActorId: actor.id,
+      playerName: actor.name,
+      playerId: game.user?.id,
+      cost,
+      serviceName: serviceDef.name || serviceDef.type,
+      serviceIcon: serviceDef.icon || "fa-concierge-bell"
+    });
+
+    // Store the request
+    if (game.user.isGM) {
+      const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
+      pendingRequests.push(request);
+      await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
+    } else {
+      emitToGM(SocketEvents.SERVICE_REQUEST, { request });
+    }
+
+    // Notify GM
+    await sendServiceRequestToGM({
+      type: serviceDef.type,
+      playerName: actor.name,
+      merchantName: merchant.name || "Merchant",
+      cost,
+      requestId: request.id,
+      serviceName: serviceDef.name
+    });
+
+    ui.notifications.info(localize("Shop.Service.PendingApproval"));
+
+    return {
+      success: true,
+      pending: true,
+      requestId: request.id,
+      cost,
+      message: localize("Shop.Service.PendingApproval")
+    };
   }
 
   /**
@@ -1458,16 +1609,54 @@ export class MerchantHandler {
     // Deduct gold from player
     await this._deductGold(actor, request.cost);
 
-    // Calculate when the item will be ready (using in-game time)
-    // Use custom duration if provided, otherwise use settings (default in days)
+    // Check if this is a non-item service that should execute immediately on approval
+    const isItemEscrow = !!request.itemData;
+
+    if (!isItemEscrow) {
+      // Non-item service: execute immediately via executor
+      const executor = getExecutor(request.type);
+      if (executor && typeof executor.execute === "function") {
+        const execContext = {
+          actor,
+          merchant,
+          serviceDef: { type: request.type, name: request.serviceName, icon: request.serviceIcon, basePrice: 0 },
+          options: request.customData || {},
+          gameTime: getCurrentGameTime(),
+          deductGold: async () => {}, // Gold already deducted above
+          restoreItemFromEscrow: this._restoreItemFromEscrow.bind(this)
+        };
+
+        try {
+          await executor.execute(execContext);
+        } catch (err) {
+          console.error(`${MODULE_ID} | Error executing approved service:`, err);
+        }
+      }
+
+      // Notify player of approval and immediate completion
+      emit(SocketEvents.SERVICE_APPROVE, {
+        requestId,
+        playerId: request.playerId,
+        readyAtGameTime: getCurrentGameTime(),
+        readyTimeStr: "Complete"
+      });
+
+      return { success: true, message: "Request approved and service executed" };
+    }
+
+    // Item escrow service: goes through the standard duration/pickup flow
     let durationDays = options.durationDays ?? 0;
     let durationHours = options.durationHours ?? 0;
 
-    // If no custom duration provided, use settings (default is in days for game time)
+    // If no custom duration provided, use settings defaults
     if (durationDays === 0 && durationHours === 0) {
-      durationDays = request.type === ApprovalRequiredServices.REPAIR
-        ? game.settings.get(MODULE_ID, "repairDuration")
-        : game.settings.get(MODULE_ID, "enchantDuration");
+      try {
+        durationDays = request.type === "repair"
+          ? game.settings.get(MODULE_ID, "repairDuration")
+          : game.settings.get(MODULE_ID, "enchantDuration");
+      } catch (e) {
+        durationDays = 1;
+      }
     }
 
     // Convert to game time seconds
@@ -1481,10 +1670,10 @@ export class MerchantHandler {
       status: ServiceRequestStatus.APPROVED,
       processedAt: Date.now(),
       processedBy: game.user.id,
-      workDuration: workDurationSeconds,           // Duration in game time seconds
-      startedAtGameTime: currentGameTime,          // Game time when work started
-      readyAtGameTime: readyAtGameTime,            // Game time when ready
-      readyAt: null                                // Deprecated: real time no longer used
+      workDuration: workDurationSeconds,
+      startedAtGameTime: currentGameTime,
+      readyAtGameTime: readyAtGameTime,
+      readyAt: null
     };
 
     // Add to active orders
@@ -1492,7 +1681,7 @@ export class MerchantHandler {
     activeOrders.push(serviceOrder);
     await game.settings.set(MODULE_ID, "activeServiceOrders", activeOrders);
 
-    // Notify player of approval with pickup time (in game time)
+    // Notify player of approval with pickup time
     const readyTimeStr = workDurationSeconds > 0 ? formatDuration(workDurationSeconds) : "Ready now";
 
     emit(SocketEvents.SERVICE_APPROVE, {
@@ -1536,13 +1725,18 @@ export class MerchantHandler {
     }
 
     // Get default duration based on type (in days for game time)
-    const defaultDurationDays = request.type === ApprovalRequiredServices.REPAIR
-      ? game.settings.get(MODULE_ID, "repairDuration")
-      : game.settings.get(MODULE_ID, "enchantDuration");
+    let defaultDurationDays = 1;
+    try {
+      if (request.type === "repair") {
+        defaultDurationDays = game.settings.get(MODULE_ID, "repairDuration");
+      } else if (request.type === "enchant") {
+        defaultDurationDays = game.settings.get(MODULE_ID, "enchantDuration");
+      }
+    } catch (e) {
+      defaultDurationDays = 1;
+    }
 
-    const serviceType = request.type === ApprovalRequiredServices.REPAIR
-      ? localize("Service.Type.Repair")
-      : localize("Service.Type.Enchant");
+    const serviceType = request.serviceName || request.type;
 
     const content = `
       <form class="bobsnpc-approval-dialog">
@@ -1619,12 +1813,13 @@ export class MerchantHandler {
    * Send a message that a service order has been accepted
    * @private
    */
-  async _sendServiceAcceptedMessage({ type, playerName, merchantName, itemName, itemImg, enchantmentName, cost, readyTimeStr, playerId }) {
+  async _sendServiceAcceptedMessage({ type, playerName, merchantName, itemName, itemImg, enchantmentName, cost, readyTimeStr, playerId, serviceName, serviceIcon: customIcon }) {
     const imgHtml = itemImg ? `<img src="${itemImg}" class="item-icon" alt="${itemName}">` : "";
-    const serviceIcon = type === "repair" ? "fa-wrench" : "fa-wand-magic-sparkles";
-    const serviceTitle = type === "repair"
+    const iconMap = { repair: "fa-wrench", enchant: "fa-wand-magic-sparkles", identify: "fa-magnifying-glass", appraise: "fa-gem" };
+    const serviceIcon = customIcon || iconMap[type] || "fa-concierge-bell";
+    const serviceTitle = serviceName || (type === "repair"
       ? localize("Chat.Service.RepairAccepted")
-      : localize("Chat.Service.EnchantAccepted");
+      : type === "enchant" ? localize("Chat.Service.EnchantAccepted") : `${type} Accepted`);
 
     const enchantmentLine = enchantmentName
       ? `<p><strong>${localize("Enchantment.Name")}:</strong> ${enchantmentName}</p>`
@@ -1740,20 +1935,55 @@ export class MerchantHandler {
       return { success: false, message: localize("Service.ActorNotFound") };
     }
 
-    // Check if we have item data to restore
+    // Check if we have item data to restore (item escrow services)
     if (!order.itemData) {
-      // Remove from active orders
+      // Non-item service order that's ready - just complete it
       activeOrders.splice(orderIndex, 1);
       await game.settings.set(MODULE_ID, "activeServiceOrders", activeOrders);
-      return { success: false, message: localize("Service.ItemDataMissing") };
+
+      const message = localize("Service.PickedUp", { item: order.serviceName || order.type });
+      ui.notifications.info(message);
+      return { success: true, message, order };
     }
 
     let resultItem = null;
     let enchantmentFailed = false;
     let failConsequence = null;
 
-    if (order.type === ApprovalRequiredServices.REPAIR) {
-      // REPAIR: Simply restore the item
+    // Use executor's onPickup if available, otherwise fall back to built-in logic
+    const executor = getExecutor(order.type);
+
+    if (executor && typeof executor.onPickup === "function") {
+      // Delegate to the executor's pickup handler
+      try {
+        const pickupResult = await executor.onPickup(
+          order, actor,
+          this._restoreItemFromEscrow.bind(this),
+          this._handleFailedEnchantment.bind(this),
+          this._applyEnchantmentAndRestore.bind(this)
+        );
+        resultItem = pickupResult.item;
+        enchantmentFailed = pickupResult.failed || false;
+        failConsequence = order.failConsequence;
+
+        if (enchantmentFailed) {
+          await this._sendEnchantmentFailureMessage({
+            playerName: order.playerName,
+            merchantName: order.merchantName,
+            itemName: order.itemName,
+            itemImg: order.itemImg,
+            enchantmentName: order.enchantmentName,
+            failConsequence,
+            playerId: order.playerId
+          });
+        }
+      } catch (err) {
+        console.error(`${MODULE_ID} | Executor onPickup failed for ${order.type}:`, err);
+        // Fallback: restore item from escrow
+        resultItem = await this._restoreItemFromEscrow(actor, order.itemData);
+      }
+    } else if (order.type === "repair" || order.type.startsWith("repair")) {
+      // REPAIR fallback: Simply restore the item
       resultItem = await this._restoreItemFromEscrow(actor, order.itemData);
 
       await sendRepairMessage({
@@ -1764,7 +1994,7 @@ export class MerchantHandler {
         cost: order.cost,
         playerId: order.playerId
       });
-    } else if (order.type === ApprovalRequiredServices.ENCHANT) {
+    } else if (order.type === "enchant") {
       // ENCHANT: Check for failure, then apply enchantment
       const enchantmentHandler = game.bobsnpc?.handlers?.enchantment;
       let enchantment = null;

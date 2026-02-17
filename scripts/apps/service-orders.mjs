@@ -102,10 +102,9 @@ export class ServiceOrdersWindow extends HandlebarsApplicationMixin(ApplicationV
           : localize("Service.Status.InProgress"),
         statusClass: ready ? "ready" : "pending",
         timeRemainingStr: ready ? localize("Service.ReadyNow") : formatDuration(timeRemaining),
-        typeLabel: order.type === "repair"
-          ? localize("Service.Type.Repair")
-          : localize("Service.Type.Enchant"),
-        typeIcon: order.type === "repair" ? "fa-wrench" : "fa-wand-magic-sparkles",
+        typeLabel: order.serviceName || order.type,
+        typeIcon: order.serviceIcon || (order.type === "repair" ? "fa-wrench" : "fa-cog"),
+        hasItem: !!(order.itemName || order.itemId),
         queueInfo: order.queuePosition > 0
           ? localize("Service.QueuePosition", { position: order.queuePosition })
           : ""

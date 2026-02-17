@@ -1,0 +1,389 @@
+{{!-- Service Database Manager --}}
+<div class="service-manager-content {{theme}}">
+  {{!-- Tab Navigation --}}
+  <nav class="tab-navigation">
+    <button type="button" class="tab-btn {{#if isTemplatesTab}}active{{/if}}" data-action="switchTab" data-tab="templates">
+      <i class="fa-solid fa-database"></i>
+      Templates
+      {{#if totalTemplates}}
+        <span class="tab-badge">{{totalTemplates}}</span>
+      {{/if}}
+    </button>
+    <button type="button" class="tab-btn {{#if isPendingTab}}active{{/if}}" data-action="switchTab" data-tab="pending">
+      <i class="fa-solid fa-clipboard-list"></i>
+      Pending
+      {{#if requestCount}}
+        <span class="tab-badge pending">{{requestCount}}</span>
+      {{/if}}
+    </button>
+    <button type="button" class="tab-btn {{#if isActiveTab}}active{{/if}}" data-action="switchTab" data-tab="active">
+      <i class="fa-solid fa-clock"></i>
+      Active
+      {{#if activeOrderCount}}
+        <span class="tab-badge active">{{activeOrderCount}}</span>
+      {{/if}}
+    </button>
+    <button type="button" class="tab-btn {{#if isSettingsTab}}active{{/if}}" data-action="switchTab" data-tab="settings">
+      <i class="fa-solid fa-gear"></i>
+      Settings
+    </button>
+  </nav>
+
+  <div class="tab-body">
+
+    {{!-- ============ TEMPLATES TAB ============ --}}
+    {{#if isTemplatesTab}}
+
+      {{#if isEditing}}
+        {{!-- Template Editor --}}
+        <div class="template-editor">
+          <div class="editor-header">
+            <h3>
+              <i class="fa-solid fa-pen"></i>
+              {{#if editingTemplate.id}}Edit Template{{else}}New Template{{/if}}
+            </h3>
+          </div>
+
+          <form class="template-edit-form">
+            <fieldset class="form-section">
+              <legend><i class="fa-solid fa-info-circle"></i> Basic Info</legend>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="tmpl-name">Name</label>
+                  <input type="text" id="tmpl-name" name="name" value="{{editingTemplate.name}}" required placeholder="Service name...">
+                </div>
+                <div class="form-group">
+                  <label for="tmpl-type">Type Key</label>
+                  <input type="text" id="tmpl-type" name="type" value="{{editingTemplate.type}}" placeholder="Auto-generated from name">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="tmpl-category">Category</label>
+                  <select id="tmpl-category" name="category">
+                    {{#each categoryOptions}}
+                      <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="tmpl-icon">Icon</label>
+                  <div class="icon-input">
+                    <i class="fa-solid {{editingTemplate.icon}}"></i>
+                    <input type="text" id="tmpl-icon" name="icon" value="{{editingTemplate.icon}}" placeholder="fa-cog">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="tmpl-desc">Description</label>
+                <textarea id="tmpl-desc" name="description" rows="2" placeholder="What this service does...">{{editingTemplate.description}}</textarea>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+              <legend><i class="fa-solid fa-coins"></i> Pricing</legend>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="tmpl-price">Base Price (gp)</label>
+                  <input type="number" id="tmpl-price" name="basePrice" value="{{editingTemplate.basePrice}}" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                  <label for="tmpl-priceType">Price Type</label>
+                  <select id="tmpl-priceType" name="priceType">
+                    {{#each priceTypeOptions}}
+                      <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="tmpl-currency">Currency</label>
+                  <input type="text" id="tmpl-currency" name="currency" value="{{editingTemplate.currency}}" placeholder="gp">
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+              <legend><i class="fa-solid fa-clock"></i> Duration & Requirements</legend>
+              <div class="form-row">
+                <div class="form-group checkbox-group">
+                  <label>
+                    <input type="checkbox" name="hasDuration" {{#if editingTemplate.hasDuration}}checked{{/if}}>
+                    Has Duration
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label for="tmpl-duration">Base Duration</label>
+                  <input type="number" id="tmpl-duration" name="baseDuration" value="{{editingTemplate.baseDuration}}" min="0">
+                </div>
+                <div class="form-group">
+                  <label for="tmpl-durUnit">Unit</label>
+                  <select id="tmpl-durUnit" name="durationUnit">
+                    {{#each durationUnitOptions}}
+                      <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group checkbox-group">
+                  <label>
+                    <input type="checkbox" name="requiresItem" {{#if editingTemplate.requiresItem}}checked{{/if}}>
+                    Requires Item
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label for="tmpl-approval">Default Approval</label>
+                  <select id="tmpl-approval" name="defaultApprovalMode">
+                    <option value="auto" {{#if (bobsnpc-eq editingTemplate.defaultApprovalMode "auto")}}selected{{/if}}>Auto-Approve</option>
+                    <option value="request" {{#if (bobsnpc-eq editingTemplate.defaultApprovalMode "request")}}selected{{/if}}>Require Approval</option>
+                  </select>
+                </div>
+              </div>
+            </fieldset>
+
+            <div class="form-actions">
+              <button type="button" class="save-btn" data-action="saveTemplate">
+                <i class="fa-solid fa-save"></i> Save
+              </button>
+              <button type="button" class="cancel-btn" data-action="cancelEdit">
+                <i class="fa-solid fa-times"></i> Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+
+      {{else}}
+        {{!-- Template List --}}
+        <div class="templates-toolbar">
+          <div class="search-bar">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" class="search-input" placeholder="Search services..." value="{{searchFilter}}">
+          </div>
+          <div class="toolbar-actions">
+            <button type="button" class="create-btn" data-action="createTemplate">
+              <i class="fa-solid fa-plus"></i> New Service
+            </button>
+            <button type="button" class="reset-btn" data-action="resetDefaults" data-tooltip="Reset to Defaults">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="category-list">
+          {{#each categories}}
+            <div class="category-section" data-category="{{this.key}}">
+              <div class="category-header" data-action="toggleCategory" data-category="{{this.key}}">
+                <div class="category-title">
+                  <i class="fa-solid {{#if this.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}} toggle-icon"></i>
+                  <i class="fa-solid {{this.icon}} category-icon"></i>
+                  <span>{{this.label}}</span>
+                  <span class="category-count">({{this.count}})</span>
+                </div>
+              </div>
+
+              {{#if this.expanded}}
+                <div class="category-templates">
+                  {{#each this.templates}}
+                    <div class="template-row" data-template-id="{{this.id}}">
+                      <div class="template-info">
+                        <i class="fa-solid {{this.icon}} template-icon"></i>
+                        <div class="template-text">
+                          <span class="template-name">{{this.name}}</span>
+                          <span class="template-desc">{{this.description}}</span>
+                        </div>
+                      </div>
+                      <div class="template-meta">
+                        {{#if this.basePrice}}
+                          <span class="template-price">
+                            <i class="fa-solid fa-coins"></i>
+                            {{this.basePrice}} {{this.currency}}
+                          </span>
+                        {{/if}}
+                        <button type="button" class="approval-toggle {{this.approvalClass}}" data-action="toggleApproval" data-template-id="{{this.id}}" data-tooltip="Toggle approval mode">
+                          {{this.approvalLabel}}
+                        </button>
+                        <button type="button" class="edit-btn" data-action="editTemplate" data-template-id="{{this.id}}" data-tooltip="Edit">
+                          <i class="fa-solid fa-pen"></i>
+                        </button>
+                        {{#unless this.isBuiltIn}}
+                          <button type="button" class="delete-btn" data-action="deleteTemplate" data-template-id="{{this.id}}" data-tooltip="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                          </button>
+                        {{/unless}}
+                      </div>
+                    </div>
+                  {{/each}}
+                </div>
+              {{/if}}
+            </div>
+          {{/each}}
+
+          {{#unless categories}}
+            <div class="no-results">
+              <i class="fa-solid fa-search"></i>
+              <p>No services match your search.</p>
+            </div>
+          {{/unless}}
+        </div>
+      {{/if}}
+    {{/if}}
+
+    {{!-- ============ PENDING TAB ============ --}}
+    {{#if isPendingTab}}
+      <div class="pending-header">
+        <button type="button" class="refresh-btn" data-action="refreshRequests" data-tooltip="Refresh">
+          <i class="fa-solid fa-refresh"></i>
+        </button>
+      </div>
+
+      {{#if hasRequests}}
+        <div class="requests-list">
+          {{#each requests}}
+            <div class="request-card" data-request-id="{{this.id}}">
+              <div class="request-header">
+                <div class="service-type">
+                  <i class="fa-solid {{this.serviceIcon}}"></i>
+                  <span>{{this.serviceLabel}}</span>
+                </div>
+                <span class="request-time">{{this.timeAgo}}</span>
+              </div>
+
+              <div class="request-body">
+                {{#if this.hasItem}}
+                  <div class="request-item">
+                    <img src="{{this.itemImg}}" alt="{{this.itemName}}" class="item-icon">
+                    <div class="item-details">
+                      <span class="item-name">{{this.itemName}}</span>
+                      {{#if this.enchantmentName}}
+                        <span class="enchantment-name">
+                          <i class="fa-solid fa-wand-sparkles"></i> {{this.enchantmentName}}
+                        </span>
+                      {{/if}}
+                    </div>
+                  </div>
+                {{/if}}
+
+                <div class="request-info">
+                  <div class="info-row">
+                    <span class="label">Player:</span>
+                    <span class="value">{{this.playerName}}</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="label">Merchant:</span>
+                    <span class="value">{{this.merchantName}}</span>
+                  </div>
+                  {{#if this.cost}}
+                    <div class="info-row cost">
+                      <span class="label">Cost:</span>
+                      <span class="value">{{this.costFormatted}}</span>
+                    </div>
+                  {{/if}}
+                </div>
+              </div>
+
+              <div class="request-actions">
+                <button type="button" class="approve-btn" data-action="approveRequest" data-request-id="{{this.id}}">
+                  <i class="fa-solid fa-check"></i> Approve
+                </button>
+                <button type="button" class="deny-btn" data-action="denyRequest" data-request-id="{{this.id}}">
+                  <i class="fa-solid fa-times"></i> Deny
+                </button>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="no-results">
+          <i class="fa-solid fa-inbox"></i>
+          <p>No pending requests.</p>
+        </div>
+      {{/if}}
+    {{/if}}
+
+    {{!-- ============ ACTIVE TAB ============ --}}
+    {{#if isActiveTab}}
+      {{#if hasActiveOrders}}
+        <div class="orders-list">
+          {{#each activeOrders}}
+            <div class="order-card {{this.statusClass}}" data-order-id="{{this.id}}">
+              <div class="order-header">
+                <div class="service-type">
+                  <i class="fa-solid {{this.serviceIcon}}"></i>
+                  <span>{{this.serviceLabel}}</span>
+                </div>
+                <span class="order-status {{this.statusClass}}">
+                  {{#if this.isReady}}
+                    <i class="fa-solid fa-check-circle"></i> Ready
+                  {{else}}
+                    <i class="fa-solid fa-clock"></i> {{this.timeRemainingStr}}
+                  {{/if}}
+                </span>
+              </div>
+
+              <div class="order-body">
+                {{#if this.hasItem}}
+                  <div class="order-item">
+                    <img src="{{this.itemImg}}" alt="{{this.itemName}}" class="item-icon">
+                    <span class="item-name">{{this.itemName}}</span>
+                  </div>
+                {{/if}}
+                <div class="order-info">
+                  <span class="info-row"><span class="label">Player:</span> {{this.playerName}}</span>
+                  <span class="info-row"><span class="label">Merchant:</span> {{this.merchantName}}</span>
+                </div>
+              </div>
+
+              <div class="order-actions">
+                {{#unless this.isReady}}
+                  <button type="button" class="ready-btn" data-action="markReady" data-order-id="{{this.id}}" data-tooltip="Mark ready now">
+                    <i class="fa-solid fa-check-circle"></i>
+                  </button>
+                {{/unless}}
+                <button type="button" class="adjust-btn" data-action="adjustTime" data-order-id="{{this.id}}" data-tooltip="Adjust time">
+                  <i class="fa-solid fa-clock"></i>
+                </button>
+                <button type="button" class="cancel-btn" data-action="cancelOrder" data-order-id="{{this.id}}" data-tooltip="Cancel & refund">
+                  <i class="fa-solid fa-times"></i>
+                </button>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="no-results">
+          <i class="fa-solid fa-clipboard-check"></i>
+          <p>No active orders.</p>
+        </div>
+      {{/if}}
+    {{/if}}
+
+    {{!-- ============ SETTINGS TAB ============ --}}
+    {{#if isSettingsTab}}
+      <div class="settings-content">
+        <h3><i class="fa-solid fa-shield-halved"></i> Default Approval Modes</h3>
+        <p class="settings-hint">Set the default approval mode for each service category. Individual templates and per-shop overrides take priority over these defaults.</p>
+
+        <div class="category-settings-list">
+          {{#each categorySettings}}
+            <div class="category-setting-row">
+              <div class="category-label">
+                <i class="fa-solid {{this.icon}}"></i>
+                <span>{{this.label}}</span>
+              </div>
+              <div class="approval-toggles">
+                <button type="button" class="mode-btn {{#if this.isAuto}}active{{/if}}" data-action="setCategoryApproval" data-category="{{this.key}}" data-mode="auto">
+                  <i class="fa-solid fa-bolt"></i> Auto
+                </button>
+                <button type="button" class="mode-btn {{#if this.isRequest}}active{{/if}}" data-action="setCategoryApproval" data-category="{{this.key}}" data-mode="request">
+                  <i class="fa-solid fa-hand"></i> Request
+                </button>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      </div>
+    {{/if}}
+  </div>
+</div>

@@ -22,6 +22,7 @@
 @import url("./components/dialogue-editor.css");
 @import url("./components/shop-manager.css");
 @import url("./components/bank-editor.css");
+@import url("./components/service-manager.css");
 
 /* ===== CSS Layer for V13 Compatibility ===== */
 @layer bobsnpc {

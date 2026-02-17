@@ -1,0 +1,725 @@
+/**
+ * Bob's Talking NPCs - Service Database Manager Styles
+ */
+
+/* ===== Service Manager Layout ===== */
+.service-database-manager .service-manager-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 0;
+}
+
+/* ===== Tab Navigation ===== */
+.service-database-manager .tab-navigation {
+  display: flex;
+  gap: 2px;
+  padding: 6px 8px 0;
+  border-bottom: 2px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.1));
+  flex-shrink: 0;
+}
+
+.service-database-manager .tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 14px;
+  color: var(--bobsnpc-text-secondary, #aaa);
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  margin-bottom: -2px;
+}
+
+.service-database-manager .tab-btn:hover {
+  color: var(--bobsnpc-text, #eee);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.service-database-manager .tab-btn.active {
+  color: var(--bobsnpc-accent, #4fc3f7);
+  border-bottom-color: var(--bobsnpc-accent, #4fc3f7);
+}
+
+.service-database-manager .tab-badge {
+  background: var(--bobsnpc-accent, #4fc3f7);
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.service-database-manager .tab-badge.pending {
+  background: #ff9800;
+}
+
+.service-database-manager .tab-badge.active {
+  background: #4caf50;
+}
+
+/* ===== Tab Body ===== */
+.service-database-manager .tab-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+/* ===== Templates Toolbar ===== */
+.service-database-manager .templates-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.service-database-manager .search-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.1));
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.service-database-manager .search-bar i {
+  color: var(--bobsnpc-text-secondary, #888);
+  font-size: 0.85rem;
+}
+
+.service-database-manager .search-input {
+  background: transparent;
+  border: none;
+  color: var(--bobsnpc-text, #eee);
+  font-size: 0.85rem;
+  flex: 1;
+  outline: none;
+}
+
+.service-database-manager .toolbar-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.service-database-manager .create-btn {
+  background: var(--bobsnpc-accent, #4fc3f7);
+  color: #000;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.2s;
+}
+
+.service-database-manager .create-btn:hover {
+  background: #81d4fa;
+}
+
+.service-database-manager .reset-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--bobsnpc-text-secondary, #aaa);
+  border: 1px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.1));
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.service-database-manager .reset-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--bobsnpc-text, #eee);
+}
+
+/* ===== Category Sections ===== */
+.service-database-manager .category-section {
+  margin-bottom: 2px;
+}
+
+.service-database-manager .category-header {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.08));
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.service-database-manager .category-header:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.service-database-manager .category-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--bobsnpc-text, #eee);
+}
+
+.service-database-manager .toggle-icon {
+  font-size: 0.7rem;
+  width: 12px;
+  color: var(--bobsnpc-text-secondary, #888);
+}
+
+.service-database-manager .category-icon {
+  color: var(--bobsnpc-accent, #4fc3f7);
+  width: 16px;
+  text-align: center;
+}
+
+.service-database-manager .category-count {
+  color: var(--bobsnpc-text-secondary, #888);
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+
+/* ===== Template Rows ===== */
+.service-database-manager .category-templates {
+  border-left: 2px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.08));
+  margin-left: 14px;
+  padding-left: 0;
+}
+
+.service-database-manager .template-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s;
+}
+
+.service-database-manager .template-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.service-database-manager .template-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.service-database-manager .template-icon {
+  color: var(--bobsnpc-text-secondary, #888);
+  width: 16px;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.service-database-manager .template-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.service-database-manager .template-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--bobsnpc-text, #eee);
+}
+
+.service-database-manager .template-desc {
+  font-size: 0.72rem;
+  color: var(--bobsnpc-text-secondary, #888);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.service-database-manager .template-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.service-database-manager .template-price {
+  font-size: 0.75rem;
+  color: #ffd700;
+  white-space: nowrap;
+}
+
+.service-database-manager .approval-toggle {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.service-database-manager .approval-auto {
+  background: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.service-database-manager .approval-auto:hover {
+  background: rgba(76, 175, 80, 0.3);
+}
+
+.service-database-manager .approval-request {
+  background: rgba(255, 152, 0, 0.15);
+  color: #ff9800;
+  border-color: rgba(255, 152, 0, 0.3);
+}
+
+.service-database-manager .approval-request:hover {
+  background: rgba(255, 152, 0, 0.3);
+}
+
+.service-database-manager .template-meta .edit-btn,
+.service-database-manager .template-meta .delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--bobsnpc-text-secondary, #888);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
+.service-database-manager .template-meta .edit-btn:hover {
+  color: var(--bobsnpc-accent, #4fc3f7);
+  background: rgba(79, 195, 247, 0.1);
+}
+
+.service-database-manager .template-meta .delete-btn:hover {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+}
+
+/* ===== Template Editor ===== */
+.service-database-manager .template-editor {
+  padding: 4px;
+}
+
+.service-database-manager .editor-header h3 {
+  font-size: 1rem;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.service-database-manager .form-section {
+  border: 1px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.1));
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.service-database-manager .form-section legend {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--bobsnpc-accent, #4fc3f7);
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.service-database-manager .form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.service-database-manager .form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.service-database-manager .form-group label {
+  font-size: 0.78rem;
+  color: var(--bobsnpc-text-secondary, #aaa);
+  font-weight: 500;
+}
+
+.service-database-manager .form-group input,
+.service-database-manager .form-group select,
+.service-database-manager .form-group textarea {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.15));
+  border-radius: 4px;
+  padding: 5px 8px;
+  color: var(--bobsnpc-text, #eee);
+  font-size: 0.85rem;
+}
+
+.service-database-manager .form-group input:focus,
+.service-database-manager .form-group select:focus,
+.service-database-manager .form-group textarea:focus {
+  border-color: var(--bobsnpc-accent, #4fc3f7);
+  outline: none;
+}
+
+.service-database-manager .checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  flex-direction: row;
+}
+
+.service-database-manager .icon-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.service-database-manager .icon-input i {
+  color: var(--bobsnpc-accent, #4fc3f7);
+}
+
+.service-database-manager .icon-input input {
+  flex: 1;
+}
+
+.service-database-manager .form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+.service-database-manager .save-btn {
+  background: var(--bobsnpc-accent, #4fc3f7);
+  color: #000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.service-database-manager .save-btn:hover {
+  background: #81d4fa;
+}
+
+.service-database-manager .cancel-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--bobsnpc-text, #eee);
+  border: 1px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.15));
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.service-database-manager .cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== Request & Order Cards ===== */
+.service-database-manager .pending-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.service-database-manager .refresh-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.1));
+  color: var(--bobsnpc-text-secondary, #aaa);
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.service-database-manager .refresh-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--bobsnpc-text, #eee);
+}
+
+.service-database-manager .request-card,
+.service-database-manager .order-card {
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.service-database-manager .request-header,
+.service-database-manager .order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.service-database-manager .service-type {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.service-database-manager .service-type i {
+  color: var(--bobsnpc-accent, #4fc3f7);
+}
+
+.service-database-manager .request-time {
+  font-size: 0.75rem;
+  color: var(--bobsnpc-text-secondary, #888);
+}
+
+.service-database-manager .request-body,
+.service-database-manager .order-body {
+  padding: 8px 10px;
+}
+
+.service-database-manager .request-item,
+.service-database-manager .order-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.service-database-manager .item-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.1));
+}
+
+.service-database-manager .item-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.service-database-manager .item-name {
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.service-database-manager .enchantment-name {
+  font-size: 0.75rem;
+  color: #ce93d8;
+}
+
+.service-database-manager .request-info,
+.service-database-manager .order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.8rem;
+}
+
+.service-database-manager .info-row .label {
+  color: var(--bobsnpc-text-secondary, #888);
+}
+
+.service-database-manager .info-row.cost .value {
+  color: #ffd700;
+  font-weight: 600;
+}
+
+.service-database-manager .request-actions,
+.service-database-manager .order-actions {
+  display: flex;
+  gap: 6px;
+  padding: 6px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  justify-content: flex-end;
+}
+
+.service-database-manager .approve-btn {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.service-database-manager .approve-btn:hover {
+  background: rgba(76, 175, 80, 0.35);
+}
+
+.service-database-manager .deny-btn {
+  background: rgba(244, 67, 54, 0.15);
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.service-database-manager .deny-btn:hover {
+  background: rgba(244, 67, 54, 0.3);
+}
+
+.service-database-manager .order-status {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.service-database-manager .order-status.ready {
+  color: #4caf50;
+}
+
+.service-database-manager .order-status.in-progress {
+  color: #ff9800;
+}
+
+.service-database-manager .order-actions button {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.1));
+  color: var(--bobsnpc-text-secondary, #aaa);
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.service-database-manager .order-actions button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--bobsnpc-text, #eee);
+}
+
+.service-database-manager .order-actions .ready-btn:hover {
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.15);
+}
+
+.service-database-manager .order-actions .cancel-btn:hover {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+}
+
+/* ===== Settings Tab ===== */
+.service-database-manager .settings-content h3 {
+  font-size: 1rem;
+  margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.service-database-manager .settings-hint {
+  font-size: 0.78rem;
+  color: var(--bobsnpc-text-secondary, #888);
+  margin: 0 0 12px;
+}
+
+.service-database-manager .category-settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.service-database-manager .category-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.06));
+  border-radius: 4px;
+}
+
+.service-database-manager .category-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.service-database-manager .category-label i {
+  color: var(--bobsnpc-accent, #4fc3f7);
+  width: 16px;
+  text-align: center;
+}
+
+.service-database-manager .approval-toggles {
+  display: flex;
+  gap: 4px;
+}
+
+.service-database-manager .mode-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--bobsnpc-border, rgba(255, 255, 255, 0.1));
+  color: var(--bobsnpc-text-secondary, #888);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.service-database-manager .mode-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.service-database-manager .mode-btn.active {
+  background: var(--bobsnpc-accent, #4fc3f7);
+  color: #000;
+  border-color: var(--bobsnpc-accent, #4fc3f7);
+  font-weight: 600;
+}
+
+/* ===== No Results ===== */
+.service-database-manager .no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--bobsnpc-text-secondary, #888);
+}
+
+.service-database-manager .no-results i {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  opacity: 0.4;
+}
+
+.service-database-manager .no-results p {
+  margin: 0;
+  font-size: 0.9rem;
+}

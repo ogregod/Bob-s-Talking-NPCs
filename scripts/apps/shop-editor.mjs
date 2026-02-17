@@ -7,7 +7,6 @@ const MODULE_ID = "bobs-talking-npcs";
 
 import { localize, generateId } from "../utils/helpers.mjs";
 import {
-  ShopType,
   ShopDisplayMode,
   StockRefreshType,
   PriceDisplayMode,
@@ -207,7 +206,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     // Ensure critical fields have valid values
     shop.id = shop.id || generateId();
     shop.name = shop.name || "";
-    shop.type = shop.type || ShopType.GENERAL;
+    shop.type = shop.type || "general";
     shop.displayMode = shop.displayMode || ShopDisplayMode.AUTO;
     shop.icon = shop.icon || "icons/svg/chest.svg";
     // Ensure color is a valid hex color (empty string breaks color input)
@@ -258,7 +257,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       id: generateId(),
       name: "",
       description: "",
-      type: ShopType.GENERAL,
+      type: "general",
       icon: "icons/svg/chest.svg",
       color: "#7b68ee",
       bannerImage: null,
@@ -349,11 +348,11 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       }
     }
 
-    // Build options for selects
-    const typeOptions = Object.entries(ShopType).map(([key, value]) => ({
+    // Build options for selects - use BusinessType instead of legacy ShopType
+    const typeOptions = Object.entries(BusinessType).map(([key, value]) => ({
       value,
-      label: localize(`ShopTypes.${key}`),
-      selected: this._shop.type === value
+      label: localize(`BusinessTypes.${key}`) || key.replace(/_/g, " "),
+      selected: this._shop.businessType === value
     }));
 
     // Business category options

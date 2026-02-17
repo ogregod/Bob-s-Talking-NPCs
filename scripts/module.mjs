@@ -32,6 +32,7 @@ import { TradeWindow } from "./apps/trade-window.mjs";
 import { ShopManager } from "./apps/shop-manager.mjs";
 import { ShopEditor } from "./apps/shop-editor.mjs";
 import { ServiceApprovalDialog } from "./apps/service-approval-dialog.mjs";
+import { ServiceDatabaseManager } from "./apps/service-database-manager.mjs";
 import { EnchantmentManager } from "./apps/enchantment-manager.mjs";
 import { EnchantmentPicker } from "./apps/enchantment-picker.mjs";
 
@@ -166,7 +167,17 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
       case "services":
       case "orders":
       case "queue":
-        ServiceApprovalDialog.open();
+        if (game.user.isGM) {
+          ServiceDatabaseManager.open();
+        } else {
+          // Players see their own service orders
+          const playerActor = game.user.character;
+          if (playerActor) {
+            game.bobsnpc?.ui?.openServiceOrders(playerActor.uuid);
+          } else {
+            ui.notifications.warn("Select a character first.");
+          }
+        }
         break;
 
       case "npc": {

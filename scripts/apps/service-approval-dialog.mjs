@@ -97,17 +97,16 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
     const requests = handler?.getPendingServiceRequests() || [];
     const preparedRequests = requests.map(request => {
       const timeAgo = this._formatTimeAgo(request.requestedAt);
-      const serviceIcon = request.type === "repair" ? "fa-wrench" : "fa-wand-magic-sparkles";
-      const serviceLabel = request.type === "repair"
-        ? localize("Shop.Service.Repair")
-        : localize("Shop.Service.Enchant");
+      const serviceIcon = request.serviceIcon || _getServiceIcon(request.type);
+      const serviceLabel = request.serviceName || request.type;
 
       return {
         ...request,
         timeAgo,
         serviceIcon,
         serviceLabel,
-        costFormatted: formatCurrency(request.cost * 100)
+        costFormatted: formatCurrency(request.cost * 100),
+        hasItem: !!(request.itemName || request.itemId)
       };
     });
 
@@ -116,10 +115,8 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
     const currentGameTime = getCurrentGameTime();
 
     const preparedActiveOrders = activeOrders.map(order => {
-      const serviceIcon = order.type === "repair" ? "fa-wrench" : "fa-wand-magic-sparkles";
-      const serviceLabel = order.type === "repair"
-        ? localize("Shop.Service.Repair")
-        : localize("Shop.Service.Enchant");
+      const serviceIcon = order.serviceIcon || _getServiceIcon(order.type);
+      const serviceLabel = order.serviceName || order.type;
 
       // Use game time for checking readiness
       const readyAtGameTime = order.readyAtGameTime ?? 0;
@@ -438,6 +435,27 @@ export class ServiceApprovalDialog extends HandlebarsApplicationMixin(Applicatio
 }
 
 /**
+ * Get service icon for a given service type (fallback map)
+ * @param {string} serviceType
+ * @returns {string}
+ */
+function _getServiceIcon(serviceType) {
+  const iconMap = {
+    repair: "fa-wrench", enchant: "fa-wand-magic-sparkles", identify: "fa-magnifying-glass",
+    appraise: "fa-gem", healing: "fa-heart", cureDisease: "fa-virus-slash",
+    curePoison: "fa-flask-vial", restoration: "fa-sparkles", resurrection: "fa-cross",
+    blessing: "fa-hand-sparkles", longRest: "fa-bed", shortRest: "fa-mug-hot",
+    skillTraining: "fa-graduation-cap", weaponTraining: "fa-swords",
+    toolTraining: "fa-screwdriver-wrench", languageTraining: "fa-language",
+    sparring: "fa-hand-fist", rumors: "fa-ear-listen", research: "fa-book",
+    silvering: "fa-wand-sparkles", brewPotion: "fa-flask", scribeScroll: "fa-scroll",
+    currencyExchange: "fa-money-bill-transfer", loan: "fa-hand-holding-dollar",
+    pawn: "fa-scale-balanced"
+  };
+  return iconMap[serviceType] || "fa-cog";
+}
+
+/**
  * Register hook to auto-open approval dialog when GM receives a service request
  */
 export function registerServiceApprovalHooks() {
@@ -445,10 +463,12 @@ export function registerServiceApprovalHooks() {
     // Only for GMs
     if (!game.user.isGM) return;
 
-    // Show notification
-    ui.notifications.info(
-      `${localize("GM.ServiceRequest")}: ${request.playerName} - ${request.type} for ${request.itemName}`
-    );
+    // Show notification with service name
+    const serviceName = request.serviceName || request.type;
+    const detail = request.itemName
+      ? `${request.playerName} - ${serviceName} for ${request.itemName}`
+      : `${request.playerName} - ${serviceName}`;
+    ui.notifications.info(`${localize("GM.ServiceRequest")}: ${detail}`);
 
     // Optionally auto-open the dialog (configurable in future)
     // ServiceApprovalDialog.open();

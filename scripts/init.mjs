@@ -23,6 +23,24 @@ import { EnchantmentHandler } from "./handlers/enchantment-handler.mjs";
 // Import service approval hooks
 import { registerServiceApprovalHooks } from "./apps/service-approval-dialog.mjs";
 
+// Import service database
+import { ServiceDatabase } from "./data/service-database.mjs";
+
+// Import service executor registry
+import { registerExecutor } from "./services/service-executor-registry.mjs";
+import { GenericExecutor } from "./services/executors/generic-executor.mjs";
+import { IdentifyExecutor } from "./services/executors/identify-executor.mjs";
+import { AppraiseExecutor } from "./services/executors/appraise-executor.mjs";
+import { RepairExecutor } from "./services/executors/repair-executor.mjs";
+import { EnchantExecutor } from "./services/executors/enchant-executor.mjs";
+import { HealingExecutor } from "./services/executors/healing-executor.mjs";
+import { RestExecutor } from "./services/executors/rest-executor.mjs";
+import { TrainingExecutor } from "./services/executors/training-executor.mjs";
+import { InformationExecutor } from "./services/executors/information-executor.mjs";
+import { ItemModificationExecutor } from "./services/executors/item-modification-executor.mjs";
+import { ItemCreationExecutor } from "./services/executors/item-creation-executor.mjs";
+import { FinancialExecutor } from "./services/executors/financial-executor.mjs";
+
 /**
  * Handler instances
  */
@@ -154,7 +172,10 @@ async function loadTemplates() {
     `modules/${MODULE_ID}/templates/faction-editor/ranks.hbs`,
     `modules/${MODULE_ID}/templates/faction-editor/relationships.hbs`,
     `modules/${MODULE_ID}/templates/faction-editor/settings.hbs`,
-    `modules/${MODULE_ID}/templates/faction-editor/footer.hbs`
+    `modules/${MODULE_ID}/templates/faction-editor/footer.hbs`,
+
+    // Service Manager template
+    `modules/${MODULE_ID}/templates/service-manager.hbs`
   ];
 
   try {
@@ -296,7 +317,7 @@ export function registerReadyHooks() {
 /**
  * Initialize all module handlers
  */
-function initializeHandlers() {
+async function initializeHandlers() {
   try {
     // Create handler instances
     handlers.quest = new QuestHandler();
@@ -323,12 +344,43 @@ function initializeHandlers() {
       game.bobsnpc.handlers = handlers;
     }
 
+    // Register all service executors
+    registerServiceExecutors();
+
+    // Initialize the service database
+    handlers.serviceDatabase = new ServiceDatabase();
+    await handlers.serviceDatabase.initialize();
+
     // Register service approval hooks for GM notifications
     registerServiceApprovalHooks();
 
     console.log(`${MODULE_ID} | Handlers initialized`);
   } catch (error) {
     console.error(`${MODULE_ID} | Failed to initialize handlers:`, error);
+  }
+}
+
+/**
+ * Register all service executors with the executor registry.
+ * Order matters: generic must be first (it's the fallback).
+ */
+function registerServiceExecutors() {
+  try {
+    registerExecutor(GenericExecutor);
+    registerExecutor(IdentifyExecutor);
+    registerExecutor(AppraiseExecutor);
+    registerExecutor(RepairExecutor);
+    registerExecutor(EnchantExecutor);
+    registerExecutor(HealingExecutor);
+    registerExecutor(RestExecutor);
+    registerExecutor(TrainingExecutor);
+    registerExecutor(InformationExecutor);
+    registerExecutor(ItemModificationExecutor);
+    registerExecutor(ItemCreationExecutor);
+    registerExecutor(FinancialExecutor);
+    console.log(`${MODULE_ID} | Service executors registered`);
+  } catch (error) {
+    console.error(`${MODULE_ID} | Failed to register service executors:`, error);
   }
 }
 

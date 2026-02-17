@@ -24,6 +24,7 @@ import { ShopManager } from "./apps/shop-manager.mjs";
 import { ShopEditor } from "./apps/shop-editor.mjs";
 import { EnchantmentManager } from "./apps/enchantment-manager.mjs";
 import { ServiceOrdersWindow } from "./apps/service-orders.mjs";
+import { ServiceDatabaseManager } from "./apps/service-database-manager.mjs";
 
 /**
  * Singleton instances of UI applications
@@ -1485,6 +1486,19 @@ class UIAPI {
     const window = ServiceOrdersWindow.open(playerActorUuid, merchantId);
     console.log(`${MODULE_ID} | Opening service orders for ${playerActorUuid}`);
     return window;
+  }
+
+  /**
+   * Open Service Database Manager (GM only)
+   * Manage service templates, pending requests, active orders, and global settings.
+   */
+  openServiceManager() {
+    if (!game.user.isGM) {
+      ui.notifications.warn(game.i18n.localize("BOBSNPC.Errors.GMOnly"));
+      return;
+    }
+    Hooks.call(`${MODULE_ID}.openServiceManager`);
+    return ServiceDatabaseManager.open();
   }
 
   /**

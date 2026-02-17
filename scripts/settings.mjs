@@ -420,6 +420,24 @@ function registerWorldSettings() {
     default: []
   });
 
+  // Service database (custom templates)
+  game.settings.register(MODULE_ID, "serviceDatabase", {
+    name: "Service Database",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: { templates: [], savedAt: 0 }
+  });
+
+  // Global approval defaults per service category
+  game.settings.register(MODULE_ID, "globalApprovalDefaults", {
+    name: "Global Approval Defaults",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {}
+  });
+
   // Service duration in hours (how long repair/enchant takes)
   game.settings.register(MODULE_ID, "repairDuration", {
     name: "BOBSNPC.Settings.RepairDuration.Name",

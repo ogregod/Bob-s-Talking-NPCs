@@ -7,11 +7,9 @@ const MODULE_ID = "bobs-talking-npcs";
 
 import { localize } from "../utils/helpers.mjs";
 import {
-  ShopType,
   BusinessCategory,
   BusinessType,
-  MerchantTemplates,
-  createMerchantFromTemplate
+  createMerchant
 } from "../data/merchant-model.mjs";
 import {
   getBusinessDefinition,
@@ -153,24 +151,17 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       { value: "all", label: localize("ShopManager.AllTypes"), selected: this._typeFilter === "all" }
     ];
 
-    // Add legacy ShopType options
-    for (const [key, value] of Object.entries(ShopType)) {
+    // Add BusinessType options for filtering
+    for (const [key, value] of Object.entries(BusinessType)) {
       typeOptions.push({
         value,
-        label: localize(`ShopTypes.${key}`),
+        label: localize(`BusinessTypes.${key}`) || key.replace(/_/g, " "),
         selected: this._typeFilter === value
       });
     }
 
-    // Build legacy template options (kept for backward compat)
-    const templates = Object.entries(MerchantTemplates).map(([key, template]) => ({
-      key,
-      name: template.name,
-      type: template.type,
-      icon: template.icon || "fa-store",
-      color: template.color || "#ff9800",
-      description: this._getTemplateDescription(key)
-    }));
+    // Legacy templates removed - use business registry templates instead
+    const templates = [];
 
     // Build categorized business type templates from registry
     const businessCategories = this._prepareCategorizedTemplates();
@@ -212,8 +203,10 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
    * @returns {string}
    */
   _getTypeLabel(type) {
-    const key = Object.keys(ShopType).find(k => ShopType[k] === type);
-    return key ? localize(`ShopTypes.${key}`) : type;
+    // Try BusinessType localization first, fall back to raw type
+    const key = Object.keys(BusinessType).find(k => BusinessType[k] === type);
+    if (key) return localize(`BusinessTypes.${key}`) || key.replace(/_/g, " ");
+    return type || "Unknown";
   }
 
   /**
@@ -223,23 +216,27 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   _getTypeIcon(type) {
     const icons = {
-      [ShopType.GENERAL]: "fa-store",
-      [ShopType.WEAPONS]: "fa-sword",
-      [ShopType.ARMOR]: "fa-shield",
-      [ShopType.MAGIC]: "fa-wand-sparkles",
-      [ShopType.POTIONS]: "fa-flask",
-      [ShopType.SCROLLS]: "fa-scroll",
-      [ShopType.TOOLS]: "fa-wrench",
-      [ShopType.FOOD]: "fa-utensils",
-      [ShopType.JEWELRY]: "fa-gem",
-      [ShopType.BLACKSMITH]: "fa-hammer",
-      [ShopType.TAILOR]: "fa-scissors",
-      [ShopType.STABLE]: "fa-horse",
-      [ShopType.INN]: "fa-bed",
-      [ShopType.BLACK_MARKET]: "fa-mask",
-      [ShopType.CUSTOM]: "fa-cog"
+      general: "fa-store",
+      weapons: "fa-sword",
+      armor: "fa-shield",
+      magic: "fa-wand-sparkles",
+      potions: "fa-flask",
+      scrolls: "fa-scroll",
+      tools: "fa-wrench",
+      food: "fa-utensils",
+      jewelry: "fa-gem",
+      blacksmith: "fa-hammer",
+      tailor: "fa-scissors",
+      stable: "fa-horse",
+      inn: "fa-bed",
+      blackMarket: "fa-mask",
+      custom: "fa-cog"
     };
-    return icons[type] || "fa-store";
+    // Check by legacy type string, then try to find from business registry
+    if (icons[type]) return icons[type];
+    // Look up from business registry definition
+    const def = game.bobsnpc?.handlers?.merchant?._getBusinessDefinition?.(type);
+    return def?.icon || "fa-store";
   }
 
   /**
@@ -332,7 +329,9 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Create shop from template
     const handler = getMerchantHandler();
-    const shopData = createMerchantFromTemplate(templateKey);
+    // Use business registry to create merchant from template
+    const { createMerchantFromBusinessType } = await import("../data/business-registry.mjs");
+    const shopData = createMerchantFromBusinessType?.(templateKey) || createMerchant({ name: "New Shop" });
     let shop;
 
     if (handler?.createMerchant) {

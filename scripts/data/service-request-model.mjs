@@ -29,7 +29,8 @@ export const ServiceRequestStatus = Object.freeze({
 });
 
 /**
- * Service types requiring approval
+ * Legacy service types requiring approval (kept for backward compatibility)
+ * @deprecated Use the approval mode system instead
  */
 export const ApprovalRequiredServices = Object.freeze({
   REPAIR: "repair",
@@ -37,15 +38,65 @@ export const ApprovalRequiredServices = Object.freeze({
 });
 
 /**
- * Create a new service request
+ * Determine whether a service requires GM approval.
+ * Priority chain: per-service override > shop default > template default > global default > "auto"
+ * @param {string} serviceType - The service type
+ * @param {object} [serviceDef] - The per-shop service definition (from createServiceDefinition)
+ * @param {object} [merchant] - The merchant data object
+ * @returns {boolean}
+ */
+export function requiresApproval(serviceType, serviceDef = null, merchant = null) {
+  const MODULE_ID = "bobs-talking-npcs";
+
+  // 1. Per-service override on the shop
+  if (serviceDef?.approvalMode && serviceDef.approvalMode !== "inherit") {
+    return serviceDef.approvalMode === "request";
+  }
+
+  // 2. Shop-level default
+  if (merchant?.defaultApprovalMode && merchant.defaultApprovalMode !== "inherit") {
+    return merchant.defaultApprovalMode === "request";
+  }
+
+  // 3. Template default from service database
+  try {
+    const db = game.bobsnpc?.handlers?.serviceDatabase;
+    if (db) {
+      const template = db.getTemplateByType(serviceType);
+      if (template?.defaultApprovalMode) {
+        return template.defaultApprovalMode === "request";
+      }
+    }
+  } catch (_) { /* ignore */ }
+
+  // 4. Global default per category
+  try {
+    const globalDefaults = game.settings.get(MODULE_ID, "globalApprovalDefaults") || {};
+    if (serviceDef?.category && globalDefaults[serviceDef.category]) {
+      return globalDefaults[serviceDef.category] === "request";
+    }
+  } catch (_) { /* ignore */ }
+
+  // 5. Fallback: auto
+  return false;
+}
+
+/**
+ * Create a new service request.
+ * Supports both item-escrow services (repair/enchant) and non-item services (healing, training, etc.)
  * @param {object} data - Request data
  * @returns {object}
  */
 export function createServiceRequest(data) {
   return {
     id: data.id || generateId(),
-    type: data.type,                      // "repair" or "enchant"
+    type: data.type,                      // Any ServiceType value
     status: data.status || ServiceRequestStatus.PENDING,
+
+    // Service display info
+    serviceName: data.serviceName || data.type || "Service",
+    serviceIcon: data.serviceIcon || "fa-cog",
+    serviceCategory: data.serviceCategory || null,
 
     // Merchant info
     merchantId: data.merchantId,
@@ -57,12 +108,15 @@ export function createServiceRequest(data) {
     playerName: data.playerName || "Unknown Player",
     playerId: data.playerId,              // User ID for notifications
 
-    // Item info
-    itemId: data.itemId,
-    itemUuid: data.itemUuid,
-    itemName: data.itemName || "Unknown Item",
-    itemImg: data.itemImg || "icons/svg/item-bag.svg",
-    itemType: data.itemType,
+    // Item info (optional - not all services need items)
+    itemId: data.itemId || null,
+    itemUuid: data.itemUuid || null,
+    itemName: data.itemName || null,
+    itemImg: data.itemImg || null,
+    itemType: data.itemType || null,
+
+    // Whether this request involves item escrow
+    hasItemEscrow: data.hasItemEscrow ?? (!!data.itemData),
 
     // Enchantment info (for enchant requests)
     enchantmentId: data.enchantmentId || null,
@@ -71,8 +125,11 @@ export function createServiceRequest(data) {
     // Cost
     cost: data.cost || 0,
 
-    // ITEM ESCROW: Full item data backup
+    // ITEM ESCROW: Full item data backup (only for item-escrow services)
     itemData: data.itemData || null,          // item.toObject() - complete item backup for restoration
+
+    // Executor-specific options to pass on approval
+    executorOptions: data.executorOptions || {},
 
     // Queue position tracking
     queuePosition: data.queuePosition ?? 0,   // Position in merchant's queue
@@ -236,7 +293,8 @@ export function calculateReadyGameTime(durationSeconds) {
 }
 
 /**
- * Validate a service request
+ * Validate a service request.
+ * Now supports all service types, not just repair/enchant.
  * @param {object} request - Service request to validate
  * @returns {object} { valid: boolean, errors: string[] }
  */
@@ -245,8 +303,6 @@ export function validateServiceRequest(request) {
 
   if (!request.type) {
     errors.push("Service type is required");
-  } else if (!Object.values(ApprovalRequiredServices).includes(request.type)) {
-    errors.push(`Invalid service type: ${request.type}`);
   }
 
   if (!request.merchantId) {
@@ -257,11 +313,12 @@ export function validateServiceRequest(request) {
     errors.push("Player actor reference is required");
   }
 
-  if (!request.itemId && !request.itemUuid) {
-    errors.push("Item reference is required");
+  // Item is only required for item-escrow services
+  if (request.hasItemEscrow && !request.itemId && !request.itemUuid) {
+    errors.push("Item reference is required for item-escrow services");
   }
 
-  if (request.type === ApprovalRequiredServices.ENCHANT && !request.enchantmentId) {
+  if (request.type === "enchant" && !request.enchantmentId) {
     errors.push("Enchantment ID is required for enchant requests");
   }
 
