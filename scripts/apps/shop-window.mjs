@@ -978,78 +978,9 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     const allServices = [];
-    const svc = merchant.services;
-
-    // --- Legacy built-in services (identify, repair, appraise, enchant) ---
-    const legacyServices = [];
-
-    if (svc.identify) {
-      legacyServices.push({
-        id: "identify",
-        type: "identify",
-        category: "magic",
-        name: localize("Shop.Service.Identify"),
-        description: localize("Shop.Service.IdentifyDesc"),
-        price: svc.identifyPrice || 25,
-        priceFormatted: formatCurrency((svc.identifyPrice || 25) * 100),
-        icon: "fa-search",
-        available: true,
-        priceType: "fixed",
-        basePrice: svc.identifyPrice || 25
-      });
-    }
-
-    if (svc.repair) {
-      const repairPercent = Math.round((svc.repairPricePercent || 0.1) * 100);
-      legacyServices.push({
-        id: "repair",
-        type: "repair",
-        category: "crafting",
-        name: localize("Shop.Service.Repair"),
-        description: localize("Shop.Service.RepairDesc", { percent: repairPercent }),
-        price: null,
-        priceFormatted: `${repairPercent}% of item value`,
-        icon: "fa-wrench",
-        available: true,
-        priceType: "percent",
-        basePrice: null
-      });
-    }
-
-    if (svc.appraise) {
-      legacyServices.push({
-        id: "appraise",
-        type: "appraise",
-        category: "information",
-        name: localize("Shop.Service.Appraise"),
-        description: localize("Shop.Service.AppraiseDesc"),
-        price: svc.appraisePrice || 5,
-        priceFormatted: formatCurrency((svc.appraisePrice || 5) * 100),
-        icon: "fa-magnifying-glass-dollar",
-        available: true,
-        priceType: "fixed",
-        basePrice: svc.appraisePrice || 5
-      });
-    }
-
-    if (svc.enchant) {
-      legacyServices.push({
-        id: "enchant",
-        type: "enchant",
-        category: "magic",
-        name: localize("Shop.Service.Enchant"),
-        description: localize("Shop.Service.EnchantDesc"),
-        price: null,
-        priceFormatted: localize("Shop.Service.PriceVaries"),
-        icon: "fa-wand-magic-sparkles",
-        available: true,
-        priceType: "variable",
-        basePrice: null
-      });
-    }
 
     // Track types we've already included to prevent duplicates
-    const includedTypes = new Set(legacyServices.map(s => s.type));
+    const includedTypes = new Set();
 
     // --- Registry-defined tiers ---
     const businessType = merchant.businessType;
@@ -1061,7 +992,6 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     if (def) {
       // Core services from registry
       coreServices = def.coreServices
-        .filter(s => !includedTypes.has(s.type))
         .map(s => {
           const entry = this._prepareServiceEntry(s);
           includedTypes.add(s.type);
@@ -1080,9 +1010,6 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
           return entry;
         });
     }
-
-    // Legacy services go into core tier (they're standard services for this shop)
-    coreServices = [...legacyServices, ...coreServices];
 
     // --- Custom services from servicesList (GM-added) ---
     const customServices = [];

@@ -838,6 +838,7 @@
       "SessionNotFound": "Shop session not found",
       "ShopNotFound": "Shop not found",
       "ItemNotFound": "Item not found",
+      "ItemAlreadyIdentified": "This item is already identified",
       "ShopDoesNotBuy": "This shop does not buy items",
       "ShopCannotAfford": "The shop cannot afford to buy that",
       "PurchaseComplete": "Purchase complete",
@@ -1060,6 +1061,7 @@
       "AvailableAt": "Available enchantments at this shop:",
       "TotalCost": "Total Cost: {cost}",
       "NoEnchantments": "No enchantments configured",
+      "NotFound": "Enchantment not found",
       "NoEnchantmentsHint": "The GM needs to set up available enchantments for this shop.",
       "ConfirmDelete": "Are you sure you want to delete this enchantment?",
       "Saved": "Enchantment saved",
@@ -1247,24 +1249,6 @@
         "CategoryOnly": "{category}",
         "WithSubcategory": "{category} ({subcategory})"
       }
-    },
-
-    "ShopTypes": {
-      "GENERAL": "General Store",
-      "WEAPONS": "Weapons Shop",
-      "ARMOR": "Armor Shop",
-      "MAGIC": "Magic Shop",
-      "POTIONS": "Potions Shop",
-      "SCROLLS": "Scroll Shop",
-      "TOOLS": "Tools & Supplies",
-      "FOOD": "Food & Provisions",
-      "JEWELRY": "Jewelry Shop",
-      "BLACKSMITH": "Blacksmith",
-      "TAILOR": "Tailor",
-      "STABLE": "Stable",
-      "INN": "Inn & Tavern",
-      "BLACK_MARKET": "Black Market",
-      "CUSTOM": "Custom"
     },
 
     "BusinessCategories": {
@@ -1726,6 +1710,10 @@
       }
     },
 
+    "ServiceManager": {
+      "Title": "Service Database Manager"
+    },
+
     "ShopEditor": {
       "Title": "Shop Editor",
       "TitleNew": "Create New Shop",
@@ -1744,7 +1732,6 @@
       "BasicInfo": "Basic Information",
       "ShopName": "Shop Name",
       "ShopNamePlaceholder": "Enter shop name...",
-      "ShopType": "Shop Type",
       "BusinessCategory": "Business Category",
       "BusinessType": "Business Type",
       "SelectBusinessType": "-- Select Business Type --",

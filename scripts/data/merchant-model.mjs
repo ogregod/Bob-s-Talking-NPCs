@@ -719,7 +719,7 @@ export function createMerchant(data = {}) {
     id: data.id || generateId(),
     name: data.name || "Shop",
     description: data.description || "",
-    type: data.type || ShopType.GENERAL,
+    type: data.type || "general",
     businessType: data.businessType || null,
     businessCategory: data.businessCategory || null,
     customType: data.customType || null,

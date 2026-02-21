@@ -16,7 +16,7 @@ BusinessTypeRegistry.set(BusinessType.VILLAGE_BLACKSMITH, {
   icon: "fa-hammer",
   color: "#8B4513",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: "blacksmith",
+
   pricing: { baseBuyMultiplier: 1.1, baseSellMultiplier: 0.6 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["weapon", "equipment", "tool"] },
@@ -44,7 +44,7 @@ BusinessTypeRegistry.set(BusinessType.MASTER_WEAPONSMITH, {
   icon: "fa-gavel",
   color: "#B22222",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: "weapons",
+
   pricing: { baseBuyMultiplier: 1.3, baseSellMultiplier: 0.55 },
   haggling: { enabled: true, persuasionDC: 16 },
   buyBack: { enabled: true, itemTypes: ["weapon"] },
@@ -73,7 +73,7 @@ BusinessTypeRegistry.set(BusinessType.ARMORER, {
   icon: "fa-shield-halved",
   color: "#4682B4",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: "armor",
+
   pricing: { baseBuyMultiplier: 1.2, baseSellMultiplier: 0.55 },
   haggling: { enabled: true, persuasionDC: 15 },
   buyBack: { enabled: true, itemTypes: ["equipment"] },
@@ -102,7 +102,7 @@ BusinessTypeRegistry.set(BusinessType.FARRIER, {
   icon: "fa-horse-head",
   color: "#8B7355",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 12 },
   buyBack: { enabled: false },
@@ -130,7 +130,7 @@ BusinessTypeRegistry.set(BusinessType.LOCKSMITH, {
   icon: "fa-key",
   color: "#696969",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.2, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 15 },
   buyBack: { enabled: true, itemTypes: ["tool"] },
@@ -158,7 +158,7 @@ BusinessTypeRegistry.set(BusinessType.SMELTER_REFINERY, {
   icon: "fa-fire-flame-curved",
   color: "#CD853F",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.7 },
   haggling: { enabled: true, persuasionDC: 13 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -186,7 +186,7 @@ BusinessTypeRegistry.set(BusinessType.STONEMASON, {
   icon: "fa-landmark",
   color: "#808080",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.1, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: false },
@@ -214,7 +214,7 @@ BusinessTypeRegistry.set(BusinessType.FINE_METALSMITH, {
   icon: "fa-ring",
   color: "#DAA520",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.4, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 16 },
   buyBack: { enabled: true, itemTypes: ["equipment", "loot"] },
@@ -247,7 +247,7 @@ BusinessTypeRegistry.set(BusinessType.CARPENTER_JOINER, {
   icon: "fa-tree",
   color: "#D2691E",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 13 },
   buyBack: { enabled: false },
@@ -275,7 +275,7 @@ BusinessTypeRegistry.set(BusinessType.COOPER, {
   icon: "fa-wine-bottle",
   color: "#A0522D",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 12 },
   buyBack: { enabled: false },
@@ -302,7 +302,7 @@ BusinessTypeRegistry.set(BusinessType.WHEELWRIGHT, {
   icon: "fa-dharmachakra",
   color: "#8B6914",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 13 },
   buyBack: { enabled: false },
@@ -329,7 +329,7 @@ BusinessTypeRegistry.set(BusinessType.BOWYER, {
   icon: "fa-bullseye",
   color: "#556B2F",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.2, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["weapon"] },
@@ -357,7 +357,7 @@ BusinessTypeRegistry.set(BusinessType.FLETCHER, {
   icon: "fa-location-arrow",
   color: "#6B8E23",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.1, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 12 },
   buyBack: { enabled: true, itemTypes: ["consumable"] },
@@ -384,7 +384,7 @@ BusinessTypeRegistry.set(BusinessType.TANNER, {
   icon: "fa-cow",
   color: "#8B4513",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.6 },
   haggling: { enabled: true, persuasionDC: 12 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -410,7 +410,7 @@ BusinessTypeRegistry.set(BusinessType.LEATHERWORKER, {
   icon: "fa-vest",
   color: "#A0522D",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.1, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 13 },
   buyBack: { enabled: true, itemTypes: ["equipment"] },
@@ -438,7 +438,7 @@ BusinessTypeRegistry.set(BusinessType.COBBLER, {
   icon: "fa-shoe-prints",
   color: "#654321",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.1, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 12 },
   buyBack: { enabled: true, itemTypes: ["equipment"] },
@@ -466,7 +466,7 @@ BusinessTypeRegistry.set(BusinessType.TAILOR, {
   icon: "fa-scissors",
   color: "#8B008B",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: "tailor",
+
   pricing: { baseBuyMultiplier: 1.1, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 13 },
   buyBack: { enabled: true, itemTypes: ["equipment"] },
@@ -495,7 +495,7 @@ BusinessTypeRegistry.set(BusinessType.WEAVER_DYER, {
   icon: "fa-palette",
   color: "#DB7093",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 12 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -523,7 +523,7 @@ BusinessTypeRegistry.set(BusinessType.ROPEMAKER, {
   icon: "fa-link",
   color: "#BDB76B",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 11 },
   buyBack: { enabled: false },
@@ -554,7 +554,7 @@ BusinessTypeRegistry.set(BusinessType.APOTHECARY, {
   icon: "fa-mortar-pestle",
   color: "#228B22",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: "potions",
+
   pricing: { baseBuyMultiplier: 1.2, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["consumable", "loot"] },
@@ -582,7 +582,7 @@ BusinessTypeRegistry.set(BusinessType.ALCHEMIST, {
   icon: "fa-flask",
   color: "#9932CC",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.3, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 15 },
   buyBack: { enabled: true, itemTypes: ["consumable", "loot"] },
@@ -610,7 +610,7 @@ BusinessTypeRegistry.set(BusinessType.WIZARDS_TOWER, {
   icon: "fa-hat-wizard",
   color: "#4169E1",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: "magic",
+
   pricing: { baseBuyMultiplier: 1.5, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 18 },
   buyBack: { enabled: true, itemTypes: ["consumable", "loot"] },
@@ -639,7 +639,7 @@ BusinessTypeRegistry.set(BusinessType.SCRIBE_SCRIVENER, {
   icon: "fa-feather-pointed",
   color: "#DEB887",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: "scrolls",
+
   pricing: { baseBuyMultiplier: 1.2, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["consumable", "loot"] },
@@ -667,7 +667,7 @@ BusinessTypeRegistry.set(BusinessType.CARTOGRAPHER, {
   icon: "fa-map",
   color: "#F4A460",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.2, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -694,7 +694,7 @@ BusinessTypeRegistry.set(BusinessType.ENCHANTER, {
   icon: "fa-wand-sparkles",
   color: "#9400D3",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.5, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 17 },
   buyBack: { enabled: true, itemTypes: ["weapon", "equipment"] },
@@ -722,7 +722,7 @@ BusinessTypeRegistry.set(BusinessType.ENGINEER_TINKERER, {
   icon: "fa-gears",
   color: "#B8860B",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.2, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["tool", "weapon"] },
@@ -750,7 +750,7 @@ BusinessTypeRegistry.set(BusinessType.GLASSBLOWER, {
   icon: "fa-wine-glass",
   color: "#87CEEB",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.1, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 13 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -778,7 +778,7 @@ BusinessTypeRegistry.set(BusinessType.CHANDLER, {
   icon: "fa-fire",
   color: "#FFD700",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 11 },
   buyBack: { enabled: false },
@@ -809,7 +809,7 @@ BusinessTypeRegistry.set(BusinessType.GENERAL_STORE, {
   icon: "fa-store",
   color: "#8B7D6B",
   displayMode: ShopDisplayMode.SHOP,
-  legacyShopType: "general",
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 13 },
   buyBack: { enabled: true, itemTypes: [] },
@@ -837,7 +837,7 @@ BusinessTypeRegistry.set(BusinessType.BUTCHER, {
   icon: "fa-drumstick-bite",
   color: "#B22222",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 12 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -864,7 +864,7 @@ BusinessTypeRegistry.set(BusinessType.BAKER, {
   icon: "fa-bread-slice",
   color: "#DEB887",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 11 },
   buyBack: { enabled: false },
@@ -892,7 +892,7 @@ BusinessTypeRegistry.set(BusinessType.MILLER, {
   icon: "fa-wheat-awn",
   color: "#F5DEB3",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 11 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -918,7 +918,7 @@ BusinessTypeRegistry.set(BusinessType.BREWER_VINTNER, {
   icon: "fa-beer-mug-empty",
   color: "#722F37",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 13 },
   buyBack: { enabled: true, itemTypes: ["consumable"] },
@@ -946,7 +946,7 @@ BusinessTypeRegistry.set(BusinessType.FISHMONGER, {
   icon: "fa-fish",
   color: "#5F9EA0",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 11 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -977,7 +977,7 @@ BusinessTypeRegistry.set(BusinessType.INN, {
   icon: "fa-bed",
   color: "#B8860B",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: "inn",
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 13 },
   buyBack: { enabled: false },
@@ -1007,7 +1007,7 @@ BusinessTypeRegistry.set(BusinessType.TAVERN, {
   icon: "fa-beer-mug-empty",
   color: "#8B4513",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 12 },
   buyBack: { enabled: false },
@@ -1037,7 +1037,7 @@ BusinessTypeRegistry.set(BusinessType.STABLE_LIVERY, {
   icon: "fa-horse",
   color: "#8B7355",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: "stable",
+
   pricing: { baseBuyMultiplier: 1.1, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["equipment"] },
@@ -1066,7 +1066,7 @@ BusinessTypeRegistry.set(BusinessType.MENAGERIE, {
   icon: "fa-dragon",
   color: "#2E8B57",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.5, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 16 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -1094,7 +1094,7 @@ BusinessTypeRegistry.set(BusinessType.ANIMAL_HANDLER, {
   icon: "fa-shield-dog",
   color: "#6B8E23",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 13 },
   buyBack: { enabled: false },
@@ -1122,7 +1122,7 @@ BusinessTypeRegistry.set(BusinessType.COURIER_POST, {
   icon: "fa-envelope",
   color: "#4169E1",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: false },
@@ -1150,7 +1150,7 @@ BusinessTypeRegistry.set(BusinessType.GUIDE_RANGER_LODGE, {
   icon: "fa-compass",
   color: "#2F4F4F",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.1, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["weapon", "tool"] },
@@ -1182,7 +1182,7 @@ BusinessTypeRegistry.set(BusinessType.TOWN_HALL, {
   icon: "fa-building-columns",
   color: "#708090",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: false, persuasionDC: 18 },
   buyBack: { enabled: false },
@@ -1211,7 +1211,7 @@ BusinessTypeRegistry.set(BusinessType.BANK_EXCHANGE, {
   icon: "fa-landmark",
   color: "#DAA520",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: false, persuasionDC: 18 },
   buyBack: { enabled: false },
@@ -1240,7 +1240,7 @@ BusinessTypeRegistry.set(BusinessType.TEMPLE_LARGE, {
   icon: "fa-place-of-worship",
   color: "#FFD700",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: false, persuasionDC: 16 },
   buyBack: { enabled: false },
@@ -1270,7 +1270,7 @@ BusinessTypeRegistry.set(BusinessType.SHRINE_SMALL, {
   icon: "fa-hands-praying",
   color: "#C0C0C0",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: false, persuasionDC: 12 },
   buyBack: { enabled: false },
@@ -1298,7 +1298,7 @@ BusinessTypeRegistry.set(BusinessType.UNDERTAKER, {
   icon: "fa-cross",
   color: "#2F2F2F",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: false, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -1326,7 +1326,7 @@ BusinessTypeRegistry.set(BusinessType.JAIL_STOCKS, {
   icon: "fa-scale-balanced",
   color: "#4A4A4A",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: false, persuasionDC: 16 },
   buyBack: { enabled: false },
@@ -1358,7 +1358,7 @@ BusinessTypeRegistry.set(BusinessType.BARBER_SURGEON, {
   icon: "fa-scissors",
   color: "#DC143C",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 12 },
   buyBack: { enabled: false },
@@ -1386,7 +1386,7 @@ BusinessTypeRegistry.set(BusinessType.BATHHOUSE, {
   icon: "fa-bath",
   color: "#4682B4",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 11 },
   buyBack: { enabled: false },
@@ -1415,7 +1415,7 @@ BusinessTypeRegistry.set(BusinessType.ARTISTS_STUDIO, {
   icon: "fa-paintbrush",
   color: "#FF6347",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.3, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -1443,7 +1443,7 @@ BusinessTypeRegistry.set(BusinessType.LUTHIER, {
   icon: "fa-guitar",
   color: "#CD853F",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.2, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["tool"] },
@@ -1471,7 +1471,7 @@ BusinessTypeRegistry.set(BusinessType.JEWELER, {
   icon: "fa-gem",
   color: "#E6E6FA",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: "jewelry",
+
   pricing: { baseBuyMultiplier: 1.4, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 16 },
   buyBack: { enabled: true, itemTypes: ["equipment", "loot"] },
@@ -1504,7 +1504,7 @@ BusinessTypeRegistry.set(BusinessType.MERCENARY_GUILD, {
   icon: "fa-swords",
   color: "#8B0000",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.2, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 16 },
   buyBack: { enabled: true, itemTypes: ["weapon", "equipment"] },
@@ -1532,7 +1532,7 @@ BusinessTypeRegistry.set(BusinessType.PAWN_SHOP_FENCE, {
   icon: "fa-mask",
   color: "#2F4F4F",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: "blackMarket",
+
   pricing: { baseBuyMultiplier: 0.8, baseSellMultiplier: 0.7 },
   haggling: { enabled: true, persuasionDC: 15 },
   buyBack: { enabled: true, itemTypes: [] },
@@ -1560,7 +1560,7 @@ BusinessTypeRegistry.set(BusinessType.BROTHEL, {
   icon: "fa-heart",
   color: "#C71585",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: false },
@@ -1588,7 +1588,7 @@ BusinessTypeRegistry.set(BusinessType.SHIPYARD, {
   icon: "fa-ship",
   color: "#2F4F4F",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.2, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 15 },
   buyBack: { enabled: false },
@@ -1616,7 +1616,7 @@ BusinessTypeRegistry.set(BusinessType.NAVIGATOR_HARBOR, {
   icon: "fa-anchor",
   color: "#4682B4",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.1, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: false },
@@ -1645,7 +1645,7 @@ BusinessTypeRegistry.set(BusinessType.MINING_OFFICE, {
   icon: "fa-helmet-safety",
   color: "#A0522D",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.6 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -1673,7 +1673,7 @@ BusinessTypeRegistry.set(BusinessType.ASYLUM, {
   icon: "fa-brain",
   color: "#696969",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: false, persuasionDC: 14 },
   buyBack: { enabled: false },
@@ -1701,7 +1701,7 @@ BusinessTypeRegistry.set(BusinessType.ORPHANAGE, {
   icon: "fa-children",
   color: "#DEB887",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: false, persuasionDC: 10 },
   buyBack: { enabled: false },
@@ -1729,7 +1729,7 @@ BusinessTypeRegistry.set(BusinessType.LIBRARY_ARCHIVES, {
   icon: "fa-book",
   color: "#8B4513",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: false, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: ["loot"] },
@@ -1757,7 +1757,7 @@ BusinessTypeRegistry.set(BusinessType.GLASSHOUSE, {
   icon: "fa-seedling",
   color: "#228B22",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.2, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 13 },
   buyBack: { enabled: true, itemTypes: ["consumable", "loot"] },
@@ -1785,7 +1785,7 @@ BusinessTypeRegistry.set(BusinessType.PAPER_MAKER, {
   icon: "fa-note-sticky",
   color: "#F5F5DC",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 11 },
   buyBack: { enabled: false },
@@ -1812,7 +1812,7 @@ BusinessTypeRegistry.set(BusinessType.POTTER_CERAMICS, {
   icon: "fa-mug-hot",
   color: "#CD853F",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.4 },
   haggling: { enabled: true, persuasionDC: 11 },
   buyBack: { enabled: false },
@@ -1839,7 +1839,7 @@ BusinessTypeRegistry.set(BusinessType.FALCONER, {
   icon: "fa-feather",
   color: "#8B6914",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.3, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 15 },
   buyBack: { enabled: false },
@@ -1867,7 +1867,7 @@ BusinessTypeRegistry.set(BusinessType.INTERPRETER, {
   icon: "fa-language",
   color: "#4682B4",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 13 },
   buyBack: { enabled: false },
@@ -1895,7 +1895,7 @@ BusinessTypeRegistry.set(BusinessType.MONEYLENDER, {
   icon: "fa-hand-holding-dollar",
   color: "#556B2F",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 17 },
   buyBack: { enabled: false },
@@ -1923,7 +1923,7 @@ BusinessTypeRegistry.set(BusinessType.TOWN_CRIER, {
   icon: "fa-bullhorn",
   color: "#FF8C00",
   displayMode: ShopDisplayMode.SERVICES,
-  legacyShopType: null,
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.3 },
   haggling: { enabled: true, persuasionDC: 11 },
   buyBack: { enabled: false },
@@ -1954,7 +1954,7 @@ BusinessTypeRegistry.set(BusinessType.CUSTOM, {
   icon: "fa-wand-magic-sparkles",
   color: "#9370DB",
   displayMode: ShopDisplayMode.MIXED,
-  legacyShopType: "custom",
+
   pricing: { baseBuyMultiplier: 1.0, baseSellMultiplier: 0.5 },
   haggling: { enabled: true, persuasionDC: 14 },
   buyBack: { enabled: true, itemTypes: [] },
@@ -2108,7 +2108,7 @@ export function createMerchantFromBusinessType(businessType, overrides = {}) {
   return createMerchant({
     name: def.name,
     description: def.description,
-    type: def.legacyShopType || "custom",
+    type: def.type,
     businessType: def.type,
     businessCategory: def.category,
     icon: def.icon,

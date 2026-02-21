@@ -8,8 +8,7 @@ const MODULE_ID = "bobs-talking-npcs";
 import { localize } from "../utils/helpers.mjs";
 import {
   BusinessCategory,
-  BusinessType,
-  createMerchant
+  BusinessType
 } from "../data/merchant-model.mjs";
 import {
   getBusinessDefinition,
@@ -62,7 +61,6 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       filterType: ShopManager.#onFilterType,
       search: ShopManager.#onSearch,
       clearSearch: ShopManager.#onClearSearch,
-      useTemplate: ShopManager.#onUseTemplate,
       useBusinessTemplate: ShopManager.#onUseBusinessTemplate
     }
   };
@@ -160,9 +158,6 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       });
     }
 
-    // Legacy templates removed - use business registry templates instead
-    const templates = [];
-
     // Build categorized business type templates from registry
     const businessCategories = this._prepareCategorizedTemplates();
 
@@ -180,7 +175,6 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       totalShops,
       hasShops: enrichedShops.length > 0,
       typeOptions,
-      templates,
       businessCategories,
       hasBusinessCategories: businessCategories.length > 0,
       searchFilter: this._searchFilter,
@@ -215,56 +209,9 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
    * @returns {string}
    */
   _getTypeIcon(type) {
-    const icons = {
-      general: "fa-store",
-      weapons: "fa-sword",
-      armor: "fa-shield",
-      magic: "fa-wand-sparkles",
-      potions: "fa-flask",
-      scrolls: "fa-scroll",
-      tools: "fa-wrench",
-      food: "fa-utensils",
-      jewelry: "fa-gem",
-      blacksmith: "fa-hammer",
-      tailor: "fa-scissors",
-      stable: "fa-horse",
-      inn: "fa-bed",
-      blackMarket: "fa-mask",
-      custom: "fa-cog"
-    };
-    // Check by legacy type string, then try to find from business registry
-    if (icons[type]) return icons[type];
     // Look up from business registry definition
-    const def = game.bobsnpc?.handlers?.merchant?._getBusinessDefinition?.(type);
+    const def = getBusinessDefinition(type);
     return def?.icon || "fa-store";
-  }
-
-  /**
-   * Get template description
-   * @param {string} templateKey - Template key
-   * @returns {string}
-   */
-  _getTemplateDescription(templateKey) {
-    const descriptions = {
-      general_store: "A versatile shop selling common goods and supplies",
-      blacksmith: "Weapons, armor, and repair services",
-      alchemist: "Potions, ingredients, and identification services",
-      magic_shop: "Magical items and enchanting services",
-      fence: "Black market goods, no questions asked",
-      inn: "Food, drink, rooms, and rest",
-      tailor: "Custom clothing, alterations, and repairs",
-      stable: "Horse boarding, rentals, and mount care",
-      temple: "Healing, blessings, and divine services",
-      guild_hall: "Training, contracts, and guild services",
-      bank: "Currency exchange, storage, and transfers",
-      tavern: "Drinks, meals, gambling, and rumors",
-      jeweler: "Gems, jewelry, appraisals, and engraving",
-      scribe: "Scrolls, translations, and research",
-      arena: "Combat, training, and wagering",
-      dock_master: "Ship passage, warehouse storage, and port services",
-      blank: "Start from scratch with default settings"
-    };
-    return descriptions[templateKey] || "";
   }
 
   // ==================== Helper Methods ====================
@@ -317,46 +264,6 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
     if (templateSection) {
       templateSection.classList.toggle("visible");
     }
-  }
-
-  /**
-   * Use a template to create shop
-   * @param {Event} event
-   * @param {HTMLElement} target
-   */
-  static async #onUseTemplate(event, target) {
-    const templateKey = target.dataset.template;
-
-    // Create shop from template
-    const handler = getMerchantHandler();
-    // Use business registry to create merchant from template
-    const { createMerchantFromBusinessType } = await import("../data/business-registry.mjs");
-    const shopData = createMerchantFromBusinessType?.(templateKey) || createMerchant({ name: "New Shop" });
-    let shop;
-
-    if (handler?.createMerchant) {
-      shop = await handler.createMerchant(shopData);
-    } else {
-      // Fall back to settings storage
-      shop = shopData;
-      await this._saveShopToSettings(shop);
-    }
-
-    // Hide template picker
-    const templateSection = this.element.querySelector(".shop-templates");
-    if (templateSection) {
-      templateSection.classList.remove("visible");
-    }
-
-    // Open editor for the new shop
-    const { ShopEditor } = await import("./shop-editor.mjs");
-    const editor = new ShopEditor({ shopId: shop.id });
-    editor.render(true);
-
-    // Refresh list
-    await this.render();
-
-    ui.notifications.info(localize("ShopManager.ShopCreated", { name: shop.name }));
   }
 
   /**

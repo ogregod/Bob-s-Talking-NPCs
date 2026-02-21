@@ -348,13 +348,6 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       }
     }
 
-    // Build options for selects - use BusinessType instead of legacy ShopType
-    const typeOptions = Object.entries(BusinessType).map(([key, value]) => ({
-      value,
-      label: localize(`BusinessTypes.${key}`) || key.replace(/_/g, " "),
-      selected: this._shop.businessType === value
-    }));
-
     // Business category options
     const businessCategoryOptions = [
       { value: "", label: localize("ShopEditor.AllCategories"), selected: !this._shop.businessCategory },
@@ -410,7 +403,6 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       tabs: this._getTabs(),
 
       // Basic tab
-      typeOptions,
       businessCategoryOptions,
       businessTypeOptions,
       displayModeOptions,
@@ -692,7 +684,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
     this._shop.businessType = businessType;
     this._shop.businessCategory = def.category;
-    this._shop.type = def.legacyShopType || this._shop.type;
+    this._shop.type = def.type;
     this._shop.displayMode = def.displayMode || this._shop.displayMode;
 
     // Apply registry defaults for icon and color only if they haven't been customized
