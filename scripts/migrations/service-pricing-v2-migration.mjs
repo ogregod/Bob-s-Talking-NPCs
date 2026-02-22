@@ -40,13 +40,25 @@ export async function migrateServicePricingToV2() {
     await game.settings.set(MODULE_ID, MIGRATION_KEY, MIGRATION_VERSION);
 
     console.log(`${MODULE_ID} | Service pricing migration completed successfully`);
-    ui.notifications.info("Service pricing system updated to V2");
+
+    // Only show notification if we're actually migrating from an older version
+    if (currentVersion !== MIGRATION_VERSION) {
+      ui.notifications.info(`Bob's Talking NPCs: Service pricing system updated to v${MIGRATION_VERSION}`);
+    }
 
     return true;
 
   } catch (error) {
     console.error(`${MODULE_ID} | Service pricing migration failed:`, error);
     ui.notifications.error("Service pricing migration failed - check console for details");
+
+    // Still update the version to prevent re-running failed migration
+    try {
+      await game.settings.set(MODULE_ID, MIGRATION_KEY, MIGRATION_VERSION);
+    } catch (e) {
+      console.error(`${MODULE_ID} | Failed to set migration version:`, e);
+    }
+
     return false;
   }
 }
@@ -58,20 +70,26 @@ export async function migrateServicePricingToV2() {
 async function _migrateServiceTemplates() {
   console.log(`${MODULE_ID} | Migrating service templates...`);
 
-  const templates = game.settings.get(MODULE_ID, "serviceTemplates") || [];
-  let migrated = 0;
+  // Check if the setting exists before trying to access it
+  try {
+    const templates = game.settings.get(MODULE_ID, "serviceTemplates") || [];
+    let migrated = 0;
 
-  const migratedTemplates = templates.map(template => {
-    const updated = _upgradeServiceDefinition(template);
-    if (updated !== template) migrated++;
-    return updated;
-  });
+    const migratedTemplates = templates.map(template => {
+      const updated = _upgradeServiceDefinition(template);
+      if (updated !== template) migrated++;
+      return updated;
+    });
 
-  if (migrated > 0) {
-    await game.settings.set(MODULE_ID, "serviceTemplates", migratedTemplates);
-    console.log(`${MODULE_ID} | Migrated ${migrated} service templates`);
-  } else {
-    console.log(`${MODULE_ID} | No service templates needed migration`);
+    if (migrated > 0) {
+      await game.settings.set(MODULE_ID, "serviceTemplates", migratedTemplates);
+      console.log(`${MODULE_ID} | Migrated ${migrated} service templates`);
+    } else {
+      console.log(`${MODULE_ID} | No service templates needed migration`);
+    }
+  } catch (error) {
+    // Setting doesn't exist - nothing to migrate
+    console.log(`${MODULE_ID} | Service templates setting not found - skipping migration`);
   }
 }
 
@@ -128,26 +146,31 @@ async function _migrateMerchantShops() {
 async function _migrateActiveServiceOrders() {
   console.log(`${MODULE_ID} | Migrating active service orders...`);
 
-  const orders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
-  let migrated = 0;
+  try {
+    const orders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
+    let migrated = 0;
 
-  const migratedOrders = orders.map(order => {
-    // Upgrade service definition if it exists
-    if (order.serviceDef) {
-      const updated = _upgradeServiceDefinition(order.serviceDef);
-      if (updated !== order.serviceDef) {
-        migrated++;
-        return { ...order, serviceDef: updated };
+    const migratedOrders = orders.map(order => {
+      // Upgrade service definition if it exists
+      if (order.serviceDef) {
+        const updated = _upgradeServiceDefinition(order.serviceDef);
+        if (updated !== order.serviceDef) {
+          migrated++;
+          return { ...order, serviceDef: updated };
+        }
       }
-    }
-    return order;
-  });
+      return order;
+    });
 
-  if (migrated > 0) {
-    await game.settings.set(MODULE_ID, "activeServiceOrders", migratedOrders);
-    console.log(`${MODULE_ID} | Migrated ${migrated} active service orders`);
-  } else {
-    console.log(`${MODULE_ID} | No active service orders needed migration`);
+    if (migrated > 0) {
+      await game.settings.set(MODULE_ID, "activeServiceOrders", migratedOrders);
+      console.log(`${MODULE_ID} | Migrated ${migrated} active service orders`);
+    } else {
+      console.log(`${MODULE_ID} | No active service orders needed migration`);
+    }
+  } catch (error) {
+    // Setting doesn't exist - nothing to migrate
+    console.log(`${MODULE_ID} | Active service orders setting not found - skipping migration`);
   }
 }
 
