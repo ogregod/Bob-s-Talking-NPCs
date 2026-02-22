@@ -3661,6 +3661,19 @@
       "HostileNPCs": "Faction NPCs are hostile",
       "AttackOnSight": "Attacked on sight",
       "Bounty": "Bounty placed on your head"
+    },
+
+    "DialoguePreview": {
+      "Title": "Dialogue Preview",
+      "PreviewMode": "PREVIEW MODE",
+      "Back": "Back",
+      "GoBack": "Go back to previous node",
+      "Restart": "Restart",
+      "RestartTooltip": "Restart dialogue from beginning",
+      "CloseTooltip": "Close preview",
+      "HistoryCount": "Steps back available",
+      "NoNextNode": "No next node configured",
+      "ConditionsNotMet": "Conditions not met (simulated)"
     }
   }
 }

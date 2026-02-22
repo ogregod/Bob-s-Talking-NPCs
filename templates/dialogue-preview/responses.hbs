@@ -1,0 +1,30 @@
+{{!-- Dialogue Preview - Responses --}}
+<div class="dialogue-responses {{theme}}">
+  {{#if hasResponses}}
+    <div class="responses-list">
+      {{#each responses}}
+        <button type="button"
+                class="response-option {{#unless this.available}}disabled{{/unless}} {{#if this.success}}success{{/if}} {{#if this.failure}}failure{{/if}}"
+                data-action="selectResponse"
+                data-response-id="{{this.id}}"
+                data-next-node-id="{{this.nextNodeId}}"
+                {{#unless this.available}}disabled{{/unless}}>
+          <span class="response-text">{{this.text}}</span>
+          {{#if this.hasSkillCheck}}
+            <i class="fa-solid fa-dice-d20 skill-check-icon"></i>
+          {{/if}}
+          {{#if this.unavailableReason}}
+            <span class="unavailable-reason">{{this.unavailableReason}}</span>
+          {{/if}}
+        </button>
+      {{/each}}
+    </div>
+  {{else}}
+    {{#unless (eq nodeType "end")}}
+      <div class="no-responses">
+        <i class="fa-solid fa-exclamation-circle"></i>
+        <p>No next node configured</p>
+      </div>
+    {{/unless}}
+  {{/if}}
+</div>

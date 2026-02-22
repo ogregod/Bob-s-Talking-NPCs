@@ -1589,7 +1589,9 @@ export class DialogueEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static async #onPreview(event, target) {
-    ui.notifications.info(localize("DialogueEditor.PreviewNotImplemented"));
+    // Import and open the dialogue preview
+    const { DialoguePreview } = await import("./dialogue-preview.mjs");
+    DialoguePreview.open(this._dialogue);
   }
 
   static async #onSave(event, target) {

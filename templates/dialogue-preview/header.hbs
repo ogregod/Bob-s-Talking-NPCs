@@ -1,0 +1,14 @@
+{{!-- Dialogue Preview - Header --}}
+<div class="dialogue-preview-header {{theme}}">
+  <div class="preview-mode-indicator">
+    <i class="fa-solid fa-play-circle"></i>
+    <span>{{localize "DialoguePreview.PreviewMode"}}</span>
+  </div>
+
+  {{#if nodeDisplay.specialInfo}}
+    <div class="node-type-indicator" style="color: {{nodeDisplay.color}}">
+      <i class="fa-solid {{nodeDisplay.icon}}"></i>
+      <span>{{nodeDisplay.specialInfo}}</span>
+    </div>
+  {{/if}}
+</div>

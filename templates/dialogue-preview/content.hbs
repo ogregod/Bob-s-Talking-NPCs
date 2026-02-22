@@ -1,0 +1,77 @@
+{{!-- Dialogue Preview - Content --}}
+<div class="dialogue-content {{theme}}">
+  {{#if error}}
+    <div class="dialogue-error">
+      <i class="fa-solid fa-exclamation-triangle"></i>
+      <p>{{errorMessage}}</p>
+    </div>
+  {{else}}
+    <div class="dialogue-speaker">
+      <div class="speaker-portrait">
+        <img src="{{speakerPortrait}}" alt="{{speakerName}}" />
+      </div>
+      <div class="speaker-info">
+        <span class="speaker-name">{{speakerName}}</span>
+        <span class="node-type-label" style="color: {{nodeDisplay.color}}">
+          <i class="fa-solid {{nodeDisplay.icon}}"></i>
+          {{nodeTypeLabel}}
+        </span>
+      </div>
+    </div>
+
+    <div class="dialogue-text-container">
+      {{#if (eq nodeType "npc_speech")}}
+        <div class="dialogue-text npc-speech">
+          {{displayedText}}
+          {{#if isTyping}}<span class="typewriter-cursor">▊</span>{{/if}}
+        </div>
+        {{#if isTyping}}
+          <button type="button" class="skip-typewriter-btn" data-action="skipTypewriter">
+            <i class="fa-solid fa-forward"></i> {{localize "Dialogue.Skip"}}
+          </button>
+        {{/if}}
+      {{else if (eq nodeType "player_choice")}}
+        <div class="dialogue-text prompt">
+          {{currentNode.text}}
+        </div>
+      {{else if (eq nodeType "skill_check")}}
+        <div class="dialogue-text skill-check">
+          <i class="fa-solid fa-dice-d20"></i>
+          {{currentNode.text}}
+        </div>
+      {{else if (eq nodeType "shop")}}
+        <div class="dialogue-text service-node">
+          <i class="fa-solid fa-store"></i>
+          {{#if currentNode.text}}
+            {{currentNode.text}}
+          {{else}}
+            <em>Opening shop...</em>
+          {{/if}}
+        </div>
+      {{else if (eq nodeType "quest_offer")}}
+        <div class="dialogue-text quest-offer">
+          <i class="fa-solid fa-scroll"></i>
+          {{currentNode.text}}
+        </div>
+      {{else if (eq nodeType "quest_turnin")}}
+        <div class="dialogue-text quest-turnin">
+          <i class="fa-solid fa-check-circle"></i>
+          {{currentNode.text}}
+        </div>
+      {{else if (eq nodeType "end")}}
+        <div class="dialogue-text end-node">
+          <i class="fa-solid fa-stop-circle"></i>
+          {{#if currentNode.text}}
+            {{currentNode.text}}
+          {{else}}
+            <em>Dialogue ends</em>
+          {{/if}}
+        </div>
+      {{else}}
+        <div class="dialogue-text">
+          {{displayedText}}
+        </div>
+      {{/if}}
+    </div>
+  {{/if}}
+</div>

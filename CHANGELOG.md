@@ -2,11 +2,17 @@
 
 All notable changes to Bob's Talking NPCs will be documented in this file.
 
-## [0.6.0] - 2025-02-22
+## [0.2.001] - 2025-02-22
 
-### 🎉 Major Feature: Dynamic Pricing System
+### 🎉 Major Features
+
+#### 1. Dynamic Pricing System
 
 Complete overhaul of the service pricing system across all 69 business types and 150+ services.
+
+#### 2. Dialogue Preview System
+
+Full-featured dialogue testing tool for rapid iteration and debugging.
 
 #### Added
 - **4 New Pricing Modes**:
@@ -68,10 +74,17 @@ Complete overhaul of the service pricing system across all 69 business types and
   - Repair executor uses dynamic cost calculation
 
 #### Technical Details
-- **Files Created**: 3 (service-pricing.mjs, service-selection-dialog.mjs, service-pricing-v2-migration.mjs)
-- **Files Modified**: 11 (merchant-model, executors, templates, business registry, UI, styles, module entry)
-- **Lines of Code**: ~2,000 new lines across pricing system, UI, and migration
-- **CSS Styling**: 387 lines of new styles for service selection dialog
+- **Pricing System**:
+  - Files Created: 3 (service-pricing.mjs, service-selection-dialog.mjs, service-pricing-v2-migration.mjs)
+  - Files Modified: 11 (merchant-model, executors, templates, business registry, UI, styles, module entry)
+  - Lines of Code: ~2,000 new lines across pricing system, UI, and migration
+  - CSS Styling: 387 lines of new styles for service selection dialog
+
+- **Dialogue Preview**:
+  - Files Created: 5 (dialogue-preview.mjs + 4 templates)
+  - Files Modified: 3 (dialogue-editor.mjs, en.json, dialogue.css)
+  - Lines of Code: ~560 lines of preview logic + 250 lines of CSS
+  - Templates: header, content, responses, footer
 
 #### Integration
 - ✅ Works with existing faction discount system
@@ -79,6 +92,16 @@ Complete overhaul of the service pricing system across all 69 business types and
 - ✅ Works with charisma modifiers
 - ✅ Works with conversation dialogue integration
 - ✅ Works with multiplayer socket sync
+
+#### Dialogue Preview Features
+- **Interactive Testing**: Test dialogue trees without needing actual NPCs
+- **Typewriter Effect**: Realistic text animation with skip option
+- **Navigation**: Forward, back, and restart controls
+- **Node Type Visualization**: Clear indicators for SHOP, QUEST, SKILL_CHECK, etc.
+- **Condition Simulation**: Test dialogue branches with simulated conditions
+- **Special Node Handling**: Shows what shops/quests/services would open
+- **History Tracking**: Back button to explore different dialogue paths
+- **No Side Effects**: Preview mode doesn't modify game state
 
 #### Example Pricing
 - **Spell Copying**: Level 1 = 60gp, Level 5 = 260gp, Level 9 = 460gp

@@ -1,0 +1,36 @@
+{{!-- Dialogue Preview - Footer --}}
+<div class="dialogue-preview-footer {{theme}}">
+  <div class="preview-controls">
+    <button type="button"
+            class="preview-btn"
+            data-action="goBack"
+            {{#unless canGoBack}}disabled{{/unless}}
+            data-tooltip="{{localize 'DialoguePreview.GoBack'}}">
+      <i class="fa-solid fa-arrow-left"></i>
+      {{localize "DialoguePreview.Back"}}
+    </button>
+
+    <button type="button"
+            class="preview-btn restart"
+            data-action="restart"
+            data-tooltip="{{localize 'DialoguePreview.RestartTooltip'}}">
+      <i class="fa-solid fa-redo"></i>
+      {{localize "DialoguePreview.Restart"}}
+    </button>
+
+    <button type="button"
+            class="preview-btn close"
+            data-action="close"
+            data-tooltip="{{localize 'DialoguePreview.CloseTooltip'}}">
+      <i class="fa-solid fa-times"></i>
+      {{localize "Common.Close"}}
+    </button>
+  </div>
+
+  <div class="preview-info">
+    <span class="history-count">
+      <i class="fa-solid fa-history"></i>
+      {{localize "DialoguePreview.HistoryCount" count=canGoBack}}
+    </span>
+  </div>
+</div>
