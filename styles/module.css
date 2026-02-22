@@ -2230,4 +2230,424 @@
     font-size: 0.9em;
   }
 
+  /* ===== Service Selection Dialog ===== */
+  .service-selection-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-md);
+    padding: var(--bobsnpc-spacing-md);
+  }
+
+  .service-selection-content .service-header {
+    border-bottom: 1px solid var(--bobsnpc-border-color);
+    padding-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .service-selection-content .service-title h2 {
+    margin: 0 0 var(--bobsnpc-spacing-xs);
+    color: var(--bobsnpc-text-primary);
+    font-size: 1.4em;
+  }
+
+  .service-selection-content .service-description {
+    margin: 0;
+    color: var(--bobsnpc-text-secondary);
+    font-size: 0.9em;
+  }
+
+  .service-selection-content .pricing-mode {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: 0.85em;
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  /* Item Context */
+  .service-selection-content .item-context {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-md);
+  }
+
+  .service-selection-content .item-icon {
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .service-selection-content .item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .service-selection-content .item-name {
+    font-weight: 600;
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .service-selection-content .item-value {
+    font-size: 0.85em;
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  /* Tier Selection */
+  .service-selection-content .tier-selection h3 {
+    margin: 0 0 var(--bobsnpc-spacing-sm);
+    font-size: 1.1em;
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .service-selection-content .tier-cards {
+    display: grid;
+    gap: var(--bobsnpc-spacing-sm);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .service-selection-content .tier-card {
+    position: relative;
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border: 2px solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .service-selection-content .tier-card:hover {
+    border-color: var(--bobsnpc-accent-primary);
+    background: var(--bobsnpc-bg-surface);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .service-selection-content .tier-card.selected {
+    border-color: var(--bobsnpc-accent-primary);
+    background: var(--bobsnpc-bg-surface);
+    box-shadow: 0 0 0 2px var(--bobsnpc-accent-primary);
+  }
+
+  .service-selection-content .tier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--bobsnpc-spacing-xs);
+  }
+
+  .service-selection-content .tier-name {
+    font-weight: 600;
+    color: var(--bobsnpc-text-primary);
+  }
+
+  .service-selection-content .tier-price {
+    font-weight: 700;
+    color: var(--bobsnpc-accent-primary);
+  }
+
+  .service-selection-content .tier-description {
+    margin: var(--bobsnpc-spacing-xs) 0;
+    font-size: 0.85em;
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .service-selection-content .tier-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: var(--bobsnpc-spacing-sm);
+  }
+
+  .service-selection-content .tier-detail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85em;
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .service-selection-content .tier-detail i {
+    width: 16px;
+    color: var(--bobsnpc-accent-secondary);
+  }
+
+  .service-selection-content .selected-indicator {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: var(--bobsnpc-accent-primary);
+    font-size: 1.2em;
+  }
+
+  /* Spell Level Selection */
+  .service-selection-content .spell-level-selection h3 {
+    margin: 0 0 var(--bobsnpc-spacing-sm);
+    font-size: 1.1em;
+  }
+
+  .service-selection-content .spell-level-input {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-md);
+  }
+
+  .service-selection-content .spell-level-input label {
+    font-weight: 600;
+  }
+
+  .service-selection-content .spell-level-input input[type="number"] {
+    width: 80px;
+    padding: 6px 10px;
+    background: var(--bobsnpc-bg-tertiary);
+    border: 1px solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+    font-size: 1em;
+  }
+
+  .service-selection-content .pricing-formula {
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border-left: 3px solid var(--bobsnpc-accent-primary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .service-selection-content .pricing-formula p {
+    margin: 4px 0;
+  }
+
+  .service-selection-content .calculation-example {
+    color: var(--bobsnpc-text-secondary);
+    font-size: 0.95em;
+  }
+
+  /* Enchantment Selection */
+  .service-selection-content .enchantment-selection h3 {
+    margin: 0 0 var(--bobsnpc-spacing-sm);
+    font-size: 1.1em;
+  }
+
+  .service-selection-content .selected-enchantment,
+  .service-selection-content .no-enchantment {
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-md);
+    text-align: center;
+  }
+
+  .service-selection-content .enchantment-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-sm);
+  }
+
+  .service-selection-content .enchantment-name {
+    font-weight: 600;
+    font-size: 1.1em;
+  }
+
+  .service-selection-content .pick-enchantment-btn,
+  .service-selection-content .change-enchantment-btn {
+    padding: 8px 16px;
+    background: var(--bobsnpc-accent-primary);
+    color: white;
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .service-selection-content .pick-enchantment-btn:hover,
+  .service-selection-content .change-enchantment-btn:hover {
+    background: var(--bobsnpc-accent-hover);
+    transform: translateY(-1px);
+  }
+
+  .service-selection-content .enchantment-pricing-note {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-xs);
+    margin-top: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-surface);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    font-size: 0.85em;
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  /* Item Value Pricing */
+  .service-selection-content .item-value-pricing h3 {
+    margin: 0 0 var(--bobsnpc-spacing-sm);
+    font-size: 1.1em;
+  }
+
+  .service-selection-content .pricing-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bobsnpc-spacing-xs);
+  }
+
+  .service-selection-content .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--bobsnpc-spacing-xs);
+    border-bottom: 1px solid var(--bobsnpc-border-color);
+  }
+
+  .service-selection-content .breakdown-row .label {
+    color: var(--bobsnpc-text-secondary);
+  }
+
+  .service-selection-content .breakdown-row .value {
+    font-weight: 600;
+    color: var(--bobsnpc-text-primary);
+  }
+
+  /* Quantity Selection */
+  .service-selection-content .quantity-selection {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-sm);
+  }
+
+  .service-selection-content .quantity-selection label {
+    font-weight: 600;
+  }
+
+  .service-selection-content .quantity-selection input[type="number"] {
+    width: 80px;
+    padding: 6px 10px;
+    background: var(--bobsnpc-bg-surface);
+    border: 1px solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-text-primary);
+  }
+
+  /* Price Summary */
+  .service-selection-content .price-summary {
+    padding: var(--bobsnpc-spacing-md);
+    background: var(--bobsnpc-bg-tertiary);
+    border-radius: var(--bobsnpc-border-radius-md);
+    border-left: 4px solid var(--bobsnpc-accent-primary);
+  }
+
+  .service-selection-content .price-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.95em;
+  }
+
+  .service-selection-content .price-row.total {
+    margin-top: var(--bobsnpc-spacing-xs);
+    padding-top: var(--bobsnpc-spacing-xs);
+    border-top: 2px solid var(--bobsnpc-border-color);
+    font-size: 1.1em;
+    font-weight: 700;
+  }
+
+  .service-selection-content .price-row.total .value {
+    color: var(--bobsnpc-accent-primary);
+  }
+
+  .service-selection-content .price-row.actor-gold {
+    margin-top: var(--bobsnpc-spacing-xs);
+    padding-top: var(--bobsnpc-spacing-xs);
+    border-top: 1px solid var(--bobsnpc-border-color);
+  }
+
+  .service-selection-content .price-row.actor-gold .value.insufficient {
+    color: var(--bobsnpc-error-color, #ef5350);
+    font-weight: 600;
+  }
+
+  /* Dialog Actions */
+  .service-selection-content .dialog-actions {
+    display: flex;
+    gap: var(--bobsnpc-spacing-sm);
+    padding-top: var(--bobsnpc-spacing-md);
+    border-top: 1px solid var(--bobsnpc-border-color);
+  }
+
+  .service-selection-content .cancel-btn {
+    flex: 1;
+    padding: 10px 20px;
+    background: var(--bobsnpc-bg-tertiary);
+    color: var(--bobsnpc-text-primary);
+    border: 1px solid var(--bobsnpc-border-color);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .service-selection-content .cancel-btn:hover {
+    background: var(--bobsnpc-bg-surface);
+    border-color: var(--bobsnpc-accent-secondary);
+  }
+
+  .service-selection-content .confirm-btn {
+    flex: 2;
+    padding: 10px 20px;
+    background: var(--bobsnpc-accent-primary);
+    color: white;
+    border: none;
+    border-radius: var(--bobsnpc-border-radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .service-selection-content .confirm-btn:hover:not(:disabled) {
+    background: var(--bobsnpc-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .service-selection-content .confirm-btn:disabled {
+    background: var(--bobsnpc-bg-tertiary);
+    color: var(--bobsnpc-text-disabled);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .service-selection-content .confirm-btn i,
+  .service-selection-content .cancel-btn i {
+    margin-right: 6px;
+  }
+
+  /* Insufficient Gold Warning */
+  .service-selection-content .insufficient-gold-warning {
+    display: flex;
+    align-items: center;
+    gap: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-sm) var(--bobsnpc-spacing-md);
+    background: rgba(239, 83, 80, 0.1);
+    border: 1px solid rgba(239, 83, 80, 0.3);
+    border-radius: var(--bobsnpc-border-radius-sm);
+    color: var(--bobsnpc-error-color, #ef5350);
+  }
+
+  .service-selection-content .insufficient-gold-warning i {
+    font-size: 1.2em;
+  }
+
+  .service-selection-content .insufficient-gold-warning p {
+    margin: 0;
+    font-weight: 600;
+  }
+
 } /* End @layer bobsnpc */

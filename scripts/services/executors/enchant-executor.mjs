@@ -50,18 +50,17 @@ export const EnchantExecutor = {
       if (!enchantment) {
         return { success: false, message: localize("Enchantment.NotFound") };
       }
-
-      const { calculateEnchantmentCost } = await import("../../data/enchantment-model.mjs");
-      const priceModifier = serviceDef?.enchantmentPriceModifier || merchant.services?.enchantmentPriceModifier || 1;
-      cost = calculateEnchantmentCost(enchantment, item.system?.rarity || "common", priceModifier);
-    } else {
-      // Non-enchant services (disenchant, recharge, etc.) use service price
-      cost = serviceDef?.basePrice || 0;
-      if (serviceDef?.priceType === "percent") {
-        const basePrice = item.system?.price?.value || 100;
-        cost = Math.round(basePrice * ((serviceDef.pricePercent || cost || 10) / 100));
-      }
     }
+
+    // Use centralized pricing calculator
+    const { calculateServicePrice } = await import("../service-pricing.mjs");
+    cost = calculateServicePrice(serviceDef, {
+      item,
+      enchantment,
+      merchant,
+      actor,
+      options
+    });
 
     const gold = convertToGold(actor.system?.currency || {});
     if (gold < cost) {

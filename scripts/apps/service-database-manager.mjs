@@ -125,7 +125,9 @@ export class ServiceDatabaseManager extends HandlebarsApplicationMixin(Applicati
       cancelOrder: ServiceDatabaseManager.#onCancelOrder,
       resetDefaults: ServiceDatabaseManager.#onResetDefaults,
       refreshRequests: ServiceDatabaseManager.#onRefresh,
-      setCategoryApproval: ServiceDatabaseManager.#onSetCategoryApproval
+      setCategoryApproval: ServiceDatabaseManager.#onSetCategoryApproval,
+      addTier: ServiceDatabaseManager.#onAddTier,
+      removeTier: ServiceDatabaseManager.#onRemoveTier
     }
   };
 
@@ -214,11 +216,49 @@ export class ServiceDatabaseManager extends HandlebarsApplicationMixin(Applicati
           value, label, selected: value === this._editingTemplate?.category
         }));
         context.priceTypeOptions = [
-          { value: "fixed", label: "Fixed Price", selected: this._editingTemplate?.priceType === "fixed" },
+          { value: "fixed", label: "Fixed Price (flat gold amount)", selected: this._editingTemplate?.priceType === "fixed" },
           { value: "percent", label: "Percentage of Item Value", selected: this._editingTemplate?.priceType === "percent" },
-          { value: "perDay", label: "Per Day", selected: this._editingTemplate?.priceType === "perDay" },
-          { value: "variable", label: "Variable (set at use)", selected: this._editingTemplate?.priceType === "variable" }
+          { value: "perDay", label: "Per Day (rentals/subscriptions)", selected: this._editingTemplate?.priceType === "perDay" },
+          { value: "perItem", label: "Per Item (bulk quantities)", selected: this._editingTemplate?.priceType === "perItem" },
+          { value: "variable", label: "Variable (set at use)", selected: this._editingTemplate?.priceType === "variable" },
+          { value: "itemValue", label: "Item Value % (with minimum)", selected: this._editingTemplate?.priceType === "itemValue" },
+          { value: "spellLevel", label: "Spell Level Formula (base + level × multiplier)", selected: this._editingTemplate?.priceType === "spellLevel" },
+          { value: "enchantment", label: "Enchantment System (links to enchantment pricing)", selected: this._editingTemplate?.priceType === "enchantment" },
+          { value: "tiered", label: "Tiered Pricing (multiple service levels)", selected: this._editingTemplate?.priceType === "tiered" }
         ];
+
+        // Conditional fields based on pricing type
+        const priceType = this._editingTemplate?.priceType || "fixed";
+
+        // Item Value pricing fields
+        if (priceType === "itemValue") {
+          context.showItemValueFields = true;
+          context.itemValuePercent = this._editingTemplate?.itemValuePercent ?? 10;
+          context.itemValueMinimum = this._editingTemplate?.itemValueMinimum ?? 0;
+        }
+
+        // Spell Level pricing fields
+        if (priceType === "spellLevel") {
+          context.showSpellLevelFields = true;
+          context.spellLevelBase = this._editingTemplate?.spellLevelBase ?? 10;
+          context.spellLevelMultiplier = this._editingTemplate?.spellLevelMultiplier ?? 50;
+        }
+
+        // Enchantment pricing fields
+        if (priceType === "enchantment") {
+          context.showEnchantmentFields = true;
+          context.useEnchantmentPricing = this._editingTemplate?.useEnchantmentPricing ?? true;
+          context.enchantmentPriceModifier = this._editingTemplate?.enchantmentPriceModifier ?? 1.0;
+        }
+
+        // Tiered pricing fields
+        if (priceType === "tiered") {
+          context.showTieredFields = true;
+          context.pricingTiers = this._editingTemplate?.pricingTiers || [
+            { name: "Basic", description: "", price: 10, tier: 0 }
+          ];
+        }
+
         context.durationUnitOptions = [
           { value: "hours", label: "Hours", selected: this._editingTemplate?.durationUnit === "hours" },
           { value: "days", label: "Days", selected: this._editingTemplate?.durationUnit === "days" },
@@ -436,8 +476,38 @@ export class ServiceDatabaseManager extends HandlebarsApplicationMixin(Applicati
       hasDuration: formData.get("hasDuration") === "on",
       durationUnit: formData.get("durationUnit"),
       baseDuration: parseInt(formData.get("baseDuration")) || 0,
-      requiresItem: formData.get("requiresItem") === "on"
+      requiresItem: formData.get("requiresItem") === "on",
+
+      // Item Value pricing fields
+      itemValuePercent: parseInt(formData.get("itemValuePercent")) || 10,
+      itemValueMinimum: parseFloat(formData.get("itemValueMinimum")) || 0,
+
+      // Spell Level pricing fields
+      spellLevelBase: parseInt(formData.get("spellLevelBase")) || 10,
+      spellLevelMultiplier: parseInt(formData.get("spellLevelMultiplier")) || 50,
+
+      // Enchantment pricing fields
+      useEnchantmentPricing: formData.get("useEnchantmentPricing") === "on",
+      enchantmentPriceModifier: parseFloat(formData.get("enchantmentPriceModifier")) || 1.0,
+
+      // Tiered pricing - will be set below from existing template
+      pricingTiers: this._editingTemplate?.pricingTiers || []
     };
+
+    // Collect tier data from form if tiered pricing
+    if (data.priceType === "tiered" && this._editingTemplate?.pricingTiers) {
+      data.pricingTiers = this._editingTemplate.pricingTiers.map((tier, index) => {
+        return {
+          name: formData.get(`tierName_${index}`) || tier.name,
+          description: formData.get(`tierDesc_${index}`) || tier.description || "",
+          price: parseFloat(formData.get(`tierPrice_${index}`)) || tier.price,
+          tier: index,
+          healAmount: tier.healAmount || null,
+          spellLevel: tier.spellLevel || null,
+          crMax: tier.crMax || null
+        };
+      });
+    }
 
     if (!data.name) {
       ui.notifications.warn("Service name is required.");
@@ -677,6 +747,49 @@ export class ServiceDatabaseManager extends HandlebarsApplicationMixin(Applicati
   }
 
   static async #onRefresh(event, target) {
+    this.render();
+  }
+
+  /**
+   * Add a new tier to tiered pricing
+   */
+  static async #onAddTier(event, target) {
+    if (!this._editingTemplate) return;
+
+    const tiers = this._editingTemplate.pricingTiers || [];
+    const newTier = {
+      name: `Tier ${tiers.length + 1}`,
+      description: "",
+      price: 10,
+      tier: tiers.length,
+      healAmount: null,
+      spellLevel: null,
+      crMax: null
+    };
+
+    tiers.push(newTier);
+    this._editingTemplate.pricingTiers = tiers;
+    this.render();
+  }
+
+  /**
+   * Remove a tier from tiered pricing
+   */
+  static async #onRemoveTier(event, target) {
+    if (!this._editingTemplate) return;
+
+    const tierIndex = parseInt(target.dataset.tier);
+    const tiers = this._editingTemplate.pricingTiers || [];
+
+    // Remove the tier
+    tiers.splice(tierIndex, 1);
+
+    // Re-index remaining tiers
+    tiers.forEach((tier, index) => {
+      tier.tier = index;
+    });
+
+    this._editingTemplate.pricingTiers = tiers;
     this.render();
   }
 

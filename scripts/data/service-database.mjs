@@ -62,7 +62,7 @@ const BUILT_IN_TEMPLATES = [
   { type: "sharpen", category: "crafting", name: "Sharpen", description: "Hone a blade or point to razor sharpness.", icon: "fa-slash", basePrice: 5, requiresItem: true, defaultApprovalMode: "request" },
   { type: "reinforce", category: "crafting", name: "Reinforce", description: "Strengthen an item's structure.", icon: "fa-shield-halved", basePrice: 0, priceType: "percent", requiresItem: true, defaultApprovalMode: "request" },
   { type: "resize", category: "crafting", name: "Resize", description: "Adjust armor or clothing to fit a new wearer.", icon: "fa-ruler", basePrice: 0, priceType: "percent", requiresItem: true, defaultApprovalMode: "request" },
-  { type: "customOrder", category: "crafting", name: "Custom Order", description: "Commission a custom-made item.", icon: "fa-hammer", basePrice: 50, defaultApprovalMode: "request" },
+  { type: "customOrder", category: "crafting", name: "Custom Order", description: "Commission a custom-made item.", icon: "fa-hammer", basePrice: 50, priceType: "itemValue", itemValuePercent: 100, itemValueMinimum: 0, requiresItem: true, defaultApprovalMode: "request", hasDuration: true, durationUnit: "days", baseDuration: 7 },
   { type: "alterations", category: "crafting", name: "Alterations", description: "Modify clothing or robes for a new wearer.", icon: "fa-scissors", basePrice: 10, requiresItem: true, defaultApprovalMode: "auto" },
   { type: "polish", category: "crafting", name: "Polish", description: "Clean and polish an item to a shine.", icon: "fa-sparkles", basePrice: 2, requiresItem: true, defaultApprovalMode: "auto" },
   { type: "engrave", category: "crafting", name: "Engrave", description: "Etch designs or text into metal or stone.", icon: "fa-pen-nib", basePrice: 15, requiresItem: true, defaultApprovalMode: "auto" },
@@ -96,24 +96,37 @@ const BUILT_IN_TEMPLATES = [
 
   // === MAGIC SERVICES ===
   { type: "identify", category: "magic", name: "Identify", description: "Reveal the properties of a magical item.", icon: "fa-magnifying-glass", basePrice: 25, requiresItem: true, defaultApprovalMode: "auto" },
-  { type: "enchant", category: "magic", name: "Enchant Item", description: "Apply a magical enchantment to an item.", icon: "fa-wand-magic-sparkles", basePrice: 100, requiresItem: true, defaultApprovalMode: "request", hasDuration: true, durationUnit: "days", baseDuration: 7 },
-  { type: "disenchant", category: "magic", name: "Disenchant", description: "Remove magical properties from an item.", icon: "fa-ban", basePrice: 50, requiresItem: true, defaultApprovalMode: "request" },
-  { type: "recharge", category: "magic", name: "Recharge", description: "Refill charges on a staff or wand.", icon: "fa-bolt", basePrice: 75, requiresItem: true, defaultApprovalMode: "request" },
+  { type: "enchant", category: "magic", name: "Enchant Item", description: "Apply a magical enchantment to an item.", icon: "fa-wand-magic-sparkles", basePrice: 100, priceType: "enchantment", useEnchantmentPricing: true, enchantmentPriceModifier: 1.0, requiresItem: true, defaultApprovalMode: "request", hasDuration: true, durationUnit: "days", baseDuration: 7 },
+  { type: "disenchant", category: "magic", name: "Disenchant", description: "Remove magical properties from an item.", icon: "fa-ban", basePrice: 100, priceType: "itemValue", itemValuePercent: 25, itemValueMinimum: 100, requiresItem: true, defaultApprovalMode: "request" },
+  { type: "recharge", category: "magic", name: "Recharge", description: "Refill charges on a staff or wand.", icon: "fa-bolt", basePrice: 75, priceType: "itemValue", itemValuePercent: 15, itemValueMinimum: 75, requiresItem: true, defaultApprovalMode: "request" },
   { type: "removeCurse", category: "magic", name: "Remove Curse", description: "Break a curse on a creature or item.", icon: "fa-hand-sparkles", basePrice: 150, defaultApprovalMode: "request" },
-  { type: "scribeScroll", category: "magic", name: "Scribe Scroll", description: "Copy a spell onto a scroll.", icon: "fa-scroll", basePrice: 50, defaultApprovalMode: "request", hasDuration: true, durationUnit: "days", baseDuration: 3 },
-  { type: "brewPotion", category: "magic", name: "Brew Potion", description: "Brew a magical potion.", icon: "fa-flask", basePrice: 50, defaultApprovalMode: "request", hasDuration: true, durationUnit: "days", baseDuration: 2 },
-  { type: "spellCopying", category: "magic", name: "Spell Copying", description: "Transcribe a spell into a spellbook.", icon: "fa-book-sparkles", basePrice: 25, defaultApprovalMode: "auto" },
+  { type: "scribeScroll", category: "magic", name: "Scribe Scroll", description: "Copy a spell onto a scroll.", icon: "fa-scroll", basePrice: 25, priceType: "spellLevel", spellLevelBase: 25, spellLevelMultiplier: 25, defaultApprovalMode: "request", hasDuration: true, durationUnit: "days", baseDuration: 3 },
+  { type: "brewPotion", category: "magic", name: "Brew Potion", description: "Brew a magical potion.", icon: "fa-flask", basePrice: 25, priceType: "spellLevel", spellLevelBase: 25, spellLevelMultiplier: 25, defaultApprovalMode: "request", hasDuration: true, durationUnit: "days", baseDuration: 2 },
+  { type: "spellCopying", category: "magic", name: "Spell Copying", description: "Transcribe a spell into a spellbook.", icon: "fa-book-sparkles", basePrice: 10, priceType: "spellLevel", spellLevelBase: 10, spellLevelMultiplier: 50, defaultApprovalMode: "auto" },
 
   // === APPRAISAL ===
   { type: "appraise", category: "crafting", name: "Appraise", description: "Determine the monetary value of an item.", icon: "fa-gem", basePrice: 5, requiresItem: true, defaultApprovalMode: "auto" },
   { type: "authenticate", category: "crafting", name: "Authenticate", description: "Verify the authenticity of an item.", icon: "fa-certificate", basePrice: 10, requiresItem: true, defaultApprovalMode: "auto" },
 
   // === HEALING SERVICES ===
-  { type: "healing", category: "healing", name: "Healing", description: "Restore hit points through divine or natural means.", icon: "fa-heart", basePrice: 25, defaultApprovalMode: "auto", customData: { healAmount: 0 } },
+  { type: "healing", category: "healing", name: "Healing", description: "Restore hit points through divine or natural means.", icon: "fa-heart", basePrice: 25, priceType: "tiered", defaultApprovalMode: "auto", pricingTiers: [
+    { name: "Minor Healing (1d8+1)", description: "Cure Wounds - minor injuries", healAmount: "1d8+1", price: 10, tier: 0 },
+    { name: "Moderate Healing (2d8+2)", description: "Cure Wounds - moderate wounds", healAmount: "2d8+2", price: 25, tier: 1 },
+    { name: "Major Healing (3d8+3)", description: "Cure Wounds - serious injuries", healAmount: "3d8+3", price: 50, tier: 2 },
+    { name: "Full Healing", description: "Complete restoration of all wounds", healAmount: 0, price: 100, tier: 3 }
+  ] },
   { type: "cureDisease", category: "healing", name: "Cure Disease", description: "Remove a disease affliction.", icon: "fa-virus-slash", basePrice: 50, defaultApprovalMode: "auto" },
   { type: "curePoison", category: "healing", name: "Cure Poison", description: "Neutralize poison in a creature's body.", icon: "fa-flask-vial", basePrice: 25, defaultApprovalMode: "auto" },
-  { type: "restoration", category: "healing", name: "Restoration", description: "Restore ability scores and remove debilitating conditions.", icon: "fa-sparkles", basePrice: 100, defaultApprovalMode: "request" },
-  { type: "resurrection", category: "healing", name: "Resurrection", description: "Raise a fallen companion from the dead.", icon: "fa-cross", basePrice: 1000, defaultApprovalMode: "request" },
+  { type: "restoration", category: "healing", name: "Restoration", description: "Restore ability scores and remove debilitating conditions.", icon: "fa-sparkles", basePrice: 100, priceType: "tiered", defaultApprovalMode: "request", pricingTiers: [
+    { name: "Lesser Restoration", description: "Remove paralysis, poison, or disease (2nd level)", price: 100, spellLevel: 2, tier: 0 },
+    { name: "Greater Restoration", description: "Remove curses, petrification, ability damage (5th level)", price: 450, spellLevel: 5, tier: 1 }
+  ] },
+  { type: "resurrection", category: "healing", name: "Resurrection", description: "Raise a fallen companion from the dead.", icon: "fa-cross", basePrice: 1000, priceType: "tiered", defaultApprovalMode: "request", pricingTiers: [
+    { name: "Revivify", description: "Raise recently deceased (within 1 minute) - 3rd level", price: 500, spellLevel: 3, tier: 0 },
+    { name: "Raise Dead", description: "Raise deceased (within 10 days) - 5th level", price: 1500, spellLevel: 5, tier: 1 },
+    { name: "Resurrection", description: "Raise long-dead (within 100 years) - 7th level", price: 5000, spellLevel: 7, tier: 2 },
+    { name: "True Resurrection", description: "Raise any deceased (no time limit, no body needed) - 9th level", price: 50000, spellLevel: 9, tier: 3 }
+  ] },
   { type: "blessing", category: "healing", name: "Blessing", description: "Receive a divine blessing granting temporary benefits.", icon: "fa-hand-sparkles", basePrice: 10, defaultApprovalMode: "auto" },
 
   // === LODGING SERVICES ===

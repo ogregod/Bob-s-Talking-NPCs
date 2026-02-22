@@ -22,7 +22,15 @@ export const ItemCreationExecutor = {
   async execute(ctx) {
     const { actor, merchant, serviceDef, options } = ctx;
 
-    const cost = serviceDef?.basePrice ?? 0;
+    // Calculate cost using centralized pricing (supports spell level pricing)
+    const { calculateServicePrice } = await import("../service-pricing.mjs");
+    const cost = calculateServicePrice(serviceDef, {
+      spellLevel: options.spellLevel,
+      actor,
+      merchant,
+      options
+    });
+
     if (cost > 0) {
       const gold = convertToGold(actor.system?.currency || {});
       if (gold < cost) {

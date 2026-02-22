@@ -47,7 +47,7 @@ export const RepairExecutor = {
     }
 
     // Calculate cost
-    const cost = _calculateRepairCost(serviceDef, item);
+    const cost = await _calculateRepairCost(serviceDef, item);
     const gold = convertToGold(actor.system?.currency || {});
 
     if (gold < cost) {
@@ -144,10 +144,8 @@ export const RepairExecutor = {
   }
 };
 
-function _calculateRepairCost(serviceDef, item) {
-  if (serviceDef.priceType === "percent") {
-    const basePrice = item.system?.price?.value || 0;
-    return Math.round(basePrice * ((serviceDef.pricePercent || serviceDef.basePrice || 10) / 100));
-  }
-  return serviceDef.basePrice || 0;
+async function _calculateRepairCost(serviceDef, item) {
+  // Use centralized pricing calculator (supports percent, itemValue, and other modes)
+  const { calculateServicePrice } = await import("../service-pricing.mjs");
+  return calculateServicePrice(serviceDef, { item });
 }

@@ -36,6 +36,9 @@ import { ServiceDatabaseManager } from "./apps/service-database-manager.mjs";
 import { EnchantmentManager } from "./apps/enchantment-manager.mjs";
 import { EnchantmentPicker } from "./apps/enchantment-picker.mjs";
 
+// Import migrations
+import { registerMigrationSetting, migrateServicePricingToV2 } from "./migrations/service-pricing-v2-migration.mjs";
+
 // Export UI applications for external use
 export {
   DialogueWindow,
@@ -66,6 +69,9 @@ Hooks.once("init", () => {
   // Register module settings
   registerSettings();
 
+  // Register migration settings
+  registerMigrationSetting();
+
   // Initialize hooks and load templates
   initializeHooks();
 
@@ -76,7 +82,7 @@ Hooks.once("init", () => {
  * Set up the module after Foundry is fully ready
  * Game data and user information is available at this point
  */
-Hooks.once("ready", () => {
+Hooks.once("ready", async () => {
   console.log(`${MODULE_ID} | Setting up ${MODULE_NAME}`);
 
   // Register socket handlers for multiplayer sync
@@ -85,6 +91,11 @@ Hooks.once("ready", () => {
   // IMPORTANT: Create the API FIRST, before initializing handlers
   // This way registerReadyHooks() can add handlers to the existing API object
   game.bobsnpc = new BobsNPCAPI();
+
+  // Run migrations (GM only) before initializing handlers
+  if (game.user.isGM) {
+    await migrateServicePricingToV2();
+  }
 
   // Register hooks that require game to be ready (this adds handlers to game.bobsnpc)
   registerReadyHooks();

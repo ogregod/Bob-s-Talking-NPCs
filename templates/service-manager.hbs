@@ -104,6 +104,99 @@
               </div>
             </fieldset>
 
+            {{!-- Item Value Pricing Fields --}}
+            {{#if showItemValueFields}}
+            <fieldset class="form-section pricing-details">
+              <legend><i class="fa-solid fa-percent"></i> Item Value Pricing</legend>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="tmpl-itemValuePercent">Percentage (%)</label>
+                  <input type="number" id="tmpl-itemValuePercent" name="itemValuePercent" value="{{itemValuePercent}}" min="0" step="1">
+                  <small>Percentage of item's base value</small>
+                </div>
+                <div class="form-group">
+                  <label for="tmpl-itemValueMinimum">Minimum (gp)</label>
+                  <input type="number" id="tmpl-itemValueMinimum" name="itemValueMinimum" value="{{itemValueMinimum}}" min="0" step="0.01">
+                  <small>Minimum price floor</small>
+                </div>
+              </div>
+            </fieldset>
+            {{/if}}
+
+            {{!-- Spell Level Pricing Fields --}}
+            {{#if showSpellLevelFields}}
+            <fieldset class="form-section pricing-details">
+              <legend><i class="fa-solid fa-wand-sparkles"></i> Spell Level Pricing</legend>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="tmpl-spellLevelBase">Base Cost (gp)</label>
+                  <input type="number" id="tmpl-spellLevelBase" name="spellLevelBase" value="{{spellLevelBase}}" min="0" step="1">
+                  <small>Fixed base cost</small>
+                </div>
+                <div class="form-group">
+                  <label for="tmpl-spellLevelMultiplier">Per Level Multiplier</label>
+                  <input type="number" id="tmpl-spellLevelMultiplier" name="spellLevelMultiplier" value="{{spellLevelMultiplier}}" min="0" step="1">
+                  <small>Cost per spell level</small>
+                </div>
+              </div>
+              <p class="formula-preview">
+                <i class="fa-solid fa-calculator"></i>
+                Formula: {{spellLevelBase}} + (level × {{spellLevelMultiplier}})gp
+              </p>
+            </fieldset>
+            {{/if}}
+
+            {{!-- Enchantment Pricing Fields --}}
+            {{#if showEnchantmentFields}}
+            <fieldset class="form-section pricing-details">
+              <legend><i class="fa-solid fa-gem"></i> Enchantment Pricing</legend>
+              <div class="form-row">
+                <div class="form-group checkbox-group">
+                  <label>
+                    <input type="checkbox" name="useEnchantmentPricing" {{#if useEnchantmentPricing}}checked{{/if}}>
+                    Use Enchantment System
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label for="tmpl-enchantPriceModifier">Price Modifier</label>
+                  <input type="number" id="tmpl-enchantPriceModifier" name="enchantmentPriceModifier" value="{{enchantmentPriceModifier}}" min="0" step="0.1">
+                  <small>Shop-specific pricing multiplier</small>
+                </div>
+              </div>
+              <p class="info-text">
+                <i class="fa-solid fa-info-circle"></i>
+                Pricing calculated from enchantment rarity and item rarity
+              </p>
+            </fieldset>
+            {{/if}}
+
+            {{!-- Tiered Pricing Fields --}}
+            {{#if showTieredFields}}
+            <fieldset class="form-section pricing-details">
+              <legend><i class="fa-solid fa-layer-group"></i> Tiered Pricing</legend>
+              <div class="tiers-list">
+                {{#each pricingTiers}}
+                  <div class="tier-row" data-tier-index="{{this.tier}}">
+                    <div class="tier-handle">
+                      <i class="fa-solid fa-grip-vertical"></i>
+                    </div>
+                    <div class="tier-fields">
+                      <input type="text" name="tierName_{{this.tier}}" value="{{this.name}}" placeholder="Tier name..." class="tier-name">
+                      <input type="number" name="tierPrice_{{this.tier}}" value="{{this.price}}" min="0" step="0.01" placeholder="Price" class="tier-price">
+                      <input type="text" name="tierDesc_{{this.tier}}" value="{{this.description}}" placeholder="Description..." class="tier-desc">
+                    </div>
+                    <button type="button" class="tier-remove" data-action="removeTier" data-tier="{{this.tier}}" data-tooltip="Remove tier">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                {{/each}}
+              </div>
+              <button type="button" class="add-tier-btn" data-action="addTier">
+                <i class="fa-solid fa-plus"></i> Add Tier
+              </button>
+            </fieldset>
+            {{/if}}
+
             <fieldset class="form-section">
               <legend><i class="fa-solid fa-clock"></i> Duration & Requirements</legend>
               <div class="form-row">

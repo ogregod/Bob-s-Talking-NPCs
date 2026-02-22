@@ -26,7 +26,17 @@ export const HealingExecutor = {
   async execute(ctx) {
     const { actor, merchant, serviceDef, options } = ctx;
 
-    const cost = serviceDef?.basePrice ?? 0;
+    // Calculate cost using centralized pricing (supports tiered pricing)
+    const { calculateServicePrice } = await import("../service-pricing.mjs");
+    const { PriceType } = await import("../../data/merchant-model.mjs");
+
+    const cost = calculateServicePrice(serviceDef, {
+      selectedTier: options.tier,
+      actor,
+      merchant,
+      options
+    });
+
     if (cost > 0) {
       const gold = convertToGold(actor.system?.currency || {});
       if (gold < cost) {
@@ -35,13 +45,21 @@ export const HealingExecutor = {
       await ctx.deductGold(actor, cost);
     }
 
+    // Get selected tier data if using tiered pricing
+    let selectedTier = null;
+    if (serviceDef.priceType === PriceType.TIERED || serviceDef.priceType === "tiered") {
+      const tierIndex = options.tier ?? 0;
+      const tiers = serviceDef.pricingTiers || [];
+      selectedTier = tiers[Math.max(0, Math.min(tierIndex, tiers.length - 1))];
+    }
+
     const serviceType = serviceDef.type;
     let resultMessage = "";
     let effectData = null;
 
     switch (serviceType) {
       case "healing":
-        resultMessage = await _applyHealing(actor, serviceDef);
+        resultMessage = await _applyHealing(actor, serviceDef, selectedTier);
         break;
 
       case "cure_disease":
@@ -53,15 +71,15 @@ export const HealingExecutor = {
         break;
 
       case "restoration":
-        resultMessage = await _applyRestoration(actor, serviceDef, options);
+        resultMessage = await _applyRestoration(actor, serviceDef, selectedTier, options);
         break;
 
       case "resurrection":
-        resultMessage = await _applyResurrection(actor, options);
+        resultMessage = await _applyResurrection(actor, selectedTier, options);
         break;
 
       case "blessing":
-        resultMessage = await _applyBlessing(actor, serviceDef);
+        resultMessage = await _applyBlessing(actor, serviceDef, selectedTier);
         break;
 
       default:
@@ -109,7 +127,7 @@ export const HealingExecutor = {
 /**
  * Apply healing to actor
  */
-async function _applyHealing(actor, serviceDef) {
+async function _applyHealing(actor, serviceDef, tier = null) {
   const hp = actor.system?.attributes?.hp;
   if (!hp) return "Could not determine hit points.";
 
@@ -120,14 +138,42 @@ async function _applyHealing(actor, serviceDef) {
     return `${actor.name} is already at full health.`;
   }
 
-  // Determine heal amount from service config or heal to full
-  const healAmount = serviceDef.customData?.healAmount || (maxHp - currentHp);
+  let healAmount = 0;
+  let rollMessage = "";
+
+  // Determine heal amount from tier or service config
+  if (tier && tier.healAmount !== undefined) {
+    if (tier.healAmount === 0 || tier.healAmount === "full") {
+      // Heal to full
+      healAmount = maxHp - currentHp;
+    } else if (typeof tier.healAmount === "string" && tier.healAmount.includes("d")) {
+      // Roll dice (e.g., "2d8+2")
+      const roll = new Roll(tier.healAmount);
+      await roll.evaluate({ async: true });
+      healAmount = roll.total;
+
+      // Show roll in chat
+      rollMessage = ` (rolled ${tier.healAmount}: ${roll.total})`;
+      roll.toMessage({
+        flavor: `Healing: ${tier.name || "Divine Healing"}`,
+        speaker: { alias: "Temple Healing" }
+      });
+    } else {
+      // Fixed amount
+      healAmount = parseInt(tier.healAmount) || 0;
+    }
+  } else {
+    // Fallback to service config or heal to full
+    healAmount = serviceDef.customData?.healAmount || (maxHp - currentHp);
+  }
+
   const newHp = Math.min(currentHp + healAmount, maxHp);
   const actualHeal = newHp - currentHp;
 
   await actor.update({ "system.attributes.hp.value": newHp });
 
-  return `${actor.name} healed for ${actualHeal} hit points. (${newHp}/${maxHp} HP)`;
+  const tierName = tier?.name ? ` (${tier.name})` : "";
+  return `${actor.name} healed for ${actualHeal} hit points${rollMessage}${tierName}. (${newHp}/${maxHp} HP)`;
 }
 
 /**
@@ -164,13 +210,15 @@ async function _removeCondition(actor, statusIds, conditionName) {
 /**
  * Apply restoration (Greater/Lesser)
  */
-async function _applyRestoration(actor, serviceDef, options) {
+async function _applyRestoration(actor, serviceDef, tier = null, options) {
   const results = [];
+
+  // Determine levels to remove from tier or service config
+  const levelsToRemove = tier?.exhaustionLevels || serviceDef.customData?.exhaustionLevels || 1;
 
   // Remove exhaustion levels
   const exhaustion = actor.system?.attributes?.exhaustion || 0;
   if (exhaustion > 0) {
-    const levelsToRemove = serviceDef.customData?.exhaustionLevels || 1;
     const newExhaustion = Math.max(0, exhaustion - levelsToRemove);
     await actor.update({ "system.attributes.exhaustion": newExhaustion });
     results.push(`Exhaustion reduced from ${exhaustion} to ${newExhaustion}`);
@@ -198,7 +246,7 @@ async function _applyRestoration(actor, serviceDef, options) {
 /**
  * Apply resurrection
  */
-async function _applyResurrection(actor, options) {
+async function _applyResurrection(actor, tier = null, options) {
   const hp = actor.system?.attributes?.hp;
   if (!hp) return "Could not determine hit points.";
 
@@ -222,16 +270,17 @@ async function _applyResurrection(actor, options) {
     }
   }
 
-  return `${actor.name} has been raised from the dead! (1 HP)`;
+  const tierName = tier?.name ? ` (${tier.name})` : "";
+  return `${actor.name} has been raised from the dead${tierName}! (1 HP)`;
 }
 
 /**
  * Apply a blessing (temporary buff)
  */
-async function _applyBlessing(actor, serviceDef) {
+async function _applyBlessing(actor, serviceDef, tier = null) {
   // Create a temporary Active Effect for the blessing
-  const blessingData = serviceDef.customData?.blessing || {};
-  const duration = blessingData.duration || 86400; // Default: 24h in-game
+  const blessingData = tier?.blessing || serviceDef.customData?.blessing || {};
+  const duration = blessingData.duration || tier?.duration || 86400; // Default: 24h in-game
 
   const effectData = {
     name: serviceDef.name || "Divine Blessing",

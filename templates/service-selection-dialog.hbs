@@ -1,0 +1,235 @@
+{{!-- Service Selection Dialog --}}
+<div class="service-selection-content {{theme}}">
+  {{!-- Service Header --}}
+  <div class="service-header">
+    <div class="service-title">
+      <h2>{{serviceName}}</h2>
+      {{#if serviceDescription}}
+        <p class="service-description">{{serviceDescription}}</p>
+      {{/if}}
+    </div>
+
+    {{!-- Pricing Summary --}}
+    <div class="pricing-info">
+      <span class="pricing-mode">{{pricingSummary}}</span>
+    </div>
+  </div>
+
+  {{!-- Item Context (if applicable) --}}
+  {{#if hasItem}}
+    <div class="item-context">
+      <img src="{{itemImg}}" alt="{{itemName}}" class="item-icon">
+      <div class="item-details">
+        <span class="item-name">{{itemName}}</span>
+        {{#if isItemValue}}
+          <span class="item-value">Base Value: {{itemValueFormatted}}</span>
+        {{/if}}
+      </div>
+    </div>
+  {{/if}}
+
+  {{!-- Dialog Content (pricing type specific) --}}
+  <div class="dialog-content">
+
+    {{!-- Tiered Pricing Selection --}}
+    {{#if isTiered}}
+      <div class="tier-selection">
+        <h3>Select Service Tier</h3>
+        <div class="tier-cards">
+          {{#each tiers}}
+            <div class="tier-card {{#if this.selected}}selected{{/if}}"
+                 data-action="selectTier"
+                 data-tier="{{this.index}}">
+              <div class="tier-header">
+                <span class="tier-name">{{this.name}}</span>
+                <span class="tier-price">{{this.priceFormatted}}</span>
+              </div>
+
+              {{#if this.description}}
+                <p class="tier-description">{{this.description}}</p>
+              {{/if}}
+
+              <div class="tier-details">
+                {{#if this.healAmountDisplay}}
+                  <div class="tier-detail heal">
+                    <i class="fa-solid fa-heart"></i>
+                    <span>{{this.healAmountDisplay}}</span>
+                  </div>
+                {{/if}}
+
+                {{#if this.spellLevelDisplay}}
+                  <div class="tier-detail spell">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>{{this.spellLevelDisplay}}</span>
+                  </div>
+                {{/if}}
+
+                {{#if this.crMaxDisplay}}
+                  <div class="tier-detail creature">
+                    <i class="fa-solid fa-paw"></i>
+                    <span>{{this.crMaxDisplay}}</span>
+                  </div>
+                {{/if}}
+              </div>
+
+              {{#if this.selected}}
+                <div class="selected-indicator">
+                  <i class="fa-solid fa-check-circle"></i>
+                </div>
+              {{/if}}
+            </div>
+          {{/each}}
+        </div>
+      </div>
+    {{/if}}
+
+    {{!-- Spell Level Pricing Selection --}}
+    {{#if isSpellLevel}}
+      <div class="spell-level-selection">
+        <h3>Select Spell Level</h3>
+        <div class="spell-level-input">
+          <label>Spell Level (0-9):</label>
+          <input type="number"
+                 name="spellLevel"
+                 min="0"
+                 max="9"
+                 value="{{spellLevel}}"
+                 data-action="updateSpellLevel">
+        </div>
+
+        <div class="pricing-formula">
+          <p>
+            <strong>Pricing Formula:</strong>
+            {{spellLevelBase}}gp + (Level × {{spellLevelMultiplier}}gp)
+          </p>
+          <p class="calculation-example">
+            Level {{spellLevel}}: {{spellLevelBase}}gp + ({{spellLevel}} × {{spellLevelMultiplier}}gp) = <strong>{{basePriceFormatted}}</strong>
+          </p>
+        </div>
+      </div>
+    {{/if}}
+
+    {{!-- Enchantment Pricing Selection --}}
+    {{#if isEnchantment}}
+      <div class="enchantment-selection">
+        <h3>Select Enchantment</h3>
+
+        {{#if selectedEnchantment}}
+          <div class="selected-enchantment">
+            <div class="enchantment-info">
+              <i class="fa-solid fa-wand-sparkles"></i>
+              <span class="enchantment-name">{{enchantmentName}}</span>
+            </div>
+            <button type="button" class="change-enchantment-btn" data-action="pickEnchantment">
+              Change Enchantment
+            </button>
+          </div>
+        {{else}}
+          <div class="no-enchantment">
+            <p>No enchantment selected</p>
+            <button type="button" class="pick-enchantment-btn" data-action="pickEnchantment">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              Choose Enchantment
+            </button>
+          </div>
+        {{/if}}
+
+        <div class="enchantment-pricing-note">
+          <i class="fa-solid fa-info-circle"></i>
+          <p>Enchantment cost is based on enchantment rarity and item rarity</p>
+        </div>
+      </div>
+    {{/if}}
+
+    {{!-- Item Value Pricing Display --}}
+    {{#if isItemValue}}
+      <div class="item-value-pricing">
+        <h3>Pricing Breakdown</h3>
+        <div class="pricing-breakdown">
+          <div class="breakdown-row">
+            <span class="label">Item Base Value:</span>
+            <span class="value">{{itemValueFormatted}}</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="label">Service Rate:</span>
+            <span class="value">{{itemValuePercent}}%</span>
+          </div>
+          {{#if itemValueMinimum}}
+            <div class="breakdown-row">
+              <span class="label">Minimum Charge:</span>
+              <span class="value">{{itemValueMinimum}}gp</span>
+            </div>
+          {{/if}}
+        </div>
+      </div>
+    {{/if}}
+
+    {{!-- Quantity Selection (if applicable) --}}
+    {{#if supportsQuantity}}
+      <div class="quantity-selection">
+        <label>Quantity:</label>
+        <input type="number"
+               name="quantity"
+               min="1"
+               max="99"
+               value="{{quantity}}"
+               data-action="updateQuantity">
+      </div>
+    {{/if}}
+  </div>
+
+  {{!-- Price Summary --}}
+  <div class="price-summary">
+    <div class="price-row base">
+      <span class="label">Base Price:</span>
+      <span class="value">{{basePriceFormatted}}</span>
+    </div>
+
+    {{#if supportsQuantity}}
+      {{#if (gt quantity 1)}}
+        <div class="price-row quantity">
+          <span class="label">Quantity:</span>
+          <span class="value">×{{quantity}}</span>
+        </div>
+      {{/if}}
+    {{/if}}
+
+    <div class="price-row total">
+      <span class="label">Total Cost:</span>
+      <span class="value">{{totalPriceFormatted}}</span>
+    </div>
+
+    <div class="price-row actor-gold">
+      <span class="label">Your Gold:</span>
+      <span class="value {{#unless canAfford}}insufficient{{/unless}}">{{actorGoldFormatted}}</span>
+    </div>
+  </div>
+
+  {{!-- Action Buttons --}}
+  <div class="dialog-actions">
+    <button type="button" class="cancel-btn" data-action="cancel">
+      <i class="fa-solid fa-times"></i>
+      Cancel
+    </button>
+
+    <button type="button"
+            class="confirm-btn"
+            data-action="confirm"
+            {{#unless canAfford}}disabled{{/unless}}>
+      <i class="fa-solid fa-check"></i>
+      {{#if canAfford}}
+        Confirm Service
+      {{else}}
+        Insufficient Gold
+      {{/if}}
+    </button>
+  </div>
+
+  {{!-- Insufficient Gold Warning --}}
+  {{#unless canAfford}}
+    <div class="insufficient-gold-warning">
+      <i class="fa-solid fa-exclamation-triangle"></i>
+      <p>You do not have enough gold to purchase this service</p>
+    </div>
+  {{/unless}}
+</div>

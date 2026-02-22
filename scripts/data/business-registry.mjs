@@ -24,7 +24,7 @@ BusinessTypeRegistry.set(BusinessType.VILLAGE_BLACKSMITH, {
   coreServices: [
     { type: ServiceType.REPAIR, category: ServiceCategory.CRAFTING, name: "Repair Equipment", description: "Mend damaged weapons, armor, and tools back to working order", icon: "fa-wrench", basePrice: 10, priceType: "percent" },
     { type: ServiceType.SHARPEN, category: ServiceCategory.CRAFTING, name: "Sharpen Blade", description: "Hone a dull edge to razor sharpness on the grinding wheel", icon: "fa-swords", basePrice: 5, priceType: "fixed" },
-    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Custom Forging", description: "Commission a bespoke piece of ironwork to your exact specifications", icon: "fa-fire", basePrice: 50, priceType: "fixed" },
+    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Custom Forging", description: "Commission a bespoke piece of ironwork to your exact specifications", icon: "fa-fire", basePrice: 50, priceType: "itemValue", itemValuePercent: 100, itemValueMinimum: 0 },
     { type: ServiceType.REINFORCE, category: ServiceCategory.CRAFTING, name: "Reinforce Armor", description: "Strengthen weak points in armor with additional rivets and plating", icon: "fa-shield-halved", basePrice: 15, priceType: "percent" }
   ],
   crossCompatibleServices: [
@@ -54,11 +54,11 @@ BusinessTypeRegistry.set(BusinessType.MASTER_WEAPONSMITH, {
     { type: ServiceType.BLADE_HONING, category: ServiceCategory.CRAFTING, name: "Blade Honing", description: "Precision honing to restore a blade's perfect geometry", icon: "fa-staff-snake", basePrice: 15, priceType: "fixed" },
     { type: ServiceType.SILVERING, category: ServiceCategory.CRAFTING, name: "Silver a Weapon", description: "Coat a weapon in alchemical silver to strike creatures of the night", icon: "fa-moon", basePrice: 100, priceType: "fixed" },
     { type: ServiceType.HAFTING, category: ServiceCategory.CRAFTING, name: "Hafting & Pommel Work", description: "Replace or upgrade a weapon's haft, grip, or pommel", icon: "fa-hammer", basePrice: 15, priceType: "fixed" },
-    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Commission Masterwork", description: "Commission a weapon crafted to exacting standards by a true master", icon: "fa-fire", basePrice: 200, priceType: "fixed" }
+    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Commission Masterwork", description: "Commission a weapon crafted to exacting standards by a true master", icon: "fa-fire", basePrice: 200, priceType: "itemValue", itemValuePercent: 100, itemValueMinimum: 200 }
   ],
   crossCompatibleServices: [
     { type: ServiceType.REPAIR, sourceType: BusinessType.VILLAGE_BLACKSMITH, category: ServiceCategory.CRAFTING, name: "Weapon Repair", description: "Mend a damaged weapon back to fighting condition", icon: "fa-wrench", basePrice: 10, priceType: "percent" },
-    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Weapon", description: "Imbue a weapon with arcane power through runic forging", icon: "fa-wand-sparkles", basePrice: 250, priceType: "fixed" }
+    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Weapon", description: "Imbue a weapon with arcane power through runic forging", icon: "fa-wand-sparkles", basePrice: 100, priceType: "enchantment", useEnchantmentPricing: true, enchantmentPriceModifier: 1.0 }
   ],
   tags: ["weapons", "blades", "master", "forge"]
 });
@@ -87,7 +87,7 @@ BusinessTypeRegistry.set(BusinessType.ARMORER, {
   ],
   crossCompatibleServices: [
     { type: ServiceType.LEATHERWORK, sourceType: BusinessType.LEATHERWORKER, category: ServiceCategory.CRAFTING, name: "Leather Strapping", description: "Replace worn leather straps and padding in plate armor", icon: "fa-vest", basePrice: 8, priceType: "fixed" },
-    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Armor", description: "Weave protective enchantments into a suit of armor", icon: "fa-wand-sparkles", basePrice: 250, priceType: "fixed" }
+    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Armor", description: "Weave protective enchantments into a suit of armor", icon: "fa-wand-sparkles", basePrice: 100, priceType: "enchantment", useEnchantmentPricing: true, enchantmentPriceModifier: 1.0 }
   ],
   tags: ["armor", "plate", "mail", "shield"]
 });
@@ -193,7 +193,11 @@ BusinessTypeRegistry.set(BusinessType.STONEMASON, {
   backroom: { enabled: false },
   coreServices: [
     { type: ServiceType.STONEWORK, category: ServiceCategory.CRAFTING, name: "Stonework", description: "Cut, shape, and lay stone for walls, floors, and foundations", icon: "fa-cubes", basePrice: 25, priceType: "fixed" },
-    { type: ServiceType.STATUARY, category: ServiceCategory.CRAFTING, name: "Carve Statue", description: "Sculpt a figure or bust from a block of fine stone", icon: "fa-chess-queen", basePrice: 100, priceType: "fixed" },
+    { type: ServiceType.STATUARY, category: ServiceCategory.CRAFTING, name: "Carve Statue", description: "Sculpt a figure or bust from a block of fine stone", icon: "fa-chess-queen", basePrice: 100, priceType: "tiered", pricingTiers: [
+      { name: "Small Bust", description: "Decorative bust or figurine", price: 50, tier: 0 },
+      { name: "Life-Size Statue", description: "Full-scale humanoid figure", price: 200, tier: 1 },
+      { name: "Monument", description: "Grand commemorative sculpture", price: 1000, tier: 2 }
+    ] },
     { type: ServiceType.EXCAVATION, category: ServiceCategory.CRAFTING, name: "Excavation Work", description: "Dig cellars, tunnels, or foundations through earth and rock", icon: "fa-mountain", basePrice: 50, priceType: "fixed" },
     { type: ServiceType.STRUCTURAL_REPAIR, category: ServiceCategory.CRAFTING, name: "Structural Repair", description: "Repair crumbling walls, cracked foundations, and damaged masonry", icon: "fa-house-crack", basePrice: 30, priceType: "fixed" },
     { type: ServiceType.SECRET_DOORS, category: ServiceCategory.CRAFTING, name: "Hidden Passage", description: "Construct a concealed door or passage within stonework", icon: "fa-door-closed", basePrice: 200, priceType: "fixed" }
@@ -224,11 +228,11 @@ BusinessTypeRegistry.set(BusinessType.FINE_METALSMITH, {
     { type: ServiceType.ENGRAVE, category: ServiceCategory.CRAFTING, name: "Engraving", description: "Etch names, runes, or intricate patterns into metal surfaces", icon: "fa-pen-fancy", basePrice: 15, priceType: "fixed" },
     { type: ServiceType.POLISH, category: ServiceCategory.CRAFTING, name: "Polish & Restore", description: "Bring a tarnished piece back to its original gleaming luster", icon: "fa-star", basePrice: 5, priceType: "fixed" },
     { type: ServiceType.RESIZE, category: ServiceCategory.CRAFTING, name: "Resize Ring or Circlet", description: "Adjust a ring, circlet, or bracelet to fit a new wearer", icon: "fa-ring", basePrice: 8, priceType: "percent" },
-    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Commission Fine Piece", description: "Commission a bespoke piece of jewelry or ornamental metalwork", icon: "fa-crown", basePrice: 150, priceType: "fixed" }
+    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Commission Fine Piece", description: "Commission a bespoke piece of jewelry or ornamental metalwork", icon: "fa-crown", basePrice: 150, priceType: "itemValue", itemValuePercent: 150, itemValueMinimum: 150 }
   ],
   crossCompatibleServices: [
     { type: ServiceType.APPRAISE, sourceType: BusinessType.VILLAGE_BLACKSMITH, category: ServiceCategory.INFORMATION, name: "Appraise Precious Metal", description: "Determine the purity, weight, and value of precious metals and gems", icon: "fa-coins", basePrice: 10, priceType: "fixed" },
-    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Jewelry", description: "Imbue a fine piece with protective or empowering magic", icon: "fa-wand-sparkles", basePrice: 300, priceType: "fixed" }
+    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Jewelry", description: "Imbue a fine piece with protective or empowering magic", icon: "fa-wand-sparkles", basePrice: 100, priceType: "enchantment", useEnchantmentPricing: true, enchantmentPriceModifier: 1.0 }
   ],
   tags: ["gold", "silver", "filigree", "jewelry", "fine"]
 });
@@ -254,7 +258,12 @@ BusinessTypeRegistry.set(BusinessType.CARPENTER_JOINER, {
   backroom: { enabled: false },
   coreServices: [
     { type: ServiceType.WOODWORKING, category: ServiceCategory.CRAFTING, name: "Woodworking", description: "Cut, plane, and join timber for any purpose", icon: "fa-tree", basePrice: 10, priceType: "fixed" },
-    { type: ServiceType.FURNITURE, category: ServiceCategory.CRAFTING, name: "Craft Furniture", description: "Build sturdy tables, chairs, chests, and beds from solid wood", icon: "fa-couch", basePrice: 25, priceType: "fixed" },
+    { type: ServiceType.FURNITURE, category: ServiceCategory.CRAFTING, name: "Craft Furniture", description: "Build sturdy tables, chairs, chests, and beds from solid wood", icon: "fa-couch", basePrice: 25, priceType: "tiered", pricingTiers: [
+      { name: "Simple (stool, bench)", description: "Basic functional furniture", price: 10, tier: 0 },
+      { name: "Standard (table, chair)", description: "Quality everyday furniture", price: 25, tier: 1 },
+      { name: "Fine (desk, cabinet)", description: "Detailed craftsmanship", price: 100, tier: 2 },
+      { name: "Masterwork (throne, grand table)", description: "Artisan-quality showpiece", price: 500, tier: 3 }
+    ] },
     { type: ServiceType.STRUCTURAL_REPAIR, category: ServiceCategory.CRAFTING, name: "Structural Timber Repair", description: "Replace rotted beams, broken joists, and damaged framework", icon: "fa-house-crack", basePrice: 20, priceType: "fixed" },
     { type: ServiceType.RENOVATION, category: ServiceCategory.CRAFTING, name: "Renovation Work", description: "Remodel rooms, add partitions, or expand existing structures", icon: "fa-house-chimney", basePrice: 50, priceType: "fixed" }
   ],
@@ -335,13 +344,13 @@ BusinessTypeRegistry.set(BusinessType.BOWYER, {
   buyBack: { enabled: true, itemTypes: ["weapon"] },
   backroom: { enabled: true },
   coreServices: [
-    { type: ServiceType.BOW_CRAFTING, category: ServiceCategory.CRAFTING, name: "Craft Bow", description: "Shape a new longbow, shortbow, or crossbow from seasoned wood", icon: "fa-bullseye", basePrice: 30, priceType: "fixed" },
+    { type: ServiceType.BOW_CRAFTING, category: ServiceCategory.CRAFTING, name: "Craft Bow", description: "Shape a new longbow, shortbow, or crossbow from seasoned wood", icon: "fa-bullseye", basePrice: 30, priceType: "itemValue", itemValuePercent: 100, itemValueMinimum: 30 },
     { type: ServiceType.BOW_STRINGING, category: ServiceCategory.CRAFTING, name: "Restring Bow", description: "Replace a worn or snapped bowstring with a fresh one", icon: "fa-link", basePrice: 3, priceType: "fixed" },
     { type: ServiceType.CUSTOM_DRAW, category: ServiceCategory.CRAFTING, name: "Custom Draw Weight", description: "Adjust a bow's draw weight and length to match a specific archer", icon: "fa-sliders", basePrice: 15, priceType: "fixed" },
     { type: ServiceType.REPAIR, category: ServiceCategory.CRAFTING, name: "Repair Bow", description: "Mend a cracked limb or replace a damaged grip on a bow", icon: "fa-wrench", basePrice: 8, priceType: "percent" }
   ],
   crossCompatibleServices: [
-    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Bow", description: "Imbue a bow with arcane accuracy or elemental force", icon: "fa-wand-sparkles", basePrice: 250, priceType: "fixed" },
+    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Bow", description: "Imbue a bow with arcane accuracy or elemental force", icon: "fa-wand-sparkles", basePrice: 100, priceType: "enchantment", useEnchantmentPricing: true, enchantmentPriceModifier: 1.0 },
     { type: ServiceType.FLETCHING, sourceType: BusinessType.FLETCHER, category: ServiceCategory.CRAFTING, name: "Bundle of Arrows", description: "Order a quiver of well-fletched arrows to accompany a new bow", icon: "fa-location-arrow", basePrice: 5, priceType: "fixed" }
   ],
   tags: ["bow", "longbow", "crossbow", "ranged"]
@@ -365,11 +374,15 @@ BusinessTypeRegistry.set(BusinessType.FLETCHER, {
   coreServices: [
     { type: ServiceType.FLETCHING, category: ServiceCategory.CRAFTING, name: "Fletch Arrows", description: "Craft a batch of straight, true-flying arrows with keen heads", icon: "fa-location-arrow", basePrice: 5, priceType: "fixed" },
     { type: ServiceType.FLINT_KNAPPING, category: ServiceCategory.CRAFTING, name: "Knap Arrowheads", description: "Shape flint, obsidian, or stone into razor-sharp arrowheads", icon: "fa-gem", basePrice: 3, priceType: "fixed" },
-    { type: ServiceType.SPECIALTY_AMMO, category: ServiceCategory.CRAFTING, name: "Specialty Ammunition", description: "Craft broadheads, bodkin points, fire arrows, or blunted tips", icon: "fa-burst", basePrice: 15, priceType: "fixed" }
+    { type: ServiceType.SPECIALTY_AMMO, category: ServiceCategory.CRAFTING, name: "Specialty Ammunition", description: "Craft broadheads, bodkin points, fire arrows, or blunted tips", icon: "fa-burst", basePrice: 15, priceType: "tiered", pricingTiers: [
+      { name: "Standard Arrows (20)", description: "Basic fletched arrows", price: 1, tier: 0 },
+      { name: "Silvered Arrows (20)", description: "Silver-tipped for undead/lycanthropes", price: 100, tier: 1 },
+      { name: "Adamantine Arrows (20)", description: "Armor-piercing rare metal", price: 500, tier: 2 }
+    ] }
   ],
   crossCompatibleServices: [
     { type: ServiceType.BOW_STRINGING, sourceType: BusinessType.BOWYER, category: ServiceCategory.CRAFTING, name: "Emergency Restring", description: "Replace a snapped bowstring in the field", icon: "fa-link", basePrice: 5, priceType: "fixed" },
-    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Ammunition", description: "Imbue a batch of arrows or bolts with elemental energy", icon: "fa-wand-sparkles", basePrice: 100, priceType: "fixed" }
+    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Ammunition", description: "Imbue a batch of arrows or bolts with elemental energy", icon: "fa-wand-sparkles", basePrice: 100, priceType: "enchantment", useEnchantmentPricing: true, enchantmentPriceModifier: 1.0 }
   ],
   tags: ["arrow", "bolt", "ammo", "fletcher"]
 });
@@ -391,7 +404,12 @@ BusinessTypeRegistry.set(BusinessType.TANNER, {
   backroom: { enabled: false },
   coreServices: [
     { type: ServiceType.TANNING, category: ServiceCategory.CRAFTING, name: "Tan a Hide", description: "Cure and tan a raw animal hide into workable leather", icon: "fa-cow", basePrice: 5, priceType: "fixed" },
-    { type: ServiceType.HIDE_PROCESSING, category: ServiceCategory.CRAFTING, name: "Process Exotic Hide", description: "Prepare a dragon, wyvern, or other exotic hide for crafting", icon: "fa-dragon", basePrice: 50, priceType: "fixed" }
+    { type: ServiceType.HIDE_PROCESSING, category: ServiceCategory.CRAFTING, name: "Process Exotic Hide", description: "Prepare a dragon, wyvern, or other exotic hide for crafting", icon: "fa-dragon", basePrice: 50, priceType: "tiered", pricingTiers: [
+      { name: "Common Hide", description: "Bear, wolf, deer leather", price: 5, tier: 0 },
+      { name: "Quality Hide", description: "Exotic beasts, thick scales", price: 15, tier: 1 },
+      { name: "Exotic Hide (drake, basilisk)", description: "Magical creature hide", price: 50, tier: 2 },
+      { name: "Legendary Hide (dragon, behemoth)", description: "Ancient creature scales", price: 200, tier: 3 }
+    ] }
   ],
   crossCompatibleServices: [
     { type: ServiceType.LEATHERWORK, sourceType: BusinessType.LEATHERWORKER, category: ServiceCategory.CRAFTING, name: "Basic Leatherwork", description: "Shape freshly tanned leather into simple goods", icon: "fa-vest", basePrice: 8, priceType: "fixed" },
@@ -418,7 +436,7 @@ BusinessTypeRegistry.set(BusinessType.LEATHERWORKER, {
   coreServices: [
     { type: ServiceType.LEATHERWORK, category: ServiceCategory.CRAFTING, name: "Leather Crafting", description: "Stitch and tool leather into armor, bags, belts, and scabbards", icon: "fa-vest", basePrice: 10, priceType: "fixed" },
     { type: ServiceType.REPAIR, category: ServiceCategory.CRAFTING, name: "Repair Leather Goods", description: "Patch torn leather armor, replace broken straps, and restitch seams", icon: "fa-wrench", basePrice: 8, priceType: "percent" },
-    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Custom Leather Order", description: "Commission a bespoke leather item crafted to your measurements", icon: "fa-ruler", basePrice: 40, priceType: "fixed" },
+    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Custom Leather Order", description: "Commission a bespoke leather item crafted to your measurements", icon: "fa-ruler", basePrice: 40, priceType: "itemValue", itemValuePercent: 100, itemValueMinimum: 40 },
     { type: ServiceType.RESIZE, category: ServiceCategory.CRAFTING, name: "Resize Leather Armor", description: "Adjust leather armor to fit a different wearer", icon: "fa-arrows-left-right", basePrice: 10, priceType: "percent" }
   ],
   crossCompatibleServices: [
@@ -474,7 +492,7 @@ BusinessTypeRegistry.set(BusinessType.TAILOR, {
   coreServices: [
     { type: ServiceType.ALTERATIONS, category: ServiceCategory.CRAFTING, name: "Alterations", description: "Take in, let out, or reshape a garment for a perfect fit", icon: "fa-scissors", basePrice: 5, priceType: "percent" },
     { type: ServiceType.RESIZE, category: ServiceCategory.CRAFTING, name: "Resize Garment", description: "Adjust clothing to fit a different body type entirely", icon: "fa-arrows-left-right", basePrice: 8, priceType: "percent" },
-    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Commission Garment", description: "Have a fine outfit or robe tailored to your exact specifications", icon: "fa-shirt", basePrice: 30, priceType: "fixed" },
+    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Commission Garment", description: "Have a fine outfit or robe tailored to your exact specifications", icon: "fa-shirt", basePrice: 30, priceType: "itemValue", itemValuePercent: 100, itemValueMinimum: 30 },
     { type: ServiceType.REPAIR, category: ServiceCategory.CRAFTING, name: "Mend Clothing", description: "Patch tears, replace buttons, and darn holes in damaged clothing", icon: "fa-wrench", basePrice: 3, priceType: "percent" },
     { type: ServiceType.DYEING, category: ServiceCategory.CRAFTING, name: "Dye Garment", description: "Change the color of a garment with quality dyes", icon: "fa-palette", basePrice: 5, priceType: "fixed" }
   ],
@@ -504,7 +522,7 @@ BusinessTypeRegistry.set(BusinessType.WEAVER_DYER, {
     { type: ServiceType.WEAVING, category: ServiceCategory.CRAFTING, name: "Weave Cloth", description: "Weave raw fiber into bolts of linen, wool, or silk cloth", icon: "fa-scroll", basePrice: 8, priceType: "fixed" },
     { type: ServiceType.DYEING, category: ServiceCategory.CRAFTING, name: "Dye Fabric", description: "Immerse cloth or garments in rich, colorfast dyes", icon: "fa-palette", basePrice: 5, priceType: "fixed" },
     { type: ServiceType.RUG_MAKING, category: ServiceCategory.CRAFTING, name: "Weave Rug or Tapestry", description: "Create a decorative rug, tapestry, or wall hanging", icon: "fa-table-cells", basePrice: 30, priceType: "fixed" },
-    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Custom Fabric Order", description: "Commission a bolt of cloth in a specific weave, weight, and color", icon: "fa-ruler", basePrice: 20, priceType: "fixed" }
+    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Custom Fabric Order", description: "Commission a bolt of cloth in a specific weave, weight, and color", icon: "fa-ruler", basePrice: 20, priceType: "itemValue", itemValuePercent: 100, itemValueMinimum: 20 }
   ],
   crossCompatibleServices: [
     { type: ServiceType.ALTERATIONS, sourceType: BusinessType.TAILOR, category: ServiceCategory.CRAFTING, name: "Simple Hemming", description: "Hem or edge a length of cloth for finished use", icon: "fa-scissors", basePrice: 3, priceType: "fixed" },
@@ -560,7 +578,7 @@ BusinessTypeRegistry.set(BusinessType.APOTHECARY, {
   buyBack: { enabled: true, itemTypes: ["consumable", "loot"] },
   backroom: { enabled: true },
   coreServices: [
-    { type: ServiceType.BREW_POTION, category: ServiceCategory.MAGIC, name: "Brew Remedy", description: "Compound a potion, salve, or tincture from rare herbs and reagents", icon: "fa-flask-vial", basePrice: 25, priceType: "fixed" },
+    { type: ServiceType.BREW_POTION, category: ServiceCategory.MAGIC, name: "Brew Remedy", description: "Compound a potion, salve, or tincture from rare herbs and reagents", icon: "fa-flask-vial", basePrice: 25, priceType: "spellLevel", spellLevelBase: 25, spellLevelMultiplier: 25 },
     { type: ServiceType.CURE_DISEASE, category: ServiceCategory.HEALING, name: "Treat Disease", description: "Prescribe herbal remedies and poultices to fight infection and plague", icon: "fa-virus-slash", basePrice: 25, priceType: "fixed" },
     { type: ServiceType.CURE_POISON, category: ServiceCategory.HEALING, name: "Neutralize Poison", description: "Administer antivenom or a purging draught to cleanse toxins", icon: "fa-skull-crossbones", basePrice: 20, priceType: "fixed" },
     { type: ServiceType.APPRAISE, category: ServiceCategory.INFORMATION, name: "Identify Herb or Reagent", description: "Determine the properties and value of an unknown herb or substance", icon: "fa-leaf", basePrice: 5, priceType: "fixed" }
@@ -588,13 +606,17 @@ BusinessTypeRegistry.set(BusinessType.ALCHEMIST, {
   buyBack: { enabled: true, itemTypes: ["consumable", "loot"] },
   backroom: { enabled: true },
   coreServices: [
-    { type: ServiceType.BREW_POTION, category: ServiceCategory.MAGIC, name: "Synthesize Compound", description: "Distill, combine, and transmute reagents into potent alchemical products", icon: "fa-flask-vial", basePrice: 50, priceType: "fixed" },
+    { type: ServiceType.BREW_POTION, category: ServiceCategory.MAGIC, name: "Synthesize Compound", description: "Distill, combine, and transmute reagents into potent alchemical products", icon: "fa-flask-vial", basePrice: 25, priceType: "spellLevel", spellLevelBase: 25, spellLevelMultiplier: 25 },
     { type: ServiceType.IDENTIFY, category: ServiceCategory.MAGIC, name: "Analyze Substance", description: "Subject an unknown substance to rigorous alchemical analysis", icon: "fa-magnifying-glass", basePrice: 20, priceType: "fixed" },
     { type: ServiceType.APPRAISE, category: ServiceCategory.INFORMATION, name: "Appraise Reagent", description: "Assess the purity and market value of alchemical ingredients", icon: "fa-coins", basePrice: 5, priceType: "fixed" },
-    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.MAGIC, name: "Custom Formula", description: "Develop a bespoke alchemical formula to your specifications", icon: "fa-prescription-bottle", basePrice: 100, priceType: "fixed" }
+    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.MAGIC, name: "Custom Formula", description: "Develop a bespoke alchemical formula to your specifications", icon: "fa-prescription-bottle", basePrice: 100, priceType: "tiered", pricingTiers: [
+      { name: "Simple Compound", description: "Basic mixture or tincture", price: 50, tier: 0 },
+      { name: "Complex Formula", description: "Advanced reagents and precise techniques", price: 150, tier: 1 },
+      { name: "Experimental Concoction", description: "Cutting-edge alchemical research", price: 500, tier: 2 }
+    ] }
   ],
   crossCompatibleServices: [
-    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Alchemical Enchantment", description: "Infuse an item with alchemical essences that mimic enchantment", icon: "fa-wand-sparkles", basePrice: 200, priceType: "fixed" },
+    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Alchemical Enchantment", description: "Infuse an item with alchemical essences that mimic enchantment", icon: "fa-wand-sparkles", basePrice: 100, priceType: "enchantment", useEnchantmentPricing: true, enchantmentPriceModifier: 1.2 },
     { type: ServiceType.GLASSWORK, sourceType: BusinessType.GLASSBLOWER, category: ServiceCategory.CRAFTING, name: "Custom Glassware", description: "Commission specialized alchemical vessels and apparatus", icon: "fa-wine-glass", basePrice: 15, priceType: "fixed" }
   ],
   tags: ["alchemy", "transmute", "elixir", "compound"]
@@ -617,13 +639,17 @@ BusinessTypeRegistry.set(BusinessType.WIZARDS_TOWER, {
   backroom: { enabled: true },
   coreServices: [
     { type: ServiceType.IDENTIFY, category: ServiceCategory.MAGIC, name: "Identify Magic Item", description: "Unravel the enchantments woven into a mysterious artifact", icon: "fa-magnifying-glass", basePrice: 25, priceType: "fixed" },
-    { type: ServiceType.ENCHANT, category: ServiceCategory.MAGIC, name: "Enchant Item", description: "Bind arcane power into an item through ritual and will", icon: "fa-wand-magic-sparkles", basePrice: 300, priceType: "fixed" },
+    { type: ServiceType.ENCHANT, category: ServiceCategory.MAGIC, name: "Enchant Item", description: "Bind arcane power into an item through ritual and will", icon: "fa-wand-magic-sparkles", basePrice: 100, priceType: "enchantment", useEnchantmentPricing: true, enchantmentPriceModifier: 1.5 },
     { type: ServiceType.ARCANE_CONSULTATION, category: ServiceCategory.MAGIC, name: "Arcane Consultation", description: "Consult the wizard on matters of magic, planar lore, or ancient mysteries", icon: "fa-hat-wizard", basePrice: 50, priceType: "fixed" },
-    { type: ServiceType.TELEPORTATION, category: ServiceCategory.MAGIC, name: "Teleportation Circle", description: "Travel instantly to a known teleportation circle in another location", icon: "fa-circle-nodes", basePrice: 250, priceType: "fixed" },
-    { type: ServiceType.SPELL_COPYING, category: ServiceCategory.MAGIC, name: "Copy Spell", description: "Allow a wizard to copy a spell from the tower's library into their spellbook", icon: "fa-book-open", basePrice: 50, priceType: "fixed" }
+    { type: ServiceType.TELEPORTATION, category: ServiceCategory.MAGIC, name: "Teleportation Circle", description: "Travel instantly to a known teleportation circle in another location", icon: "fa-circle-nodes", basePrice: 250, priceType: "tiered", pricingTiers: [
+      { name: "Local (same continent)", description: "Short-range teleportation within region", price: 250, tier: 0 },
+      { name: "Continental", description: "Long-range teleportation across the continent", price: 500, tier: 1 },
+      { name: "Planar", description: "Interplanar travel to another plane of existence", price: 1000, tier: 2 }
+    ] },
+    { type: ServiceType.SPELL_COPYING, category: ServiceCategory.MAGIC, name: "Copy Spell", description: "Allow a wizard to copy a spell from the tower's library into their spellbook", icon: "fa-book-open", basePrice: 10, priceType: "spellLevel", spellLevelBase: 10, spellLevelMultiplier: 50 }
   ],
   crossCompatibleServices: [
-    { type: ServiceType.SCRIBE_SCROLL, sourceType: BusinessType.SCRIBE_SCRIVENER, category: ServiceCategory.MAGIC, name: "Scribe Spell Scroll", description: "Have a spell inscribed onto a scroll for later use", icon: "fa-scroll", basePrice: 100, priceType: "fixed" },
+    { type: ServiceType.SCRIBE_SCROLL, sourceType: BusinessType.SCRIBE_SCRIVENER, category: ServiceCategory.MAGIC, name: "Scribe Spell Scroll", description: "Have a spell inscribed onto a scroll for later use", icon: "fa-scroll", basePrice: 25, priceType: "spellLevel", spellLevelBase: 25, spellLevelMultiplier: 25 },
     { type: ServiceType.LORE_RESEARCH, sourceType: BusinessType.LIBRARY_ARCHIVES, category: ServiceCategory.INFORMATION, name: "Arcane Research", description: "Research a specific magical topic in the tower's private library", icon: "fa-book", basePrice: 30, priceType: "fixed" }
   ],
   tags: ["wizard", "magic", "arcane", "tower", "spell"]
@@ -646,7 +672,7 @@ BusinessTypeRegistry.set(BusinessType.SCRIBE_SCRIVENER, {
   backroom: { enabled: true },
   coreServices: [
     { type: ServiceType.LETTER_WRITING, category: ServiceCategory.MISC, name: "Write a Letter", description: "Compose a formal letter, petition, or correspondence in elegant script", icon: "fa-envelope", basePrice: 3, priceType: "fixed" },
-    { type: ServiceType.SCRIBE_SCROLL, category: ServiceCategory.MAGIC, name: "Scribe Scroll", description: "Inscribe a spell scroll with precise arcane notation", icon: "fa-scroll", basePrice: 75, priceType: "fixed" },
+    { type: ServiceType.SCRIBE_SCROLL, category: ServiceCategory.MAGIC, name: "Scribe Scroll", description: "Inscribe a spell scroll with precise arcane notation", icon: "fa-scroll", basePrice: 25, priceType: "spellLevel", spellLevelBase: 25, spellLevelMultiplier: 25 },
     { type: ServiceType.FORGERY, category: ServiceCategory.MISC, name: "Produce a Forgery", description: "Create a convincing replica of a document, seal, or signature", icon: "fa-stamp", basePrice: 50, priceType: "fixed" },
     { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.MISC, name: "Commission Manuscript", description: "Have a book, codex, or illuminated manuscript produced to order", icon: "fa-book", basePrice: 100, priceType: "fixed" }
   ],
@@ -700,9 +726,9 @@ BusinessTypeRegistry.set(BusinessType.ENCHANTER, {
   buyBack: { enabled: true, itemTypes: ["weapon", "equipment"] },
   backroom: { enabled: true },
   coreServices: [
-    { type: ServiceType.ENCHANT, category: ServiceCategory.MAGIC, name: "Enchant Item", description: "Weave permanent magical properties into a weapon, armor, or trinket", icon: "fa-wand-magic-sparkles", basePrice: 250, priceType: "fixed" },
-    { type: ServiceType.DISENCHANT, category: ServiceCategory.MAGIC, name: "Disenchant Item", description: "Strip an item of its magical properties, salvaging residual essence", icon: "fa-ban", basePrice: 100, priceType: "fixed" },
-    { type: ServiceType.RECHARGE, category: ServiceCategory.MAGIC, name: "Recharge Magic Item", description: "Restore expended charges to a wand, staff, or charged item", icon: "fa-bolt", basePrice: 150, priceType: "fixed" },
+    { type: ServiceType.ENCHANT, category: ServiceCategory.MAGIC, name: "Enchant Item", description: "Weave permanent magical properties into a weapon, armor, or trinket", icon: "fa-wand-magic-sparkles", basePrice: 100, priceType: "enchantment", useEnchantmentPricing: true, enchantmentPriceModifier: 1.0 },
+    { type: ServiceType.DISENCHANT, category: ServiceCategory.MAGIC, name: "Disenchant Item", description: "Strip an item of its magical properties, salvaging residual essence", icon: "fa-ban", basePrice: 100, priceType: "itemValue", itemValuePercent: 25, itemValueMinimum: 100 },
+    { type: ServiceType.RECHARGE, category: ServiceCategory.MAGIC, name: "Recharge Magic Item", description: "Restore expended charges to a wand, staff, or charged item", icon: "fa-bolt", basePrice: 75, priceType: "itemValue", itemValuePercent: 15, itemValueMinimum: 75 },
     { type: ServiceType.ATTUNE, category: ServiceCategory.MAGIC, name: "Attunement Assistance", description: "Guide an adventurer through the delicate process of attuning to a magical item", icon: "fa-hand-sparkles", basePrice: 50, priceType: "fixed" }
   ],
   crossCompatibleServices: [
@@ -729,8 +755,13 @@ BusinessTypeRegistry.set(BusinessType.ENGINEER_TINKERER, {
   backroom: { enabled: true },
   coreServices: [
     { type: ServiceType.GADGET_REPAIR, category: ServiceCategory.CRAFTING, name: "Repair Device", description: "Fix a broken clockwork, mechanical, or intricate device", icon: "fa-gears", basePrice: 15, priceType: "fixed" },
-    { type: ServiceType.TRAP_MAKING, category: ServiceCategory.CRAFTING, name: "Build Trap", description: "Design and construct a mechanical trap, alarm, or deterrent", icon: "fa-skull-crossbones", basePrice: 50, priceType: "fixed" },
-    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Commission Gadget", description: "Design and build a custom mechanical device to specification", icon: "fa-lightbulb", basePrice: 75, priceType: "fixed" },
+    { type: ServiceType.TRAP_MAKING, category: ServiceCategory.CRAFTING, name: "Build Trap", description: "Design and construct a mechanical trap, alarm, or deterrent", icon: "fa-skull-crossbones", basePrice: 50, priceType: "tiered", pricingTiers: [
+      { name: "Simple Tripwire", description: "Basic alarm or snare", price: 25, tier: 0 },
+      { name: "Bear Trap / Pit", description: "Damaging mechanical trap", price: 75, tier: 1 },
+      { name: "Poison Dart Trap", description: "Complex triggered mechanism", price: 150, tier: 2 },
+      { name: "Elaborate Mechanism", description: "Multi-stage deadly trap", price: 500, tier: 3 }
+    ] },
+    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Commission Gadget", description: "Design and build a custom mechanical device to specification", icon: "fa-lightbulb", basePrice: 75, priceType: "itemValue", itemValuePercent: 125, itemValueMinimum: 75 },
     { type: ServiceType.REPAIR, category: ServiceCategory.CRAFTING, name: "General Repair", description: "Fix any complex mechanism, from crossbow triggers to clockwork toys", icon: "fa-wrench", basePrice: 10, priceType: "percent" }
   ],
   crossCompatibleServices: [
@@ -1072,8 +1103,17 @@ BusinessTypeRegistry.set(BusinessType.MENAGERIE, {
   buyBack: { enabled: true, itemTypes: ["loot"] },
   backroom: { enabled: true },
   coreServices: [
-    { type: ServiceType.COMPANION_SALE, category: ServiceCategory.ANIMAL, name: "Purchase Exotic Beast", description: "Buy a rare or exotic creature as a companion, guard, or curiosity", icon: "fa-dragon", basePrice: 200, priceType: "fixed" },
-    { type: ServiceType.FAMILIAR_SOURCING, category: ServiceCategory.ANIMAL, name: "Source a Familiar", description: "Acquire a suitable creature for use as an arcane familiar", icon: "fa-dove", basePrice: 100, priceType: "fixed" },
+    { type: ServiceType.COMPANION_SALE, category: ServiceCategory.ANIMAL, name: "Purchase Exotic Beast", description: "Buy a rare or exotic creature as a companion, guard, or curiosity", icon: "fa-dragon", basePrice: 200, priceType: "tiered", pricingTiers: [
+      { name: "Common (cat, raven, owl)", description: "Small familiar-type creatures", price: 25, crMax: 0, tier: 0 },
+      { name: "Uncommon (hawk, monkey)", description: "Useful companion animals", price: 100, crMax: 0.25, tier: 1 },
+      { name: "Rare (pseudodragon, sprite)", description: "Magical or intelligent beasts", price: 500, crMax: 1, tier: 2 },
+      { name: "Exotic (imp, quasit)", description: "Dangerous or otherworldly creatures", price: 2000, crMax: 2, tier: 3 }
+    ] },
+    { type: ServiceType.FAMILIAR_SOURCING, category: ServiceCategory.ANIMAL, name: "Source a Familiar", description: "Acquire a suitable creature for use as an arcane familiar", icon: "fa-dove", basePrice: 100, priceType: "tiered", pricingTiers: [
+      { name: "Common Familiar", description: "Cat, owl, raven, rat, or toad", price: 50, tier: 0 },
+      { name: "Magical Familiar", description: "Imp, pseudodragon, quasit, or sprite", price: 200, tier: 1 },
+      { name: "Exotic Familiar", description: "Rare or planar creatures", price: 1000, tier: 2 }
+    ] },
     { type: ServiceType.BEAST_TAMING, category: ServiceCategory.ANIMAL, name: "Tame Wild Beast", description: "Break and domesticate a captured wild creature", icon: "fa-shield-dog", basePrice: 75, priceType: "fixed" },
     { type: ServiceType.ANIMAL_REHABILITATION, category: ServiceCategory.ANIMAL, name: "Rehabilitate Creature", description: "Nurse an injured or sick exotic creature back to health", icon: "fa-heart-pulse", basePrice: 30, priceType: "fixed" }
   ],
@@ -1128,7 +1168,11 @@ BusinessTypeRegistry.set(BusinessType.COURIER_POST, {
   buyBack: { enabled: false },
   backroom: { enabled: false },
   coreServices: [
-    { type: ServiceType.COURIER_SERVICE, category: ServiceCategory.TRANSPORT, name: "Send a Letter", description: "Dispatch a letter or message by foot courier to a nearby settlement", icon: "fa-envelope", basePrice: 5, priceType: "fixed" },
+    { type: ServiceType.COURIER_SERVICE, category: ServiceCategory.TRANSPORT, name: "Send a Letter", description: "Dispatch a letter or message by courier to a destination", icon: "fa-envelope", basePrice: 5, priceType: "tiered", pricingTiers: [
+      { name: "Local (same city)", description: "Delivered within the day", price: 2, tier: 0 },
+      { name: "Regional (1-3 days)", description: "Nearby settlements", price: 10, tier: 1 },
+      { name: "Long Distance (1 week+)", description: "Far cities or other regions", price: 50, tier: 2 }
+    ] },
     { type: ServiceType.CARAVAN_POST, category: ServiceCategory.TRANSPORT, name: "Parcel by Caravan", description: "Send a package with the next merchant caravan heading in your direction", icon: "fa-box", basePrice: 10, priceType: "fixed" },
     { type: ServiceType.SECURE_TRANSPORT, category: ServiceCategory.TRANSPORT, name: "Secure Delivery", description: "Hire an armed courier for valuable or sensitive deliveries", icon: "fa-lock", basePrice: 50, priceType: "fixed" },
     { type: ServiceType.CARRIER_PIGEON, category: ServiceCategory.TRANSPORT, name: "Send by Pigeon", description: "Dispatch an urgent short message by trained carrier pigeon", icon: "fa-dove", basePrice: 3, priceType: "fixed" }
@@ -1246,11 +1290,24 @@ BusinessTypeRegistry.set(BusinessType.TEMPLE_LARGE, {
   buyBack: { enabled: false },
   backroom: { enabled: true },
   coreServices: [
-    { type: ServiceType.HEALING, category: ServiceCategory.HEALING, name: "Divine Healing", description: "Receive miraculous healing through prayer and divine grace", icon: "fa-heart-pulse", basePrice: 25, priceType: "fixed" },
+    { type: ServiceType.HEALING, category: ServiceCategory.HEALING, name: "Divine Healing", description: "Receive miraculous healing through prayer and divine grace", icon: "fa-heart-pulse", basePrice: 25, priceType: "tiered", pricingTiers: [
+      { name: "Minor Healing (1d8+1)", description: "Cure Wounds - minor injuries", healAmount: "1d8+1", price: 10, tier: 0 },
+      { name: "Moderate Healing (2d8+2)", description: "Cure Wounds - moderate wounds", healAmount: "2d8+2", price: 25, tier: 1 },
+      { name: "Major Healing (3d8+3)", description: "Cure Wounds - serious injuries", healAmount: "3d8+3", price: 50, tier: 2 },
+      { name: "Full Healing", description: "Complete restoration of all wounds", healAmount: 0, price: 100, tier: 3 }
+    ] },
     { type: ServiceType.CURE_DISEASE, category: ServiceCategory.HEALING, name: "Cure Disease", description: "Cleanse disease through holy rites and divine intervention", icon: "fa-virus-slash", basePrice: 50, priceType: "fixed" },
     { type: ServiceType.REMOVE_CURSE, category: ServiceCategory.HEALING, name: "Remove Curse", description: "Break a curse through ritual prayer and divine power", icon: "fa-hand-sparkles", basePrice: 100, priceType: "fixed" },
-    { type: ServiceType.RESTORATION, category: ServiceCategory.HEALING, name: "Restoration", description: "Restore drained abilities, youth, or vitality through greater divine magic", icon: "fa-sun", basePrice: 200, priceType: "fixed" },
-    { type: ServiceType.RESURRECTION, category: ServiceCategory.HEALING, name: "Raise the Dead", description: "Call a departed soul back from the beyond to rejoin the living", icon: "fa-cross", basePrice: 500, priceType: "fixed" },
+    { type: ServiceType.RESTORATION, category: ServiceCategory.HEALING, name: "Restoration", description: "Restore drained abilities, youth, or vitality through greater divine magic", icon: "fa-sun", basePrice: 100, priceType: "tiered", pricingTiers: [
+      { name: "Lesser Restoration", description: "Remove paralysis, poison, or disease (2nd level)", price: 100, spellLevel: 2, tier: 0 },
+      { name: "Greater Restoration", description: "Remove curses, petrification, ability damage (5th level)", price: 450, spellLevel: 5, tier: 1 }
+    ] },
+    { type: ServiceType.RESURRECTION, category: ServiceCategory.HEALING, name: "Raise the Dead", description: "Call a departed soul back from the beyond to rejoin the living", icon: "fa-cross", basePrice: 1000, priceType: "tiered", pricingTiers: [
+      { name: "Revivify", description: "Raise recently deceased (within 1 minute) - 3rd level", price: 500, spellLevel: 3, tier: 0 },
+      { name: "Raise Dead", description: "Raise deceased (within 10 days) - 5th level", price: 1500, spellLevel: 5, tier: 1 },
+      { name: "Resurrection", description: "Raise long-dead (within 100 years) - 7th level", price: 5000, spellLevel: 7, tier: 2 },
+      { name: "True Resurrection", description: "Raise any deceased (no time limit, no body needed) - 9th level", price: 50000, spellLevel: 9, tier: 3 }
+    ] },
     { type: ServiceType.BLESSING, category: ServiceCategory.HEALING, name: "Receive Blessing", description: "Receive a priestly blessing for protection, luck, or safe travels", icon: "fa-hand-holding-heart", basePrice: 10, priceType: "fixed" }
   ],
   crossCompatibleServices: [
@@ -1422,7 +1479,12 @@ BusinessTypeRegistry.set(BusinessType.ARTISTS_STUDIO, {
   backroom: { enabled: false },
   coreServices: [
     { type: ServiceType.PORTRAIT, category: ServiceCategory.ARTS, name: "Paint Portrait", description: "Sit for a painted portrait in oils, from a quick sketch to a grand canvas", icon: "fa-image", basePrice: 25, priceType: "fixed" },
-    { type: ServiceType.COMMISSION_ART, category: ServiceCategory.ARTS, name: "Commission Artwork", description: "Order a painting, mural, or sculpture to your specifications", icon: "fa-paintbrush", basePrice: 50, priceType: "fixed" },
+    { type: ServiceType.COMMISSION_ART, category: ServiceCategory.ARTS, name: "Commission Artwork", description: "Order a painting, mural, or sculpture to your specifications", icon: "fa-paintbrush", basePrice: 50, priceType: "tiered", pricingTiers: [
+      { name: "Small Sketch", description: "Charcoal or ink drawing", price: 10, tier: 0 },
+      { name: "Portrait", description: "Canvas portrait painting", price: 50, tier: 1 },
+      { name: "Large Canvas", description: "Grand landscape or scene", price: 200, tier: 2 },
+      { name: "Mural / Epic Work", description: "Wall-sized masterpiece", price: 1000, tier: 3 }
+    ] },
     { type: ServiceType.ART_RESTORATION, category: ServiceCategory.ARTS, name: "Restore Artwork", description: "Clean, repair, and restore damaged paintings, frescoes, or sculptures", icon: "fa-wand-magic-sparkles", basePrice: 30, priceType: "fixed" },
     { type: ServiceType.SKETCH_ARTIST, category: ServiceCategory.ARTS, name: "Sketch a Likeness", description: "Quick charcoal sketch of a person, place, or creature from description", icon: "fa-pen", basePrice: 5, priceType: "fixed" }
   ],
@@ -1451,11 +1513,11 @@ BusinessTypeRegistry.set(BusinessType.LUTHIER, {
   coreServices: [
     { type: ServiceType.INSTRUMENT_REPAIR, category: ServiceCategory.ARTS, name: "Repair Instrument", description: "Fix cracks, replace strings, and restore damaged instruments", icon: "fa-wrench", basePrice: 10, priceType: "percent" },
     { type: ServiceType.INSTRUMENT_TUNING, category: ServiceCategory.ARTS, name: "Tune Instrument", description: "Professionally tune and adjust an instrument for perfect pitch", icon: "fa-sliders", basePrice: 3, priceType: "fixed" },
-    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.ARTS, name: "Commission Instrument", description: "Have a bespoke instrument crafted from fine woods and materials", icon: "fa-guitar", basePrice: 100, priceType: "fixed" },
+    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.ARTS, name: "Commission Instrument", description: "Have a bespoke instrument crafted from fine woods and materials", icon: "fa-guitar", basePrice: 100, priceType: "itemValue", itemValuePercent: 100, itemValueMinimum: 100 },
     { type: ServiceType.APPRAISE, category: ServiceCategory.INFORMATION, name: "Appraise Instrument", description: "Assess the age, origin, and value of a musical instrument", icon: "fa-magnifying-glass", basePrice: 5, priceType: "fixed" }
   ],
   crossCompatibleServices: [
-    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Instrument", description: "Imbue an instrument with magical resonance for bardic casting", icon: "fa-wand-sparkles", basePrice: 200, priceType: "fixed" },
+    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Instrument", description: "Imbue an instrument with magical resonance for bardic casting", icon: "fa-wand-sparkles", basePrice: 100, priceType: "enchantment", useEnchantmentPricing: true, enchantmentPriceModifier: 1.0 },
     { type: ServiceType.WOODWORKING, sourceType: BusinessType.CARPENTER_JOINER, category: ServiceCategory.CRAFTING, name: "Custom Wood Selection", description: "Source rare tonewoods for an instrument body or neck", icon: "fa-tree", basePrice: 25, priceType: "fixed" }
   ],
   tags: ["luthier", "music", "instrument", "lute", "bard"]
@@ -1478,13 +1540,13 @@ BusinessTypeRegistry.set(BusinessType.JEWELER, {
   backroom: { enabled: true },
   coreServices: [
     { type: ServiceType.APPRAISE, category: ServiceCategory.INFORMATION, name: "Appraise Gems", description: "Examine and assess the cut, clarity, and value of precious stones", icon: "fa-gem", basePrice: 10, priceType: "fixed" },
-    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Commission Jewelry", description: "Design a custom piece of jewelry with your choice of metals and gems", icon: "fa-ring", basePrice: 100, priceType: "fixed" },
+    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.CRAFTING, name: "Commission Jewelry", description: "Design a custom piece of jewelry with your choice of metals and gems", icon: "fa-ring", basePrice: 100, priceType: "itemValue", itemValuePercent: 150, itemValueMinimum: 100 },
     { type: ServiceType.REPAIR, category: ServiceCategory.CRAFTING, name: "Repair Jewelry", description: "Fix broken clasps, replace missing stones, and restore damaged pieces", icon: "fa-wrench", basePrice: 15, priceType: "percent" },
     { type: ServiceType.RESIZE, category: ServiceCategory.CRAFTING, name: "Resize Jewelry", description: "Adjust rings, bracelets, and circlets for a perfect fit", icon: "fa-ring", basePrice: 8, priceType: "fixed" },
     { type: ServiceType.POLISH, category: ServiceCategory.CRAFTING, name: "Clean & Polish", description: "Restore the brilliance of tarnished or dull jewelry", icon: "fa-star", basePrice: 3, priceType: "fixed" }
   ],
   crossCompatibleServices: [
-    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Jewelry", description: "Have gems enchanted with protective or enhancing magic", icon: "fa-wand-sparkles", basePrice: 250, priceType: "fixed" },
+    { type: ServiceType.ENCHANT, sourceType: BusinessType.ENCHANTER, category: ServiceCategory.MAGIC, name: "Enchant Jewelry", description: "Have gems enchanted with protective or enhancing magic", icon: "fa-wand-sparkles", basePrice: 100, priceType: "enchantment", useEnchantmentPricing: true, enchantmentPriceModifier: 1.0 },
     { type: ServiceType.FINE_METALWORK, sourceType: BusinessType.FINE_METALSMITH, category: ServiceCategory.CRAFTING, name: "Fine Metal Setting", description: "Set gems in elaborate gold or platinum mountings", icon: "fa-ring", basePrice: 30, priceType: "fixed" }
   ],
   tags: ["jeweler", "gems", "rings", "precious", "stones"]
@@ -1594,9 +1656,19 @@ BusinessTypeRegistry.set(BusinessType.SHIPYARD, {
   buyBack: { enabled: false },
   backroom: { enabled: false },
   coreServices: [
-    { type: ServiceType.SHIP_REPAIR, category: ServiceCategory.MARITIME, name: "Repair Hull", description: "Patch holes, replace rotted planking, and restore a damaged hull", icon: "fa-ship", basePrice: 100, priceType: "fixed" },
+    { type: ServiceType.SHIP_REPAIR, category: ServiceCategory.MARITIME, name: "Repair Hull", description: "Patch holes, replace rotted planking, and restore a damaged hull", icon: "fa-ship", basePrice: 100, priceType: "tiered", pricingTiers: [
+      { name: "Minor Repairs (sails, rigging)", description: "Fix torn sails and replace worn rigging", price: 100, tier: 0 },
+      { name: "Moderate Damage (hull breach)", description: "Patch hull breaches and replace planking", price: 500, tier: 1 },
+      { name: "Major Overhaul", description: "Extensive repairs to structure and masts", price: 2000, tier: 2 },
+      { name: "Complete Rebuild", description: "Rebuild ship from keel up", price: 10000, tier: 3 }
+    ] },
     { type: ServiceType.CAULKING, category: ServiceCategory.MARITIME, name: "Caulk & Seal", description: "Seal hull seams with oakum and tar to prevent leaks", icon: "fa-droplet", basePrice: 25, priceType: "fixed" },
-    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.MARITIME, name: "Commission Vessel", description: "Order a new boat, ship, or barge built to your specifications", icon: "fa-anchor", basePrice: 500, priceType: "fixed" },
+    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.MARITIME, name: "Commission Vessel", description: "Order a new boat, ship, or barge built to your specifications", icon: "fa-anchor", basePrice: 500, priceType: "tiered", pricingTiers: [
+      { name: "Rowboat", description: "Small craft for rivers and calm waters", price: 50, tier: 0 },
+      { name: "Sailing Ship", description: "Merchant vessel for trade routes", price: 10000, tier: 1 },
+      { name: "Warship", description: "Armed vessel for naval combat", price: 25000, tier: 2 },
+      { name: "Galleon", description: "Massive flagship for exploration or war", price: 50000, tier: 3 }
+    ] },
     { type: ServiceType.SALVAGE, category: ServiceCategory.MARITIME, name: "Salvage Operations", description: "Recover cargo and materials from sunken or wrecked vessels", icon: "fa-life-ring", basePrice: 75, priceType: "fixed" }
   ],
   crossCompatibleServices: [
@@ -1738,7 +1810,7 @@ BusinessTypeRegistry.set(BusinessType.LIBRARY_ARCHIVES, {
     { type: ServiceType.LORE_RESEARCH, category: ServiceCategory.INFORMATION, name: "Research a Topic", description: "Spend hours poring over texts to uncover information on a specific subject", icon: "fa-book-open-reader", basePrice: 15, priceType: "fixed" },
     { type: ServiceType.RESEARCH, category: ServiceCategory.INFORMATION, name: "Hire a Researcher", description: "Commission an archivist to search for information on your behalf", icon: "fa-magnifying-glass", basePrice: 30, priceType: "fixed" },
     { type: ServiceType.TRANSLATION, category: ServiceCategory.INFORMATION, name: "Translate Text", description: "Have an ancient or foreign text translated by the library's scholars", icon: "fa-language", basePrice: 20, priceType: "fixed" },
-    { type: ServiceType.SPELL_COPYING, category: ServiceCategory.MAGIC, name: "Copy Spell from Archive", description: "Wizards may copy spells from the library's collection into their own spellbook", icon: "fa-book", basePrice: 50, priceType: "fixed" }
+    { type: ServiceType.SPELL_COPYING, category: ServiceCategory.MAGIC, name: "Copy Spell from Archive", description: "Wizards may copy spells from the library's collection into their own spellbook", icon: "fa-book", basePrice: 10, priceType: "spellLevel", spellLevelBase: 10, spellLevelMultiplier: 50 }
   ],
   crossCompatibleServices: [
     { type: ServiceType.CARTOGRAPHY, sourceType: BusinessType.CARTOGRAPHER, category: ServiceCategory.INFORMATION, name: "Historical Maps", description: "Access the library's collection of historical and antique maps", icon: "fa-map", basePrice: 10, priceType: "fixed" },
@@ -1763,7 +1835,12 @@ BusinessTypeRegistry.set(BusinessType.GLASSHOUSE, {
   buyBack: { enabled: true, itemTypes: ["consumable", "loot"] },
   backroom: { enabled: true },
   coreServices: [
-    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.MISC, name: "Cultivate Rare Plant", description: "Commission the growing of a rare or exotic herb from seed or cutting", icon: "fa-seedling", basePrice: 25, priceType: "fixed" },
+    { type: ServiceType.CUSTOM_ORDER, category: ServiceCategory.MISC, name: "Cultivate Rare Plant", description: "Commission the growing of a rare or exotic herb from seed or cutting", icon: "fa-seedling", basePrice: 25, priceType: "tiered", pricingTiers: [
+      { name: "Common Herb", description: "Basic medicinal or culinary plant", price: 5, tier: 0 },
+      { name: "Uncommon Plant", description: "Specialized growing conditions required", price: 25, tier: 1 },
+      { name: "Rare Botanical", description: "Delicate climate and soil needs", price: 100, tier: 2 },
+      { name: "Legendary Flora", description: "Mythical plant requiring extraordinary care", price: 500, tier: 3 }
+    ] },
     { type: ServiceType.APPRAISE, category: ServiceCategory.INFORMATION, name: "Identify Plant", description: "Have an unknown plant, herb, or fungus identified by an expert botanist", icon: "fa-leaf", basePrice: 5, priceType: "fixed" },
     { type: ServiceType.CURE_POISON, category: ServiceCategory.HEALING, name: "Antidote Herbs", description: "Source fresh antidote herbs for poison treatment", icon: "fa-leaf", basePrice: 15, priceType: "fixed" },
     { type: ServiceType.RESEARCH, category: ServiceCategory.INFORMATION, name: "Botanical Research", description: "Study the properties and uses of rare plants in the collection", icon: "fa-flask-vial", basePrice: 10, priceType: "fixed" }
@@ -1846,7 +1923,12 @@ BusinessTypeRegistry.set(BusinessType.FALCONER, {
   backroom: { enabled: false },
   coreServices: [
     { type: ServiceType.FALCONRY, category: ServiceCategory.ANIMAL, name: "Train Raptor", description: "Capture and train a hawk, falcon, or eagle for hunting or scouting", icon: "fa-feather", basePrice: 50, priceType: "fixed" },
-    { type: ServiceType.COMPANION_SALE, category: ServiceCategory.ANIMAL, name: "Purchase Raptor", description: "Buy a trained hunting bird -- hawk, falcon, or owl", icon: "fa-dove", basePrice: 75, priceType: "fixed" },
+    { type: ServiceType.COMPANION_SALE, category: ServiceCategory.ANIMAL, name: "Purchase Raptor", description: "Buy a trained hunting bird -- hawk, falcon, or owl", icon: "fa-dove", basePrice: 75, priceType: "tiered", pricingTiers: [
+      { name: "Common Bird (crow, pigeon)", description: "Message carrier or pet", price: 10, tier: 0 },
+      { name: "Hunting Bird (hawk, falcon)", description: "Trained hunter raptor", price: 75, tier: 1 },
+      { name: "Rare Bird (eagle, vulture)", description: "Large powerful raptor", price: 200, tier: 2 },
+      { name: "Exotic Bird (giant eagle)", description: "Intelligent magical bird", price: 1000, tier: 3 }
+    ] },
     { type: ServiceType.ANIMAL_HEALING, category: ServiceCategory.ANIMAL, name: "Treat Raptor", description: "Treat injuries, broken feathers, or illness in a bird of prey", icon: "fa-kit-medical", basePrice: 10, priceType: "fixed" },
     { type: ServiceType.CARRIER_PIGEON, category: ServiceCategory.TRANSPORT, name: "Message by Bird", description: "Send a message via trained raptor or carrier hawk", icon: "fa-dove", basePrice: 5, priceType: "fixed" }
   ],

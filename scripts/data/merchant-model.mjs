@@ -477,6 +477,25 @@ export const ServiceType = Object.freeze({
 });
 
 /**
+ * Service pricing types
+ * Defines how a service's cost is calculated
+ */
+export const PriceType = Object.freeze({
+  // Existing pricing modes
+  FIXED: "fixed",              // Flat gold amount
+  PERCENT: "percent",          // Percentage of item value
+  PER_DAY: "perDay",          // Per day pricing (rentals)
+  PER_ITEM: "perItem",        // Per item pricing
+  VARIABLE: "variable",        // Custom calculation (set at use)
+
+  // New dynamic pricing modes
+  ITEM_VALUE: "itemValue",     // Based on % of item's value with minimum floor
+  SPELL_LEVEL: "spellLevel",   // Base + (spell level × multiplier)
+  ENCHANTMENT: "enchantment",  // Uses enchantment system pricing
+  TIERED: "tiered"            // Multiple service tiers to choose from
+});
+
+/**
  * Create a service definition
  * @param {object} data - Service data
  * @returns {object}
@@ -493,10 +512,25 @@ export function createServiceDefinition(data = {}) {
     // Pricing
     enabled: data.enabled ?? false,
     basePrice: data.basePrice ?? 0,
-    priceType: data.priceType || "fixed",  // fixed, percent, perDay, perItem, variable
+    priceType: data.priceType || "fixed",  // fixed, percent, perDay, perItem, variable, itemValue, spellLevel, enchantment, tiered
     pricePercent: data.pricePercent ?? 0,  // For percent-based pricing
     pricePerUnit: data.pricePerUnit ?? 0,  // For per-day/per-item pricing
     currency: data.currency || "gp",
+
+    // NEW: Item value percentage pricing (for itemValue priceType)
+    itemValuePercent: data.itemValuePercent ?? 10,  // Percentage of item's value
+    itemValueMinimum: data.itemValueMinimum ?? 0,   // Minimum price floor (0 = no minimum)
+
+    // NEW: Spell level pricing (for spellLevel priceType)
+    spellLevelBase: data.spellLevelBase ?? 25,           // Base cost
+    spellLevelMultiplier: data.spellLevelMultiplier ?? 50, // Gold per spell level
+
+    // NEW: Enchantment system integration (for enchantment priceType)
+    useEnchantmentPricing: data.useEnchantmentPricing ?? false,
+    enchantmentPriceModifier: data.enchantmentPriceModifier ?? 1.0, // Shop-specific multiplier
+
+    // NEW: Tiered pricing (for tiered priceType)
+    pricingTiers: data.pricingTiers || [],  // Array of tier objects: [{name, description, price, tier, healAmount, spellLevel, crMax, etc.}]
 
     // Duration
     hasDuration: data.hasDuration ?? false,
