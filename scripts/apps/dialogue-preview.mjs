@@ -11,6 +11,18 @@ import { NodeType } from "../data/dialogue-model.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 /**
+ * Ensure a value is an array (handles Foundry form data converting arrays to objects)
+ * @param {*} value - Value that should be an array
+ * @returns {Array}
+ */
+function ensureArray(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'object') return Object.values(value);
+  return [];
+}
+
+/**
  * Dialogue Preview Application
  * Simulates dialogue execution for testing
  */
@@ -206,9 +218,9 @@ export class DialoguePreview extends HandlebarsApplicationMixin(ApplicationV2) {
 
       case NodeType.PLAYER_CHOICE:
         // Player response options
-        (node.responses || []).forEach((response, index) => {
+        ensureArray(node.responses).forEach((response, index) => {
           // Check conditions (simplified for preview)
-          const available = this._checkConditions(response.conditions || []);
+          const available = this._checkConditions(ensureArray(response.conditions));
           responses.push({
             id: response.id,
             index,
@@ -285,12 +297,12 @@ export class DialoguePreview extends HandlebarsApplicationMixin(ApplicationV2) {
 
       case NodeType.BRANCH:
         // Show each branch option
-        (node.branches || []).forEach((branch, index) => {
+        ensureArray(node.branches).forEach((branch, index) => {
           responses.push({
             id: `branch_${index}`,
             text: `[Branch ${index + 1}] ${branch.label || "Unlabeled"}`,
             nextNodeId: branch.nextNodeId,
-            available: this._checkConditions(branch.conditions || [])
+            available: this._checkConditions(ensureArray(branch.conditions))
           });
         });
         break;
