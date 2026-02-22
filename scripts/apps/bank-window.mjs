@@ -71,6 +71,9 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       setTab: BankWindow.#onSetTab,
       selectAccount: BankWindow.#onSelectAccount,
       openAccount: BankWindow.#onOpenAccount,
+      openCustomFund: BankWindow.#onOpenCustomFund,
+      closeAccount: BankWindow.#onCloseAccount,
+      renameAccount: BankWindow.#onRenameAccount,
       confirmDeposit: BankWindow.#onDeposit,
       confirmWithdraw: BankWindow.#onWithdraw,
       confirmTransfer: BankWindow.#onTransfer,
@@ -353,6 +356,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const balanceBreakdown = this._formatCurrencyBreakdown(account.balance);
     const isChecking = account.type === AccountType.PERSONAL || account.type === AccountType.PARTY;
     const isSavings = account.type === AccountType.SAVINGS;
+    const isCustomFund = account.type === AccountType.CUSTOM_FUND;
 
     // Format transactions for display (most recent 20, newest first)
     const formattedTransactions = (account.transactions || []).slice(-20).reverse().map(t => ({
@@ -371,20 +375,40 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         : formatCurrency(t.balanceAfter || 0)
     }));
 
+    // Custom fund progress
+    const savingsGoal = account.metadata?.savingsGoal || 0;
+    const currentBalance = balanceBreakdown.totalGold;
+    const goalProgress = savingsGoal > 0 ? Math.min(100, Math.round((currentBalance / savingsGoal) * 100)) : 0;
+
     return {
       ...account,
       balance: balanceBreakdown,
       balanceFormatted: balanceBreakdown.totalFormatted,
-      typeLabel: isSavings ? localize("Bank.Savings") : localize("Bank.Checking"),
-      typeIcon: isSavings ? "fa-piggy-bank" : "fa-wallet",
-      typeClass: isSavings ? "savings" : "checking",
+      typeLabel: isCustomFund ? account.name
+        : isSavings ? localize("Bank.Savings")
+        : localize("Bank.Checking"),
+      typeIcon: isCustomFund ? "fa-bullseye" : isSavings ? "fa-piggy-bank" : "fa-wallet",
+      typeClass: isCustomFund ? "custom-fund" : isSavings ? "savings" : "checking",
       isSelected: account.id === this._selectedAccountId,
+      isCustomFund,
+      isChecking,
+      isSavings,
       accountNumber: account.accountNumber || "---",
       interestRate: account.interest?.enabled ? `${(account.interest.rate * 100).toFixed(1)}%` : null,
       hasInterest: account.interest?.enabled ?? false,
+      hasSavingsGoal: savingsGoal > 0,
+      savingsGoal: savingsGoal,
+      savingsGoalFormatted: formatCurrency(savingsGoal),
+      goalProgress,
+      goalProgressWidth: `${goalProgress}%`,
+      goalReached: currentBalance >= savingsGoal && savingsGoal > 0,
+      amountRemaining: Math.max(0, savingsGoal - currentBalance),
+      amountRemainingFormatted: formatCurrency(Math.max(0, savingsGoal - currentBalance)),
       lastActivity: this._formatGameTime(account.updatedAt),
       formattedTransactions,
-      hasTransactions: formattedTransactions.length > 0
+      hasTransactions: formattedTransactions.length > 0,
+      canClose: isCustomFund,  // Only custom funds can be closed
+      canRename: isCustomFund  // Only custom funds can be renamed
     };
   }
 
@@ -514,6 +538,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     // Check which types the player already has
     const hasChecking = accounts.some(a => a.type === AccountType.PERSONAL || a.type === AccountType.PARTY);
     const hasSavings = accounts.some(a => a.type === AccountType.SAVINGS);
+    const customFunds = accounts.filter(a => a.type === AccountType.CUSTOM_FUND);
 
     return {
       accountTypes: accountTypes.filter(t => {
@@ -522,6 +547,10 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         return true;
       }),
       canOpenAccount: accountTypes.length > 0 && (!hasChecking || !hasSavings),
+      canCreateCustomFund: true,  // Always allow creating custom funds
+      customFunds: customFunds.map(a => this._prepareAccount(a)),
+      hasCustomFunds: customFunds.length > 0,
+      customFundCount: customFunds.length,
       totalBalanceGold: accounts.reduce((sum, a) => sum + copperToGold(toCopper(a.balance)), 0)
     };
   }
@@ -717,6 +746,154 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       } else {
         ui.notifications.error(result.message);
       }
+    } catch (error) {
+      ui.notifications.error(error.message);
+    }
+  }
+
+  static async #onOpenCustomFund(event, target) {
+    // Prompt for fund name and optional goal amount
+    const dialog = await Dialog.prompt({
+      title: localize("Bank.CreateCustomFund") || "Create Custom Savings Fund",
+      content: `
+        <form class="bobsnpc-form">
+          <div class="form-group">
+            <label>${localize("Bank.FundName") || "Fund Name"}</label>
+            <input type="text" name="fundName" placeholder="${localize("Bank.FundNamePlaceholder") || "e.g. Sword Fund, House Fund"}" required />
+          </div>
+          <div class="form-group">
+            <label>${localize("Bank.SavesGoal") || "Savings Goal (optional)"}</label>
+            <input type="number" name="savingsGoal" placeholder="1000" min="0" />
+            <small>${localize("Bank.SavesGoalHint") || "Set a target amount you're saving for"}</small>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="enableInterest" checked />
+              ${localize("Bank.EnableInterest") || "Earn interest on this fund"}
+            </label>
+          </div>
+        </form>
+      `,
+      callback: (html) => {
+        const form = html.querySelector("form");
+        const formData = new FormData(form);
+        return {
+          name: formData.get("fundName")?.trim(),
+          savingsGoal: parseInt(formData.get("savingsGoal")) || 0,
+          enableInterest: formData.get("enableInterest") === "on"
+        };
+      },
+      rejectClose: false
+    });
+
+    if (!dialog || !dialog.name) return;
+
+    try {
+      const bank = getBankHandler().getBank(this.bankId);
+      const result = await getBankHandler().openAccount(
+        this.bankId,
+        this.playerActorUuid,
+        {
+          type: AccountType.CUSTOM_FUND,
+          name: dialog.name,
+          metadata: {
+            savingsGoal: dialog.savingsGoal,
+            createdAt: getCurrentGameTime()
+          },
+          interest: dialog.enableInterest ? {
+            enabled: true,
+            rate: bank.rates?.savingsInterest ?? 0.01,
+            period: "month",
+            lastAccrual: null,
+            accruedAmount: 0
+          } : { enabled: false }
+        }
+      );
+
+      if (result.success) {
+        ui.notifications.info(localize("Bank.Messages.FundCreated") || `${dialog.name} fund created!`);
+        this._selectedAccountId = result.account.id;
+        this.render();
+      } else {
+        ui.notifications.error(result.message);
+      }
+    } catch (error) {
+      ui.notifications.error(error.message);
+    }
+  }
+
+  static async #onCloseAccount(event, target) {
+    const accountId = target.dataset.accountId || this._selectedAccountId;
+    if (!accountId) return;
+
+    const account = getBankHandler().getAccount(accountId);
+    if (!account) return;
+
+    const balance = copperToGold(toCopper(account.balance));
+    const balanceFormatted = formatCurrency(balance);
+
+    const confirmed = await Dialog.confirm({
+      title: localize("Bank.CloseAccount") || "Close Account",
+      content: `
+        <p>${localize("Bank.CloseAccountConfirm") || "Are you sure you want to close this account?"}</p>
+        <p><strong>${account.name}</strong></p>
+        <p>${localize("Bank.CurrentBalance") || "Current Balance"}: <strong>${balanceFormatted}</strong></p>
+        ${balance > 0 ? `<p class="notification warning">${localize("Bank.BalanceWillBeWithdrawn") || "The remaining balance will be withdrawn to your character."}</p>` : ""}
+      `,
+      yes: () => true,
+      no: () => false,
+      defaultYes: false
+    });
+
+    if (!confirmed) return;
+
+    try {
+      const result = await getBankHandler().closeAccount(accountId, this.playerActorUuid);
+      if (result.success) {
+        ui.notifications.info(result.message || localize("Bank.Messages.AccountClosed") || "Account closed!");
+        this._selectedAccountId = null;
+        this._playerActor = await fromUuid(this.playerActorUuid);
+        this.render();
+      } else {
+        ui.notifications.error(result.message);
+      }
+    } catch (error) {
+      ui.notifications.error(error.message);
+    }
+  }
+
+  static async #onRenameAccount(event, target) {
+    const accountId = target.dataset.accountId || this._selectedAccountId;
+    if (!accountId) return;
+
+    const account = getBankHandler().getAccount(accountId);
+    if (!account) return;
+
+    const newName = await Dialog.prompt({
+      title: localize("Bank.RenameAccount") || "Rename Account",
+      content: `
+        <form>
+          <div class="form-group">
+            <label>${localize("Bank.AccountName") || "Account Name"}</label>
+            <input type="text" name="accountName" value="${account.name}" required autofocus />
+          </div>
+        </form>
+      `,
+      callback: (html) => html.querySelector('input[name="accountName"]')?.value?.trim(),
+      rejectClose: false
+    });
+
+    if (!newName) return;
+
+    try {
+      // Update account name via handler
+      const handler = getBankHandler();
+      const updated = { ...account, name: newName, updatedAt: getCurrentGameTime() };
+      handler._accountCache.set(accountId, updated);
+      await handler._saveData();
+
+      ui.notifications.info(localize("Bank.Messages.AccountRenamed") || "Account renamed!");
+      this.render();
     } catch (error) {
       ui.notifications.error(error.message);
     }

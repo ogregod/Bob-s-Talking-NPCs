@@ -326,10 +326,12 @@ export class BankHandler {
       return { success: false, message: localize("BOBSNPC.BankNotFound") };
     }
 
-    // Check if already has account
-    const existingAccount = this.getAccountForPlayer(playerActorUuid, bankId);
-    if (existingAccount) {
-      return { success: false, message: localize("BOBSNPC.AccountAlreadyExists") };
+    // Check if already has account (only for non-custom fund types)
+    if (options.type !== AccountType.CUSTOM_FUND) {
+      const existingAccount = this.getAccountForPlayer(playerActorUuid, bankId);
+      if (existingAccount && existingAccount.type === options.type) {
+        return { success: false, message: localize("BOBSNPC.AccountAlreadyExists") };
+      }
     }
 
     const actor = await fromUuid(playerActorUuid);
@@ -351,7 +353,15 @@ export class BankHandler {
       ownerUuid: playerActorUuid,
       ownerName: actor.name,
       type: options.type || AccountType.PERSONAL,
-      name: options.name || `${actor.name}'s Account`
+      name: options.name || `${actor.name}'s Account`,
+      metadata: options.metadata || {},
+      interest: options.interest || (options.type === AccountType.SAVINGS ? {
+        enabled: true,
+        rate: bank.rates?.savingsInterest ?? 0.01,
+        period: "month",
+        lastAccrual: null,
+        accruedAmount: 0
+      } : { enabled: false })
     });
 
     this._accountCache.set(account.id, account);

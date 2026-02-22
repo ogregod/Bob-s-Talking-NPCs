@@ -2,6 +2,56 @@
 
 All notable changes to Bob's Talking NPCs will be documented in this file.
 
+## [0.3.0] - 2025-02-22
+
+### 🏦 Banking System Enhancements
+
+The comprehensive banking system has been enhanced with custom savings funds (like "Sword Fund", "House Fund", etc.):
+
+#### Added
+- **Custom Named Savings Funds** (`AccountType.CUSTOM_FUND`):
+  - Create unlimited custom savings accounts with your own names
+  - Set optional savings goals with visual progress tracking
+  - Enable/disable interest per fund
+  - Perfect for saving toward specific purchases (gear, property, mounts, etc.)
+
+- **Enhanced Account Management**:
+  - Rename custom funds at any time
+  - Close custom funds with automatic balance return
+  - View all custom funds in accounts tab
+  - Goal progress bars showing % complete
+  - Amount remaining display
+
+- **Account Metadata System**:
+  - Added `metadata` field to bank accounts for extensibility
+  - Supports savings goals, custom notes, and future features
+  - Preserved through saves and migrations
+
+- **Improved Localization**:
+  - 16 new Bank localization strings
+  - Custom fund creation prompts
+  - Goal tracking messages
+  - Account management confirmations
+
+#### Modified
+- `bank-model.mjs`: Added CUSTOM_FUND account type and metadata field
+- `bank-handler.mjs`: Updated openAccount to support custom funds and metadata
+- `bank-window.mjs`: Added 3 new action handlers (openCustomFund, closeAccount, renameAccount)
+- `bank-window.mjs`: Enhanced _prepareAccount to show goal progress for custom funds
+- `templates/bank/content.hbs`: Added custom fund UI with goal tracking, rename/close buttons, and fund creation section
+- `lang/en.json`: Added 9 new banking localization strings + 2 Common strings (Or, Rename)
+
+#### Banking System Overview
+The existing banking system (3,268 lines) includes:
+- ✓ Multiple account types (checking, savings, custom funds)
+- ✓ Loans with interest calculations and payment schedules
+- ✓ Time-based interest accrual using game time
+- ✓ Transaction logging with full history
+- ✓ Safe deposit boxes for item storage
+- ✓ Inter-account transfers
+- ✓ Global bank networks
+- ✓ Full dialogue integration via BANK nodes
+
 ## [0.2.001] - 2025-02-22
 
 ### 🎉 Major Features

@@ -56,6 +56,40 @@
                   {{this.balanceFormatted}}
                 </div>
 
+                {{!-- Savings Goal Progress (Custom Funds) --}}
+                {{#if this.hasSavingsGoal}}
+                  <div class="savings-goal-section">
+                    <div class="goal-header">
+                      <span class="goal-label">
+                        <i class="fa-solid fa-bullseye"></i>
+                        {{localize "BOBSNPC.Bank.SavesGoal"}}
+                      </span>
+                      <span class="goal-amount">{{this.savingsGoalFormatted}}</span>
+                    </div>
+                    <div class="goal-progress-bar">
+                      <div class="goal-progress-fill {{#if this.goalReached}}complete{{/if}}"
+                           style="width: {{this.goalProgressWidth}}">
+                        {{#if this.goalReached}}
+                          <i class="fa-solid fa-check"></i>
+                        {{/if}}
+                      </div>
+                    </div>
+                    <div class="goal-stats">
+                      {{#if this.goalReached}}
+                        <span class="goal-reached-badge">
+                          <i class="fa-solid fa-trophy"></i>
+                          {{localize "BOBSNPC.Bank.GoalReached"}}
+                        </span>
+                      {{else}}
+                        <span class="goal-remaining">
+                          {{this.amountRemainingFormatted}} {{localize "BOBSNPC.Bank.AmountRemaining"}}
+                        </span>
+                      {{/if}}
+                      <span class="goal-progress-pct">{{this.goalProgress}}%</span>
+                    </div>
+                  </div>
+                {{/if}}
+
                 <div class="account-meta">
                   {{#if this.hasInterest}}
                     <span class="interest-badge" data-tooltip="{{localize 'BOBSNPC.Bank.AnnualInterest'}}">
@@ -68,6 +102,26 @@
                     {{this.lastActivity}}
                   </span>
                 </div>
+
+                {{!-- Custom Fund Actions --}}
+                {{#if this.canRename}}
+                  <div class="account-actions">
+                    <button type="button" class="account-action-btn rename"
+                            data-action="renameAccount" data-account-id="{{this.id}}"
+                            data-tooltip="{{localize 'BOBSNPC.Bank.RenameAccount'}}">
+                      <i class="fa-solid fa-edit"></i>
+                      {{localize "BOBSNPC.Common.Rename"}}
+                    </button>
+                    {{#if this.canClose}}
+                      <button type="button" class="account-action-btn close"
+                              data-action="closeAccount" data-account-id="{{this.id}}"
+                              data-tooltip="{{localize 'BOBSNPC.Bank.CloseAccount'}}">
+                        <i class="fa-solid fa-times-circle"></i>
+                        {{localize "BOBSNPC.Common.Close"}}
+                      </button>
+                    {{/if}}
+                  </div>
+                {{/if}}
               </div>
             </div>
           {{/each}}
@@ -162,6 +216,64 @@
               </div>
             {{/each}}
           </div>
+        </div>
+      {{/if}}
+
+      {{!-- Create Custom Savings Fund --}}
+      {{#if canCreateCustomFund}}
+        <div class="custom-fund-section">
+          <div class="section-divider">
+            <span>{{localize "BOBSNPC.Common.Or"}}</span>
+          </div>
+
+          <div class="custom-fund-card">
+            <div class="custom-fund-icon">
+              <i class="fa-solid fa-bullseye"></i>
+            </div>
+            <div class="custom-fund-info">
+              <h4>{{localize "BOBSNPC.Bank.CreateCustomFund"}}</h4>
+              <p>{{localize "BOBSNPC.Bank.CustomFundDescription"}}</p>
+              <ul class="custom-fund-features">
+                <li><i class="fa-solid fa-check"></i> {{localize "BOBSNPC.Bank.CustomFundFeature1"}}</li>
+                <li><i class="fa-solid fa-check"></i> {{localize "BOBSNPC.Bank.CustomFundFeature2"}}</li>
+                <li><i class="fa-solid fa-check"></i> {{localize "BOBSNPC.Bank.CustomFundFeature3"}}</li>
+              </ul>
+            </div>
+            <button type="button" class="action-btn custom-fund-btn" data-action="openCustomFund">
+              <i class="fa-solid fa-plus-circle"></i>
+              {{localize "BOBSNPC.Bank.CreateFund"}}
+            </button>
+          </div>
+
+          {{!-- Show existing custom funds --}}
+          {{#if hasCustomFunds}}
+            <div class="custom-funds-list">
+              <h5>
+                <i class="fa-solid fa-folder-open"></i>
+                {{localize "BOBSNPC.Bank.YourCustomFunds"}} ({{customFundCount}})
+              </h5>
+              <div class="custom-funds-grid">
+                {{#each customFunds}}
+                  <div class="custom-fund-summary {{#if this.isSelected}}selected{{/if}}"
+                       data-action="selectAccount" data-account-id="{{this.id}}">
+                    <div class="fund-summary-header">
+                      <i class="fa-solid fa-bullseye"></i>
+                      <span class="fund-name">{{this.name}}</span>
+                    </div>
+                    <div class="fund-summary-balance">{{this.balanceFormatted}}</div>
+                    {{#if this.hasSavingsGoal}}
+                      <div class="fund-summary-progress">
+                        <div class="mini-progress-bar">
+                          <div class="mini-progress-fill" style="width: {{this.goalProgressWidth}}"></div>
+                        </div>
+                        <span class="mini-progress-text">{{this.goalProgress}}% of {{this.savingsGoalFormatted}}</span>
+                      </div>
+                    {{/if}}
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+          {{/if}}
         </div>
       {{/if}}
     </section>

@@ -16,7 +16,8 @@ export const AccountType = Object.freeze({
   PARTY: "party",
   GUILD: "guild",
   MERCHANT: "merchant",
-  SAVINGS: "savings"
+  SAVINGS: "savings",
+  CUSTOM_FUND: "customFund"  // Custom named savings funds (sword fund, house fund, etc.)
 });
 
 /**
@@ -182,6 +183,9 @@ export function createBankAccount(data = {}) {
 
     // Associated bank
     bankId: data.bankId || null,
+
+    // Custom metadata (for custom funds, etc.)
+    metadata: data.metadata || {},
 
     // Metadata
     openedAt: data.openedAt || getCurrentGameTime(),
