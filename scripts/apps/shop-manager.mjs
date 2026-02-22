@@ -49,8 +49,8 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       resizable: true
     },
     position: {
-      width: 700,
-      height: 600
+      width: 800,
+      height: 650
     },
     actions: {
       createShop: ShopManager.#onCreateShop,

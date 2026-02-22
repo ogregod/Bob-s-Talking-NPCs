@@ -261,6 +261,8 @@
 
   .shop-templates.visible {
     display: block;
+    max-height: 500px;
+    overflow-y: auto;
   }
 
   .shop-templates .templates-header {
@@ -279,21 +281,23 @@
 
   .templates-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: var(--bobsnpc-spacing-sm);
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--bobsnpc-spacing-md);
   }
 
   .template-card {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--bobsnpc-spacing-sm);
-    padding: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-md);
     background: var(--bobsnpc-bg-elevated);
     border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
     border-radius: var(--bobsnpc-border-radius-sm);
     cursor: pointer;
     transition: all var(--bobsnpc-transition-fast);
     text-align: left;
+    min-height: 60px;
+    overflow: hidden;
   }
 
   .template-card:hover {
@@ -302,25 +306,41 @@
   }
 
   .template-card .template-icon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
     border-radius: var(--bobsnpc-border-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     flex-shrink: 0;
+    font-size: 14px;
+  }
+
+  .template-card .template-info {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
   }
 
   .template-card .template-info h4 {
     margin: 0;
     font-size: var(--bobsnpc-font-size-sm);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .template-card .template-info p {
-    margin: 2px 0 0;
+    margin: 4px 0 0;
     font-size: var(--bobsnpc-font-size-xs);
     color: var(--bobsnpc-text-muted);
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   /* ===== Shop Editor ===== */
@@ -1459,7 +1479,7 @@
   .category-section {
     border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
     border-radius: var(--bobsnpc-border-radius-md);
-    margin-bottom: var(--bobsnpc-spacing-sm);
+    margin-bottom: var(--bobsnpc-spacing-md);
     overflow: hidden;
   }
 
@@ -1518,7 +1538,7 @@
   }
 
   .category-section > .templates-grid {
-    padding: var(--bobsnpc-spacing-sm);
+    padding: var(--bobsnpc-spacing-md);
   }
 
   .template-card.business-card .template-subtitle {
@@ -1526,6 +1546,10 @@
     font-size: 10px;
     color: var(--bobsnpc-text-muted);
     font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
   }
 
   /* ===== Shop Editor - Service Tier Sections ===== */
