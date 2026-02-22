@@ -96,6 +96,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       // Enhanced services actions
       toggleService: ShopEditor.#onToggleService,
       addService: ShopEditor.#onAddService,
+      editService: ShopEditor.#onEditService,
       removeService: ShopEditor.#onRemoveService
     }
   };
@@ -1419,18 +1420,96 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
    * Add a new service to the shop
    */
   static async #onAddService(event, target) {
-    // Import service definitions
-    const { createServiceDefinition, ServiceType, ServiceCategory } = await import("../data/merchant-model.mjs");
+    // Get available service templates
+    const { getServiceDatabase } = await import("../data/service-database.mjs");
+    const serviceDB = getServiceDatabase();
+    const templates = serviceDB?.getAllTemplates() || [];
 
-    // Create a default service
+    if (templates.length === 0) {
+      ui.notifications.warn("No service templates available. Create templates in the Service Database Manager first.");
+      return;
+    }
+
+    // Group templates by category
+    const grouped = {};
+    for (const template of templates) {
+      const category = template.category || "misc";
+      if (!grouped[category]) {
+        grouped[category] = [];
+      }
+      grouped[category].push(template);
+    }
+
+    // Build dialog content with categorized service list
+    let content = `
+      <form class="bobsnpc-service-selector">
+        <div class="form-group">
+          <label>Select a service to add:</label>
+          <select name="serviceTemplate" style="width: 100%; padding: 6px; margin-top: 8px;">
+            <option value="">-- Choose a service --</option>
+    `;
+
+    for (const [category, services] of Object.entries(grouped)) {
+      content += `<optgroup label="${category.toUpperCase()}">`;
+      for (const service of services) {
+        const pricing = service.priceType === "fixed"
+          ? `${service.basePrice}gp`
+          : service.priceType;
+        content += `<option value="${service.type}">${service.name} (${pricing})</option>`;
+      }
+      content += `</optgroup>`;
+    }
+
+    content += `
+          </select>
+        </div>
+        <p class="hint" style="margin-top: 8px; font-size: 0.9em; color: #999;">
+          Service templates can be managed in the Service Database Manager
+        </p>
+      </form>
+    `;
+
+    // Show dialog
+    const selectedType = await new Promise(resolve => {
+      new Dialog({
+        title: "Add Service to Shop",
+        content,
+        buttons: {
+          add: {
+            icon: '<i class="fas fa-plus"></i>',
+            label: "Add Service",
+            callback: html => {
+              const select = html.find('[name="serviceTemplate"]');
+              resolve(select.val());
+            }
+          },
+          cancel: {
+            icon: '<i class="fas fa-times"></i>',
+            label: "Cancel",
+            callback: () => resolve(null)
+          }
+        },
+        default: "add"
+      }, {
+        classes: ["bobsnpc", "service-selector-dialog"],
+        width: 450
+      }).render(true);
+    });
+
+    if (!selectedType) return;
+
+    // Find the selected template
+    const template = templates.find(t => t.type === selectedType);
+    if (!template) {
+      ui.notifications.error("Service template not found");
+      return;
+    }
+
+    // Clone the template and add to shop
+    const { createServiceDefinition } = await import("../data/merchant-model.mjs");
     const newService = createServiceDefinition({
-      type: ServiceType.REPAIR,
-      category: ServiceCategory.MISC,
-      name: "New Service",
-      description: "Describe this service...",
-      icon: "fa-cog",
-      enabled: true,
-      basePrice: 10
+      ...template,
+      enabled: true // Enable by default when adding to shop
     });
 
     if (!this._shop.servicesList) {
@@ -1438,6 +1517,103 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     this._shop.servicesList.push(newService);
+    ui.notifications.info(`Added "${template.name}" to shop services`);
+    await this.render();
+  }
+
+  /**
+   * Edit a service in the shop
+   */
+  static async #onEditService(event, target) {
+    const serviceIndex = parseInt(target.dataset.serviceIndex);
+    if (isNaN(serviceIndex) || !this._shop.servicesList?.[serviceIndex]) return;
+
+    const service = this._shop.servicesList[serviceIndex];
+    const { PriceType } = await import("../data/merchant-model.mjs");
+
+    // Build edit dialog content
+    let content = `
+      <form class="bobsnpc-service-edit-form">
+        <div class="form-group">
+          <label>Service Name</label>
+          <input type="text" name="name" value="${service.name}" style="width: 100%;">
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" rows="3" style="width: 100%;">${service.description || ''}</textarea>
+        </div>
+
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Pricing Mode</label>
+            <select name="priceType" style="width: 100%;">
+              <option value="fixed" ${service.priceType === 'fixed' ? 'selected' : ''}>Fixed Price</option>
+              <option value="percent" ${service.priceType === 'percent' ? 'selected' : ''}>Percentage</option>
+              <option value="perDay" ${service.priceType === 'perDay' ? 'selected' : ''}>Per Day</option>
+              <option value="itemValue" ${service.priceType === 'itemValue' ? 'selected' : ''}>Item Value %</option>
+              <option value="spellLevel" ${service.priceType === 'spellLevel' ? 'selected' : ''}>Spell Level</option>
+              <option value="enchantment" ${service.priceType === 'enchantment' ? 'selected' : ''}>Enchantment</option>
+              <option value="tiered" ${service.priceType === 'tiered' ? 'selected' : ''}>Tiered</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Base Price (gp)</label>
+            <input type="number" name="basePrice" value="${service.basePrice || 0}" min="0" step="0.01" style="width: 100%;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="requiresGMApproval" ${service.requiresGMApproval ? 'checked' : ''}>
+            Requires GM Approval
+          </label>
+        </div>
+
+        <p class="hint" style="margin-top: 10px; font-size: 0.9em; color: #999;">
+          For advanced pricing options (tiers, spell levels, etc.), edit the service template in the Service Database Manager.
+        </p>
+      </form>
+    `;
+
+    // Show dialog
+    const result = await new Promise(resolve => {
+      new Dialog({
+        title: `Edit Service: ${service.name}`,
+        content,
+        buttons: {
+          save: {
+            icon: '<i class="fas fa-save"></i>',
+            label: "Save Changes",
+            callback: html => {
+              const formData = new FormData(html.find('form')[0]);
+              resolve({
+                name: formData.get('name'),
+                description: formData.get('description'),
+                priceType: formData.get('priceType'),
+                basePrice: parseFloat(formData.get('basePrice')) || 0,
+                requiresGMApproval: formData.get('requiresGMApproval') === 'on'
+              });
+            }
+          },
+          cancel: {
+            icon: '<i class="fas fa-times"></i>',
+            label: "Cancel",
+            callback: () => resolve(null)
+          }
+        },
+        default: "save"
+      }, {
+        classes: ["bobsnpc", "service-edit-dialog"],
+        width: 500
+      }).render(true);
+    });
+
+    if (!result) return;
+
+    // Update service with edited values
+    Object.assign(service, result);
+    ui.notifications.info(`Updated "${service.name}"`);
     await this.render();
   }
 
