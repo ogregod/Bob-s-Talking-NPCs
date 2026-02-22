@@ -1245,14 +1245,16 @@ BusinessTypeRegistry.set(BusinessType.TOWN_HALL, {
   tags: ["government", "civic", "tax", "law", "permit"]
 });
 
-// 43. Bank & Exchange
+// 43. Money Changer & Financial Services
+// NOTE: For full banking (accounts, loans, interest), use the standalone Banking System via BANK dialogue nodes
+// This business provides utility financial services only (currency exchange, money transfers, appraisals)
 BusinessTypeRegistry.set(BusinessType.BANK_EXCHANGE, {
   type: BusinessType.BANK_EXCHANGE,
   category: BusinessCategory.CIVIC_FAITH_LAW,
-  name: "Bank & Exchange",
-  subtitle: "Finance & Vaults",
-  description: "Iron-bound doors guard vault rooms stacked with coin and bullion. The banker counts, exchanges, and lends with the precision of a master accountant.",
-  icon: "fa-landmark",
+  name: "Money Changer",
+  subtitle: "Currency & Financial Services",
+  description: "A money changer's office with scales, ledgers, and locked strongboxes. They exchange currency, arrange transfers, and appraise valuables - but for full banking services, visit a proper bank.",
+  icon: "fa-coins",
   color: "#DAA520",
   displayMode: ShopDisplayMode.SERVICES,
 
@@ -1261,17 +1263,15 @@ BusinessTypeRegistry.set(BusinessType.BANK_EXCHANGE, {
   buyBack: { enabled: false },
   backroom: { enabled: true },
   coreServices: [
-    { type: ServiceType.CURRENCY_EXCHANGE, category: ServiceCategory.FINANCIAL, name: "Exchange Currency", description: "Convert between copper, silver, electrum, gold, and platinum at market rates", icon: "fa-coins", basePrice: 1, priceType: "percent" },
-    { type: ServiceType.SAFE_DEPOSIT, category: ServiceCategory.STORAGE, name: "Safe Deposit Box", description: "Store valuables in a locked, guarded vault box", icon: "fa-vault", basePrice: 10, priceType: "perDay" },
-    { type: ServiceType.MONEY_TRANSFER, category: ServiceCategory.FINANCIAL, name: "Money Transfer", description: "Wire funds to a partner bank in another city via sealed letter of credit", icon: "fa-paper-plane", basePrice: 25, priceType: "fixed" },
-    { type: ServiceType.LOAN, category: ServiceCategory.FINANCIAL, name: "Take a Loan", description: "Borrow gold against collateral or credit, with interest", icon: "fa-hand-holding-dollar", basePrice: 50, priceType: "fixed" },
-    { type: ServiceType.ITEM_STORAGE, category: ServiceCategory.STORAGE, name: "Vault Storage", description: "Store bulky or valuable items in the bank's secured vaults", icon: "fa-box", basePrice: 5, priceType: "perDay" }
+    { type: ServiceType.CURRENCY_EXCHANGE, category: ServiceCategory.FINANCIAL, name: "Exchange Currency", description: "Convert between copper, silver, electrum, gold, and platinum at market rates (1% fee)", icon: "fa-coins", basePrice: 1, priceType: "percent" },
+    { type: ServiceType.MONEY_TRANSFER, category: ServiceCategory.FINANCIAL, name: "Inter-City Money Transfer", description: "Wire funds to a partner exchange in another city via sealed letter of credit", icon: "fa-paper-plane", basePrice: 25, priceType: "fixed" },
+    { type: ServiceType.ITEM_STORAGE, category: ServiceCategory.STORAGE, name: "Secure Vault Storage", description: "Store bulky or valuable items in secured vaults (short-term storage only)", icon: "fa-box", basePrice: 5, priceType: "perDay" }
   ],
   crossCompatibleServices: [
-    { type: ServiceType.APPRAISE, sourceType: BusinessType.FINE_METALSMITH, category: ServiceCategory.INFORMATION, name: "Appraise Valuables", description: "Have a certified appraiser assess the value of gems, art, or bullion", icon: "fa-magnifying-glass", basePrice: 10, priceType: "fixed" },
+    { type: ServiceType.APPRAISE, sourceType: BusinessType.FINE_METALSMITH, category: ServiceCategory.INFORMATION, name: "Financial Appraisal", description: "Have a certified appraiser assess the value of gems, art, or bullion for a fee", icon: "fa-magnifying-glass", basePrice: 10, priceType: "fixed" },
     { type: ServiceType.CONTRACT, sourceType: BusinessType.TOWN_HALL, category: ServiceCategory.LEGAL, name: "Financial Contract", description: "Draft and notarize a financial agreement or promissory note", icon: "fa-file-contract", basePrice: 15, priceType: "fixed" }
   ],
-  tags: ["bank", "vault", "exchange", "finance", "gold"]
+  tags: ["exchange", "currency", "finance", "appraisal", "money-changer"]
 });
 
 // 44. Temple (Large)

@@ -52,6 +52,33 @@ The existing banking system (3,268 lines) includes:
 - ✓ Global bank networks
 - ✓ Full dialogue integration via BANK nodes
 
+#### Clarified: Banking vs Money Changer
+
+To avoid confusion between the comprehensive Banking System and merchant services:
+
+**Standalone Banking System** (accessed via BANK dialogue nodes):
+- Comprehensive account management (checking, savings, party, guild, custom funds)
+- Full loan system with collateral, interest rates, and payment schedules
+- Transaction logs with complete game time history
+- Interest accrual on savings accounts
+- Account-to-account transfers
+- Safe deposit box rentals
+
+**Money Changer Business** (accessed via SHOP dialogue nodes):
+- Renamed from "Bank & Exchange" to "Money Changer"
+- Utility financial services only (NO full banking)
+- Currency exchange (CP/SP/EP/GP/PP conversions)
+- Inter-city money transfers
+- Financial appraisals
+- Short-term vault storage
+
+**What Changed**:
+- Removed LOAN service from Money Changer (use Banking System instead)
+- Removed SAFE_DEPOSIT service from Money Changer (use Banking System instead)
+- Updated business description to clarify it's NOT a full bank
+- Changed icon from fa-landmark to fa-coins
+- Updated tags to emphasize currency exchange focus
+
 ## [0.2.001] - 2025-02-22
 
 ### 🎉 Major Features

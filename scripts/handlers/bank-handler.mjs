@@ -267,7 +267,16 @@ export class BankHandler {
     const currency = actor.system?.currency || {};
     const gold = copperToGold(toCopper(currency));
 
-    const factionStandings = await game.bobsnpc?.factions?.getAllStandings(playerActorUuid) || {};
+    // Get faction standings if available
+    let factionStandings = {};
+    try {
+      if (game.bobsnpc?.handlers?.faction?.getAllStandings) {
+        factionStandings = await game.bobsnpc.handlers.faction.getAllStandings(playerActorUuid) || {};
+      }
+    } catch (error) {
+      // Factions not available or not loaded yet
+      console.debug(`${MODULE_ID} | Factions not available for bank context`);
+    }
 
     return {
       actor,
