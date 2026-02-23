@@ -590,7 +590,7 @@
               {{#each playerRecipients}}
                 <option value="{{this.id}}" {{#unless this.hasAccount}}disabled{{/unless}}>
                   {{this.name}}
-                  {{#if this.hasAccount}}({{this.accountBalance}}){{else}}(no account at this bank){{/unless}}
+                  {{#if this.hasAccount}}({{this.accountBalance}}){{else}}(no account at this bank){{/if}}
                 </option>
               {{/each}}
             </select>
