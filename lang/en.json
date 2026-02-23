@@ -2125,6 +2125,7 @@
       "Deposit": "Deposit",
       "Withdraw": "Withdraw",
       "Transfer": "Transfer",
+      "SendMoney": "Send Money",
       "TransferTo": "Transfer To",
       "Loan": "Loan",
       "TakeLoan": "Take Loan",

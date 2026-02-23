@@ -27,6 +27,12 @@
       <i class="fa-solid fa-exchange-alt"></i>
       <span>{{localize "BOBSNPC.Bank.Transfer"}}</span>
     </button>
+
+    <button type="button" class="bank-tab {{#if (eq activeTab 'sendMoney')}}active{{/if}}"
+            data-action="setTab" data-tab="sendMoney">
+      <i class="fa-solid fa-paper-plane"></i>
+      <span>{{localize "BOBSNPC.Bank.SendMoney"}}</span>
+    </button>
   {{/if}}
 
   {{#if loansEnabled}}

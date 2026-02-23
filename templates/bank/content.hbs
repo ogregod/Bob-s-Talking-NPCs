@@ -543,17 +543,113 @@
           </div>
         </div>
 
-        {{!-- Transfer fee notice --}}
-        {{#if transferFee}}
-          <div class="fee-notice">
-            <i class="fa-solid fa-info-circle"></i>
-            {{localize "BOBSNPC.Bank.TransferFee"}}: {{transferFeeFormatted}}
-          </div>
-        {{/if}}
+        <div class="fee-notice free-notice">
+          <i class="fa-solid fa-check-circle"></i>
+          Transfers between your own accounts are always free.
+        </div>
 
         <button type="button" class="action-btn transfer-btn" data-action="confirmTransfer">
           <i class="fa-solid fa-exchange-alt"></i>
           {{localize "BOBSNPC.Bank.Transfer"}}
+        </button>
+      </div>
+    </section>
+
+  {{!-- ═══════════════════ SEND MONEY TAB ═══════════════════ --}}
+  {{else if (eq activeTab 'sendMoney')}}
+    <section class="send-money-section">
+      <div class="section-header">
+        <i class="fa-solid fa-paper-plane"></i>
+        <h3>Send Money</h3>
+      </div>
+
+      <div class="transaction-form">
+        {{!-- Source account --}}
+        <div class="form-group">
+          <label>
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            From Account
+          </label>
+          <select name="sendFrom" class="bank-select">
+            {{#each sendSourceAccounts}}
+              <option value="{{this.id}}">{{this.label}}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        {{!-- Recipient selection --}}
+        <div class="form-group">
+          <label>
+            <i class="fa-solid fa-user"></i>
+            Send To
+          </label>
+
+          {{#if hasPlayerRecipients}}
+            <select name="sendRecipient" class="bank-select">
+              <option value="">— Choose recipient —</option>
+              {{#each playerRecipients}}
+                <option value="{{this.id}}" {{#unless this.hasAccount}}disabled{{/unless}}>
+                  {{this.name}}
+                  {{#if this.hasAccount}}({{this.accountBalance}}){{else}}(no account at this bank){{/unless}}
+                </option>
+              {{/each}}
+            </select>
+          {{else}}
+            <div class="no-content-message compact">
+              <i class="fa-solid fa-users"></i>
+              <p>No other players have accounts at this bank.</p>
+            </div>
+          {{/if}}
+        </div>
+
+        {{!-- Note --}}
+        <div class="form-group">
+          <label>
+            <i class="fa-solid fa-note-sticky"></i>
+            Note (optional)
+          </label>
+          <input type="text" name="sendNote" class="bank-text-input" placeholder="e.g. Party funds, payment for services..." maxlength="120" />
+        </div>
+
+        {{!-- Amount --}}
+        <div class="form-group">
+          <label>
+            <i class="fa-solid fa-coins"></i>
+            Amount
+          </label>
+          <div class="currency-input-row">
+            <div class="currency-field pp">
+              <div class="currency-coin pp-coin" data-tooltip="Platinum"><span>PP</span></div>
+              <input type="number" name="currency.pp" min="0" value="0" />
+            </div>
+            <div class="currency-field gp">
+              <div class="currency-coin gp-coin" data-tooltip="Gold"><span>GP</span></div>
+              <input type="number" name="currency.gp" min="0" value="0" />
+            </div>
+            <div class="currency-field ep">
+              <div class="currency-coin ep-coin" data-tooltip="Electrum"><span>EP</span></div>
+              <input type="number" name="currency.ep" min="0" value="0" />
+            </div>
+            <div class="currency-field sp">
+              <div class="currency-coin sp-coin" data-tooltip="Silver"><span>SP</span></div>
+              <input type="number" name="currency.sp" min="0" value="0" />
+            </div>
+            <div class="currency-field cp">
+              <div class="currency-coin cp-coin" data-tooltip="Copper"><span>CP</span></div>
+              <input type="number" name="currency.cp" min="0" value="0" />
+            </div>
+          </div>
+        </div>
+
+        {{!-- Fee notice --}}
+        <div class="fee-notice">
+          <i class="fa-solid fa-info-circle"></i>
+          Transfer fee: {{sendFeeFormatted}} (charged to sender's account)
+        </div>
+
+        <button type="button" class="action-btn send-money-btn" data-action="confirmSendMoney">
+          <i class="fa-solid fa-paper-plane"></i>
+          Send Money
         </button>
       </div>
     </section>

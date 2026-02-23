@@ -77,6 +77,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       confirmDeposit: BankWindow.#onDeposit,
       confirmWithdraw: BankWindow.#onWithdraw,
       confirmTransfer: BankWindow.#onTransfer,
+      confirmSendMoney: BankWindow.#onSendMoney,
       requestLoan: BankWindow.#onRequestLoan,
       repayLoan: BankWindow.#onRepayLoan,
       rentStorage: BankWindow.#onRentBox,
@@ -172,6 +173,9 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       case "transfer":
         tabContent = this._prepareTransferTab(selectedAccount, playerAccounts);
         break;
+      case "sendMoney":
+        tabContent = this._prepareSendMoneyTab(playerAccounts);
+        break;
       case "loans":
         tabContent = this._prepareLoansTab(loans, bank, playerAccounts, playerGoldTotal);
         break;
@@ -180,9 +184,12 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         break;
     }
 
-    // Compute totals
-    const totalBalance = playerAccounts.reduce((sum, a) => sum + copperToGold(toCopper(a.balance)), 0);
-    const totalDebt = loans.filter(l => l.status === LoanStatus.ACTIVE).reduce((sum, l) => sum + (l.remainingBalance || 0), 0);
+    // Compute totals (work in copper to avoid gold-float errors)
+    const totalBalanceCopper = playerAccounts.reduce((sum, a) => sum + toCopper(a.balance), 0);
+    const totalBalance = copperToGold(totalBalanceCopper);
+    const totalDebtCopper = loans.filter(l => l.status === LoanStatus.ACTIVE)
+      .reduce((sum, l) => sum + Math.round((l.remainingBalance || 0) * 100), 0);
+    const totalDebt = copperToGold(totalDebtCopper);
     const activeLoans = loans.filter(l => l.status === LoanStatus.ACTIVE);
 
     return {
@@ -202,9 +209,9 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       // Player
       playerName: this._playerActor?.name,
       playerGold: playerGoldTotal,
-      playerGoldFormatted: formatCurrency(playerGoldTotal),
+      playerGoldFormatted: formatCurrency(playerCurrency),
       playerCurrency,
-      playerCurrencyTotal: formatCurrency(playerGoldTotal),
+      playerCurrencyTotal: formatCurrency(playerCurrency),
 
       // Tab state
       activeTab: this._tab,
@@ -219,9 +226,9 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
       // Balance summary
       totalBalance: totalBalance.toFixed(2),
-      totalBalanceFormatted: formatCurrency(totalBalance),
+      totalBalanceFormatted: formatCurrency(totalBalanceCopper),
       totalDebt: totalDebt.toFixed(2),
-      totalDebtFormatted: formatCurrency(totalDebt),
+      totalDebtFormatted: formatCurrency(totalDebtCopper),
       hasDebt: totalDebt > 0,
 
       // Loans
@@ -313,7 +320,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       sp: currency.sp || 0,
       cp: currency.cp || 0,
       totalGold: copperToGold(toCopper(currency)),
-      totalFormatted: formatCurrency(copperToGold(toCopper(currency)))
+      totalFormatted: formatCurrency(currency)   // pass object directly – formatCurrency handles {pp,gp,ep,sp,cp}
     };
   }
 
@@ -363,7 +370,6 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const rawTransactions = (account.transactions || [])
       .filter(t => t !== null && typeof t === "object" && t.id);
     const formattedTransactions = rawTransactions.slice(-20).reverse().map(t => {
-      const amountGold = copperToGold(toCopper(t.amount || {}));
       const isCredit = t.type === TransactionType.DEPOSIT || t.type === TransactionType.INTEREST
         || (t.type === TransactionType.TRANSFER && t.toAccountId === account.id);
       return {
@@ -376,9 +382,10 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
           : "fa-receipt",
         typeClass: isCredit ? "credit" : "debit",
         isCredit,
-        amountFormatted: `${isCredit ? "+" : "-"}${formatCurrency(amountGold)}`,
+        // Pass currency object directly – formatCurrency expects copper or {pp,gp,ep,sp,cp}
+        amountFormatted: `${isCredit ? "+" : "-"}${formatCurrency(t.amount || {})}`,
         balanceAfterFormatted: t.balanceAfter && typeof t.balanceAfter === "object"
-          ? formatCurrency(copperToGold(toCopper(t.balanceAfter)))
+          ? formatCurrency(t.balanceAfter)
           : null
       };
     });
@@ -406,12 +413,12 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       hasInterest: account.interest?.enabled ?? false,
       hasSavingsGoal: savingsGoal > 0,
       savingsGoal: savingsGoal,
-      savingsGoalFormatted: formatCurrency(savingsGoal),
+      savingsGoalFormatted: formatCurrency(Math.round(savingsGoal * 100)),
       goalProgress,
       goalProgressWidth: `${goalProgress}%`,
       goalReached: currentBalance >= savingsGoal && savingsGoal > 0,
       amountRemaining: Math.max(0, savingsGoal - currentBalance),
-      amountRemainingFormatted: formatCurrency(Math.max(0, savingsGoal - currentBalance)),
+      amountRemainingFormatted: formatCurrency(Math.round(Math.max(0, savingsGoal - currentBalance) * 100)),
       lastActivity: this._formatGameTime(account.updatedAt),
       formattedTransactions,
       hasTransactions: formattedTransactions.length > 0,
@@ -434,11 +441,11 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
     return {
       ...loan,
-      principalFormatted: formatCurrency(loan.principal),
-      totalDueFormatted: formatCurrency(loan.totalDue),
-      amountPaidFormatted: formatCurrency(loan.amountPaid),
-      remainingFormatted: formatCurrency(loan.remainingBalance),
-      paymentFormatted: formatCurrency(loan.paymentAmount),
+      principalFormatted: formatCurrency(Math.round((loan.principal || 0) * 100)),
+      totalDueFormatted: formatCurrency(Math.round((loan.totalDue || 0) * 100)),
+      amountPaidFormatted: formatCurrency(Math.round((loan.amountPaid || 0) * 100)),
+      remainingFormatted: formatCurrency(Math.round((loan.remainingBalance || 0) * 100)),
+      paymentFormatted: formatCurrency(Math.round((loan.paymentAmount || 0) * 100)),
       interestRateFormatted: `${(loan.interestRate * 100).toFixed(1)}%`,
       dueDate: this._formatGameTime(loan.nextPaymentDue),
       isOverdue,
@@ -593,31 +600,59 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
    * @private
    */
   _prepareTransferTab(sourceAccount, accounts) {
-    const otherPlayers = game.actors?.filter(a =>
-      a.hasPlayerOwner && a.uuid !== this.playerActorUuid
-    ) || [];
-
-    const transferTargets = [
-      ...accounts
-        .filter(a => a.id !== this._selectedAccountId)
-        .map(a => ({
-          id: a.id,
-          label: `${a.name} (${formatCurrency(copperToGold(toCopper(a.balance)))})`,
-          type: "own",
-          group: localize("Bank.OwnAccounts") || "Your Accounts"
-        })),
-      ...otherPlayers.map(p => ({
-        id: `player:${p.uuid}`,
-        label: p.name,
-        type: "player",
-        group: localize("Bank.OtherPlayers") || "Other Players"
-      }))
-    ];
+    // Transfer tab: only own accounts (same-owner = no fee)
+    const transferTargets = accounts
+      .map(a => ({
+        id: a.id,
+        label: `${a.name || a.typeLabel} – ${formatCurrency(a.balance)}`,
+        type: "own",
+        isSelected: a.id === this._selectedAccountId
+      }));
 
     return {
       transferTargets,
-      hasTransferTargets: transferTargets.length > 0,
-      selectedTarget: this._transferTargetId
+      hasTransferTargets: transferTargets.filter(t => !t.isSelected).length > 0
+    };
+  }
+
+  /**
+   * Prepare send-money tab content (send to other players / NPCs)
+   * @param {object[]} accounts - Player's accounts
+   * @returns {object}
+   * @private
+   */
+  _prepareSendMoneyTab(accounts) {
+    const handler = getBankHandler();
+
+    // Build player recipient list
+    const playerRecipients = (game.actors?.contents || [])
+      .filter(a => a.hasPlayerOwner && a.uuid !== this.playerActorUuid)
+      .map(a => {
+        const acct = handler.getAccountForPlayer(a.uuid, this.bankId);
+        return {
+          id: `player:${a.uuid}`,
+          name: a.name,
+          img: a.img || "icons/svg/mystery-man.svg",
+          type: "player",
+          hasAccount: !!acct,
+          accountBalance: acct ? formatCurrency(acct.balance) : null
+        };
+      });
+
+    // Source account options
+    const sourceAccounts = accounts.map(a => ({
+      id: a.id,
+      label: `${a.name || a.typeLabel} – ${formatCurrency(a.balance)}`
+    }));
+
+    return {
+      sendSourceAccounts: sourceAccounts,
+      hasSendSourceAccounts: sourceAccounts.length > 0,
+      playerRecipients,
+      hasPlayerRecipients: playerRecipients.length > 0,
+      // Fee notice: transferring to other players applies the bank's transfer fee
+      sendFee: this._bank?.fees?.transferFee ?? 0.01,
+      sendFeeFormatted: `${((this._bank?.fees?.transferFee ?? 0.01) * 100).toFixed(1)}%`
     };
   }
 
@@ -640,17 +675,18 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     );
     const minLoan = bank.loans?.minLoanAmount ?? 50;
 
+    const totalOwedGold = activeLoans.reduce((sum, l) => sum + (l.remainingBalance || 0), 0);
     return {
       canRequestLoan: activeLoans.length === 0 && (bank.loans?.enabled ?? true),
       loansAvailable: bank.loans?.enabled ?? true,
       maxLoanAmount: maxLoan,
-      maxLoanFormatted: formatCurrency(maxLoan),
+      maxLoanFormatted: formatCurrency(Math.round(maxLoan * 100)),
       minLoan,
       maxLoan,
       loanInterestRate: `${((bank.rates?.loanInterest ?? 0.1) * 100).toFixed(1)}%`,
       repaymentPeriod: `${bank.loans?.maxLoanTerm ?? 52} weeks`,
-      totalOwed: activeLoans.reduce((sum, l) => sum + (l.remainingBalance || 0), 0),
-      totalOwedFormatted: formatCurrency(activeLoans.reduce((sum, l) => sum + (l.remainingBalance || 0), 0))
+      totalOwed: totalOwedGold,
+      totalOwedFormatted: formatCurrency(Math.round(totalOwedGold * 100))
     };
   }
 
@@ -669,7 +705,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         capacity: 10,
         icon: "fa-box-archive",
         price: bank.safeDeposit?.boxPriceSmall ?? 10,
-        priceFormatted: formatCurrency(bank.safeDeposit?.boxPriceSmall ?? 10),
+        priceFormatted: formatCurrency(Math.round((bank.safeDeposit?.boxPriceSmall ?? 10) * 100)),
         period: bank.safeDeposit?.rentalPeriod || "month"
       },
       {
@@ -678,7 +714,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         capacity: 20,
         icon: "fa-box",
         price: bank.safeDeposit?.boxPriceMedium ?? 25,
-        priceFormatted: formatCurrency(bank.safeDeposit?.boxPriceMedium ?? 25),
+        priceFormatted: formatCurrency(Math.round((bank.safeDeposit?.boxPriceMedium ?? 25) * 100)),
         period: bank.safeDeposit?.rentalPeriod || "month"
       },
       {
@@ -687,7 +723,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         capacity: 30,
         icon: "fa-vault",
         price: bank.safeDeposit?.boxPriceLarge ?? 50,
-        priceFormatted: formatCurrency(bank.safeDeposit?.boxPriceLarge ?? 50),
+        priceFormatted: formatCurrency(Math.round((bank.safeDeposit?.boxPriceLarge ?? 50) * 100)),
         period: bank.safeDeposit?.rentalPeriod || "month"
       }
     ];
@@ -699,9 +735,9 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       storedItems: boxes.reduce((sum, b) => sum + (b.items?.length || 0), 0),
       storageCapacity: boxes.reduce((sum, b) => sum + (b.maxSlots || 10), 0),
       storageFee: formatCurrency(
-        boxes.reduce((sum, b) => sum + (b.rentalPrice || 0), 0)
+        Math.round(boxes.reduce((sum, b) => sum + (b.rentalPrice || 0), 0) * 100)
       ),
-      storageRentalCost: formatCurrency(bank.safeDeposit?.boxPriceSmall ?? 10)
+      storageRentalCost: formatCurrency(Math.round((bank.safeDeposit?.boxPriceSmall ?? 10) * 100))
     };
   }
 
@@ -838,7 +874,7 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!account) return;
 
     const balance = copperToGold(toCopper(account.balance));
-    const balanceFormatted = formatCurrency(balance);
+    const balanceFormatted = formatCurrency(account.balance);
 
     const confirmed = await Dialog.confirm({
       title: localize("Bank.CloseAccount") || "Close Account",
@@ -908,29 +944,28 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static async #onDeposit(event, target) {
-    if (!this._selectedAccountId) return;
-
-    // Read currency from form
     const contentEl = this.element?.querySelector(".bank-content") || this.element;
+
+    // Read which account to deposit into from the form selector
+    const accountSelect = contentEl.querySelector("select[name='depositAccount']");
+    const accountId = accountSelect?.value || this._selectedAccountId;
+    if (!accountId) return;
+
     const currency = this._readCurrencyInputs(contentEl);
     const totalCopper = toCopper(currency);
 
     if (totalCopper <= 0) {
-      ui.notifications.warn(localize("Bank.Messages.NoAmount") || "Enter an amount to deposit.");
+      ui.notifications.warn(localize("Bank.Messages.NoAmount"));
       return;
     }
 
     try {
-      const result = await getBankHandler().depositFunds(
-        this._selectedAccountId,
-        currency,
-        this.playerActorUuid
-      );
+      const result = await getBankHandler().depositFunds(accountId, currency, this.playerActorUuid);
 
       if (result.success) {
-        const goldEquiv = copperToGold(totalCopper);
-        ui.notifications.info((localize("Bank.Messages.Deposited") || "Deposited {amount}").replace("{amount}", formatCurrency(goldEquiv)));
-        // Reload player actor to get updated currency
+        // Pass the currency object – formatCurrency handles {pp,gp,ep,sp,cp} correctly
+        ui.notifications.info(localize("Bank.Messages.Deposited", { amount: formatCurrency(currency) }));
+        this._selectedAccountId = accountId;
         this._playerActor = await fromUuid(this.playerActorUuid);
         this._currencyAmount = { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 };
         this.render();
@@ -943,27 +978,27 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static async #onWithdraw(event, target) {
-    if (!this._selectedAccountId) return;
-
     const contentEl = this.element?.querySelector(".bank-content") || this.element;
+
+    // Read which account to withdraw from
+    const accountSelect = contentEl.querySelector("select[name='withdrawAccount']");
+    const accountId = accountSelect?.value || this._selectedAccountId;
+    if (!accountId) return;
+
     const currency = this._readCurrencyInputs(contentEl);
     const totalCopper = toCopper(currency);
 
     if (totalCopper <= 0) {
-      ui.notifications.warn(localize("Bank.Messages.NoAmount") || "Enter an amount to withdraw.");
+      ui.notifications.warn(localize("Bank.Messages.NoAmount"));
       return;
     }
 
     try {
-      const result = await getBankHandler().withdrawFunds(
-        this._selectedAccountId,
-        currency,
-        this.playerActorUuid
-      );
+      const result = await getBankHandler().withdrawFunds(accountId, currency, this.playerActorUuid);
 
       if (result.success) {
-        const goldEquiv = copperToGold(totalCopper);
-        ui.notifications.info((localize("Bank.Messages.Withdrawn") || "Withdrew {amount}").replace("{amount}", formatCurrency(goldEquiv)));
+        ui.notifications.info(localize("Bank.Messages.Withdrawn", { amount: formatCurrency(currency) }));
+        this._selectedAccountId = accountId;
         this._playerActor = await fromUuid(this.playerActorUuid);
         this._currencyAmount = { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 };
         this.render();
@@ -976,35 +1011,79 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static async #onTransfer(event, target) {
-    if (!this._selectedAccountId) return;
-
     const contentEl = this.element?.querySelector(".bank-content") || this.element;
+
+    // Read from/to selects
+    const fromSelect = contentEl.querySelector("select[name='transferFrom']");
+    const fromAccountId = fromSelect?.value || this._selectedAccountId;
+    if (!fromAccountId) return;
+
+    const toSelect = contentEl.querySelector("select[name='transferTo']");
+    const toAccountId = toSelect?.value;
+    if (!toAccountId) {
+      ui.notifications.warn(localize("Bank.Messages.SelectTarget"));
+      return;
+    }
+
+    if (fromAccountId === toAccountId) {
+      ui.notifications.warn("Cannot transfer to the same account.");
+      return;
+    }
+
     const currency = this._readCurrencyInputs(contentEl);
     const totalCopper = toCopper(currency);
-
-    if (totalCopper <= 0) return;
-
-    // Get transfer target from select
-    const targetSelect = contentEl.querySelector("select[name='transferTo']");
-    const targetId = targetSelect?.value || this._transferTargetId;
-    if (!targetId) {
-      ui.notifications.warn(localize("Bank.Messages.SelectTarget") || "Select a transfer target.");
+    if (totalCopper <= 0) {
+      ui.notifications.warn(localize("Bank.Messages.NoAmount"));
       return;
     }
 
     try {
-      const result = await getBankHandler().transferFunds(
-        this._selectedAccountId,
-        targetId,
-        currency,
-        this.playerActorUuid
-      );
+      const result = await getBankHandler().transferFunds(fromAccountId, toAccountId, currency, this.playerActorUuid);
 
       if (result.success) {
-        const goldEquiv = copperToGold(totalCopper);
-        ui.notifications.info((localize("Bank.Messages.Transferred") || "Transferred {amount}").replace("{amount}", formatCurrency(goldEquiv)));
+        ui.notifications.info(localize("Bank.Messages.Transferred", { amount: formatCurrency(currency) }));
+        this._selectedAccountId = fromAccountId;
         this._currencyAmount = { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 };
-        this._transferTargetId = null;
+        this.render();
+      } else {
+        ui.notifications.error(result.message);
+      }
+    } catch (error) {
+      ui.notifications.error(error.message);
+    }
+  }
+
+  static async #onSendMoney(event, target) {
+    const contentEl = this.element?.querySelector(".bank-content") || this.element;
+
+    const fromSelect = contentEl.querySelector("select[name='sendFrom']");
+    const fromAccountId = fromSelect?.value || this._selectedAccountId;
+    if (!fromAccountId) return;
+
+    const recipientSelect = contentEl.querySelector("select[name='sendRecipient']");
+    const recipientId = recipientSelect?.value;
+    if (!recipientId) {
+      ui.notifications.warn(localize("Bank.Messages.SelectTarget"));
+      return;
+    }
+
+    const currency = this._readCurrencyInputs(contentEl);
+    const totalCopper = toCopper(currency);
+    if (totalCopper <= 0) {
+      ui.notifications.warn(localize("Bank.Messages.NoAmount"));
+      return;
+    }
+
+    const noteInput = contentEl.querySelector("input[name='sendNote']");
+    const note = noteInput?.value?.trim() || "";
+
+    try {
+      const result = await getBankHandler().transferFunds(fromAccountId, recipientId, currency, this.playerActorUuid);
+
+      if (result.success) {
+        ui.notifications.info(localize("Bank.Messages.Transferred", { amount: formatCurrency(currency) }));
+        this._currencyAmount = { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 };
+        this._tab = "accounts";
         this.render();
       } else {
         ui.notifications.error(result.message);
