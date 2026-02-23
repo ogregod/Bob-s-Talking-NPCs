@@ -409,7 +409,7 @@ export class BankingManager extends HandlebarsApplicationMixin(ApplicationV2) {
       defaultSavingsRate: 0.01,
       defaultLoanRate: 0.1,
       defaultTransferFee: 0.01,
-      enableBanking: game.settings?.get(MODULE_ID, "enableBanking") ?? true
+      enableBanking: true  // Global banking toggle (future feature)
     };
   }
 
