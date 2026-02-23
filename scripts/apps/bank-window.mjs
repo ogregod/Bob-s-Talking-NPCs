@@ -359,21 +359,29 @@ export class BankWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const isCustomFund = account.type === AccountType.CUSTOM_FUND;
 
     // Format transactions for display (most recent 20, newest first)
-    const formattedTransactions = (account.transactions || []).slice(-20).reverse().map(t => ({
-      ...t,
-      dateFormatted: this._formatGameTime(t.timestamp),
-      typeIcon: t.type === TransactionType.DEPOSIT ? "fa-arrow-down"
-        : t.type === TransactionType.WITHDRAWAL ? "fa-arrow-up"
-        : t.type === TransactionType.TRANSFER ? "fa-exchange-alt"
-        : t.type === TransactionType.INTEREST ? "fa-percentage"
-        : "fa-receipt",
-      typeClass: t.type === "deposit" ? "credit" : t.type === "interest" ? "interest" : "debit",
-      isCredit: t.type === "deposit" || t.type === "interest",
-      amountFormatted: `${(t.type === "deposit" || t.type === "interest") ? "+" : "-"}${formatCurrency(Math.abs(t.amount))}`,
-      balanceAfterFormatted: typeof t.balanceAfter === "object"
-        ? formatCurrency(copperToGold(toCopper(t.balanceAfter)))
-        : formatCurrency(t.balanceAfter || 0)
-    }));
+    // Filter out legacy string IDs (old data stored IDs, new data stores full objects)
+    const rawTransactions = (account.transactions || [])
+      .filter(t => t !== null && typeof t === "object" && t.id);
+    const formattedTransactions = rawTransactions.slice(-20).reverse().map(t => {
+      const amountGold = copperToGold(toCopper(t.amount || {}));
+      const isCredit = t.type === TransactionType.DEPOSIT || t.type === TransactionType.INTEREST
+        || (t.type === TransactionType.TRANSFER && t.toAccountId === account.id);
+      return {
+        ...t,
+        dateFormatted: this._formatGameTime(t.timestamp),
+        typeIcon: t.type === TransactionType.DEPOSIT ? "fa-arrow-down"
+          : t.type === TransactionType.WITHDRAWAL ? "fa-arrow-up"
+          : t.type === TransactionType.TRANSFER ? "fa-exchange-alt"
+          : t.type === TransactionType.INTEREST ? "fa-percentage"
+          : "fa-receipt",
+        typeClass: isCredit ? "credit" : "debit",
+        isCredit,
+        amountFormatted: `${isCredit ? "+" : "-"}${formatCurrency(amountGold)}`,
+        balanceAfterFormatted: t.balanceAfter && typeof t.balanceAfter === "object"
+          ? formatCurrency(copperToGold(toCopper(t.balanceAfter)))
+          : null
+      };
+    });
 
     // Custom fund progress
     const savingsGoal = account.metadata?.savingsGoal || 0;

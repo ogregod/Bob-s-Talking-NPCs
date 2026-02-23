@@ -675,9 +675,24 @@ export class BankHandler {
    */
   async transferFunds(fromAccountId, toAccountId, amount, playerActorUuid) {
     const fromAccount = this.getAccount(fromAccountId);
-    const toAccount = this.getAccount(toAccountId);
+    if (!fromAccount) {
+      return { success: false, message: localize("BOBSNPC.AccountNotFound") };
+    }
 
-    if (!fromAccount || !toAccount) {
+    // Handle "player:uuid" format — find that player's account at the same bank
+    let resolvedToAccountId = toAccountId;
+    if (typeof toAccountId === "string" && toAccountId.startsWith("player:")) {
+      const targetPlayerUuid = toAccountId.slice("player:".length);
+      const targetAccount = this.getAccountForPlayer(targetPlayerUuid, fromAccount.bankId);
+      if (!targetAccount) {
+        return { success: false, message: localize("BOBSNPC.AccountNotFound") || "Target player has no account at this bank." };
+      }
+      resolvedToAccountId = targetAccount.id;
+    }
+
+    const toAccount = this.getAccount(resolvedToAccountId);
+
+    if (!toAccount) {
       return { success: false, message: localize("BOBSNPC.AccountNotFound") };
     }
 

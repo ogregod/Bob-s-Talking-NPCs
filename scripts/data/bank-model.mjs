@@ -108,6 +108,9 @@ export function createTransaction(data = {}) {
       pp: data.amount?.pp ?? 0
     },
 
+    // Balance after transaction (for history display)
+    balanceAfter: data.balanceAfter || null,
+
     // Exchange details (if currency exchange)
     exchange: data.exchange || null,  // {fromCurrency, toCurrency, rate}
 
@@ -539,14 +542,15 @@ export function deposit(account, amount, reference = "") {
     type: TransactionType.DEPOSIT,
     toAccountId: account.id,
     amount,
-    reference
+    reference,
+    balanceAfter: newBalance
   });
 
   return {
     account: {
       ...account,
       balance: newBalance,
-      transactions: [...account.transactions, transaction.id],
+      transactions: [...account.transactions, transaction],
       updatedAt: getCurrentGameTime()
     },
     transaction
@@ -626,7 +630,8 @@ export function withdraw(account, amount, bank, reference = "") {
     fromAccountId: account.id,
     amount,
     fee: copperToGold(fee),
-    reference
+    reference,
+    balanceAfter: newBalance
   });
 
   return {
@@ -634,7 +639,7 @@ export function withdraw(account, amount, bank, reference = "") {
     account: {
       ...account,
       balance: newBalance,
-      transactions: [...account.transactions, transaction.id],
+      transactions: [...account.transactions, transaction],
       limits: {
         ...account.limits,
         withdrawnThisPeriod: account.limits.withdrawnThisPeriod + withdrawalAmount,
@@ -658,7 +663,9 @@ export function withdraw(account, amount, bank, reference = "") {
  */
 export function transfer(fromAccount, toAccount, amount, bank, reference = "") {
   const transferAmount = toCopper(amount);
-  const fee = Math.round(transferAmount * bank.fees.transferFee);
+  // No transfer fee for same-owner transfers (e.g. checking → savings)
+  const isSelfTransfer = fromAccount.ownerUuid === toAccount.ownerUuid;
+  const fee = isSelfTransfer ? 0 : Math.round(transferAmount * bank.fees.transferFee);
   const totalRequired = transferAmount + fee;
   const currentBalance = toCopper(fromAccount.balance);
 
@@ -688,7 +695,8 @@ export function transfer(fromAccount, toAccount, amount, bank, reference = "") {
     toAccountId: toAccount.id,
     amount,
     fee: copperToGold(fee),
-    reference
+    reference,
+    balanceAfter: newFromBalance
   });
 
   return {
@@ -696,13 +704,13 @@ export function transfer(fromAccount, toAccount, amount, bank, reference = "") {
     fromAccount: {
       ...fromAccount,
       balance: newFromBalance,
-      transactions: [...fromAccount.transactions, transaction.id],
+      transactions: [...fromAccount.transactions, transaction],
       updatedAt: getCurrentGameTime()
     },
     toAccount: {
       ...toAccount,
       balance: newToBalance,
-      transactions: [...toAccount.transactions, transaction.id],
+      transactions: [...toAccount.transactions, transaction],
       updatedAt: getCurrentGameTime()
     },
     transaction,
