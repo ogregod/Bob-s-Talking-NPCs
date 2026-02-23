@@ -1,0 +1,18 @@
+{{!-- Banking Manager Header --}}
+<header class="bank-manager-header">
+  <div class="header-title">
+    <i class="fa-solid fa-landmark"></i>
+    <h2>{{localize "BOBSNPC.BankManager.Title"}}</h2>
+  </div>
+
+  <div class="header-actions">
+    {{#if isGM}}
+      {{#unless isEditTab}}
+        <button type="button" class="action-btn create-bank-btn" data-action="createBank">
+          <i class="fa-solid fa-plus"></i>
+          {{localize "BOBSNPC.BankManager.CreateBank"}}
+        </button>
+      {{/unless}}
+    {{/if}}
+  </div>
+</header>

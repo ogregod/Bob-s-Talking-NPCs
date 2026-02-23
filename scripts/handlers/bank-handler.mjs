@@ -199,6 +199,90 @@ export class BankHandler {
     return updatedBank;
   }
 
+  /**
+   * Delete a bank
+   * @param {string} bankId - Bank ID
+   * @returns {boolean} Success
+   */
+  async deleteBank(bankId) {
+    const bank = this.getBank(bankId);
+    if (!bank) return false;
+
+    // Delete all branches if this is a parent bank
+    if (bank.branchIds && bank.branchIds.length > 0) {
+      for (const branchId of bank.branchIds) {
+        await this.deleteBank(branchId);
+      }
+    }
+
+    // Delete all accounts at this bank
+    for (const accountId of bank.accountIds || []) {
+      this._accountCache.delete(accountId);
+    }
+
+    // Delete all loans at this bank
+    for (const loanId of bank.loanIds || []) {
+      this._loanCache.delete(loanId);
+    }
+
+    // Remove from parent's branch list if this is a branch
+    if (bank.parentBankId) {
+      const parent = this.getBank(bank.parentBankId);
+      if (parent) {
+        const updatedBranchIds = (parent.branchIds || []).filter(id => id !== bankId);
+        await this.updateBank(bank.parentBankId, { branchIds: updatedBranchIds });
+      }
+    }
+
+    // Delete the bank itself
+    this._bankCache.delete(bankId);
+    await this._saveData();
+
+    Hooks.callAll("bobsNPCBankDeleted", bankId);
+
+    return true;
+  }
+
+  /**
+   * Get all branches for a parent bank
+   * @param {string} parentBankId - Parent bank ID
+   * @returns {object[]}
+   */
+  getBranchesForBank(parentBankId) {
+    const parent = this.getBank(parentBankId);
+    if (!parent) return [];
+
+    return (parent.branchIds || [])
+      .map(id => this.getBank(id))
+      .filter(b => b !== null);
+  }
+
+  /**
+   * Get all banks owned by a faction
+   * @param {string} factionId - Faction ID
+   * @returns {object[]}
+   */
+  getBanksForFaction(factionId) {
+    return this.getAllBanks().filter(b => b.factionId === factionId);
+  }
+
+  /**
+   * Get bank for banker NPC (updated to support multiple NPCs per bank)
+   * @param {string} npcActorUuid - NPC actor UUID
+   * @returns {object|null}
+   */
+  getBankForBanker(npcActorUuid) {
+    // Check new bankerNpcUuids array first
+    const bankWithNpc = this.getAllBanks().find(b =>
+      (b.bankerNpcUuids || []).includes(npcActorUuid)
+    );
+
+    if (bankWithNpc) return bankWithNpc;
+
+    // Fallback to legacy location.npcActorUuid
+    return this.getBankForNPC(npcActorUuid);
+  }
+
   // ==================== BANK ACCESS ====================
 
   /**

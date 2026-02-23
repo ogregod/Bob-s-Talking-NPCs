@@ -1,0 +1,29 @@
+{{!-- Banking Manager Navigation Tabs --}}
+<nav class="bank-manager-tabs">
+  <button
+    type="button"
+    class="tab-btn {{#if isBanksTab}}active{{/if}}"
+    data-action="setTab"
+    data-tab="banks">
+    <i class="fa-solid fa-list"></i>
+    <span>{{localize "BOBSNPC.BankManager.AllBanks"}}</span>
+  </button>
+
+  <button
+    type="button"
+    class="tab-btn {{#if isBranchesTab}}active{{/if}}"
+    data-action="setTab"
+    data-tab="branches">
+    <i class="fa-solid fa-code-branch"></i>
+    <span>{{localize "BOBSNPC.BankManager.Branches"}}</span>
+  </button>
+
+  <button
+    type="button"
+    class="tab-btn {{#if isSettingsTab}}active{{/if}}"
+    data-action="setTab"
+    data-tab="settings">
+    <i class="fa-solid fa-cog"></i>
+    <span>{{localize "BOBSNPC.BankManager.Settings"}}</span>
+  </button>
+</nav>

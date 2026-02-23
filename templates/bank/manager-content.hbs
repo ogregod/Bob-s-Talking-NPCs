@@ -1,0 +1,552 @@
+{{!-- Banking Manager Main Content --}}
+<main class="bank-manager-content">
+
+  {{!-- ═══════════════════ ALL BANKS TAB ═══════════════════ --}}
+  {{#if isBanksTab}}
+    <section class="banks-list-section">
+
+      {{!-- Filters --}}
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label>
+            <i class="fa-solid fa-filter"></i>
+            {{localize "BOBSNPC.BankManager.FilterByFaction"}}
+          </label>
+          <select name="factionFilter" data-action="filterByFaction">
+            <option value="">{{localize "BOBSNPC.Common.All"}}</option>
+            {{#each factionOptions}}
+              <option value="{{this.value}}">{{this.label}}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>
+            <i class="fa-solid fa-map"></i>
+            {{localize "BOBSNPC.BankManager.FilterByScene"}}
+          </label>
+          <select name="sceneFilter" data-action="filterByScene">
+            <option value="">{{localize "BOBSNPC.Common.All"}}</option>
+            {{#each sceneOptions}}
+              <option value="{{this.value}}">{{this.label}}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        {{#if hasFilters}}
+          <button type="button" class="clear-filters-btn" data-action="clearFilters">
+            <i class="fa-solid fa-times"></i>
+            {{localize "BOBSNPC.Common.ClearFilters"}}
+          </button>
+        {{/if}}
+      </div>
+
+      {{!-- Banks Grid --}}
+      {{#if banks.length}}
+        <div class="banks-grid">
+          {{#each banks}}
+            <div class="bank-card {{#if this.isSelected}}selected{{/if}} {{#if this.isBranch}}branch{{/if}}"
+                 data-action="selectBank"
+                 data-bank-id="{{this.id}}">
+
+              <div class="bank-card-header" style="border-left: 4px solid {{this.color}}">
+                <div class="bank-icon" style="color: {{this.color}}">
+                  <i class="fa-solid {{this.icon}}"></i>
+                </div>
+                <div class="bank-name-group">
+                  <h3>{{this.name}}</h3>
+                  {{#if this.isBranch}}
+                    <span class="branch-badge">
+                      <i class="fa-solid fa-code-branch"></i>
+                      {{localize "BOBSNPC.BankManager.Branch"}}
+                    </span>
+                  {{/if}}
+                  <span class="network-badge {{this.networkClass}}">
+                    <i class="fa-solid fa-network-wired"></i>
+                    {{this.networkLabel}}
+                  </span>
+                </div>
+              </div>
+
+              <div class="bank-card-body">
+                {{#if this.description}}
+                  <p class="bank-description">{{this.description}}</p>
+                {{/if}}
+
+                <div class="bank-metadata">
+                  {{#if this.factionInfo}}
+                    <div class="meta-item faction">
+                      <i class="fa-solid {{this.factionInfo.icon}}"></i>
+                      <span>{{this.factionInfo.name}}</span>
+                    </div>
+                  {{/if}}
+
+                  {{#if this.sceneInfo}}
+                    <div class="meta-item scene">
+                      <i class="fa-solid fa-map"></i>
+                      <span>{{this.sceneInfo.name}}</span>
+                    </div>
+                  {{/if}}
+
+                  <div class="meta-item accounts">
+                    <i class="fa-solid fa-users"></i>
+                    <span>{{this.accountCount}} {{localize "BOBSNPC.BankManager.Accounts"}}</span>
+                  </div>
+
+                  <div class="meta-item loans">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <span>{{this.loanCount}} {{localize "BOBSNPC.BankManager.Loans"}}</span>
+                  </div>
+
+                  {{#if this.hasBranches}}
+                    <div class="meta-item branches">
+                      <i class="fa-solid fa-code-branch"></i>
+                      <span>{{this.branchCount}} {{localize "BOBSNPC.BankManager.Branches"}}</span>
+                    </div>
+                  {{/if}}
+
+                  <div class="meta-item bankers">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <span>{{this.bankerCount}} {{localize "BOBSNPC.BankManager.Bankers"}}</span>
+                  </div>
+                </div>
+
+                <div class="bank-rates">
+                  <div class="rate-item savings">
+                    <i class="fa-solid fa-piggy-bank"></i>
+                    <span>{{localize "BOBSNPC.BankManager.SavingsRate"}}: {{this.savingsRate}}</span>
+                  </div>
+                  <div class="rate-item loans">
+                    <i class="fa-solid fa-percent"></i>
+                    <span>{{localize "BOBSNPC.BankManager.LoanRate"}}: {{this.loanRate}}</span>
+                  </div>
+                </div>
+
+                <div class="bank-reserves">
+                  <i class="fa-solid fa-vault"></i>
+                  <span>{{localize "BOBSNPC.BankManager.Reserves"}}: {{this.totalReserves}}</span>
+                </div>
+              </div>
+
+              <div class="bank-card-actions">
+                <button type="button" class="action-btn edit-btn" data-action="editBank" data-bank-id="{{this.id}}"
+                        data-tooltip="{{localize 'BOBSNPC.Common.Edit'}}">
+                  <i class="fa-solid fa-edit"></i>
+                </button>
+
+                <button type="button" class="action-btn view-accounts-btn" data-action="viewAccounts" data-bank-id="{{this.id}}"
+                        data-tooltip="{{localize 'BOBSNPC.BankManager.ViewAccounts'}}">
+                  <i class="fa-solid fa-list-ul"></i>
+                </button>
+
+                {{#if this.canDelete}}
+                  <button type="button" class="action-btn delete-btn" data-action="deleteBank" data-bank-id="{{this.id}}"
+                          data-tooltip="{{localize 'BOBSNPC.Common.Delete'}}">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                {{/if}}
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="empty-state">
+          <i class="fa-solid fa-landmark"></i>
+          <p>{{localize "BOBSNPC.BankManager.NoBanksFound"}}</p>
+          <button type="button" class="action-btn create-bank-btn" data-action="createBank">
+            <i class="fa-solid fa-plus"></i>
+            {{localize "BOBSNPC.BankManager.CreateFirstBank"}}
+          </button>
+        </div>
+      {{/if}}
+    </section>
+
+  {{!-- ═══════════════════ CREATE/EDIT BANK TAB ═══════════════════ --}}
+  {{else if isEditTab}}
+    <section class="bank-edit-section">
+      <form class="bank-edit-form">
+
+        <div class="form-section">
+          <h3>
+            <i class="fa-solid fa-info-circle"></i>
+            {{localize "BOBSNPC.BankManager.BasicInfo"}}
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.BankName"}}</label>
+              <input type="text" name="name" value="{{bank.name}}" required placeholder="Iron Bank of Waterdeep" />
+            </div>
+
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.Icon"}}</label>
+              <input type="text" name="icon" value="{{bank.icon}}" placeholder="fa-landmark" />
+            </div>
+
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.Color"}}</label>
+              <input type="color" name="color" value="{{bank.color}}" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>{{localize "BOBSNPC.BankManager.Description"}}</label>
+            <textarea name="description" rows="3" placeholder="A prestigious bank serving the nobility...">{{bank.description}}</textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>
+            <i class="fa-solid fa-map-marked-alt"></i>
+            {{localize "BOBSNPC.BankManager.Location"}}
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.Scene"}}</label>
+              <select name="sceneId">
+                {{#each sceneOptions}}
+                  <option value="{{this.value}}" {{#if (eq this.value ../bank.location.sceneId)}}selected{{/if}}>
+                    {{this.label}}
+                  </option>
+                {{/each}}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.Region"}}</label>
+              <input type="text" name="region" value="{{bank.location.region}}" placeholder="Waterdeep, Sword Coast" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>
+            <i class="fa-solid fa-flag"></i>
+            {{localize "BOBSNPC.BankManager.FactionOwnership"}}
+          </h3>
+
+          <div class="form-group">
+            <label>{{localize "BOBSNPC.BankManager.Faction"}}</label>
+            <select name="factionId">
+              {{#each factionOptions}}
+                <option value="{{this.value}}" {{#if (eq this.value ../bank.factionId)}}selected{{/if}}>
+                  {{this.label}}
+                </option>
+              {{/each}}
+            </select>
+            <small>{{localize "BOBSNPC.BankManager.FactionHelp"}}</small>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>
+            <i class="fa-solid fa-network-wired"></i>
+            {{localize "BOBSNPC.BankManager.NetworkBranches"}}
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.NetworkType"}}</label>
+              <select name="networkType">
+                {{#each networkTypeOptions}}
+                  <option value="{{this.value}}" {{#if (eq this.value ../bank.network.type)}}selected{{/if}}>
+                    {{this.label}}
+                  </option>
+                {{/each}}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.ParentBank"}}</label>
+              <select name="parentBankId">
+                {{#each parentBankOptions}}
+                  <option value="{{this.value}}" {{#if (eq this.value ../bank.parentBankId)}}selected{{/if}}>
+                    {{this.label}}
+                  </option>
+                {{/each}}
+              </select>
+              <small>{{localize "BOBSNPC.BankManager.ParentBankHelp"}}</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="interBranchFeesEnabled" {{#if bank.interBranchFees.enabled}}checked{{/if}} />
+              {{localize "BOBSNPC.BankManager.EnableInterBranchFees"}}
+            </label>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.InterBranchTransferFee"}}</label>
+              <input type="number" name="interBranchTransferFee" value="{{bank.interBranchFees.transferFee}}" min="0" step="1" />
+              <small>{{localize "BOBSNPC.BankManager.FlatFeeGold"}}</small>
+            </div>
+
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.ItemRetrievalFee"}}</label>
+              <input type="number" name="itemRetrievalFee" value="{{bank.interBranchFees.itemRetrievalFee}}" min="0" step="1" />
+              <small>{{localize "BOBSNPC.BankManager.LockBoxFeeHelp"}}</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>
+            <i class="fa-solid fa-box"></i>
+            {{localize "BOBSNPC.BankManager.LockBoxPolicy"}}
+          </h3>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="branchSpecific" {{#if bank.lockBoxPolicy.branchSpecific}}checked{{/if}} />
+              {{localize "BOBSNPC.BankManager.BranchSpecificLockBoxes"}}
+            </label>
+            <small>{{localize "BOBSNPC.BankManager.BranchSpecificHelp"}}</small>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="allowRemoteAccess" {{#if bank.lockBoxPolicy.allowRemoteAccess}}checked{{/if}} />
+              {{localize "BOBSNPC.BankManager.AllowRemoteAccess"}}
+            </label>
+            <small>{{localize "BOBSNPC.BankManager.RemoteAccessHelp"}}</small>
+          </div>
+
+          <div class="form-group">
+            <label>{{localize "BOBSNPC.BankManager.RemoteAccessFee"}}</label>
+            <input type="number" name="remoteAccessFee" value="{{bank.lockBoxPolicy.remoteAccessFee}}" min="0" step="1" />
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>
+            <i class="fa-solid fa-cog"></i>
+            {{localize "BOBSNPC.BankManager.Services"}}
+          </h3>
+
+          <div class="services-grid">
+            <label class="service-toggle">
+              <input type="checkbox" name="deposits" {{#if bank.services.deposits}}checked{{/if}} />
+              <span><i class="fa-solid fa-arrow-down"></i> {{localize "BOBSNPC.BankManager.Deposits"}}</span>
+            </label>
+
+            <label class="service-toggle">
+              <input type="checkbox" name="withdrawals" {{#if bank.services.withdrawals}}checked{{/if}} />
+              <span><i class="fa-solid fa-arrow-up"></i> {{localize "BOBSNPC.BankManager.Withdrawals"}}</span>
+            </label>
+
+            <label class="service-toggle">
+              <input type="checkbox" name="transfers" {{#if bank.services.transfers}}checked{{/if}} />
+              <span><i class="fa-solid fa-exchange-alt"></i> {{localize "BOBSNPC.BankManager.Transfers"}}</span>
+            </label>
+
+            <label class="service-toggle">
+              <input type="checkbox" name="currencyExchange" {{#if bank.services.currencyExchange}}checked{{/if}} />
+              <span><i class="fa-solid fa-coins"></i> {{localize "BOBSNPC.BankManager.CurrencyExchange"}}</span>
+            </label>
+
+            <label class="service-toggle">
+              <input type="checkbox" name="loans" {{#if bank.services.loans}}checked{{/if}} />
+              <span><i class="fa-solid fa-hand-holding-dollar"></i> {{localize "BOBSNPC.BankManager.Loans"}}</span>
+            </label>
+
+            <label class="service-toggle">
+              <input type="checkbox" name="safeDeposit" {{#if bank.services.safeDeposit}}checked{{/if}} />
+              <span><i class="fa-solid fa-vault"></i> {{localize "BOBSNPC.BankManager.SafeDeposit"}}</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>
+            <i class="fa-solid fa-percent"></i>
+            {{localize "BOBSNPC.BankManager.FeesRates"}}
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.TransferFee"}}</label>
+              <input type="number" name="transferFee" value="{{bank.fees.transferFee}}" min="0" max="1" step="0.01" />
+              <small>{{localize "BOBSNPC.BankManager.PercentageHelp"}}</small>
+            </div>
+
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.ExchangeFee"}}</label>
+              <input type="number" name="exchangeFee" value="{{bank.fees.exchangeFee}}" min="0" max="1" step="0.01" />
+              <small>{{localize "BOBSNPC.BankManager.PercentageHelp"}}</small>
+            </div>
+
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.LoanOriginationFee"}}</label>
+              <input type="number" name="loanOriginationFee" value="{{bank.fees.loanOriginationFee}}" min="0" max="1" step="0.01" />
+              <small>{{localize "BOBSNPC.BankManager.PercentageHelp"}}</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.SavingsInterest"}}</label>
+              <input type="number" name="savingsInterest" value="{{bank.rates.savingsInterest}}" min="0" max="1" step="0.01" />
+              <small>{{localize "BOBSNPC.BankManager.PerMonthHelp"}}</small>
+            </div>
+
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.LoanInterest"}}</label>
+              <input type="number" name="loanInterest" value="{{bank.rates.loanInterest}}" min="0" max="2" step="0.01" />
+              <small>{{localize "BOBSNPC.BankManager.PerMonthHelp"}}</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+            {{localize "BOBSNPC.BankManager.LoanSettings"}}
+          </h3>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="loansEnabled" {{#if bank.loans.enabled}}checked{{/if}} />
+              {{localize "BOBSNPC.BankManager.EnableLoans"}}
+            </label>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.MinLoanAmount"}}</label>
+              <input type="number" name="minLoanAmount" value="{{bank.loans.minLoanAmount}}" min="1" step="1" />
+            </div>
+
+            <div class="form-group">
+              <label>{{localize "BOBSNPC.BankManager.MaxLoanAmount"}}</label>
+              <input type="number" name="maxLoanAmount" value="{{bank.loans.maxLoanAmount}}" min="1" step="100" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="requiresCollateral" {{#if bank.loans.requiresCollateral}}checked{{/if}} />
+              {{localize "BOBSNPC.BankManager.RequireCollateral"}}
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="action-btn save-btn" data-action="saveBank">
+            <i class="fa-solid fa-save"></i>
+            {{#if isCreating}}
+              {{localize "BOBSNPC.BankManager.CreateBank"}}
+            {{else}}
+              {{localize "BOBSNPC.Common.Save"}}
+            {{/if}}
+          </button>
+
+          <button type="button" class="action-btn cancel-btn" data-action="cancelEdit">
+            <i class="fa-solid fa-times"></i>
+            {{localize "BOBSNPC.Common.Cancel"}}
+          </button>
+        </div>
+      </form>
+    </section>
+
+  {{!-- ═══════════════════ BRANCHES TAB ═══════════════════ --}}
+  {{else if isBranchesTab}}
+    <section class="branches-section">
+
+      {{#if selectedBank}}
+        <div class="selected-bank-header">
+          <h3>
+            <i class="fa-solid {{selectedBank.icon}}" style="color: {{selectedBank.color}}"></i>
+            {{selectedBank.name}}
+          </h3>
+          <p>{{selectedBank.description}}</p>
+
+          <button type="button" class="action-btn create-branch-btn" data-action="createBranch" data-bank-id="{{selectedBank.id}}">
+            <i class="fa-solid fa-plus"></i>
+            {{localize "BOBSNPC.BankManager.CreateBranch"}}
+          </button>
+        </div>
+
+        {{#if selectedBank.branches.length}}
+          <div class="branches-grid">
+            {{#each selectedBank.branches}}
+              <div class="branch-card">
+                <div class="branch-header">
+                  <h4>{{this.name}}</h4>
+                  <span class="branch-badge">
+                    <i class="fa-solid fa-code-branch"></i>
+                    {{localize "BOBSNPC.BankManager.Branch"}}
+                  </span>
+                </div>
+
+                <div class="branch-info">
+                  <div class="info-item">
+                    <i class="fa-solid fa-map"></i>
+                    <span>{{this.sceneName}}</span>
+                  </div>
+                  <div class="info-item">
+                    <i class="fa-solid fa-users"></i>
+                    <span>{{this.accountCount}} {{localize "BOBSNPC.BankManager.Accounts"}}</span>
+                  </div>
+                  <div class="info-item">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <span>{{this.bankerCount}} {{localize "BOBSNPC.BankManager.Bankers"}}</span>
+                  </div>
+                </div>
+
+                <div class="branch-actions">
+                  <button type="button" class="action-btn edit-btn" data-action="editBank" data-bank-id="{{this.id}}">
+                    <i class="fa-solid fa-edit"></i>
+                  </button>
+                  <button type="button" class="action-btn delete-btn" data-action="removeBranch"
+                          data-branch-id="{{this.id}}" data-parent-id="{{../selectedBank.id}}">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="empty-state">
+            <i class="fa-solid fa-code-branch"></i>
+            <p>{{localize "BOBSNPC.BankManager.NoBranches"}}</p>
+          </div>
+        {{/if}}
+      {{else}}
+        <div class="select-bank-prompt">
+          <i class="fa-solid fa-landmark"></i>
+          <p>{{localize "BOBSNPC.BankManager.SelectBankToManageBranches"}}</p>
+
+          <div class="banks-list-compact">
+            {{#each banks}}
+              <div class="bank-compact-item" data-action="selectBank" data-bank-id="{{this.id}}">
+                <i class="fa-solid {{this.icon}}" style="color: {{this.color}}"></i>
+                <span>{{this.name}}</span>
+                {{#if this.branchCount}}
+                  <span class="branch-count">({{this.branchCount}} branches)</span>
+                {{/if}}
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      {{/if}}
+    </section>
+
+  {{!-- ═══════════════════ SETTINGS TAB ═══════════════════ --}}
+  {{else if isSettingsTab}}
+    <section class="settings-section">
+      <div class="settings-info">
+        <i class="fa-solid fa-info-circle"></i>
+        <p>{{localize "BOBSNPC.BankManager.SettingsDescription"}}</p>
+      </div>
+
+      <div class="form-section">
+        <h3>{{localize "BOBSNPC.BankManager.GlobalDefaults"}}</h3>
+        <p>{{localize "BOBSNPC.BankManager.GlobalDefaultsHelp"}}</p>
+      </div>
+    </section>
+  {{/if}}
+
+</main>

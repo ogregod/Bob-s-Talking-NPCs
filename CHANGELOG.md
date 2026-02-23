@@ -2,6 +2,111 @@
 
 All notable changes to Bob's Talking NPCs will be documented in this file.
 
+## [0.4.0] - 2026-02-22
+
+### 🏦 Banking Management System
+
+Complete overhaul of banking with world-wide bank management, faction integration, and multi-location branches:
+
+#### Added - Banking Management System
+- **Banking Manager** (`/bobsnpc bank` command for GMs):
+  - Comprehensive UI for creating and managing banks across the world
+  - View all banks with filterable grid (by faction, scene, network type)
+  - Create, edit, and delete banks with full configuration
+  - Visual bank cards showing accounts, loans, branches, bankers, reserves
+
+- **Faction-Based Banking**:
+  - Assign banks to factions for thematic organization
+  - Faction-owned banks can span multiple cities/regions
+  - Example: "Iron Bank Faction" with branches across Waterdeep, Baldur's Gate, Neverwinter
+  - Filter banks by faction ownership in manager
+
+- **Branch System**:
+  - Create unlimited branches for parent banks
+  - Each branch can have different location, scene, and banker NPCs
+  - Branches inherit parent bank's settings (fees, rates, services)
+  - Branch management tab shows all branches with location and stats
+  - Parent banks track all branch IDs
+
+- **Inter-Branch Configuration**:
+  - Configurable inter-branch transfer fees (flat gold amount)
+  - Item retrieval fees for accessing lock boxes from different branches
+  - Lock box policies: branch-specific OR global access with fees
+  - Example: Store sword at Waterdeep branch, retrieve from Baldur's Gate for 10gp fee
+
+- **Multi-Banker Support**:
+  - Assign multiple NPC bankers to each bank location
+  - `bankerNpcUuids` array replaces single NPC limitation
+  - Any assigned NPC can trigger banking dialogue node
+  - Perfect for large bank branches with multiple tellers
+
+- **Enhanced Bank Model** (bank-model.mjs):
+  - `factionId` - Ties bank to faction system
+  - `parentBankId` / `branchIds` - Branch hierarchy
+  - `isBranch` - Quick branch identification flag
+  - `interBranchFees` - Transfer and item retrieval fees
+  - `lockBoxPolicy` - Branch-specific vs remote access rules
+  - `bankerNpcUuids` - Array of banker NPCs
+
+- **New BankHandler Methods**:
+  - `deleteBank()` - Remove bank and all branches
+  - `getBranchesForBank()` - Get all branches of parent
+  - `getBanksForFaction()` - Query banks by faction
+  - `getBankForBanker()` - Find bank for banker NPC (supports new array)
+
+- **Banking Manager Templates**:
+  - `manager-header.hbs` - Title bar with create button
+  - `manager-tabs.hbs` - Navigation (All Banks, Branches, Settings)
+  - `manager-content.hbs` - Comprehensive forms for all bank configuration
+
+- **65+ New Localization Strings**:
+  - Complete BankManager localization section
+  - All UI labels, tooltips, help text
+  - Form field descriptions and validation messages
+
+#### Modified - Banking Clarification
+- **Money Changer Business** (formerly "Bank & Exchange"):
+  - Renamed to "Money Changer" to distinguish from full banking
+  - Removed LOAN service (use Banking System instead)
+  - Removed SAFE_DEPOSIT service (use Banking System instead)
+  - Kept CURRENCY_EXCHANGE, MONEY_TRANSFER, APPRAISE services
+  - Changed icon from fa-landmark to fa-coins
+  - Updated description to clarify it's NOT a full bank
+
+#### Banking System Architecture
+**Standalone Banking** (BANK dialogue node → BankWindow):
+- Comprehensive account management (checking, savings, custom funds)
+- Full loan system with collateral & interest calculations
+- Transaction logs with game time tracking
+- Interest accrual on savings accounts
+- Account-to-account transfers
+- Safe deposit boxes with item storage
+
+**Money Changer** (SHOP dialogue node → ShopWindow):
+- Currency exchange (CP/SP/EP/GP/PP conversions)
+- Inter-city money wire transfers
+- Financial appraisals
+- Short-term vault storage
+- NO account management or loans
+
+#### Use Cases
+- **Global Banking Network**: Create "Iron Bank" faction, add branches in every major city
+- **Regional Banks**: Create separate banks per region with local branches
+- **Faction Exclusive**: Harpers Bank (requires Harper faction membership)
+- **Branch Fees**: Transfer money between branches for small fee, or visit branch directly for free
+- **Lock Box Retrieval**: Store items at home branch, pay fee to access from distant branch
+
+#### Files Changed
+- `scripts/data/bank-model.mjs` - Added faction/branch fields to createBank()
+- `scripts/handlers/bank-handler.mjs` - Added branch/faction management methods
+- `scripts/apps/bank-manager.mjs` - NEW: Banking Management ApplicationV2
+- `templates/bank/manager-header.hbs` - NEW: Manager header template
+- `templates/bank/manager-tabs.hbs` - NEW: Manager tabs template
+- `templates/bank/manager-content.hbs` - NEW: Manager content with all forms
+- `scripts/module.mjs` - Added BankingManager import/export, `/bobsnpc bank` command
+- `scripts/data/business-registry.mjs` - Refactored BANK_EXCHANGE to Money Changer
+- `lang/en.json` - Added 65+ BankManager localization strings
+
 ## [0.3.0] - 2025-02-22
 
 ### 🏦 Banking System Enhancements

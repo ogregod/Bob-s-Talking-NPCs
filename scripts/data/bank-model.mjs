@@ -296,6 +296,32 @@ export function createBank(data = {}) {
       networkName: data.network?.networkName || null
     },
 
+    // Faction ownership (ties bank to faction system)
+    factionId: data.factionId || null,  // Faction that owns/operates this bank
+    factionRankRequired: data.factionRankRequired || 0,  // Minimum rank for special services
+
+    // Branch system (for multi-location banks)
+    parentBankId: data.parentBankId || null,  // If this is a branch, ID of parent bank
+    branchIds: data.branchIds || [],  // If this is parent, IDs of all branches
+    isBranch: data.isBranch ?? false,  // Quick flag for branch identification
+
+    // Inter-branch configuration
+    interBranchFees: {
+      enabled: data.interBranchFees?.enabled ?? true,
+      transferFee: data.interBranchFees?.transferFee ?? 5,  // Flat fee for inter-branch transfers
+      itemRetrievalFee: data.interBranchFees?.itemRetrievalFee ?? 10  // Fee to retrieve lock box items from different branch
+    },
+
+    // Lock box policy
+    lockBoxPolicy: {
+      branchSpecific: data.lockBoxPolicy?.branchSpecific ?? true,  // Items stored only at this branch
+      allowRemoteAccess: data.lockBoxPolicy?.allowRemoteAccess ?? false,  // Can access from any branch (with fee)
+      remoteAccessFee: data.lockBoxPolicy?.remoteAccessFee ?? 10  // Fee if remote access allowed
+    },
+
+    // Banker NPCs (can have multiple NPCs at one branch)
+    bankerNpcUuids: data.bankerNpcUuids || [],  // Array of NPC actor UUIDs who can trigger banking
+
     // Services
     services: {
       deposits: data.services?.deposits ?? true,

@@ -23,6 +23,7 @@ import { QuestLog } from "./apps/quest-log.mjs";
 import { QuestTracker } from "./apps/quest-tracker.mjs";
 import { ShopWindow } from "./apps/shop-window.mjs";
 import { BankWindow } from "./apps/bank-window.mjs";
+import { BankingManager } from "./apps/bank-manager.mjs";
 import { FactionWindow } from "./apps/faction-window.mjs";
 import { HirelingManager } from "./apps/hireling-manager.mjs";
 import { PropertyManager } from "./apps/property-manager.mjs";
@@ -46,6 +47,7 @@ export {
   QuestTracker,
   ShopWindow,
   BankWindow,
+  BankingManager,
   FactionWindow,
   HirelingManager,
   PropertyManager,
@@ -191,6 +193,17 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
         }
         break;
 
+      case "bank":
+      case "banks":
+      case "banking":
+        if (game.user.isGM) {
+          // GMs see the Banking Management System
+          BankingManager.open();
+        } else {
+          ui.notifications.warn("Only GMs can access the Banking Manager. Use a Bank NPC to access your accounts.");
+        }
+        break;
+
       case "npc": {
         // Configure selected token's NPC
         const selectedToken = canvas.tokens?.controlled?.[0];
@@ -221,6 +234,7 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
               <tr><td><code>/bobsnpc tracker</code></td><td>Open Quest Tracker</td></tr>
               <tr><td><code>/bobsnpc npc</code></td><td>Configure selected NPC</td></tr>
               ${game.user.isGM ? '<tr><td><code>/bobsnpc shops</code></td><td>Open Shop Manager</td></tr>' : ''}
+              ${game.user.isGM ? '<tr><td><code>/bobsnpc bank</code></td><td>Manage Banks & Branches</td></tr>' : ''}
               ${game.user.isGM ? '<tr><td><code>/bobsnpc enchantments</code></td><td>Open Enchantment Manager</td></tr>' : ''}
               ${game.user.isGM ? '<tr><td><code>/bobsnpc services</code></td><td>Manage Service Orders</td></tr>' : ''}
               ${game.user.isGM ? '<tr><td><code>/bobsnpc dashboard</code></td><td>Open GM Dashboard</td></tr>' : ''}
