@@ -22,6 +22,7 @@
 @import url("./components/dialogue-editor.css");
 @import url("./components/shop-manager.css");
 @import url("./components/bank-editor.css");
+@import url("./components/bank-manager.css");
 @import url("./components/service-manager.css");
 
 /* ===== CSS Layer for V13 Compatibility ===== */
@@ -50,10 +51,30 @@
   /* ===== ApplicationV2 Layout Fixes ===== */
   /* Targeted fixes for scrolling and proper layout */
 
+  /* Banking manager layout */
+  .bank-manager .window-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .bank-manager .bank-manager-tabs {
+    flex-shrink: 0;
+  }
+
+  .bank-manager .bank-manager-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
   /* CRITICAL: Ensure tab navigation stays horizontal with correct class names */
   .npc-config-tabs,
   .dashboard-tabs,
   .tab-navigation,
+  .bank-manager-tabs,
   .shop-editor-nav .tab-list,
   .service-approval-content .tab-navigation {
     display: flex !important;
