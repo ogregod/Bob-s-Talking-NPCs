@@ -299,12 +299,20 @@ export class BankingManager extends HandlebarsApplicationMixin(ApplicationV2) {
           branchSpecific: true,
           allowRemoteAccess: false,
           remoteAccessFee: 10
-        }
+        },
+        reserves: { pp: 0, gp: 100000, ep: 0, sp: 0, cp: 0 }
       };
     } else if (this._editingBank) {
-      return {
-        ...this._editingBank
+      const bank = { ...this._editingBank };
+      // Ensure reserves always has all fields
+      bank.reserves = {
+        pp: bank.reserves?.pp ?? 0,
+        gp: bank.reserves?.gp ?? 100000,
+        ep: bank.reserves?.ep ?? 0,
+        sp: bank.reserves?.sp ?? 0,
+        cp: bank.reserves?.cp ?? 0
       };
+      return bank;
     }
     return null;
   }
@@ -572,6 +580,14 @@ export class BankingManager extends HandlebarsApplicationMixin(ApplicationV2) {
           branchSpecific: formData.get("branchSpecific") === "on",
           allowRemoteAccess: formData.get("allowRemoteAccess") === "on",
           remoteAccessFee: parseInt(formData.get("remoteAccessFee")) || 10
+        },
+
+        reserves: {
+          pp: parseInt(formData.get("reserves.pp")) || 0,
+          gp: parseInt(formData.get("reserves.gp")) || 0,
+          ep: parseInt(formData.get("reserves.ep")) || 0,
+          sp: parseInt(formData.get("reserves.sp")) || 0,
+          cp: parseInt(formData.get("reserves.cp")) || 0
         },
 
         bankerNpcUuids: this._editingBank?.bankerNpcUuids || []

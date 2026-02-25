@@ -197,6 +197,39 @@
 
         <div class="form-section">
           <h3>
+            <i class="fa-solid fa-coins"></i>
+            {{localize "BOBSNPC.BankManager.Reserves"}}
+          </h3>
+          <small>The bank's treasury reserves. These are tracked by the GM and do not change automatically.</small>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Platinum (pp)</label>
+              <input type="number" name="reserves.pp" value="{{bank.reserves.pp}}" min="0" placeholder="0" />
+            </div>
+            <div class="form-group">
+              <label>Gold (gp)</label>
+              <input type="number" name="reserves.gp" value="{{bank.reserves.gp}}" min="0" placeholder="100000" />
+            </div>
+            <div class="form-group">
+              <label>Electrum (ep)</label>
+              <input type="number" name="reserves.ep" value="{{bank.reserves.ep}}" min="0" placeholder="0" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Silver (sp)</label>
+              <input type="number" name="reserves.sp" value="{{bank.reserves.sp}}" min="0" placeholder="0" />
+            </div>
+            <div class="form-group">
+              <label>Copper (cp)</label>
+              <input type="number" name="reserves.cp" value="{{bank.reserves.cp}}" min="0" placeholder="0" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>
             <i class="fa-solid fa-map-marked-alt"></i>
             {{localize "BOBSNPC.BankManager.Location"}}
           </h3>

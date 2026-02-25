@@ -221,6 +221,14 @@ export class FactionEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     if (data.faction) {
       foundry.utils.mergeObject(this._faction, data.faction, { overwrite: true });
     }
+
+    // foundry.utils.mergeObject converts arrays to numeric-keyed objects — restore them
+    if (this._faction.ranks && !Array.isArray(this._faction.ranks)) {
+      this._faction.ranks = Object.values(this._faction.ranks);
+    }
+    if (this._faction.factionRelationships && !Array.isArray(this._faction.factionRelationships)) {
+      this._faction.factionRelationships = Object.values(this._faction.factionRelationships);
+    }
   }
 
   // ==================== TAB ACTIONS ====================
