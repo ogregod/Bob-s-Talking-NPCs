@@ -159,8 +159,8 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
     const questJournal = game.journal.getName("Bob's NPCs - Quests");
     const quests = questJournal?.pages?.contents || [];
 
-    // Get factions from settings or journal
-    const factions = game.settings.get(MODULE_ID, "factions") || [];
+    // Get factions from faction handler
+    const factions = game.bobsnpc?.handlers?.faction?.getAllFactions() || [];
 
     // Get active events from settings (V13 compatible)
     const activeEvents = game.settings.get(MODULE_ID, "activeEvents") || [];
@@ -255,19 +255,58 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    * @returns {Promise<object>}
    */
   async #prepareFactionsData() {
-    const factionsData = game.settings.get(MODULE_ID, "factions") || {};
-    // Convert object to array if needed (settings stores as Object)
-    const factions = Array.isArray(factionsData) ? factionsData : Object.values(factionsData);
+    const factions = game.bobsnpc?.handlers?.faction?.getAllFactions() || [];
+    const questHandler = game.bobsnpc?.handlers?.quest;
+    const merchantHandler = game.bobsnpc?.handlers?.merchant;
 
-    const factionList = factions.map(faction => ({
-      id: faction.id,
-      name: faction.name,
-      icon: faction.icon || "fa-flag",
-      color: faction.color || "#808080",
-      memberCount: this.#countFactionMembers(faction.id),
-      rankCount: faction.ranks?.length || 0,
-      description: faction.description || ""
-    }));
+    const factionList = factions.map(faction => {
+      // Gather NPC members from actor flags
+      const memberActors = game.actors.filter(a => {
+        const cfg = a.getFlag(MODULE_ID, "config");
+        return cfg?.factions?.some(f => f.factionId === faction.id);
+      });
+      // Also include any UUIDs stored directly on the faction model
+      const directMembers = (faction.members || [])
+        .map(uuid => game.actors.find(a => a.uuid === uuid || a.id === uuid))
+        .filter(Boolean);
+      const allMembers = [...new Map(
+        [...memberActors, ...directMembers].map(a => [a.id, a])
+      ).values()];
+
+      // Resolve quest names
+      const questNames = (faction.questIds || []).map(qid => {
+        const q = questHandler?.getQuest?.(qid);
+        return q ? { id: qid, name: q.name } : null;
+      }).filter(Boolean);
+
+      // Resolve shop/business names
+      const shopNames = (faction.shopIds || []).map(sid => {
+        const s = merchantHandler?.getMerchant?.(sid);
+        return s ? { id: sid, name: s.name } : null;
+      }).filter(Boolean);
+
+      return {
+        id: faction.id,
+        name: faction.name,
+        icon: faction.icon || "fa-flag",
+        color: faction.color || "#808080",
+        description: faction.description || "",
+        shortDescription: faction.shortDescription || "",
+        memberCount: allMembers.length,
+        rankCount: faction.ranks?.length || 0,
+        members: allMembers.slice(0, 5).map(a => ({ id: a.id, name: a.name, img: a.img })),
+        moreMembers: Math.max(0, allMembers.length - 5),
+        quests: questNames.slice(0, 5),
+        moreQuests: Math.max(0, questNames.length - 5),
+        shops: shopNames.slice(0, 5),
+        moreShops: Math.max(0, shopNames.length - 5),
+        hasMembers: allMembers.length > 0,
+        hasQuests: questNames.length > 0,
+        hasShops: shopNames.length > 0,
+        hostileThreshold: faction.hostileThreshold ?? -50,
+        ranks: (faction.ranks || []).map(r => ({ name: r.name, color: r.color }))
+      };
+    });
 
     return {
       factions: factionList,
@@ -415,8 +454,8 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
   #countFactionMembers(factionId) {
     let count = 0;
     for (const actor of game.actors) {
-      const factions = actor.getFlag(MODULE_ID, "factions") || [];
-      if (factions.some(f => f.id === factionId)) {
+      const cfg = actor.getFlag(MODULE_ID, "config");
+      if (cfg?.factions?.some(f => f.factionId === factionId)) {
         count++;
       }
     }

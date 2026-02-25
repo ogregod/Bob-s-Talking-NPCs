@@ -14,18 +14,31 @@
       <div class="faction-list">
         {{#each factions}}
           <div class="faction-card">
-            <div class="faction-header" style="border-left-color: {{this.color}}">
+
+            {{!-- Header row --}}
+            <div class="faction-header" style="border-left: 4px solid {{this.color}}">
               <div class="faction-icon" style="background-color: {{this.color}}20; color: {{this.color}}">
                 <i class="fa-solid {{this.icon}}"></i>
               </div>
               <div class="faction-info">
                 <h4 class="faction-name">{{this.name}}</h4>
-                {{#if this.description}}
+                {{#if this.shortDescription}}
+                  <p class="faction-description">{{this.shortDescription}}</p>
+                {{else if this.description}}
                   <p class="faction-description">{{this.description}}</p>
                 {{/if}}
               </div>
+              <div class="faction-actions">
+                <button type="button" class="icon-btn" data-action="editFaction" data-faction-id="{{this.id}}" title="{{localize 'BOBSNPC.Common.Edit'}}">
+                  <i class="fa-solid fa-edit"></i>
+                </button>
+                <button type="button" class="icon-btn danger" data-action="deleteFaction" data-faction-id="{{this.id}}" title="{{localize 'BOBSNPC.Common.Delete'}}">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
             </div>
 
+            {{!-- Stats row --}}
             <div class="faction-stats">
               <div class="faction-stat">
                 <span class="stat-value">{{this.memberCount}}</span>
@@ -35,16 +48,78 @@
                 <span class="stat-value">{{this.rankCount}}</span>
                 <span class="stat-label">{{localize "BOBSNPC.GMDashboard.Ranks"}}</span>
               </div>
+              <div class="faction-stat">
+                <span class="stat-value">{{this.quests.length}}</span>
+                <span class="stat-label">Quests</span>
+              </div>
+              <div class="faction-stat">
+                <span class="stat-value">{{this.shops.length}}</span>
+                <span class="stat-label">Businesses</span>
+              </div>
             </div>
 
-            <div class="faction-actions">
-              <button type="button" class="icon-btn" data-action="editFaction" data-faction-id="{{this.id}}" title="{{localize 'BOBSNPC.Common.Edit'}}">
-                <i class="fa-solid fa-edit"></i>
-              </button>
-              <button type="button" class="icon-btn danger" data-action="deleteFaction" data-faction-id="{{this.id}}" title="{{localize 'BOBSNPC.Common.Delete'}}">
-                <i class="fa-solid fa-trash"></i>
-              </button>
-            </div>
+            {{!-- Ranks --}}
+            {{#if this.ranks.length}}
+              <div class="faction-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-medal"></i> Ranks:</span>
+                <div class="faction-tag-list">
+                  {{#each this.ranks}}
+                    <span class="faction-tag" style="border-color: {{this.color}}; color: {{this.color}}">
+                      {{this.name}}
+                    </span>
+                  {{/each}}
+                </div>
+              </div>
+            {{/if}}
+
+            {{!-- NPC Members --}}
+            {{#if this.hasMembers}}
+              <div class="faction-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-users"></i> Members:</span>
+                <div class="faction-member-list">
+                  {{#each this.members}}
+                    <span class="faction-member" title="{{this.name}}">
+                      {{#if this.img}}<img src="{{this.img}}" class="member-thumb" />{{/if}}
+                      {{this.name}}
+                    </span>
+                  {{/each}}
+                  {{#if this.moreMembers}}
+                    <span class="faction-more">+{{../moreMembers}} more</span>
+                  {{/if}}
+                </div>
+              </div>
+            {{/if}}
+
+            {{!-- Quests / Missions --}}
+            {{#if this.hasQuests}}
+              <div class="faction-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-scroll"></i> Missions:</span>
+                <div class="faction-tag-list">
+                  {{#each this.quests}}
+                    <span class="faction-tag">{{this.name}}</span>
+                  {{/each}}
+                  {{#if ../moreQuests}}
+                    <span class="faction-more">+{{../moreQuests}} more</span>
+                  {{/if}}
+                </div>
+              </div>
+            {{/if}}
+
+            {{!-- Businesses / Shops --}}
+            {{#if this.hasShops}}
+              <div class="faction-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-store"></i> Businesses:</span>
+                <div class="faction-tag-list">
+                  {{#each this.shops}}
+                    <span class="faction-tag">{{this.name}}</span>
+                  {{/each}}
+                  {{#if ../moreShops}}
+                    <span class="faction-more">+{{../moreShops}} more</span>
+                  {{/if}}
+                </div>
+              </div>
+            {{/if}}
+
           </div>
         {{/each}}
       </div>
