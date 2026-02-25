@@ -11,6 +11,7 @@ import {
   createRank,
   createDefaultRanks,
   createFactionRelationship,
+  createRole,
   FactionRelationType,
   ReputationLevel
 } from "../data/faction-model.mjs";
@@ -74,6 +75,8 @@ export class FactionEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       useDefaultRanks: FactionEditor.#onUseDefaultRanks,
       addRelationship: FactionEditor.#onAddRelationship,
       removeRelationship: FactionEditor.#onRemoveRelationship,
+      addRole: FactionEditor.#onAddRole,
+      removeRole: FactionEditor.#onRemoveRole,
       saveFaction: FactionEditor.#onSaveFaction,
       cancelEdit: FactionEditor.#onCancelEdit,
       deleteFaction: FactionEditor.#onDeleteFaction,
@@ -98,6 +101,10 @@ export class FactionEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     },
     relationships: {
       template: `modules/${MODULE_ID}/templates/faction-editor/relationships.hbs`,
+      scrollable: [".tab-content"]
+    },
+    roles: {
+      template: `modules/${MODULE_ID}/templates/faction-editor/roles.hbs`,
       scrollable: [".tab-content"]
     },
     settings: {
@@ -140,6 +147,12 @@ export class FactionEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       };
     });
 
+    // Prepare roles display data
+    const rolesDisplay = (this._faction.roles || []).map((role, index) => ({
+      ...role,
+      index
+    }));
+
     return {
       faction: this._faction,
       isNew: this._isNew,
@@ -150,6 +163,7 @@ export class FactionEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       otherFactions,
       ranksDisplay,
       relationshipsDisplay,
+      rolesDisplay,
 
       // Enum options
       relationshipTypeOptions: this._getRelationshipTypeOptions(),
@@ -228,6 +242,17 @@ export class FactionEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     }
     if (this._faction.factionRelationships && !Array.isArray(this._faction.factionRelationships)) {
       this._faction.factionRelationships = Object.values(this._faction.factionRelationships);
+    }
+    if (this._faction.roles && !Array.isArray(this._faction.roles)) {
+      this._faction.roles = Object.values(this._faction.roles);
+    }
+    // Restore nested permissions objects within roles
+    if (Array.isArray(this._faction.roles)) {
+      for (const role of this._faction.roles) {
+        if (role.permissions && !Array.isArray(role.permissions)) {
+          // permissions is already an object — no restoration needed
+        }
+      }
     }
   }
 
@@ -351,6 +376,30 @@ export class FactionEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     const index = parseInt(target.dataset.index, 10);
     if (!isNaN(index) && this._faction.factionRelationships) {
       this._faction.factionRelationships.splice(index, 1);
+      this.render();
+    }
+  }
+
+  // ==================== ROLE ACTIONS ====================
+
+  /**
+   * Add a new functional role to the faction
+   */
+  static async #onAddRole(event, target) {
+    if (!this._faction.roles) this._faction.roles = [];
+    this._faction.roles.push(createRole({
+      name: game.i18n.localize("BOBSNPC.FactionEditor.NewRole")
+    }));
+    this.render();
+  }
+
+  /**
+   * Remove a role
+   */
+  static async #onRemoveRole(event, target) {
+    const index = parseInt(target.dataset.index, 10);
+    if (!isNaN(index) && this._faction.roles) {
+      this._faction.roles.splice(index, 1);
       this.render();
     }
   }

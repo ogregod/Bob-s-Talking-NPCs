@@ -165,6 +165,30 @@ export function createDefaultRanks() {
 }
 
 /**
+ * Create a faction role (functional position, separate from prestige rank)
+ * Roles define what a member CAN DO in the faction (e.g. Treasurer, Quest Master)
+ * @param {object} data - Role data
+ * @returns {object}
+ */
+export function createRole(data = {}) {
+  return {
+    id: data.id || generateId(),
+    name: data.name || "New Role",
+    description: data.description || "",
+    color: data.color || null,
+    icon: data.icon || "fa-user-tie",
+    permissions: {
+      manageFunds: data.permissions?.manageFunds ?? false,
+      manageQuests: data.permissions?.manageQuests ?? false,
+      manageMembers: data.permissions?.manageMembers ?? false,
+      manageShops: data.permissions?.manageShops ?? false,
+      viewReports: data.permissions?.viewReports ?? false,
+      isLeader: data.permissions?.isLeader ?? false
+    }
+  };
+}
+
+/**
  * Create a faction relationship with another faction
  * @param {object} data - Relationship data
  * @returns {object}
@@ -237,6 +261,10 @@ export function createFaction(data = {}) {
     factionRelationships: (data.factionRelationships || []).map(r =>
       createFactionRelationship(r)
     ),
+
+    // Roles (functional positions - separate from prestige ranks)
+    // e.g. Treasurer, Quest Master, Council Member — define what members CAN DO
+    roles: (data.roles || []).map(r => createRole(r)),
 
     // Members (NPC Actor UUIDs)
     members: data.members || [],

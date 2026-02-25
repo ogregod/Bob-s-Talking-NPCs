@@ -14,29 +14,38 @@
             </div>
 
             <div class="faction-details">
+
+              {{!-- Rank: dropdown from faction's defined ranks (prestige/standing tier) --}}
               <div class="form-group inline">
-                <label>{{localize "BOBSNPC.NPCConfig.Role"}}</label>
-                <select name="config.factions.{{this.index}}.role">
-                  <option value="member" {{#if (eq this.role 'member')}}selected{{/if}}>
-                    {{localize "BOBSNPC.NPCConfig.FactionRole.Member"}}
-                  </option>
-                  <option value="officer" {{#if (eq this.role 'officer')}}selected{{/if}}>
-                    {{localize "BOBSNPC.NPCConfig.FactionRole.Officer"}}
-                  </option>
-                  <option value="leader" {{#if (eq this.role 'leader')}}selected{{/if}}>
-                    {{localize "BOBSNPC.NPCConfig.FactionRole.Leader"}}
-                  </option>
-                  <option value="ally" {{#if (eq this.role 'ally')}}selected{{/if}}>
-                    {{localize "BOBSNPC.NPCConfig.FactionRole.Ally"}}
-                  </option>
+                <label>{{localize "BOBSNPC.NPCConfig.Rank"}}</label>
+                <select name="config.factions.{{this.index}}.rank">
+                  <option value="">— {{localize "BOBSNPC.NPCConfig.NoRank"}} —</option>
+                  {{#each this.availableRanks}}
+                    <option value="{{this.id}}" {{#if (eq this.id ../rank)}}selected{{/if}}>
+                      {{this.name}}
+                    </option>
+                  {{/each}}
                 </select>
               </div>
 
+              {{!-- Role: dropdown from faction's custom roles (functional position) --}}
               <div class="form-group inline">
-                <label>{{localize "BOBSNPC.NPCConfig.Rank"}}</label>
-                <input type="text" name="config.factions.{{this.index}}.rank"
-                       value="{{this.rank}}" placeholder="{{localize 'BOBSNPC.NPCConfig.RankPlaceholder'}}" />
+                <label>{{localize "BOBSNPC.NPCConfig.FactionRole"}}</label>
+                {{#if this.availableRoles.length}}
+                  <select name="config.factions.{{this.index}}.roleId">
+                    <option value="">— {{localize "BOBSNPC.NPCConfig.NoRole"}} —</option>
+                    {{#each this.availableRoles}}
+                      <option value="{{this.id}}" {{#if (eq this.id ../roleId)}}selected{{/if}}>
+                        {{this.name}}
+                      </option>
+                    {{/each}}
+                  </select>
+                {{else}}
+                  <span class="hint">{{localize "BOBSNPC.NPCConfig.NoRolesDefined"}}</span>
+                  <input type="hidden" name="config.factions.{{this.index}}.roleId" value="" />
+                {{/if}}
               </div>
+
             </div>
 
             <button type="button" class="remove-btn" data-action="removeFaction" data-index="{{this.index}}">

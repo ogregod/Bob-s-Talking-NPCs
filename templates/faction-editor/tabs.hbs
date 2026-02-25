@@ -15,6 +15,11 @@
     <i class="fa-solid fa-handshake"></i>
     {{localize "BOBSNPC.FactionEditor.TabRelationships"}}
   </button>
+  <button type="button" class="tab-btn {{#if (eq activeTab 'roles')}}active{{/if}}"
+          data-action="changeTab" data-tab="roles">
+    <i class="fa-solid fa-user-tie"></i>
+    {{localize "BOBSNPC.FactionEditor.TabRoles"}}
+  </button>
   <button type="button" class="tab-btn {{#if (eq activeTab 'settings')}}active{{/if}}"
           data-action="changeTab" data-tab="settings">
     <i class="fa-solid fa-cog"></i>

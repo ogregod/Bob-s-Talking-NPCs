@@ -490,11 +490,19 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   _prepareFactionsDisplay(allFactions) {
     return this._config.factions.map((factionEntry, index) => {
       const faction = allFactions.find(f => f.id === factionEntry.factionId);
+      // Sorted ranks for the rank dropdown
+      const availableRanks = (faction?.ranks || [])
+        .slice()
+        .sort((a, b) => a.order - b.order);
+      // Custom roles defined on this faction for the role dropdown
+      const availableRoles = faction?.roles || [];
       return {
         ...factionEntry,
         name: faction?.name || factionEntry.factionId,
         icon: faction?.icon || "fa-flag",
         color: faction?.color || "#666666",
+        availableRanks,
+        availableRoles,
         index
       };
     });

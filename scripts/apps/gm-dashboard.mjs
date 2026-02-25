@@ -285,6 +285,37 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
         return s ? { id: sid, name: s.name } : null;
       }).filter(Boolean);
 
+      // Build a lookup map of roleId → role for this faction
+      const roleMap = {};
+      for (const role of (faction.roles || [])) {
+        roleMap[role.id] = role;
+      }
+
+      // Build a lookup map of rankId → rank for this faction
+      const rankMap = {};
+      for (const rank of (faction.ranks || [])) {
+        rankMap[rank.id] = rank;
+      }
+
+      // Resolve members with their rank and role display info
+      const resolvedMembers = allMembers.slice(0, 5).map(a => {
+        const cfg = a.getFlag(MODULE_ID, "config");
+        const membership = cfg?.factions?.find(f => f.factionId === faction.id);
+        const rank = membership?.rank ? rankMap[membership.rank] : null;
+        const role = membership?.roleId ? roleMap[membership.roleId] : null;
+        return {
+          id: a.id,
+          name: a.name,
+          img: a.img,
+          rankName: rank?.name || null,
+          rankColor: rank?.color || null,
+          roleName: role?.name || null,
+          roleColor: role?.color || null,
+          roleIcon: role?.icon || null,
+          isLeader: role?.permissions?.isLeader ?? false
+        };
+      });
+
       return {
         id: faction.id,
         name: faction.name,
@@ -294,7 +325,8 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
         shortDescription: faction.shortDescription || "",
         memberCount: allMembers.length,
         rankCount: faction.ranks?.length || 0,
-        members: allMembers.slice(0, 5).map(a => ({ id: a.id, name: a.name, img: a.img })),
+        roleCount: (faction.roles || []).length,
+        members: resolvedMembers,
         moreMembers: Math.max(0, allMembers.length - 5),
         quests: questNames.slice(0, 5),
         moreQuests: Math.max(0, questNames.length - 5),
@@ -304,7 +336,8 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
         hasQuests: questNames.length > 0,
         hasShops: shopNames.length > 0,
         hostileThreshold: faction.hostileThreshold ?? -50,
-        ranks: (faction.ranks || []).map(r => ({ name: r.name, color: r.color }))
+        ranks: (faction.ranks || []).map(r => ({ name: r.name, color: r.color })),
+        roles: (faction.roles || []).map(r => ({ id: r.id, name: r.name, color: r.color, icon: r.icon, isLeader: r.permissions?.isLeader }))
       };
     });
 

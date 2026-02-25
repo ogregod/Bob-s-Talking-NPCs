@@ -1,0 +1,119 @@
+{{!-- Faction Editor - Roles Tab --}}
+{{!-- Roles define functional positions (e.g. Treasurer, Quest Master) --}}
+{{!-- These are separate from Ranks (prestige) — a Mithral-rank knight may hold no role --}}
+<div class="tab-content roles-tab {{theme}}" {{#unless (eq activeTab 'roles')}}hidden{{/unless}}>
+
+  <div class="tab-header">
+    <div class="tab-header-info">
+      <h3>{{localize "BOBSNPC.FactionEditor.Roles"}}</h3>
+      <p class="hint">{{localize "BOBSNPC.FactionEditor.RolesHint"}}</p>
+    </div>
+    <button type="button" class="create-btn" data-action="addRole">
+      <i class="fa-solid fa-plus"></i>
+      {{localize "BOBSNPC.FactionEditor.AddRole"}}
+    </button>
+  </div>
+
+  {{#if rolesDisplay.length}}
+    <div class="roles-list">
+      {{#each rolesDisplay}}
+        <div class="role-card">
+
+          {{!-- Role header: icon, name, color, remove button --}}
+          <div class="role-header">
+            <div class="role-icon-wrap" style="{{#if this.color}}color: {{this.color}};{{/if}}">
+              <i class="fa-solid {{#if this.icon}}{{this.icon}}{{else}}fa-user-tie{{/if}}"></i>
+            </div>
+
+            <div class="role-identity">
+              <div class="form-row compact">
+                <div class="form-group">
+                  <label>{{localize "BOBSNPC.FactionEditor.RoleName"}}</label>
+                  <input type="text" name="faction.roles.{{this.index}}.name"
+                         value="{{this.name}}" />
+                  <input type="hidden" name="faction.roles.{{this.index}}.id" value="{{this.id}}" />
+                </div>
+                <div class="form-group">
+                  <label>{{localize "BOBSNPC.FactionEditor.RoleColor"}}</label>
+                  <input type="color" name="faction.roles.{{this.index}}.color"
+                         value="{{#if this.color}}{{this.color}}{{else}}#7c4dff{{/if}}" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>{{localize "BOBSNPC.FactionEditor.RoleDescription"}}</label>
+                <input type="text" name="faction.roles.{{this.index}}.description"
+                       value="{{this.description}}"
+                       placeholder="{{localize 'BOBSNPC.FactionEditor.RoleDescriptionPlaceholder'}}" />
+              </div>
+            </div>
+
+            <button type="button" class="icon-btn danger remove-role-btn"
+                    data-action="removeRole" data-index="{{this.index}}"
+                    title="{{localize 'BOBSNPC.Common.Delete'}}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+
+          {{!-- Permissions --}}
+          <div class="role-permissions">
+            <span class="permissions-label">
+              <i class="fa-solid fa-key"></i>
+              {{localize "BOBSNPC.FactionEditor.Permissions"}}:
+            </span>
+            <div class="permissions-grid">
+              <label class="perm-checkbox">
+                <input type="checkbox" name="faction.roles.{{this.index}}.permissions.isLeader"
+                       {{#if this.permissions.isLeader}}checked{{/if}} />
+                <i class="fa-solid fa-crown"></i>
+                {{localize "BOBSNPC.FactionEditor.Perm.IsLeader"}}
+              </label>
+              <label class="perm-checkbox">
+                <input type="checkbox" name="faction.roles.{{this.index}}.permissions.manageFunds"
+                       {{#if this.permissions.manageFunds}}checked{{/if}} />
+                <i class="fa-solid fa-coins"></i>
+                {{localize "BOBSNPC.FactionEditor.Perm.ManageFunds"}}
+              </label>
+              <label class="perm-checkbox">
+                <input type="checkbox" name="faction.roles.{{this.index}}.permissions.manageQuests"
+                       {{#if this.permissions.manageQuests}}checked{{/if}} />
+                <i class="fa-solid fa-scroll"></i>
+                {{localize "BOBSNPC.FactionEditor.Perm.ManageQuests"}}
+              </label>
+              <label class="perm-checkbox">
+                <input type="checkbox" name="faction.roles.{{this.index}}.permissions.manageMembers"
+                       {{#if this.permissions.manageMembers}}checked{{/if}} />
+                <i class="fa-solid fa-users"></i>
+                {{localize "BOBSNPC.FactionEditor.Perm.ManageMembers"}}
+              </label>
+              <label class="perm-checkbox">
+                <input type="checkbox" name="faction.roles.{{this.index}}.permissions.manageShops"
+                       {{#if this.permissions.manageShops}}checked{{/if}} />
+                <i class="fa-solid fa-store"></i>
+                {{localize "BOBSNPC.FactionEditor.Perm.ManageShops"}}
+              </label>
+              <label class="perm-checkbox">
+                <input type="checkbox" name="faction.roles.{{this.index}}.permissions.viewReports"
+                       {{#if this.permissions.viewReports}}checked{{/if}} />
+                <i class="fa-solid fa-chart-bar"></i>
+                {{localize "BOBSNPC.FactionEditor.Perm.ViewReports"}}
+              </label>
+            </div>
+          </div>
+
+        </div>
+      {{/each}}
+    </div>
+  {{else}}
+    <div class="empty-state">
+      <i class="fa-solid fa-user-tie"></i>
+      <p>{{localize "BOBSNPC.FactionEditor.NoRoles"}}</p>
+      <p class="hint">{{localize "BOBSNPC.FactionEditor.NoRolesHint"}}</p>
+      <button type="button" class="create-btn" data-action="addRole">
+        <i class="fa-solid fa-plus"></i>
+        {{localize "BOBSNPC.FactionEditor.AddFirstRole"}}
+      </button>
+    </div>
+  {{/if}}
+
+</div>
