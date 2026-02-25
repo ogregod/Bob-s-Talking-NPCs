@@ -261,9 +261,11 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
 
     const factionList = factions.map(faction => {
       // Gather NPC members from actor flags
+      // cfg.factions may be stored as a numeric-keyed object (due to mergeObject) — normalize to array
       const memberActors = game.actors.filter(a => {
         const cfg = a.getFlag(MODULE_ID, "config");
-        return cfg?.factions?.some(f => f.factionId === faction.id);
+        const fList = Array.isArray(cfg?.factions) ? cfg.factions : Object.values(cfg?.factions || {});
+        return fList.some(f => f.factionId === faction.id);
       });
       // Also include any UUIDs stored directly on the faction model
       const directMembers = (faction.members || [])
@@ -300,7 +302,8 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
       // Resolve members with their rank and role display info
       const resolvedMembers = allMembers.slice(0, 5).map(a => {
         const cfg = a.getFlag(MODULE_ID, "config");
-        const membership = cfg?.factions?.find(f => f.factionId === faction.id);
+        const fList = Array.isArray(cfg?.factions) ? cfg.factions : Object.values(cfg?.factions || {});
+        const membership = fList.find(f => f.factionId === faction.id);
         const rank = membership?.rank ? rankMap[membership.rank] : null;
         const role = membership?.roleId ? roleMap[membership.roleId] : null;
         return {
@@ -488,7 +491,8 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
     let count = 0;
     for (const actor of game.actors) {
       const cfg = actor.getFlag(MODULE_ID, "config");
-      if (cfg?.factions?.some(f => f.factionId === factionId)) {
+      const fList = Array.isArray(cfg?.factions) ? cfg.factions : Object.values(cfg?.factions || {});
+      if (fList.some(f => f.factionId === factionId)) {
         count++;
       }
     }
