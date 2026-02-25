@@ -41,6 +41,7 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
       editFaction: GMDashboard.#onEditFaction,
       deleteFaction: GMDashboard.#onDeleteFaction,
       manageFactionMembers: GMDashboard.#onManageFactionMembers,
+      toggleFactionCollapse: GMDashboard.#onToggleFactionCollapse,
       configureNPC: GMDashboard.#onConfigureNPC,
       setWorldState: GMDashboard.#onSetWorldState,
       deleteWorldState: GMDashboard.#onDeleteWorldState,
@@ -96,6 +97,12 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    * @type {object}
    */
   #cachedData = null;
+
+  /**
+   * Set of faction IDs whose cards are collapsed in the factions tab
+   * @type {Set<string>}
+   */
+  #collapsedFactions = new Set();
 
   /** @override */
   async _prepareContext(options) {
@@ -331,18 +338,16 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
         memberCount: allMembers.length,
         rankCount: faction.ranks?.length || 0,
         roleCount: (faction.roles || []).length,
-        members: resolvedMembers,
-        moreMembers: Math.max(0, allMembers.length - 5),
         quests: questNames.slice(0, 5),
         moreQuests: Math.max(0, questNames.length - 5),
         shops: shopNames.slice(0, 5),
         moreShops: Math.max(0, shopNames.length - 5),
-        hasMembers: allMembers.length > 0,
         hasQuests: questNames.length > 0,
         hasShops: shopNames.length > 0,
         hostileThreshold: faction.hostileThreshold ?? -50,
         ranks: (faction.ranks || []).map(r => ({ name: r.name, color: r.color })),
-        roles: (faction.roles || []).map(r => ({ id: r.id, name: r.name, color: r.color, icon: r.icon, isLeader: r.permissions?.isLeader }))
+        roles: (faction.roles || []).map(r => ({ id: r.id, name: r.name, color: r.color, icon: r.icon, isLeader: r.permissions?.isLeader })),
+        isCollapsed: this.#collapsedFactions.has(faction.id)
       };
     });
 
@@ -606,6 +611,19 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
     }
     const editor = new FactionEditor(faction);
     editor.render(true);
+  }
+
+  /**
+   * Toggle collapse state of a faction card
+   */
+  static #onToggleFactionCollapse(event, target) {
+    const factionId = target.dataset.factionId;
+    if (this.#collapsedFactions.has(factionId)) {
+      this.#collapsedFactions.delete(factionId);
+    } else {
+      this.#collapsedFactions.add(factionId);
+    }
+    this.render();
   }
 
   /**

@@ -166,23 +166,41 @@ export class FactionMembersManager extends HandlebarsApplicationMixin(Applicatio
         ? (this._faction.ranks || []).findIndex(r => r.id === rank.id)
         : 9999;
 
+      // Pre-build rank options for this member (avoids fragile Handlebars ../ scoping)
+      const currentRankId = entry.rank || "";
+      const rankOptions = (this._faction.ranks || []).map(r => ({
+        id: r.id,
+        name: r.name,
+        selected: r.id === currentRankId
+      }));
+
+      // Pre-build role options for this member
+      const currentRoleId = entry.roleId || "";
+      const roleOptions = (this._faction.roles || []).map(r => ({
+        id: r.id,
+        name: r.name,
+        selected: r.id === currentRoleId
+      }));
+
       return {
         actorId: actor.id,
         actorUuid: actor.uuid,
         name: actor.name,
         img: actor.img,
         // Rank
-        rankId: entry.rank || "",
+        rankId: currentRankId,
         rankName: rank?.name || "—",
         rankColor: rank?.color || null,
         rankIcon: rank?.icon || null,
         rankOrder,
+        rankOptions,
         // Role
-        roleId: entry.roleId || "",
+        roleId: currentRoleId,
         roleName: role?.name || "—",
         roleColor: role?.color || null,
         roleIcon: role?.icon || null,
         isLeader: role?.permissions?.isLeader || false,
+        roleOptions,
         // Reputation
         reputation,
         reputationLevel,

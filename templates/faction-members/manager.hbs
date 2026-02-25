@@ -103,8 +103,8 @@
                     data-actor-id="{{this.actorId}}"
                     {{#if this.rankColor}}style="color: {{this.rankColor}}"{{/if}}>
               <option value="">— {{localize "BOBSNPC.NPCConfig.NoRank"}} —</option>
-              {{#each ../availableRanks}}
-                <option value="{{this.id}}" {{#if (eq this.id ../rankId)}}selected{{/if}}>
+              {{#each this.rankOptions}}
+                <option value="{{this.id}}" {{#if this.selected}}selected{{/if}}>
                   {{this.name}}
                 </option>
               {{/each}}
@@ -113,14 +113,14 @@
 
           {{!-- Role --}}
           <div class="col-role">
-            {{#if ../availableRoles.length}}
+            {{#if this.roleOptions.length}}
               <select class="inline-select role-select"
                       data-member-action="changeRole"
                       data-actor-id="{{this.actorId}}"
                       {{#if this.roleColor}}style="color: {{this.roleColor}}"{{/if}}>
                 <option value="">— {{localize "BOBSNPC.NPCConfig.NoRole"}} —</option>
-                {{#each ../availableRoles}}
-                  <option value="{{this.id}}" {{#if (eq this.id ../roleId)}}selected{{/if}}>
+                {{#each this.roleOptions}}
+                  <option value="{{this.id}}" {{#if this.selected}}selected{{/if}}>
                     {{this.name}}
                   </option>
                 {{/each}}
