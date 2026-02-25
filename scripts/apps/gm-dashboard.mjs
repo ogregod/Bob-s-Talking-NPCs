@@ -8,6 +8,7 @@ const MODULE_ID = "bobs-talking-npcs";
 
 import { QuestEditor } from "./quest-editor.mjs";
 import { FactionEditor } from "./faction-editor.mjs";
+import { FactionMembersManager } from "./faction-members-manager.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -39,6 +40,7 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
       createFaction: GMDashboard.#onCreateFaction,
       editFaction: GMDashboard.#onEditFaction,
       deleteFaction: GMDashboard.#onDeleteFaction,
+      manageFactionMembers: GMDashboard.#onManageFactionMembers,
       configureNPC: GMDashboard.#onConfigureNPC,
       setWorldState: GMDashboard.#onSetWorldState,
       deleteWorldState: GMDashboard.#onDeleteWorldState,
@@ -604,6 +606,19 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
     }
     const editor = new FactionEditor(faction);
     editor.render(true);
+  }
+
+  /**
+   * Open faction members manager
+   */
+  static async #onManageFactionMembers(event, target) {
+    const factionId = target.dataset.factionId;
+    const faction = game.bobsnpc?.handlers?.faction?.getFaction(factionId);
+    if (!faction) {
+      ui.notifications.error(game.i18n.localize("BOBSNPC.GMDashboard.FactionNotFound"));
+      return;
+    }
+    FactionMembersManager.open(faction);
   }
 
   /**

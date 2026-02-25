@@ -29,6 +29,9 @@
                 {{/if}}
               </div>
               <div class="faction-actions">
+                <button type="button" class="icon-btn" data-action="manageFactionMembers" data-faction-id="{{this.id}}" title="{{localize 'BOBSNPC.FactionMembers.ManageMembers'}}">
+                  <i class="fa-solid fa-users"></i>
+                </button>
                 <button type="button" class="icon-btn" data-action="editFaction" data-faction-id="{{this.id}}" title="{{localize 'BOBSNPC.Common.Edit'}}">
                   <i class="fa-solid fa-edit"></i>
                 </button>

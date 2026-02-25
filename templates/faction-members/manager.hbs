@@ -1,0 +1,206 @@
+{{!-- Faction Members Manager --}}
+<div class="faction-members-manager {{theme}}">
+
+  {{!-- Header --}}
+  <header class="members-manager-header" style="border-bottom: 3px solid {{factionColor}}">
+    <div class="faction-identity">
+      <div class="faction-icon-circle" style="background-color: {{factionColor}}20; color: {{factionColor}}; border: 2px solid {{factionColor}}60">
+        <i class="fa-solid {{faction.icon}}"></i>
+      </div>
+      <div class="faction-title-block">
+        <h2>{{faction.name}}</h2>
+        <span class="member-count-label">{{memberCount}} {{localize "BOBSNPC.FactionMembers.MembersLabel"}}</span>
+      </div>
+    </div>
+
+    <div class="manager-controls">
+      <div class="search-wrapper">
+        <i class="fa-solid fa-search search-icon"></i>
+        <input type="text" class="member-search" placeholder="{{localize 'BOBSNPC.FactionMembers.SearchPlaceholder'}}" value="{{search}}" />
+      </div>
+
+      {{#if isGM}}
+        <div class="add-member-row">
+          <select name="newMemberActorId" class="add-member-select">
+            <option value="">{{localize "BOBSNPC.FactionMembers.SelectActor"}}</option>
+            {{#each unaffiliated}}
+              <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
+          </select>
+          <button type="button" class="add-member-btn" data-action="addMember"
+                  title="{{localize 'BOBSNPC.FactionMembers.AddMember'}}">
+            <i class="fa-solid fa-user-plus"></i>
+            {{localize "BOBSNPC.FactionMembers.AddMember"}}
+          </button>
+        </div>
+      {{/if}}
+    </div>
+  </header>
+
+  {{!-- Table --}}
+  <div class="members-table">
+
+    {{!-- Table Head --}}
+    <div class="table-head">
+      <div class="col-avatar"></div>
+      <div class="col-name sortable {{#if (eq sortBy 'name')}}active-sort{{/if}}"
+           data-action="sortBy" data-sort="name">
+        {{localize "BOBSNPC.FactionMembers.ColName"}}
+        <i class="fa-solid {{#if (eq sortBy 'name')}}{{#if (eq sortDir 'asc')}}fa-sort-up{{else}}fa-sort-down{{/if}}{{else}}fa-sort{{/if}} sort-icon"></i>
+      </div>
+      <div class="col-rank sortable {{#if (eq sortBy 'rank')}}active-sort{{/if}}"
+           data-action="sortBy" data-sort="rank">
+        {{localize "BOBSNPC.FactionMembers.ColRank"}}
+        <i class="fa-solid {{#if (eq sortBy 'rank')}}{{#if (eq sortDir 'asc')}}fa-sort-up{{else}}fa-sort-down{{/if}}{{else}}fa-sort{{/if}} sort-icon"></i>
+      </div>
+      <div class="col-role sortable {{#if (eq sortBy 'role')}}active-sort{{/if}}"
+           data-action="sortBy" data-sort="role">
+        {{localize "BOBSNPC.FactionMembers.ColRole"}}
+        <i class="fa-solid {{#if (eq sortBy 'role')}}{{#if (eq sortDir 'asc')}}fa-sort-up{{else}}fa-sort-down{{/if}}{{else}}fa-sort{{/if}} sort-icon"></i>
+      </div>
+      <div class="col-rep sortable {{#if (eq sortBy 'reputation')}}active-sort{{/if}}"
+           data-action="sortBy" data-sort="reputation">
+        {{localize "BOBSNPC.FactionMembers.ColReputation"}}
+        <i class="fa-solid {{#if (eq sortBy 'reputation')}}{{#if (eq sortDir 'asc')}}fa-sort-up{{else}}fa-sort-down{{/if}}{{else}}fa-sort{{/if}} sort-icon"></i>
+      </div>
+      <div class="col-business">{{localize "BOBSNPC.FactionMembers.ColBusiness"}}</div>
+      <div class="col-actions"></div>
+    </div>
+
+    {{!-- Table Body --}}
+    <div class="members-table-body">
+      {{#each members}}
+        <div class="member-row {{#if this.isLeader}}is-leader{{/if}} rep-{{this.reputationLevel}}">
+
+          {{!-- Avatar --}}
+          <div class="col-avatar">
+            {{#if this.img}}
+              <img src="{{this.img}}" class="member-portrait"
+                   data-action="openActorSheet" data-actor-id="{{this.actorId}}"
+                   title="{{this.name}}" />
+            {{else}}
+              <div class="member-portrait-placeholder"
+                   data-action="openActorSheet" data-actor-id="{{this.actorId}}">
+                <i class="fa-solid fa-user"></i>
+              </div>
+            {{/if}}
+          </div>
+
+          {{!-- Name --}}
+          <div class="col-name">
+            <span class="member-display-name" data-action="openActorSheet" data-actor-id="{{this.actorId}}">
+              {{#if this.isLeader}}
+                <i class="fa-solid fa-crown leader-crown"></i>
+              {{/if}}
+              {{this.name}}
+            </span>
+          </div>
+
+          {{!-- Rank --}}
+          <div class="col-rank">
+            <select class="inline-select rank-select"
+                    data-member-action="changeRank"
+                    data-actor-id="{{this.actorId}}"
+                    {{#if this.rankColor}}style="color: {{this.rankColor}}"{{/if}}>
+              <option value="">— {{localize "BOBSNPC.NPCConfig.NoRank"}} —</option>
+              {{#each ../availableRanks}}
+                <option value="{{this.id}}" {{#if (eq this.id ../rankId)}}selected{{/if}}>
+                  {{this.name}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+
+          {{!-- Role --}}
+          <div class="col-role">
+            {{#if ../availableRoles.length}}
+              <select class="inline-select role-select"
+                      data-member-action="changeRole"
+                      data-actor-id="{{this.actorId}}"
+                      {{#if this.roleColor}}style="color: {{this.roleColor}}"{{/if}}>
+                <option value="">— {{localize "BOBSNPC.NPCConfig.NoRole"}} —</option>
+                {{#each ../availableRoles}}
+                  <option value="{{this.id}}" {{#if (eq this.id ../roleId)}}selected{{/if}}>
+                    {{this.name}}
+                  </option>
+                {{/each}}
+              </select>
+            {{else}}
+              <span class="no-roles-hint">{{localize "BOBSNPC.NPCConfig.NoRolesDefined"}}</span>
+            {{/if}}
+          </div>
+
+          {{!-- Reputation --}}
+          <div class="col-rep">
+            <span class="rep-value-display">{{this.reputation}}</span>
+            <span class="rep-level-chip rep-chip-{{this.reputationLevel}}">{{this.reputationLevelLabel}}</span>
+            {{#if ../isGM}}
+              <button type="button" class="rep-modify-btn icon-btn"
+                      data-action="modifyReputation"
+                      data-actor-id="{{this.actorId}}"
+                      data-actor-uuid="{{this.actorUuid}}"
+                      data-actor-name="{{this.name}}"
+                      title="{{localize 'BOBSNPC.FactionMembers.ModifyRep'}}">
+                <i class="fa-solid fa-sliders"></i>
+              </button>
+            {{/if}}
+          </div>
+
+          {{!-- Business --}}
+          <div class="col-business">
+            {{#if this.businessName}}
+              <span class="business-chip">
+                <i class="fa-solid fa-store"></i>
+                {{this.businessName}}
+              </span>
+            {{else}}
+              <span class="no-business">—</span>
+            {{/if}}
+          </div>
+
+          {{!-- Actions --}}
+          <div class="col-actions">
+            <button type="button" class="icon-btn" data-action="openActorSheet"
+                    data-actor-id="{{this.actorId}}"
+                    title="{{localize 'BOBSNPC.FactionMembers.OpenSheet'}}">
+              <i class="fa-solid fa-external-link-alt"></i>
+            </button>
+            {{#if ../isGM}}
+              <button type="button" class="icon-btn danger" data-action="removeMember"
+                      data-actor-id="{{this.actorId}}"
+                      data-actor-name="{{this.name}}"
+                      title="{{localize 'BOBSNPC.FactionMembers.Remove'}}">
+                <i class="fa-solid fa-user-minus"></i>
+              </button>
+            {{/if}}
+          </div>
+
+        </div>
+      {{else}}
+        <div class="no-members-state">
+          <i class="fa-solid fa-users-slash"></i>
+          <p>{{#if search}}{{localize "BOBSNPC.FactionMembers.NoSearchResults"}}{{else}}{{localize "BOBSNPC.FactionMembers.NoMembers"}}{{/if}}</p>
+        </div>
+      {{/each}}
+    </div>
+
+  </div>
+
+  {{!-- Footer --}}
+  <footer class="members-manager-footer">
+    <span class="footer-summary">
+      <i class="fa-solid fa-users"></i>
+      {{memberCount}} {{localize "BOBSNPC.FactionMembers.MembersLabel"}} in {{faction.name}}
+    </span>
+    {{#if (and availableRanks.length (not availableRanks.length))}}{{/if}}
+    <div class="footer-legend">
+      {{#if availableRanks.length}}
+        <span class="legend-item"><i class="fa-solid fa-medal"></i> {{availableRanks.length}} ranks defined</span>
+      {{/if}}
+      {{#if availableRoles.length}}
+        <span class="legend-item"><i class="fa-solid fa-user-tie"></i> {{availableRoles.length}} roles defined</span>
+      {{/if}}
+    </div>
+  </footer>
+
+</div>

@@ -680,3 +680,417 @@
     color: var(--bobsnpc-text-muted);
   }
 }
+
+/* ============================================================
+   FACTION MEMBERS MANAGER
+   ============================================================ */
+
+.faction-members-manager {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bobsnpc-bg-primary);
+  color: var(--bobsnpc-text-primary);
+  font-family: var(--bobsnpc-font-primary);
+}
+
+/* ---- Header ---- */
+.members-manager-header {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bobsnpc-spacing-sm);
+  padding: var(--bobsnpc-spacing-md);
+  background: var(--bobsnpc-bg-secondary);
+  border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+}
+
+.faction-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--bobsnpc-spacing-md);
+}
+
+.faction-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.faction-title-block h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: var(--bobsnpc-font-weight-bold);
+  color: var(--bobsnpc-text-primary);
+}
+
+.member-count-label {
+  font-size: 0.8rem;
+  color: var(--bobsnpc-text-muted);
+}
+
+.manager-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bobsnpc-spacing-sm);
+}
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--bobsnpc-text-muted);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.member-search {
+  width: 100%;
+  padding: 6px 10px 6px 32px;
+  background: var(--bobsnpc-bg-input, var(--bobsnpc-bg-primary));
+  border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  border-radius: var(--bobsnpc-border-radius);
+  color: var(--bobsnpc-text-primary);
+  font-size: 0.85rem;
+}
+
+.member-search:focus {
+  outline: none;
+  border-color: var(--bobsnpc-accent-color);
+}
+
+.add-member-row {
+  display: flex;
+  gap: var(--bobsnpc-spacing-sm);
+  align-items: center;
+}
+
+.add-member-select {
+  flex: 1;
+  padding: 5px 8px;
+  background: var(--bobsnpc-bg-input, var(--bobsnpc-bg-primary));
+  border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  border-radius: var(--bobsnpc-border-radius);
+  color: var(--bobsnpc-text-primary);
+  font-size: 0.85rem;
+}
+
+.add-member-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--bobsnpc-accent-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--bobsnpc-border-radius);
+  font-size: 0.8rem;
+  font-weight: var(--bobsnpc-font-weight-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.add-member-btn:hover {
+  opacity: 0.85;
+}
+
+/* ---- Table ---- */
+.members-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.table-head {
+  display: grid;
+  grid-template-columns: 44px 1fr 160px 160px 160px 140px 70px;
+  gap: 0;
+  padding: 6px 8px;
+  background: var(--bobsnpc-bg-tertiary, var(--bobsnpc-bg-secondary));
+  border-bottom: 2px solid var(--bobsnpc-border-color);
+  font-size: 0.75rem;
+  font-weight: var(--bobsnpc-font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bobsnpc-text-muted);
+  flex-shrink: 0;
+}
+
+.table-head > div {
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.table-head .sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.table-head .sortable:hover {
+  color: var(--bobsnpc-text-primary);
+}
+
+.table-head .active-sort {
+  color: var(--bobsnpc-accent-color);
+}
+
+.sort-icon {
+  font-size: 0.7rem;
+  opacity: 0.6;
+}
+
+.members-table-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ---- Member Row ---- */
+.member-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 160px 160px 160px 140px 70px;
+  gap: 0;
+  padding: 4px 8px;
+  border-bottom: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  align-items: center;
+  transition: background 0.1s;
+}
+
+.member-row:hover {
+  background: var(--bobsnpc-bg-hover, rgba(255,255,255,0.04));
+}
+
+.member-row.is-leader {
+  background: rgba(255, 215, 0, 0.04);
+}
+
+.member-row.is-leader:hover {
+  background: rgba(255, 215, 0, 0.08);
+}
+
+.member-row > div {
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+/* ---- Columns ---- */
+.col-avatar {
+  justify-content: center;
+  padding: 4px !important;
+}
+
+.member-portrait {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--bobsnpc-border-radius-sm);
+  object-fit: cover;
+  cursor: pointer;
+  border: 1px solid var(--bobsnpc-border-color);
+  transition: border-color 0.15s;
+}
+
+.member-portrait:hover {
+  border-color: var(--bobsnpc-accent-color);
+}
+
+.member-portrait-placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--bobsnpc-border-radius-sm);
+  background: var(--bobsnpc-bg-secondary);
+  border: 1px solid var(--bobsnpc-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bobsnpc-text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.member-portrait-placeholder:hover {
+  border-color: var(--bobsnpc-accent-color);
+}
+
+.col-name {
+  overflow: hidden;
+}
+
+.member-display-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.875rem;
+  font-weight: var(--bobsnpc-font-weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.member-display-name:hover {
+  color: var(--bobsnpc-accent-color);
+}
+
+.leader-crown {
+  color: gold;
+  font-size: 0.75em;
+  flex-shrink: 0;
+}
+
+.col-rank,
+.col-role {
+  overflow: hidden;
+}
+
+.inline-select {
+  width: 100%;
+  padding: 3px 6px;
+  background: var(--bobsnpc-bg-input, var(--bobsnpc-bg-primary));
+  border: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  border-radius: var(--bobsnpc-border-radius-sm);
+  color: var(--bobsnpc-text-primary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.inline-select:focus {
+  outline: none;
+  border-color: var(--bobsnpc-accent-color);
+}
+
+.no-roles-hint {
+  font-size: 0.75rem;
+  color: var(--bobsnpc-text-muted);
+  font-style: italic;
+}
+
+.col-rep {
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.rep-value-display {
+  font-size: 0.85rem;
+  font-weight: var(--bobsnpc-font-weight-medium);
+  white-space: nowrap;
+}
+
+.rep-level-chip {
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 10px;
+  white-space: nowrap;
+  border: 1px solid currentColor;
+}
+
+/* Reputation level colors */
+.rep-chip-exalted    { color: #c084fc; }
+.rep-chip-revered    { color: #60a5fa; }
+.rep-chip-honored    { color: #34d399; }
+.rep-chip-friendly   { color: #86efac; }
+.rep-chip-neutral    { color: #94a3b8; }
+.rep-chip-unfriendly { color: #fbbf24; }
+.rep-chip-hostile    { color: #f87171; }
+.rep-chip-hated      { color: #ef4444; }
+
+.rep-modify-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.col-business {
+  overflow: hidden;
+}
+
+.business-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--bobsnpc-text-secondary);
+}
+
+.no-business {
+  color: var(--bobsnpc-text-muted);
+  font-size: 0.8rem;
+}
+
+.col-actions {
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+/* ---- Empty State ---- */
+.no-members-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: var(--bobsnpc-text-muted);
+  text-align: center;
+  gap: var(--bobsnpc-spacing-sm);
+}
+
+.no-members-state i {
+  font-size: 2.5rem;
+  opacity: 0.3;
+}
+
+.no-members-state p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* ---- Footer ---- */
+.members-manager-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bobsnpc-bg-secondary);
+  border-top: var(--bobsnpc-border-width) solid var(--bobsnpc-border-color);
+  font-size: 0.8rem;
+  color: var(--bobsnpc-text-muted);
+}
+
+.footer-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-legend {
+  display: flex;
+  gap: var(--bobsnpc-spacing-md);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

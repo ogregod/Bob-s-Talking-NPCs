@@ -209,14 +209,18 @@
 
             {{!-- Card Actions --}}
             <div class="card-actions">
+              <button type="button" class="card-action-btn members-btn" data-action="manageFactionMembers" data-faction-id="{{this.id}}">
+                <i class="fa-solid fa-users"></i>
+                {{localize "BOBSNPC.FactionMembers.ManageMembers"}}
+              </button>
               {{#if ../isGM}}
                 <button type="button" class="card-action-btn edit-btn" data-action="editFaction" data-faction-id="{{this.id}}">
                   <i class="fa-solid fa-edit"></i>
-                  Edit Faction
+                  {{localize "BOBSNPC.Common.Edit"}}
                 </button>
                 <button type="button" class="card-action-btn rep-btn" data-action="modifyReputation" data-faction-id="{{this.id}}">
                   <i class="fa-solid fa-sliders"></i>
-                  Modify Rep
+                  {{localize "BOBSNPC.Factions.ModifyRep"}}
                 </button>
               {{/if}}
             </div>

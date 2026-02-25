@@ -3656,7 +3656,36 @@
       "Hostile": "Hostile",
       "Members": "Members",
       "NoFactions": "No factions available",
-      "Create": "Create Faction"
+      "Create": "Create Faction",
+      "ModifyRep": "Modify Reputation"
+    },
+
+    "FactionMembers": {
+      "Title": "Faction Members",
+      "MembersLabel": "Members",
+      "SearchPlaceholder": "Search members...",
+      "SelectActor": "— Select actor to add —",
+      "AddMember": "Add Member",
+      "NoMembers": "No members in this faction",
+      "NoSearchResults": "No members match your search",
+      "ManageMembers": "Manage Members",
+      "ModifyRep": "Modify Reputation",
+      "ModifyRepTitle": "Modify Reputation",
+      "RepChange": "Reputation Change",
+      "RepHint": "Enter a positive or negative number to adjust reputation.",
+      "Remove": "Remove",
+      "RemoveTitle": "Remove Member",
+      "RemoveConfirm": "Remove {name} from this faction?",
+      "Added": "Added {name} to {faction}",
+      "Removed": "Removed {name} from {faction}",
+      "OpenSheet": "Open Sheet",
+      "SelectActorFirst": "Please select an actor to add.",
+      "AlreadyMember": "{name} is already a member of this faction.",
+      "ColName": "Name",
+      "ColRank": "Rank",
+      "ColRole": "Role",
+      "ColReputation": "Reputation",
+      "ColBusiness": "Business"
     },
 
     "QuestLog": {

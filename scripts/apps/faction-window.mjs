@@ -9,6 +9,7 @@ const MODULE_ID = "bobs-talking-npcs";
 import { localize } from "../utils/helpers.mjs";
 import { ReputationLevel } from "../data/faction-model.mjs";
 import { FactionEditor } from "./faction-editor.mjs";
+import { FactionMembersManager } from "./faction-members-manager.mjs";
 
 /** Get faction handler instance from API */
 function getFactionHandler() {
@@ -59,7 +60,8 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       toggleCollapse: FactionWindow.#onToggleCollapse,
       editFaction: FactionWindow.#onEditFaction,
       createFaction: FactionWindow.#onCreateFaction,
-      modifyReputation: FactionWindow.#onModifyReputation
+      modifyReputation: FactionWindow.#onModifyReputation,
+      manageFactionMembers: FactionWindow.#onManageFactionMembers
     }
   };
 
@@ -509,6 +511,15 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!game.user.isGM) return;
     const editor = new FactionEditor(null);
     editor.render(true);
+  }
+
+  static async #onManageFactionMembers(event, target) {
+    const factionId = target.dataset.factionId;
+    const handler = getFactionHandler();
+    const faction = handler?.getFaction?.(factionId)
+      ?? handler?.getAllFactions?.().find(f => f.id === factionId);
+    if (!faction) return;
+    FactionMembersManager.open(faction);
   }
 
   static async #onModifyReputation(event, target) {
