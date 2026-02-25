@@ -142,6 +142,13 @@ export class BankEditor extends HandlebarsApplicationMixin(ApplicationV2) {
         minimumDeposit: 0,
         requiredFaction: null,
         requiredReputation: 0
+      },
+      reserves: {
+        pp: 0,
+        gp: 100000,
+        ep: 0,
+        sp: 0,
+        cp: 0
       }
     };
   }
@@ -191,6 +198,14 @@ export class BankEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       { value: "fa-crown", label: "Crown", selected: bank.icon === "fa-crown" },
       { value: "fa-shield", label: "Shield", selected: bank.icon === "fa-shield" }
     ];
+
+    // Ensure reserves object always has all fields for template rendering
+    if (!bank.reserves) bank.reserves = { pp: 0, gp: 100000, ep: 0, sp: 0, cp: 0 };
+    bank.reserves.pp = bank.reserves.pp ?? 0;
+    bank.reserves.gp = bank.reserves.gp ?? 100000;
+    bank.reserves.ep = bank.reserves.ep ?? 0;
+    bank.reserves.sp = bank.reserves.sp ?? 0;
+    bank.reserves.cp = bank.reserves.cp ?? 0;
 
     return {
       ...context,

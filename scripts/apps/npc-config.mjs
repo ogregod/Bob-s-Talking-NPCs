@@ -599,23 +599,9 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
    * @private
    */
   async _getAvailableBanks() {
-    // Get banks from journal entries or other storage
-    const banks = [];
-    const journalEntries = game.journal.filter(j =>
-      j.getFlag(MODULE_ID, "bankData")
-    );
-
-    for (const journal of journalEntries) {
-      const bankData = journal.getFlag(MODULE_ID, "bankData");
-      if (bankData) {
-        banks.push({
-          id: journal.id,
-          name: journal.name
-        });
-      }
-    }
-
-    return banks;
+    const bankHandler = game.bobsnpc?.handlers?.bank;
+    if (!bankHandler) return [];
+    return bankHandler.getAllBanks().map(b => ({ id: b.id, name: b.name }));
   }
 
   // ==================== Form Handling ====================
@@ -828,6 +814,12 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         await this._linkShopToNpc(shopId);
       }
 
+      // Update bank's bankerNpcUuids if a bank is configured (bi-directional linking)
+      const bankId = this._config.services?.banker?.bankId;
+      if (bankId) {
+        await this._linkBankToNpc(bankId);
+      }
+
       this._unsavedChanges = false;
       ui.notifications.info(localize("NPCConfig.Saved"));
       this.render();
@@ -866,6 +858,34 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       console.log(`${MODULE_ID} | Linked shop ${shopId} to NPC ${this.npc.name}`);
     } catch (e) {
       console.warn(`${MODULE_ID} | Failed to link shop to NPC:`, e);
+    }
+  }
+
+  /**
+   * Update a bank to link back to this NPC (bidirectional sync)
+   * @param {string} bankId - Bank ID to link
+   */
+  async _linkBankToNpc(bankId) {
+    try {
+      const bankHandler = game.bobsnpc?.handlers?.bank;
+      if (!bankHandler) return;
+
+      const bank = bankHandler.getBank(bankId);
+      if (!bank) return;
+
+      const npcUuid = this.npc.uuid;
+      const uuids = bank.bankerNpcUuids || [];
+
+      // Add this NPC to bankerNpcUuids if not already there
+      if (!uuids.includes(npcUuid)) {
+        await bankHandler.updateBank(bankId, {
+          bankerNpcUuids: [...uuids, npcUuid],
+          location: { ...bank.location, npcActorUuid: npcUuid }
+        });
+        console.log(`${MODULE_ID} | Linked bank ${bankId} to NPC ${this.npc.name}`);
+      }
+    } catch (e) {
+      console.warn(`${MODULE_ID} | Failed to link bank to NPC:`, e);
     }
   }
 

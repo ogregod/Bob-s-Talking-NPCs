@@ -211,7 +211,7 @@ export class BankingManager extends HandlebarsApplicationMixin(ApplicationV2) {
         networkClass: bank.network?.type === "global" ? "global" : "local",
         savingsRate: `${((bank.rates?.savingsInterest || 0) * 100).toFixed(1)}%`,
         loanRate: `${((bank.rates?.loanInterest || 0) * 100).toFixed(1)}%`,
-        totalReserves: formatCurrency(copperToGold(toCopper(bank.reserves || {}))),
+        totalReserves: formatCurrency(toCopper(bank.reserves || {})),
         canEdit: true,
         canDelete: accountCount === 0 && loanCount === 0  // Only delete if no active accounts/loans
       };

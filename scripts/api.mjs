@@ -1326,10 +1326,23 @@ class UIAPI {
 
     // Look up or auto-create bank for this NPC
     const bankHandler = game.bobsnpc?.handlers?.bank;
-    let bank = bankHandler?.getBankForNPC(npcUuid);
+
+    // 1. Check if NPC has a bank explicitly configured in their NPC config flags
+    let bank = null;
+    const npcActor = await fromUuid(npcUuid);
+    const npcConfig = npcActor?.getFlag(MODULE_ID, "config");
+    const configuredBankId = npcConfig?.services?.banker?.bankId;
+    if (configuredBankId) {
+      bank = bankHandler?.getBank(configuredBankId);
+    }
+
+    // 2. Fall back to searching bank data by NPC UUID (legacy location field)
+    if (!bank) {
+      bank = bankHandler?.getBankForNPC(npcUuid);
+    }
+
+    // 3. Auto-create a standard bank for this NPC if none found
     if (!bank && bankHandler) {
-      // Auto-create a standard bank for this NPC
-      const npcActor = await fromUuid(npcUuid);
       bank = await bankHandler.createBank({
         name: npcActor?.name ? `${npcActor.name}'s Bank` : "Bank",
         location: { npcActorUuid: npcUuid }
