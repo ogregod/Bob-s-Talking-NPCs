@@ -8,6 +8,7 @@ const MODULE_ID = "bobs-talking-npcs";
 
 import { localize } from "../utils/helpers.mjs";
 import { ReputationLevel } from "../data/faction-model.mjs";
+import { FactionEditor } from "./faction-editor.mjs";
 
 /** Get faction handler instance from API */
 function getFactionHandler() {
@@ -18,7 +19,7 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 /**
  * Faction Window Application
- * Displays faction standings, ranks, and reputation progress
+ * Displays faction standings, ranks, and reputation progress as collapseable cards
  */
 export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   /**
@@ -32,8 +33,8 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     this.actorUuid = options.actorUuid || game.user.character?.uuid;
     this.initialFactionId = options.factionId || null;
 
-    this._selectedFactionId = options.factionId || null;
     this._filter = "all"; // all, allied, neutral, hostile
+    this._collapsedFactions = new Set(); // IDs of collapsed faction cards
   }
 
   /** @override */
@@ -50,27 +51,26 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       resizable: true
     },
     position: {
-      width: 750,
-      height: 600
+      width: 860,
+      height: 700
     },
     actions: {
       setFilter: FactionWindow.#onSetFilter,
-      selectFaction: FactionWindow.#onSelectFaction,
-      viewRanks: FactionWindow.#onViewRanks,
-      viewRelations: FactionWindow.#onViewRelations,
-      viewMembers: FactionWindow.#onViewMembers
+      toggleCollapse: FactionWindow.#onToggleCollapse,
+      editFaction: FactionWindow.#onEditFaction,
+      createFaction: FactionWindow.#onCreateFaction,
+      modifyReputation: FactionWindow.#onModifyReputation
     }
   };
 
   /** @override */
   static PARTS = {
-    sidebar: {
-      template: `modules/${MODULE_ID}/templates/factions/sidebar.hbs`,
-      scrollable: [".faction-list"]
+    header: {
+      template: `modules/${MODULE_ID}/templates/factions/sidebar.hbs`
     },
-    details: {
+    cards: {
       template: `modules/${MODULE_ID}/templates/factions/details.hbs`,
-      scrollable: [".faction-details-content"]
+      scrollable: [".faction-cards-area"]
     }
   };
 
@@ -87,7 +87,15 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const handler = getFactionHandler();
     if (!handler) {
       console.warn("bobs-talking-npcs | Faction handler not available");
-      return { ...context, factions: [], hasFactions: false, counts: { all: 0, allied: 0, neutral: 0, hostile: 0 } };
+      return {
+        ...context,
+        factionCards: [],
+        hasFactions: false,
+        filter: this._filter,
+        counts: { all: 0, allied: 0, neutral: 0, hostile: 0 },
+        isGM: game.user.isGM,
+        theme: game.settings.get(MODULE_ID, "theme") || "dark"
+      };
     }
     const allFactions = handler.getAllFactions?.() || [];
 
@@ -97,21 +105,22 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     // Apply filter
     const filteredFactions = this._filterFactions(playerStandings);
 
-    // Select first faction if none selected
-    if (!this._selectedFactionId && filteredFactions.length > 0) {
-      this._selectedFactionId = filteredFactions[0].id;
+    // If initial faction specified, expand it, collapse others
+    if (this.initialFactionId && this._collapsedFactions.size === 0) {
+      for (const f of filteredFactions) {
+        if (f.id !== this.initialFactionId) {
+          this._collapsedFactions.add(f.id);
+        }
+      }
+      this.initialFactionId = null; // Only do this once
     }
-
-    // Get selected faction details
-    const selectedFaction = this._selectedFactionId ?
-      playerStandings.find(f => f.id === this._selectedFactionId) : null;
 
     // Count factions by standing
     const counts = {
       all: playerStandings.length,
-      allied: playerStandings.filter(f => f.standing === "allied" || f.standing === "exalted").length,
+      allied: playerStandings.filter(f => f.standing === "allied").length,
       neutral: playerStandings.filter(f => f.standing === "neutral").length,
-      hostile: playerStandings.filter(f => f.standing === "hostile" || f.standing === "hated").length
+      hostile: playerStandings.filter(f => f.standing === "hostile").length
     };
 
     return {
@@ -119,8 +128,7 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       actorUuid: this.actorUuid,
       filter: this._filter,
       counts,
-      factions: filteredFactions.map(f => this._prepareFactionListItem(f)),
-      selectedFaction: selectedFaction ? this._prepareFactionDetails(selectedFaction) : null,
+      factionCards: filteredFactions.map(f => this._prepareFactionCard(f)),
       hasFactions: filteredFactions.length > 0,
       isGM: game.user.isGM,
       theme: game.settings.get(MODULE_ID, "theme") || "dark"
@@ -191,45 +199,34 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   /**
-   * Prepare faction for list display
-   * @param {object} faction - Faction with standing
+   * Prepare a full faction card for display (header + expanded body data)
+   * @param {object} faction - Faction with standing data
    * @returns {object}
    * @private
    */
-  _prepareFactionListItem(faction) {
+  _prepareFactionCard(faction) {
     const progress = this._calculateProgressToNext(faction);
+    const ranks = faction.ranks || [];
+    const roles = faction.roles || [];
+    const relations = this._prepareFactionRelations(faction);
+    const members = this._resolveMembers(faction);
+
+    const MAX_MEMBERS = 8;
+    const displayMembers = members.slice(0, MAX_MEMBERS);
+    const moreMembers = Math.max(0, members.length - MAX_MEMBERS);
 
     return {
       id: faction.id,
       name: faction.name,
       icon: faction.icon || "fa-flag",
       color: faction.color || "#666666",
+      shortDescription: faction.shortDescription || "",
+      description: faction.description || "",
+      headquarters: faction.headquarters,
       reputation: faction.reputation,
       level: faction.level,
       levelLabel: localize(`ReputationLevel.${faction.level}`),
       standing: faction.standing,
-      standingClass: `standing-${faction.standing}`,
-      rank: faction.rank?.name || null,
-      rankIcon: faction.rank?.icon,
-      progress,
-      isSelected: faction.id === this._selectedFactionId
-    };
-  }
-
-  /**
-   * Prepare faction details for display
-   * @param {object} faction - Faction with standing
-   * @returns {object}
-   * @private
-   */
-  _prepareFactionDetails(faction) {
-    const progress = this._calculateProgressToNext(faction);
-    const ranks = faction.ranks || [];
-    const relations = this._prepareFactionRelations(faction);
-
-    return {
-      ...faction,
-      levelLabel: localize(`ReputationLevel.${faction.level}`),
       standingClass: `standing-${faction.standing}`,
       progress,
       nextLevel: this._getNextLevel(faction.level),
@@ -240,18 +237,71 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         ...r,
         index: i,
         isCurrentRank: faction.rank?.id === r.id,
-        isAchieved: i <= ranks.findIndex(rank => rank.id === faction.rank?.id),
+        isAchieved: faction.rank
+          ? i <= ranks.findIndex(rank => rank.id === faction.rank?.id)
+          : false,
         requirementsMet: faction.reputation >= (r.requiredReputation || 0)
       })),
       currentRank: faction.rank,
+      roles: roles.map(r => ({
+        ...r,
+        isLeader: r.permissions?.isLeader || false
+      })),
+      members: displayMembers,
+      hasMembers: displayMembers.length > 0,
+      moreMembers,
       relations,
       hasRelations: relations.length > 0,
-      description: faction.description,
-      headquarters: faction.headquarters,
-      leader: faction.leader,
       benefits: this._prepareBenefits(faction),
-      penalties: this._preparePenalties(faction)
+      penalties: this._preparePenalties(faction),
+      isCollapsed: this._collapsedFactions.has(faction.id)
     };
+  }
+
+  /**
+   * Resolve NPC members for a faction with role/rank info
+   * @param {object} faction - Faction data
+   * @returns {object[]}
+   * @private
+   */
+  _resolveMembers(faction) {
+    const members = [];
+    const roleMap = new Map((faction.roles || []).map(r => [r.id, r]));
+    const rankMap = new Map((faction.ranks || []).map(r => [r.id, r]));
+
+    for (const actor of game.actors || []) {
+      const cfg = actor.getFlag(MODULE_ID, "config");
+      if (!cfg) continue;
+      const fList = Array.isArray(cfg.factions)
+        ? cfg.factions
+        : Object.values(cfg.factions || {});
+      const entry = fList.find(f => f.factionId === faction.id);
+      if (!entry) continue;
+
+      const role = entry.roleId ? roleMap.get(entry.roleId) : null;
+      const rank = entry.rank ? rankMap.get(entry.rank) : null;
+
+      members.push({
+        id: actor.id,
+        name: actor.name,
+        img: actor.img,
+        roleName: role?.name || null,
+        roleColor: role?.color || null,
+        roleIcon: role?.icon || null,
+        rankName: rank?.name || null,
+        rankColor: rank?.color || null,
+        isLeader: role?.permissions?.isLeader || false
+      });
+    }
+
+    // Sort: leaders first, then by name
+    members.sort((a, b) => {
+      if (a.isLeader && !b.isLeader) return -1;
+      if (!a.isLeader && b.isLeader) return 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    return members;
   }
 
   /**
@@ -359,7 +409,6 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   _prepareBenefits(faction) {
     const benefits = [];
 
-    // Add rank benefits
     if (faction.rank?.benefits) {
       benefits.push(...faction.rank.benefits.map(b => ({
         type: "rank",
@@ -368,7 +417,6 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       })));
     }
 
-    // Add reputation level benefits
     const levelBenefits = this._getLevelBenefits(faction.level);
     benefits.push(...levelBenefits);
 
@@ -431,49 +479,69 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static #onSetFilter(event, target) {
     this._filter = target.dataset.filter;
-    this._selectedFactionId = null;
+    this._collapsedFactions.clear();
     this.render();
   }
 
-  static #onSelectFaction(event, target) {
-    this._selectedFactionId = target.dataset.factionId;
-    this.render();
-  }
-
-  static #onViewRanks(event, target) {
-    // Scroll to ranks section
-    const ranksSection = this.element.querySelector(".faction-ranks");
-    if (ranksSection) {
-      ranksSection.scrollIntoView({ behavior: "smooth" });
-    }
-  }
-
-  static #onViewRelations(event, target) {
-    // Scroll to relations section
-    const relationsSection = this.element.querySelector(".faction-relations");
-    if (relationsSection) {
-      relationsSection.scrollIntoView({ behavior: "smooth" });
-    }
-  }
-
-  static async #onViewMembers(event, target) {
+  static #onToggleCollapse(event, target) {
     const factionId = target.dataset.factionId;
+    if (!factionId) return;
 
-    // Get NPCs belonging to this faction
+    if (this._collapsedFactions.has(factionId)) {
+      this._collapsedFactions.delete(factionId);
+    } else {
+      this._collapsedFactions.add(factionId);
+    }
+    this.render();
+  }
+
+  static async #onEditFaction(event, target) {
+    if (!game.user.isGM) return;
+    const factionId = target.dataset.factionId;
     const handler = getFactionHandler();
-    const npcs = handler?.getFactionNPCs ? await handler.getFactionNPCs(factionId) : [];
+    const faction = handler?.getFaction?.(factionId) ?? handler?.getAllFactions?.().find(f => f.id === factionId);
+    if (!faction) return;
+    const editor = new FactionEditor(faction);
+    editor.render(true);
+  }
 
-    // Show in a dialog
-    const content = await renderTemplate(
-      `modules/${MODULE_ID}/templates/factions/members-dialog.hbs`,
-      { npcs, factionId }
-    );
+  static async #onCreateFaction(event, target) {
+    if (!game.user.isGM) return;
+    const editor = new FactionEditor(null);
+    editor.render(true);
+  }
 
-    new Dialog({
-      title: localize("Factions.Members"),
+  static async #onModifyReputation(event, target) {
+    if (!game.user.isGM) return;
+    const factionId = target.dataset.factionId;
+    const handler = getFactionHandler();
+    const faction = handler?.getFaction?.(factionId) ?? handler?.getAllFactions?.().find(f => f.id === factionId);
+    if (!faction) return;
+
+    const currentRep = handler?.getReputation?.(this.actorUuid, factionId) || 0;
+
+    const content = `
+      <div class="form-group">
+        <label>Reputation Change (positive or negative)</label>
+        <input type="number" name="repChange" value="0" style="width: 100%; text-align: center;" />
+        <p class="hint">Current: ${currentRep} rep — ${faction.name}</p>
+      </div>
+    `;
+
+    const result = await Dialog.prompt({
+      title: `Modify Reputation — ${faction.name}`,
       content,
-      buttons: { close: { label: localize("Close") } }
-    }).render(true);
+      label: "Apply",
+      callback: (html) => {
+        const val = parseInt(html.find("[name='repChange']").val()) || 0;
+        return val;
+      }
+    });
+
+    if (result !== null && result !== undefined && handler?.modifyReputation) {
+      await handler.modifyReputation(this.actorUuid, factionId, result);
+      this.render();
+    }
   }
 
   // ==================== Hooks ====================

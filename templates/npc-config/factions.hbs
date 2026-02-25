@@ -8,6 +8,7 @@
       <ul class="factions-list">
         {{#each factionsDisplay}}
           <li class="faction-entry">
+            <input type="hidden" name="config.factions.{{this.index}}.factionId" value="{{this.factionId}}" />
             <div class="faction-info">
               <i class="fa-solid {{this.icon}}" style="color: {{this.color}}"></i>
               <span class="faction-name">{{this.name}}</span>

@@ -3655,7 +3655,8 @@
       "Neutral": "Neutral",
       "Hostile": "Hostile",
       "Members": "Members",
-      "NoFactions": "No factions available"
+      "NoFactions": "No factions available",
+      "Create": "Create Faction"
     },
 
     "QuestLog": {

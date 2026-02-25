@@ -488,7 +488,11 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
    * @private
    */
   _prepareFactionsDisplay(allFactions) {
-    return this._config.factions.map((factionEntry, index) => {
+    // Normalize — mergeObject can convert arrays to numeric-keyed objects
+    const factions = Array.isArray(this._config.factions)
+      ? this._config.factions
+      : Object.values(this._config.factions || {});
+    return factions.map((factionEntry, index) => {
       const faction = allFactions.find(f => f.id === factionEntry.factionId);
       // Sorted ranks for the rank dropdown
       const availableRanks = (faction?.ranks || [])
@@ -627,6 +631,17 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     // Update config with form values
     if (data.config) {
       foundry.utils.mergeObject(this._config, data.config);
+    }
+
+    // foundry.utils.mergeObject converts arrays to numeric-keyed objects — restore them
+    if (this._config.factions && !Array.isArray(this._config.factions)) {
+      this._config.factions = Object.values(this._config.factions);
+    }
+    if (this._config.roles && !Array.isArray(this._config.roles)) {
+      this._config.roles = Object.values(this._config.roles);
+    }
+    if (this._config.dialogues && !Array.isArray(this._config.dialogues)) {
+      this._config.dialogues = Object.values(this._config.dialogues);
     }
 
     this._unsavedChanges = true;
