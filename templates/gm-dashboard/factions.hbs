@@ -72,38 +72,6 @@
                 </div>
               </div>
 
-              {{!-- Ranks --}}
-              {{#if this.ranks.length}}
-                <div class="faction-detail-row">
-                  <span class="detail-label"><i class="fa-solid fa-medal"></i> Ranks:</span>
-                  <div class="faction-tag-list">
-                    {{#each this.ranks}}
-                      <span class="faction-tag" style="border-color: {{this.color}}; color: {{this.color}}">
-                        {{this.name}}
-                      </span>
-                    {{/each}}
-                  </div>
-                </div>
-              {{/if}}
-
-              {{!-- Roles (functional positions) --}}
-              {{#if this.roles.length}}
-                <div class="faction-detail-row">
-                  <span class="detail-label"><i class="fa-solid fa-user-tie"></i> Roles:</span>
-                  <div class="faction-tag-list">
-                    {{#each this.roles}}
-                      <span class="faction-tag"
-                            {{#if this.color}}style="border-color: {{this.color}}; color: {{this.color}}"{{/if}}
-                            title="{{#if this.isLeader}}Leadership role{{/if}}">
-                        {{#if this.icon}}<i class="fa-solid {{this.icon}}"></i> {{/if}}
-                        {{this.name}}
-                        {{#if this.isLeader}}<i class="fa-solid fa-crown" style="font-size: 0.75em; opacity: 0.7;"></i>{{/if}}
-                      </span>
-                    {{/each}}
-                  </div>
-                </div>
-              {{/if}}
-
               {{!-- Quests / Missions --}}
               {{#if this.hasQuests}}
                 <div class="faction-detail-row">

@@ -249,18 +249,26 @@ export class FactionMembersManager extends HandlebarsApplicationMixin(Applicatio
 
   // ==================== Inline Field Change Handling ====================
 
-  /** @override */
-  async _onFirstRender(context, options) {
-    await super._onFirstRender(context, options);
+  /**
+   * Re-attach change listeners after every render.
+   * Mirrors the bank-editor pattern: call _setupMemberListeners from _onRender,
+   * use only public methods in event callbacks (no private method access from closures).
+   * @override
+   */
+  _onRender(context, options) {
+    super._onRender(context, options);
+    this._setupMemberListeners();
+  }
 
-    // Listen for inline rank/role select changes
-    this.element.addEventListener("change", (event) => {
-      const action = event.target.dataset.memberAction;
-      if (action === "changeRank") this.#onChangeMemberRank(event);
-      else if (action === "changeRole") this.#onChangeMemberRole(event);
+  /**
+   * Attach change listeners to inline selects and the search input.
+   * Called after every render so fresh DOM elements are covered.
+   */
+  _setupMemberListeners() {
+    this.element.querySelectorAll("select[data-member-action]").forEach(select => {
+      select.addEventListener("change", (event) => this._onMemberSelectChange(event));
     });
 
-    // Listen for search input (debounced)
     const searchInput = this.element.querySelector(".member-search");
     if (searchInput) {
       searchInput.addEventListener("input", (event) => {
@@ -274,23 +282,15 @@ export class FactionMembersManager extends HandlebarsApplicationMixin(Applicatio
   }
 
   /**
-   * Handle inline rank change via select element
+   * Handle a change on an inline rank or role select.
    * @param {Event} event
    */
-  async #onChangeMemberRank(event) {
-    const actorId = event.target.dataset.actorId;
-    const newRankId = event.target.value;
-    await this._updateMemberField(actorId, "rank", newRankId);
-  }
-
-  /**
-   * Handle inline role change via select element
-   * @param {Event} event
-   */
-  async #onChangeMemberRole(event) {
-    const actorId = event.target.dataset.actorId;
-    const newRoleId = event.target.value;
-    await this._updateMemberField(actorId, "roleId", newRoleId);
+  _onMemberSelectChange(event) {
+    const { memberAction, actorId } = event.target.dataset;
+    const value = event.target.value;
+    if (!actorId || !memberAction) return;
+    if (memberAction === "changeRank") this._updateMemberField(actorId, "rank", value);
+    else if (memberAction === "changeRole") this._updateMemberField(actorId, "roleId", value);
   }
 
   /**
@@ -301,21 +301,32 @@ export class FactionMembersManager extends HandlebarsApplicationMixin(Applicatio
    * @private
    */
   async _updateMemberField(actorId, field, value) {
-    const actor = game.actors.get(actorId);
-    if (!actor) return;
+    try {
+      const actor = game.actors.get(actorId);
+      if (!actor) {
+        console.error(`FactionMembersManager: actor ${actorId} not found`);
+        return;
+      }
 
-    const cfg = foundry.utils.deepClone(actor.getFlag(MODULE_ID, "config") || {});
-    const fList = Array.isArray(cfg.factions)
-      ? cfg.factions
-      : Object.values(cfg.factions || {});
-    const idx = fList.findIndex(f => f.factionId === this._faction.id);
-    if (idx === -1) return;
+      const cfg = foundry.utils.deepClone(actor.getFlag(MODULE_ID, "config") || {});
+      let fList = Array.isArray(cfg.factions)
+        ? cfg.factions
+        : Object.values(cfg.factions || {});
+      const idx = fList.findIndex(f => f.factionId === this._faction.id);
+      if (idx === -1) {
+        console.error(`FactionMembersManager: faction entry ${this._faction.id} not found on actor ${actor.name}`);
+        return;
+      }
 
-    fList[idx] = { ...fList[idx], [field]: value };
-    cfg.factions = fList;
+      fList[idx] = { ...fList[idx], [field]: value };
+      cfg.factions = fList;
 
-    await actor.setFlag(MODULE_ID, "config", cfg);
-    this.render();
+      await actor.setFlag(MODULE_ID, "config", cfg);
+      this.render();
+    } catch (err) {
+      console.error("FactionMembersManager: failed to update member field", err);
+      ui.notifications.error(`Failed to save: ${err.message}`);
+    }
   }
 
   // ==================== Actions ====================
