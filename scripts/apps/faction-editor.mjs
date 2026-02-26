@@ -42,6 +42,12 @@ export class FactionEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     this._faction = faction ? foundry.utils.deepClone(faction) : createFaction({
       name: game.i18n.localize("BOBSNPC.FactionEditor.NewFaction")
     });
+
+    // Ensure all ranks have IDs — they can be stripped by mergeObject if the
+    // faction was saved while the hidden id input was missing (backward compat)
+    for (const rank of (this._faction.ranks || [])) {
+      if (!rank.id) rank.id = generateId();
+    }
   }
 
   /** @override */
