@@ -824,6 +824,22 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static async #onSaveConfig(event, target) {
     try {
+      // Capture the latest form values right before saving.
+      // This is needed because submitOnChange may not have flushed all values
+      // into this._config yet (e.g. if the change event fires after the click).
+      // Since tag:"form" means this.element IS the form, FormDataExtended reads all inputs.
+      const formData = new FormDataExtended(this.element);
+      const formValues = foundry.utils.expandObject(formData.object);
+      if (formValues.config) {
+        foundry.utils.mergeObject(this._config, formValues.config);
+        // mergeObject converts arrays to numeric-keyed objects — restore them
+        for (const key of ["factions", "roles", "dialogues"]) {
+          if (this._config[key] && !Array.isArray(this._config[key])) {
+            this._config[key] = Object.values(this._config[key]);
+          }
+        }
+      }
+
       // Update metadata
       this._config.metadata.lastModified = Date.now();
       this._config.metadata.modifiedBy = game.user.id;
