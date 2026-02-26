@@ -63,8 +63,18 @@ export class FactionHandler {
     const factions = worldData.factions || {};
 
     this._factionCache.clear();
+    let migrationNeeded = false;
+
     for (const [id, factionData] of Object.entries(factions)) {
+      // Detect ranks missing IDs (written by versions before v0.2.013)
+      if ((factionData.ranks || []).some(r => !r.id)) migrationNeeded = true;
       this._factionCache.set(id, createFaction(factionData));
+    }
+
+    // createFaction() now assigns stable IDs to any ID-less ranks — persist immediately
+    if (migrationNeeded) {
+      await this._saveFactions();
+      console.log(`${MODULE_ID} | Migrated faction rank IDs to stable values`);
     }
   }
 

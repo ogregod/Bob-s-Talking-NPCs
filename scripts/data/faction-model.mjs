@@ -49,8 +49,19 @@ export const ReputationLevel = Object.freeze({
  * @returns {object}
  */
 export function createRank(data = {}) {
+  // Use canonical IDs for standard rank names to preserve backward compatibility
+  // (rank IDs can be stripped by mergeObject in older versions — this restores them stably)
+  const defaultNameIds = {
+    "Copper": "copper",
+    "Iron": "iron",
+    "Silver": "silver",
+    "Gold": "gold",
+    "Platinum": "platinum",
+    "Mythril": "mythril"
+  };
+
   return {
-    id: data.id || generateId(),
+    id: data.id || defaultNameIds[data.name] || generateId(),
     name: data.name || "New Rank",
     order: data.order ?? 0,
 
@@ -241,8 +252,8 @@ export function createFaction(data = {}) {
       coordinates: data.headquarters?.coordinates || null
     },
 
-    // Ranks
-    ranks: data.ranks || createDefaultRanks(),
+    // Ranks — run through createRank() to guarantee every rank has an id
+    ranks: Array.isArray(data.ranks) ? data.ranks.map(r => createRank(r)) : createDefaultRanks(),
     useDefaultRanks: data.useDefaultRanks ?? true,
 
     // Reputation configuration
