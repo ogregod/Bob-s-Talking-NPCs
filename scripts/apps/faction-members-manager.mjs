@@ -308,20 +308,39 @@ export class FactionMembersManager extends HandlebarsApplicationMixin(Applicatio
         return;
       }
 
-      const cfg = foundry.utils.deepClone(actor.getFlag(MODULE_ID, "config") || {});
-      let fList = Array.isArray(cfg.factions)
-        ? cfg.factions
-        : Object.values(cfg.factions || {});
+      const rawCfg = actor.getFlag(MODULE_ID, "config");
+      if (!rawCfg) {
+        console.error(`FactionMembersManager: no config flag on actor ${actor.name}`);
+        ui.notifications.warn(`${actor.name} has no module config flag.`);
+        return;
+      }
+
+      // Normalize factions — mergeObject can convert arrays to numeric-keyed objects
+      let fList = Array.isArray(rawCfg.factions)
+        ? rawCfg.factions.map(f => ({ ...f }))
+        : Object.values(rawCfg.factions || {}).map(f => ({ ...f }));
+
       const idx = fList.findIndex(f => f.factionId === this._faction.id);
       if (idx === -1) {
-        console.error(`FactionMembersManager: faction entry ${this._faction.id} not found on actor ${actor.name}`);
+        const available = fList.map(f => f.factionId).join(", ") || "(none)";
+        console.error(
+          `FactionMembersManager: faction entry "${this._faction.id}" not found on actor "${actor.name}".`,
+          `Entries present: [${available}]`
+        );
+        ui.notifications.warn(
+          `Could not find faction entry for ${actor.name}. Open the browser console (F12) for details.`
+        );
         return;
       }
 
       fList[idx] = { ...fList[idx], [field]: value };
-      cfg.factions = fList;
 
-      await actor.setFlag(MODULE_ID, "config", cfg);
+      // Use a targeted path update to avoid mergeObject array-conversion issues
+      // that can occur when saving the entire config object at once.
+      await actor.update({
+        [`flags.${MODULE_ID}.config.factions`]: fList
+      });
+
       this.render();
     } catch (err) {
       console.error("FactionMembersManager: failed to update member field", err);
