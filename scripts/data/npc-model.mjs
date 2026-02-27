@@ -203,8 +203,8 @@ export function createNPCConfig(data = {}) {
     primaryRole: data.primaryRole || null,
 
     // Faction membership
-    factions: data.factions || [],  // Array of faction IDs
-    factionRanks: data.factionRanks || {},  // {factionId: rankId}
+    factions: data.factions || [],  // Array of {factionId, rank, roleId} objects
+    factionRanks: data.factionRanks || {},  // Legacy field — rank is stored in each factions[] entry
 
     // Dialogue - support both formats
     dialogueId: data.dialogueId || data.defaultDialogue || null,  // Primary dialogue

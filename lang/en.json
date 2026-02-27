@@ -3572,6 +3572,11 @@
       "UnlockArea": "Unlock Area"
     },
 
+    "RankPromoted": "Rank Up!",
+    "RankDemoted": "Rank Down",
+    "HasBeenPromoted": "has been promoted to",
+    "HasBeenDemoted": "has been demoted to",
+
     "Notifications": {
       "QuestAvailable": "New quest available: {quest}",
       "QuestAccepted": "Quest accepted: {quest}",

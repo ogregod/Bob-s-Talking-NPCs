@@ -12,6 +12,7 @@ import {
   createFactionRelationship,
   FactionRelationType,
   DefaultRanks,
+  ReputationLevel,
   getRankForReputation,
   getNextRank,
   checkRankRequirements,
@@ -47,6 +48,11 @@ export class FactionHandler {
     if (this._initialized) return;
 
     await this._loadFactions();
+
+    // Wire reputation decay to world time advances (GM only)
+    Hooks.on("updateWorldTime", () => {
+      if (game.user.isGM) this.applyReputationDecay();
+    });
 
     this._initialized = true;
     console.log(`${MODULE_ID} | Faction Handler initialized`);
@@ -112,6 +118,77 @@ export class FactionHandler {
    */
   getFactionsForNPC(npcActorUuid) {
     return this.getAllFactions().filter(f => f.members.includes(npcActorUuid));
+  }
+
+  /**
+   * Get NPCs belonging to a faction (searches all actor flags)
+   * @param {string} factionId - Faction ID
+   * @returns {object[]} Actor objects
+   */
+  getFactionNPCs(factionId) {
+    return (game.actors || []).filter(actor => {
+      const cfg = actor.getFlag(MODULE_ID, "config");
+      if (!cfg) return false;
+      const fList = Array.isArray(cfg.factions)
+        ? cfg.factions
+        : Object.values(cfg.factions || {});
+      return fList.some(f => f.factionId === factionId);
+    });
+  }
+
+  // ==================== SYNCHRONOUS REPUTATION HELPERS ====================
+
+  /**
+   * Get player reputation with a faction (synchronous)
+   * Reads actor flags directly — use for UI/display where async is not possible.
+   * @param {string} actorUuid - Player actor UUID
+   * @param {string} factionId - Faction ID
+   * @returns {number}
+   */
+  getReputation(actorUuid, factionId) {
+    const actor = fromUuidSync(actorUuid);
+    if (!actor) return 0;
+
+    const standings = actor.getFlag(MODULE_ID, STORAGE_KEYS.PLAYER_STANDINGS) || {};
+    const standing = standings[factionId];
+
+    if (!standing) {
+      const faction = this.getFaction(factionId);
+      return faction?.reputation?.startingValue ?? 0;
+    }
+
+    return standing.reputation ?? 0;
+  }
+
+  /**
+   * Convert numeric reputation to ReputationLevel string (synchronous)
+   * Thresholds match _calculateProgressToNext in faction-window.mjs.
+   * @param {number} reputation - Numeric reputation value
+   * @returns {string} ReputationLevel enum value
+   */
+  getReputationLevel(reputation) {
+    if (reputation >= 2000) return ReputationLevel.EXALTED;
+    if (reputation >= 1000) return ReputationLevel.REVERED;
+    if (reputation >= 500) return ReputationLevel.HONORED;
+    if (reputation >= 100) return ReputationLevel.FRIENDLY;
+    if (reputation >= 0) return ReputationLevel.NEUTRAL;
+    if (reputation >= -100) return ReputationLevel.UNFRIENDLY;
+    if (reputation >= -500) return ReputationLevel.HOSTILE;
+    return ReputationLevel.HATED;
+  }
+
+  /**
+   * Get current rank for player (synchronous)
+   * Derives rank from current reputation — use for UI/display.
+   * @param {string} actorUuid - Player actor UUID
+   * @param {string} factionId - Faction ID
+   * @returns {object|null} Rank data
+   */
+  getRankSync(actorUuid, factionId) {
+    const reputation = this.getReputation(actorUuid, factionId);
+    const faction = this.getFaction(factionId);
+    if (!faction) return null;
+    return getRankForReputation(faction, reputation);
   }
 
   // ==================== FACTION CRUD ====================
@@ -402,7 +479,7 @@ export class FactionHandler {
       newRank
     });
 
-    Hooks.callAll("bobsNPCReputationChanged", actorUuid, factionId, amount, updatedStanding);
+    Hooks.callAll(`${MODULE_ID}.reputationChanged`, actorUuid, factionId, amount, updatedStanding);
 
     return {
       standing: updatedStanding,
@@ -603,6 +680,29 @@ export class FactionHandler {
     updatedRanks[rankIndex] = { ...updatedRanks[rankIndex], ...updates };
 
     return this.updateFaction(factionId, { ranks: updatedRanks });
+  }
+
+  /**
+   * Set a player's rank directly (bypasses reputation check)
+   * @param {string} actorUuid - Player actor UUID
+   * @param {string} factionId - Faction ID
+   * @param {string} rankId - Rank ID to set
+   * @returns {boolean}
+   */
+  async setRank(actorUuid, factionId, rankId) {
+    const faction = this.getFaction(factionId);
+    if (!faction) return false;
+
+    const rank = faction.ranks.find(r => r.id === rankId);
+    if (!rank) return false;
+
+    const standing = await this.getStanding(actorUuid, factionId) ||
+      createPlayerStanding({ reputation: faction.reputation.startingValue });
+
+    await this._setStanding(actorUuid, factionId, { ...standing, rank: rankId });
+
+    Hooks.callAll(`${MODULE_ID}.rankChanged`, actorUuid, factionId, rankId);
+    return true;
   }
 
   /**

@@ -755,7 +755,7 @@ export class NPCConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       this._config.factions.push({
         factionId,
         rank: null,
-        role: "member"
+        roleId: ""
       });
       this._unsavedChanges = true;
       this.render();

@@ -150,7 +150,7 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
     for (const faction of factions) {
       const reputation = handler.getReputation?.(this.actorUuid, faction.id) || 0;
-      const rank = handler.getRank?.(this.actorUuid, faction.id) || null;
+      const rank = handler.getRankSync?.(this.actorUuid, faction.id) || null;
       const level = handler.getReputationLevel?.(reputation) || "neutral";
 
       standings.push({
@@ -382,22 +382,22 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
    * @private
    */
   _prepareFactionRelations(faction) {
-    if (!faction.relations) return [];
+    if (!faction.factionRelationships?.length) return [];
 
     const handler = getFactionHandler();
     const allFactions = handler?.getAllFactions?.() || [];
 
-    return Object.entries(faction.relations).map(([factionId, relation]) => {
-      const relatedFaction = allFactions.find(f => f.id === factionId);
+    return faction.factionRelationships.map(rel => {
+      const relatedFaction = allFactions.find(f => f.id === rel.factionId);
       return {
-        factionId,
-        factionName: relatedFaction?.name || factionId,
+        factionId: rel.factionId,
+        factionName: relatedFaction?.name || rel.factionId,
         factionIcon: relatedFaction?.icon || "fa-flag",
         factionColor: relatedFaction?.color || "#666666",
-        type: relation.type,
-        typeLabel: localize(`RelationType.${relation.type}`),
-        typeClass: `relation-${relation.type}`,
-        effect: relation.reputationEffect
+        type: rel.type,
+        typeLabel: localize(`RelationType.${rel.type}`),
+        typeClass: `relation-${rel.type}`,
+        effect: rel.reputationEffect
       };
     });
   }
@@ -411,12 +411,29 @@ export class FactionWindow extends HandlebarsApplicationMixin(ApplicationV2) {
   _prepareBenefits(faction) {
     const benefits = [];
 
-    if (faction.rank?.benefits) {
-      benefits.push(...faction.rank.benefits.map(b => ({
-        type: "rank",
-        description: b,
-        icon: "fa-star"
-      })));
+    // rank.benefits is an object {priceDiscount, titles, questAccess, custom, ...}
+    const rb = faction.rank?.benefits;
+    if (rb) {
+      if (rb.priceDiscount > 0) {
+        benefits.push({
+          type: "discount",
+          description: `${Math.round(rb.priceDiscount * 100)}% price discount`,
+          icon: "fa-percent"
+        });
+      }
+      for (const title of (rb.titles || [])) {
+        benefits.push({ type: "title", description: title, icon: "fa-crown" });
+      }
+      if (rb.questAccess?.length > 0) {
+        benefits.push({
+          type: "access",
+          description: localize("Benefits.SpecialQuests"),
+          icon: "fa-scroll"
+        });
+      }
+      for (const text of (rb.custom || [])) {
+        benefits.push({ type: "custom", description: text, icon: "fa-star" });
+      }
     }
 
     const levelBenefits = this._getLevelBenefits(faction.level);

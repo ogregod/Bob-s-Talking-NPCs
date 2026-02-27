@@ -202,9 +202,9 @@ export class FactionEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
   _getDecayIntervalOptions() {
     return [
-      { value: "day", label: localize("FactionEditor.Decay.Day") },
-      { value: "week", label: localize("FactionEditor.Decay.Week") },
-      { value: "month", label: localize("FactionEditor.Decay.Month") }
+      { value: "day", label: localize("FactionEditor.Decays.Day") },
+      { value: "week", label: localize("FactionEditor.Decays.Week") },
+      { value: "month", label: localize("FactionEditor.Decays.Month") }
     ];
   }
 

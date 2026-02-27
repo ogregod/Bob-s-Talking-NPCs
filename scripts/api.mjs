@@ -479,9 +479,8 @@ class FactionsAPI {
    * @returns {Promise<boolean>}
    */
   async modifyReputation(factionId, playerUuid, amount) {
-    const actor = await fromUuid(playerUuid);
-    if (!actor) return false;
-    return this.#handler?.modifyReputation(factionId, actor, amount) || false;
+    // Handler expects (actorUuid, factionId, amount)
+    return this.#handler?.modifyReputation(playerUuid, factionId, amount) || false;
   }
 
   /**
@@ -491,21 +490,17 @@ class FactionsAPI {
    * @returns {number}
    */
   getReputation(actorUuid, factionId) {
-    const actor = fromUuidSync(actorUuid);
-    if (!actor) return 0;
-    return this.#handler?.getReputation(factionId, actor) || 0;
+    return this.#handler?.getReputation(actorUuid, factionId) || 0;
   }
 
   /**
-   * Get player rank in a faction
+   * Get player rank in a faction (synchronous)
    * @param {string} actorUuid
    * @param {string} factionId
    * @returns {object|null}
    */
   getRank(actorUuid, factionId) {
-    const actor = fromUuidSync(actorUuid);
-    if (!actor) return null;
-    return this.#handler?.getRank(factionId, actor) || null;
+    return this.#handler?.getRankSync(actorUuid, factionId) || null;
   }
 
   /**
@@ -520,9 +515,9 @@ class FactionsAPI {
   /**
    * Get NPCs belonging to a faction
    * @param {string} factionId
-   * @returns {Promise<object[]>}
+   * @returns {object[]}
    */
-  async getFactionNPCs(factionId) {
+  getFactionNPCs(factionId) {
     return this.#handler?.getFactionNPCs(factionId) || [];
   }
 
@@ -537,9 +532,8 @@ class FactionsAPI {
     if (!game.user.isGM) {
       throw new Error("Only GM can set faction ranks");
     }
-    const actor = await fromUuid(playerUuid);
-    if (!actor) return false;
-    return this.#handler?.setRank(factionId, actor, rankId) || false;
+    // Handler expects (actorUuid, factionId, rankId)
+    return this.#handler?.setRank(playerUuid, factionId, rankId) || false;
   }
 }
 

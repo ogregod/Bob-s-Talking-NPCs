@@ -407,17 +407,17 @@ export function calculateReputationChanges(faction, amount, allFactions) {
 /**
  * Get faction standing description
  * @param {number} reputation - Reputation value
- * @returns {string} Standing description key
+ * @returns {string} ReputationLevel enum value
  */
 export function getStandingDescription(reputation) {
-  if (reputation <= -75) return "hostile";
-  if (reputation <= -50) return "hated";
-  if (reputation <= -25) return "unfriendly";
-  if (reputation < 50) return "neutral";
-  if (reputation < 150) return "friendly";
-  if (reputation < 300) return "trusted";
-  if (reputation < 500) return "honored";
-  return "exalted";
+  if (reputation >= 2000) return ReputationLevel.EXALTED;
+  if (reputation >= 1000) return ReputationLevel.REVERED;
+  if (reputation >= 500) return ReputationLevel.HONORED;
+  if (reputation >= 100) return ReputationLevel.FRIENDLY;
+  if (reputation >= 0) return ReputationLevel.NEUTRAL;
+  if (reputation >= -100) return ReputationLevel.UNFRIENDLY;
+  if (reputation >= -500) return ReputationLevel.HOSTILE;
+  return ReputationLevel.HATED;
 }
 
 /**
