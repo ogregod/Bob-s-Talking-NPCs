@@ -18,7 +18,6 @@ import {
   createHagglingConfig,
   getActiveRoles,
   hasRole,
-  getPrimaryIndicator,
   isNPCAvailable,
   recordVisit,
   getVisitCount,
@@ -34,7 +33,6 @@ export class NPCHandler {
   constructor() {
     this._initialized = false;
     this._configuredNPCs = new Map(); // actorUuid -> config
-    this._indicatorTokens = new Set(); // Token IDs with indicators
   }
 
   /**
@@ -44,31 +42,9 @@ export class NPCHandler {
     if (this._initialized) return;
 
     await this._loadConfiguredNPCs();
-    this._registerHooks();
 
     this._initialized = true;
     console.log(`${MODULE_ID} | NPC handler initialized`);
-  }
-
-  /**
-   * Register Foundry hooks
-   * @private
-   */
-  _registerHooks() {
-    // Token creation - add indicators
-    Hooks.on("createToken", (token) => {
-      this._updateTokenIndicator(token);
-    });
-
-    // Token update - refresh indicators
-    Hooks.on("updateToken", (token) => {
-      this._updateTokenIndicator(token);
-    });
-
-    // Canvas ready - refresh all indicators
-    Hooks.on("canvasReady", () => {
-      this._refreshAllIndicators();
-    });
   }
 
   // ==================== Data Loading ====================
@@ -727,102 +703,6 @@ export class NPCHandler {
     }
   }
 
-  // ==================== Token Indicators ====================
-
-  /**
-   * Update token indicator
-   * @param {Token} token - Token document
-   * @private
-   */
-  _updateTokenIndicator(token) {
-    if (!token?.actor) return;
-
-    const config = this.getConfigFromActor(token.actor);
-    if (!config?.enabled) {
-      this._removeIndicator(token);
-      return;
-    }
-
-    // Check if indicators are enabled in settings
-    if (!game.settings.get(MODULE_ID, "npcIndicators")) {
-      return;
-    }
-
-    const indicator = getPrimaryIndicator(config);
-    if (indicator) {
-      this._addIndicator(token, indicator);
-    } else {
-      this._removeIndicator(token);
-    }
-  }
-
-  /**
-   * Add indicator to token
-   * @param {Token} token - Token
-   * @param {object} indicator - Indicator data
-   * @private
-   */
-  _addIndicator(token, indicator) {
-    // Store indicator info for rendering
-    this._indicatorTokens.add(token.id);
-
-    // Trigger indicator render (implementation depends on UI layer)
-    Hooks.callAll(`${MODULE_ID}.indicatorUpdate`, token, indicator);
-  }
-
-  /**
-   * Remove indicator from token
-   * @param {Token} token - Token
-   * @private
-   */
-  _removeIndicator(token) {
-    this._indicatorTokens.delete(token.id);
-    Hooks.callAll(`${MODULE_ID}.indicatorRemove`, token);
-  }
-
-  /**
-   * Refresh indicators for an actor's tokens
-   * @param {Actor} actor - Actor
-   * @private
-   */
-  _refreshActorTokens(actor) {
-    if (!actor) return;
-
-    // Find all tokens for this actor
-    for (const scene of game.scenes) {
-      for (const token of scene.tokens) {
-        if (token.actor?.id === actor.id) {
-          this._updateTokenIndicator(token);
-        }
-      }
-    }
-  }
-
-  /**
-   * Refresh all indicators
-   * @private
-   */
-  _refreshAllIndicators() {
-    if (!game.canvas?.tokens) return;
-
-    for (const token of game.canvas.tokens.placeables) {
-      this._updateTokenIndicator(token.document);
-    }
-  }
-
-  /**
-   * Get indicator for token
-   * @param {string} tokenId - Token ID
-   * @returns {object|null}
-   */
-  getIndicatorForToken(tokenId) {
-    const token = game.canvas?.tokens?.get(tokenId);
-    if (!token?.actor) return null;
-
-    const config = this.getConfigFromActor(token.actor);
-    return getPrimaryIndicator(config);
-  }
-
   // ==================== Faction Integration ====================
 
   /**
@@ -1023,6 +903,3 @@ export class NPCHandler {
     }
   }
 }
-
-// Singleton instance
-export const npcHandler = new NPCHandler();

@@ -56,6 +56,7 @@ import {
 } from "../data/service-request-model.mjs";
 import { FailConsequence } from "../data/enchantment-model.mjs";
 import { emit, emitToGM, SocketEvents, requestPickupFromGM } from "../socket.mjs";
+import { ServiceSelectionDialog } from "../apps/service-selection-dialog.mjs";
 
 /**
  * Check if an executor handles its own escrow/approval flow
@@ -1056,6 +1057,23 @@ export class MerchantHandler {
       return { success: false, message: localize("Shop.ServiceNotAvailable") };
     }
 
+    // Show service selection dialog for services with dynamic pricing (tiered, spell level, enchantment)
+    if (ServiceSelectionDialog.needsDialog(serviceDef)) {
+      const item = options.itemId ? actor.items.get(options.itemId) : null;
+      const dialogResult = await ServiceSelectionDialog.show(serviceDef, { actor, merchant, item });
+      if (!dialogResult?.confirmed) {
+        return { success: false, cancelled: true, message: localize("Shop.ServiceCancelled") };
+      }
+      // Merge dialog selections into options
+      options = {
+        ...options,
+        selectedTier: dialogResult.tier,
+        spellLevel: dialogResult.spellLevel,
+        quantity: dialogResult.quantity,
+        enchantmentId: dialogResult.enchantment?.id || options.enchantmentId
+      };
+    }
+
     // Resolve approval mode
     const approvalMode = this._resolveApprovalMode(merchant, serviceDef);
 
@@ -1205,341 +1223,6 @@ export class MerchantHandler {
       requestId: request.id,
       cost,
       message: localize("Shop.Service.PendingApproval")
-    };
-  }
-
-  /**
-   * Identify service
-   * @private
-   */
-  async _serviceIdentify(merchant, actor, options) {
-    if (!merchant.services.identify) {
-      return { success: false, message: localize("Shop.ServiceNotAvailable") };
-    }
-
-    const item = actor.items.get(options.itemId);
-    if (!item) {
-      return { success: false, message: localize("Shop.ItemNotFound") };
-    }
-
-    const cost = merchant.services.identifyPrice || 25;
-    const gold = convertToGold(actor.system?.currency || {});
-
-    if (gold < cost) {
-      return { success: false, message: localize("Shop.InsufficientFunds") };
-    }
-
-    await this._deductGold(actor, cost);
-
-    // Mark item as identified (system-specific)
-    await item.update({ "system.identified": true });
-
-    // Send private chat message
-    await sendIdentifyMessage({
-      playerName: actor.name,
-      merchantName: merchant.name || "Merchant",
-      itemName: item.name,
-      itemImg: item.img,
-      cost,
-      playerId: game.user?.id
-    });
-
-    return {
-      success: true,
-      cost,
-      message: `${item.name} ${localize("Shop.HasBeenIdentified")}`
-    };
-  }
-
-  /**
-   * Repair service - requires GM approval
-   * Implements item escrow: item is removed from player and stored in request
-   * @private
-   */
-  async _serviceRepair(merchant, actor, options) {
-    if (!merchant.services.repair) {
-      return { success: false, message: localize("Shop.ServiceNotAvailable") };
-    }
-
-    const item = actor.items.get(options.itemId);
-    if (!item) {
-      return { success: false, message: localize("Shop.ItemNotFound") };
-    }
-
-    // Calculate repair cost based on item value
-    const basePrice = item.system?.price?.value || 0;
-    const cost = Math.round(basePrice * (merchant.services.repairPricePercent || 0.1));
-    const gold = convertToGold(actor.system?.currency || {});
-
-    if (gold < cost) {
-      return { success: false, message: localize("Shop.InsufficientFunds") };
-    }
-
-    // ITEM ESCROW: Store full item data before removing
-    const itemData = item.toObject();
-
-    // Get queue position for this merchant
-    const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
-    const merchantOrders = activeOrders.filter(o => o.merchantId === merchant.id);
-    const queuePosition = merchantOrders.length + 1;
-
-    // Create service request for GM approval with item data
-    const request = createServiceRequest({
-      type: ApprovalRequiredServices.REPAIR,
-      merchantId: merchant.id,
-      merchantName: merchant.name || "Merchant",
-      playerActorUuid: actor.uuid,
-      playerActorId: actor.id,
-      playerName: actor.name,
-      playerId: game.user?.id,
-      itemId: item.id,
-      itemUuid: item.uuid,
-      itemName: item.name,
-      itemImg: item.img,
-      itemType: item.type,
-      itemData: itemData, // Full item backup for restoration
-      queuePosition,
-      cost
-    });
-
-    // Store the request - GM stores directly, players go through socket
-    if (game.user.isGM) {
-      const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
-      pendingRequests.push(request);
-      await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
-    } else {
-      // Send to GM via socket - GM will store the request
-      emitToGM(SocketEvents.SERVICE_REQUEST, { request });
-    }
-
-    // ITEM ESCROW: Remove item from player inventory
-    await item.delete();
-    console.log(`${MODULE_ID} | Item "${itemData.name}" escrowed for repair service`);
-
-    // Send notification to GM
-    await sendServiceRequestToGM({
-      type: "repair",
-      playerName: actor.name,
-      merchantName: merchant.name || "Merchant",
-      itemName: itemData.name,
-      itemImg: itemData.img,
-      cost,
-      requestId: request.id
-    });
-
-    ui.notifications.info(localize("Service.ItemDroppedOff", { item: itemData.name }));
-
-    return {
-      success: true,
-      pending: true,
-      requestId: request.id,
-      cost,
-      queuePosition,
-      message: localize("Shop.Service.PendingApproval")
-    };
-  }
-
-  /**
-   * Appraise service
-   * @private
-   */
-  async _serviceAppraise(merchant, actor, options) {
-    if (!merchant.services.appraise) {
-      return { success: false, message: localize("Shop.ServiceNotAvailable") };
-    }
-
-    const item = actor.items.get(options.itemId);
-    if (!item) {
-      return { success: false, message: localize("Shop.ItemNotFound") };
-    }
-
-    const cost = merchant.services.appraisePrice || 5;
-    const gold = convertToGold(actor.system?.currency || {});
-
-    if (gold < cost) {
-      return { success: false, message: localize("Shop.InsufficientFunds") };
-    }
-
-    await this._deductGold(actor, cost);
-
-    const value = item.system?.price?.value || 0;
-
-    // Send private chat message
-    await sendAppraiseMessage({
-      playerName: actor.name,
-      merchantName: merchant.name || "Merchant",
-      itemName: item.name,
-      itemImg: item.img,
-      appraisedValue: value,
-      cost,
-      playerId: game.user?.id
-    });
-
-    return {
-      success: true,
-      cost,
-      appraisedValue: value,
-      message: `${item.name}: ${this._formatCurrency(value)}`
-    };
-  }
-
-  /**
-   * Enchant service - requires GM approval
-   * Implements item escrow: item is removed from player and stored in request
-   * @private
-   */
-  async _serviceEnchant(merchant, actor, options) {
-    if (!merchant.services.enchant) {
-      return { success: false, message: localize("Shop.ServiceNotAvailable") };
-    }
-
-    const item = actor.items.get(options.itemId);
-    if (!item) {
-      return { success: false, message: localize("Shop.ItemNotFound") };
-    }
-
-    // Get enchantment from options (should be selected from enchantment picker)
-    const enchantmentId = options.enchantmentId;
-    const enchantmentHandler = game.bobsnpc?.handlers?.enchantment;
-
-    let enchantment = null;
-    let cost = 0;
-
-    if (enchantmentId && enchantmentHandler) {
-      enchantment = enchantmentHandler.getEnchantment(enchantmentId);
-      if (!enchantment) {
-        return { success: false, message: localize("Enchantment.NotFound") };
-      }
-
-      // Calculate cost based on enchantment and item rarity
-      const { calculateEnchantmentCost } = await import("../data/enchantment-model.mjs");
-      const priceModifier = merchant.services?.enchantmentPriceModifier || 1;
-      cost = calculateEnchantmentCost(enchantment, item.system?.rarity || "common", priceModifier);
-    } else {
-      // Fallback: Calculate base cost based on item value and rarity
-      const basePrice = item.system?.price?.value || 100;
-      const rarityMultiplier = {
-        common: 1,
-        uncommon: 1.5,
-        rare: 2,
-        veryRare: 3,
-        legendary: 5,
-        artifact: 10
-      };
-      const rarity = item.system?.rarity || "common";
-      cost = Math.round(basePrice * (rarityMultiplier[rarity] || 1));
-    }
-
-    const gold = convertToGold(actor.system?.currency || {});
-
-    if (gold < cost) {
-      return { success: false, message: localize("Shop.InsufficientFunds") };
-    }
-
-    // ITEM ESCROW: Store full item data before removing
-    const itemData = item.toObject();
-
-    // Get queue position for this merchant
-    const activeOrders = game.settings.get(MODULE_ID, "activeServiceOrders") || [];
-    const merchantOrders = activeOrders.filter(o => o.merchantId === merchant.id);
-    const queuePosition = merchantOrders.length + 1;
-
-    // Create service request for GM approval with item data and enchantment info
-    const request = createServiceRequest({
-      type: ApprovalRequiredServices.ENCHANT,
-      merchantId: merchant.id,
-      merchantName: merchant.name || "Merchant",
-      playerActorUuid: actor.uuid,
-      playerActorId: actor.id,
-      playerName: actor.name,
-      playerId: game.user?.id,
-      itemId: item.id,
-      itemUuid: item.uuid,
-      itemName: item.name,
-      itemImg: item.img,
-      itemType: item.type,
-      itemData: itemData, // Full item backup for restoration
-      queuePosition,
-      enchantmentId: enchantmentId || null,
-      enchantmentName: enchantment?.name || "Custom Enchantment",
-      cost
-    });
-
-    // Store the request - GM stores directly, players go through socket
-    if (game.user.isGM) {
-      const pendingRequests = game.settings.get(MODULE_ID, "pendingServiceRequests") || [];
-      pendingRequests.push(request);
-      await game.settings.set(MODULE_ID, "pendingServiceRequests", pendingRequests);
-    } else {
-      // Send to GM via socket - GM will store the request
-      emitToGM(SocketEvents.SERVICE_REQUEST, { request });
-    }
-
-    // ITEM ESCROW: Remove item from player inventory
-    await item.delete();
-    console.log(`${MODULE_ID} | Item "${itemData.name}" escrowed for enchantment service`);
-
-    // Send notification to GM
-    await sendServiceRequestToGM({
-      type: "enchant",
-      playerName: actor.name,
-      merchantName: merchant.name || "Merchant",
-      itemName: itemData.name,
-      itemImg: itemData.img,
-      enchantmentName: enchantment?.name || "Custom Enchantment",
-      cost,
-      requestId: request.id
-    });
-
-    ui.notifications.info(localize("Service.ItemDroppedOff", { item: itemData.name }));
-
-    return {
-      success: true,
-      pending: true,
-      requestId: request.id,
-      cost,
-      queuePosition,
-      message: localize("Shop.Service.PendingApproval")
-    };
-  }
-
-  /**
-   * Generic service handler for registry-defined services
-   * Handles any service not covered by specific handlers above
-   * @private
-   */
-  async _serviceGeneric(merchant, actor, serviceType, options = {}) {
-    // Find the service definition from the merchant's services list
-    const serviceDef = (merchant.servicesList || []).find(s => s.type === serviceType && s.enabled);
-    if (!serviceDef) {
-      return { success: false, message: localize("Shop.ServiceNotAvailable") };
-    }
-
-    // Calculate cost
-    let cost = serviceDef.basePrice || 0;
-    if (serviceDef.priceType === "percent" && options.itemId) {
-      const item = actor.items.get(options.itemId);
-      if (item) {
-        const itemValue = item.system?.price?.value || 0;
-        cost = Math.round(itemValue * (cost / 100 || 0.1));
-      }
-    }
-
-    // Check if player can afford it
-    if (cost > 0) {
-      const gold = convertToGold(actor.system?.currency || {});
-      if (gold < cost) {
-        return { success: false, message: localize("Shop.InsufficientFunds") };
-      }
-      await this._deductGold(actor, cost);
-    }
-
-    return {
-      success: true,
-      cost,
-      serviceType,
-      serviceName: serviceDef.name,
-      message: localize("Shop.ServiceComplete", { service: serviceDef.name, cost: this._formatCurrency(cost) })
     };
   }
 
@@ -2411,6 +2094,3 @@ export class MerchantHandler {
     });
   }
 }
-
-// Singleton instance
-export const merchantHandler = new MerchantHandler();

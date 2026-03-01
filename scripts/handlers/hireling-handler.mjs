@@ -1377,6 +1377,3 @@ export class HirelingHandler {
     }
   }
 }
-
-// Singleton instance
-export const hirelingHandler = new HirelingHandler();

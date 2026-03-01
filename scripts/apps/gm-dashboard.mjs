@@ -511,8 +511,60 @@ export class GMDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
    * @returns {Promise<object[]>}
    */
   async #getRecentActivity() {
-    // Placeholder - would track actual activity
-    return [];
+    const activity = [];
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000; // last 7 days
+
+    // Recent quest completions and failures
+    const questHandler = game.bobsnpc?.handlers?.quest;
+    if (questHandler) {
+      const quests = questHandler.getAllQuests?.() || [];
+      for (const q of quests) {
+        if (q.completedAt && q.completedAt > cutoff) {
+          const isFailed = q.status === "failed";
+          activity.push({
+            icon: isFailed ? "fa-times-circle" : "fa-scroll",
+            text: `Quest ${isFailed ? "failed" : "completed"}: ${q.name}`,
+            timestamp: q.completedAt,
+            type: isFailed ? "quest-failed" : "quest"
+          });
+        }
+      }
+    }
+
+    // Recent NPC visits (lastVisited stored in NPC config flag)
+    for (const npc of game.actors.filter(a => a.type === "npc")) {
+      const config = npc.getFlag(MODULE_ID, "config") || {};
+      if (config.lastVisited && config.lastVisited > cutoff) {
+        activity.push({
+          icon: "fa-comments",
+          text: `NPC visited: ${npc.name}`,
+          timestamp: config.lastVisited,
+          type: "npc"
+        });
+      }
+    }
+
+    return activity
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 10)
+      .map(a => ({ ...a, timeAgo: this.#formatTimeAgo(a.timestamp) }));
+  }
+
+  /**
+   * Format a timestamp as a human-readable "time ago" string
+   * @param {number} timestamp - Unix timestamp in ms
+   * @returns {string}
+   * @private
+   */
+  #formatTimeAgo(timestamp) {
+    const diff = Date.now() - timestamp;
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor(diff / 3600000);
+    const mins = Math.floor(diff / 60000);
+    if (days > 0) return `${days}d ago`;
+    if (hours > 0) return `${hours}h ago`;
+    if (mins > 0) return `${mins}m ago`;
+    return "just now";
   }
 
   /* ===== Action Handlers ===== */

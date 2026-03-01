@@ -350,7 +350,7 @@ export function validateQuest(quest) {
  * @param {Actor} actor - Player actor
  * @returns {object} {met: boolean, reasons: string[]}
  */
-export function checkPrerequisites(quest, actor) {
+export async function checkPrerequisites(quest, actor) {
   const reasons = [];
   const prereqs = quest.prerequisites;
 
@@ -362,16 +362,34 @@ export function checkPrerequisites(quest, actor) {
     }
   }
 
-  // Quest completion check
+  // Prior quest completion check
   if (prereqs.quests?.length > 0) {
-    // Would need to check quest completion status
-    // This is a stub - actual implementation needs quest storage access
+    const questHandler = game.bobsnpc?.handlers?.quest;
+    if (questHandler) {
+      for (const requiredQuestId of prereqs.quests) {
+        const completed = await questHandler.hasCompletedQuest(actor.uuid, requiredQuestId);
+        if (!completed) {
+          const rq = questHandler.getQuest(requiredQuestId);
+          reasons.push(`Requires quest: ${rq?.name || requiredQuestId}`);
+        }
+      }
+    }
   }
 
   // Faction rank check
   if (prereqs.factionRank) {
-    // Would need to check faction standings
-    // This is a stub - actual implementation needs faction storage access
+    const factionHandler = game.bobsnpc?.handlers?.faction;
+    if (factionHandler) {
+      const { factionId, rank: requiredRankId } = prereqs.factionRank;
+      const faction = factionHandler.getFaction(factionId);
+      const requiredRank = faction?.ranks?.find(r => r.id === requiredRankId);
+      const currentRank = factionHandler.getRankSync(actor.uuid, factionId);
+      if (!requiredRank) {
+        reasons.push(`Requires faction rank: ${requiredRankId}`);
+      } else if (!currentRank || currentRank.order < requiredRank.order) {
+        reasons.push(`Requires ${faction?.name ?? factionId} rank: ${requiredRank.name}`);
+      }
+    }
   }
 
   // Gold check

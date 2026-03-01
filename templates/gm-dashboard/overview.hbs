@@ -128,5 +128,23 @@
         </button>
       </div>
     </section>
+
+    {{!-- Recent Activity --}}
+    <section class="overview-section">
+      <h3>{{localize "BOBSNPC.GMDashboard.RecentActivity"}}</h3>
+      {{#if recentActivity.length}}
+        <ul class="activity-feed">
+          {{#each recentActivity}}
+            <li class="activity-entry activity-{{this.type}}">
+              <i class="fa-solid {{this.icon}} activity-icon"></i>
+              <span class="activity-text">{{this.text}}</span>
+              <span class="activity-time">{{this.timeAgo}}</span>
+            </li>
+          {{/each}}
+        </ul>
+      {{else}}
+        <p class="no-activity">No recent activity in the last 7 days.</p>
+      {{/if}}
+    </section>
   {{/with}}
 </div>

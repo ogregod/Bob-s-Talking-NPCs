@@ -692,6 +692,38 @@ export class DialogueHandler {
     return true;
   }
 
+  /**
+   * Revert a dialogue session to the previous node
+   * Used by the dialogue window's go-back button.
+   * @param {string} sessionId - Session ID
+   * @returns {boolean} True if reverted, false if already at start
+   */
+  goBack(sessionId) {
+    const session = this.getSession(sessionId);
+    if (!session) return false;
+
+    const choices = session.choices ?? [];
+    const visited = session.visitedNodes ?? [];
+
+    if (choices.length === 0 && visited.length === 0) return false;
+
+    // Pop the last choice and visited node
+    choices.pop();
+    visited.pop();
+
+    // Determine the node to return to
+    const prevChoice = choices[choices.length - 1];
+    if (prevChoice) {
+      session.currentNodeId = prevChoice.nodeId;
+    } else {
+      // Back to the dialogue start node
+      const dialogue = this.getDialogue(session.dialogueId);
+      session.currentNodeId = dialogue?.startNodeId ?? session.currentNodeId;
+    }
+
+    return true;
+  }
+
   // ==================== NODE NAVIGATION ====================
 
   /**
@@ -1324,6 +1356,3 @@ export class DialogueHandler {
     });
   }
 }
-
-// Singleton instance
-export const dialogueHandler = new DialogueHandler();

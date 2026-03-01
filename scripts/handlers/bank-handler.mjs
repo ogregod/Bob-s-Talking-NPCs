@@ -1328,6 +1328,3 @@ export class BankHandler {
     });
   }
 }
-
-// Singleton instance
-export const bankHandler = new BankHandler();

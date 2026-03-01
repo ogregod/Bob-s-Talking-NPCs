@@ -238,7 +238,7 @@ export class QuestHandler {
     }
 
     // Check prerequisites for first actor (party leader)
-    const prereqCheck = checkPrerequisites(quest, actorArray[0]);
+    const prereqCheck = await checkPrerequisites(quest, actorArray[0]);
     if (!prereqCheck.met) {
       return {
         success: false,
@@ -900,8 +900,11 @@ export class QuestHandler {
 
     const newCount = quest.repeatable.completionCount + 1;
     const updates = {
-      "repeatable.completionCount": newCount,
-      "repeatable.lastCompleted": Date.now()
+      repeatable: {
+        ...quest.repeatable,
+        completionCount: newCount,
+        lastCompleted: Date.now()
+      }
     };
 
     // Reset quest for next run (after cooldown)
@@ -1083,7 +1086,7 @@ export class QuestHandler {
    */
   _notifyQuestCompleted(quest, actors, rewards) {
     const message = `${localize("BOBSNPC.QuestCompleted")}: ${quest.name}`;
-    ui.notifications.success(message);
+    ui.notifications.info(message);
 
     // Chat message with rewards
     this._postQuestChatMessage(quest, "completed", actors, rewards);
@@ -1266,6 +1269,3 @@ export class QuestHandler {
     });
   }
 }
-
-// Singleton instance
-export const questHandler = new QuestHandler();

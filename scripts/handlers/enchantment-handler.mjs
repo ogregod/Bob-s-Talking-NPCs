@@ -765,6 +765,3 @@ export class EnchantmentHandler {
     return true;
   }
 }
-
-// Singleton instance
-export const enchantmentHandler = new EnchantmentHandler();

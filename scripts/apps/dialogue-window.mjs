@@ -49,6 +49,7 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     this._fullText = "";
     this._isTyping = false;
     this._initialized = false;
+    this._nodeHistory = [];
   }
 
   /** @override */
@@ -70,6 +71,8 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     },
     actions: {
       selectResponse: DialogueWindow.#onSelectResponse,
+      castVote: DialogueWindow.#onCastVote,
+      goBack: DialogueWindow.#onGoBack,
       skipTypewriter: DialogueWindow.#onSkipTypewriter,
       openService: DialogueWindow.#onOpenService,
       endDialogue: DialogueWindow.#onEndDialogue
@@ -248,26 +251,45 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       mood: this._currentNode?.emotion || "neutral",
       moodIcon: this._getMoodIcon(this._currentNode?.emotion || "neutral"),
 
+      // Resolve items from Reward nodes
+      ...(() => {
+        const isRewardNode = this._currentNode?.type === "reward";
+        const rawItems = isRewardNode ? (this._currentNode.rewards?.items || []) : [];
+        const resolvedItems = rawItems.map(entry => {
+          const item = fromUuidSync(entry.uuid) ?? game.items?.getName?.(entry.uuid);
+          return item ? { img: item.img, name: item.name, quantity: entry.quantity || 1 } : null;
+        }).filter(Boolean);
+        return { hasItems: resolvedItems.length > 0, items: resolvedItems };
+      })(),
+
+      // Resolve quest name from Quest Offer nodes
+      ...(() => {
+        const isQuestOffer = this._currentNode?.type === "quest_offer";
+        const questId = isQuestOffer ? this._currentNode?.questId : null;
+        const questName = questId
+          ? (game.bobsnpc?.handlers?.quest?.getQuest(questId)?.name ?? questId)
+          : null;
+        return { hasQuest: !!questName, questName };
+      })(),
+
       // Top-level variables for content template
       dialogueText,
       speakerName: speakerType === "npc" ? speakerName : null,
       isTypewriting: this._isTyping,
-      hasItems: false, // TODO: implement item display
-      hasQuest: false, // TODO: implement quest display
 
       // Top-level variables for responses template
       hasResponses: formattedResponses.length > 0,
       responses: formattedResponses,
       isMultiplayer,
       participantCount: participants.length,
-      votingEnabled: false, // TODO: implement voting
-      votesCollected: 0,
-      hasVoted: false,
+      votingEnabled: this._session?.votingEnabled ?? false,
+      votesCollected: Object.values(this._session?.currentVotes || {}).flat().length,
+      hasVoted: Object.values(this._session?.currentVotes || {}).flat().includes(this.playerActorUuid),
 
       // Top-level variables for footer template
       hasServices: formattedServices.length > 0,
       services: formattedServices,
-      canGoBack: false, // TODO: implement history navigation
+      canGoBack: this._nodeHistory.length > 0,
       showHistory: false,
       isGM: game.user.isGM,
       theme,
@@ -458,6 +480,9 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
       return;
     }
 
+    // Track history for go-back navigation
+    if (this._currentNode) this._nodeHistory.push(this._currentNode);
+
     try {
       console.log(`${MODULE_ID} | Selecting response: ${responseId}`);
 
@@ -626,6 +651,33 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     await this.close();
   }
 
+  /**
+   * Cast a vote for a response (multiplayer voting mode)
+   * @param {Event} event - Click event
+   * @param {HTMLElement} target - Target element
+   */
+  static async #onCastVote(event, target) {
+    const responseId = target.closest("[data-response-id]")?.dataset.responseId;
+    if (!responseId || !this.playerActorUuid) return;
+    await getDialogueHandler().submitVote(this.sessionId, responseId, this.playerActorUuid);
+    await this.render({ parts: ["responses"] });
+  }
+
+  /**
+   * Navigate back to the previous dialogue node
+   * @param {Event} event - Click event
+   * @param {HTMLElement} target - Target element
+   */
+  static async #onGoBack(event, target) {
+    const prev = this._nodeHistory.pop();
+    if (!prev) return;
+    getDialogueHandler().goBack(this.sessionId);
+    this._currentNode = prev;
+    this._displayedText = prev.text || "";
+    this._isTyping = false;
+    await this.render();
+  }
+
   // ==================== Keyboard Shortcuts ====================
 
   /**
@@ -728,6 +780,13 @@ export class DialogueWindow extends HandlebarsApplicationMixin(ApplicationV2) {
 
       case "dialogue.participantJoined":
         await this.render();
+        break;
+
+      case "dialogue.voteSubmitted":
+        if (this._session && data.votes) {
+          this._session.currentVotes = data.votes;
+        }
+        await this.render({ parts: ["responses"] });
         break;
     }
   }

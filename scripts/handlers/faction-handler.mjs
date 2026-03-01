@@ -1012,6 +1012,3 @@ export class FactionHandler {
     });
   }
 }
-
-// Singleton instance
-export const factionHandler = new FactionHandler();

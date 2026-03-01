@@ -1355,6 +1355,3 @@ export class CrimeHandler {
     }
   }
 }
-
-// Singleton instance
-export const crimeHandler = new CrimeHandler();

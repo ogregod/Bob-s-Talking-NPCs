@@ -394,20 +394,20 @@ export function throttle(func, wait) {
 
 /**
  * Emit a module hook
- * @param {string} hookName - Hook name (without btnpc. prefix)
+ * @param {string} hookName - Hook name (without bobs-talking-npcs. prefix)
  * @param {...*} args - Hook arguments
  */
 export function callHook(hookName, ...args) {
-  Hooks.call(`btnpc.${hookName}`, ...args);
+  Hooks.call(`bobs-talking-npcs.${hookName}`, ...args);
 }
 
 /**
  * Emit a module hook to all listeners
- * @param {string} hookName - Hook name (without btnpc. prefix)
+ * @param {string} hookName - Hook name (without bobs-talking-npcs. prefix)
  * @param {...*} args - Hook arguments
  */
 export function callAllHooks(hookName, ...args) {
-  Hooks.callAll(`btnpc.${hookName}`, ...args);
+  Hooks.callAll(`bobs-talking-npcs.${hookName}`, ...args);
 }
 
 // ===== Logging Helpers =====

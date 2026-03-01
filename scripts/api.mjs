@@ -184,13 +184,91 @@ export class BobsNPCAPI {
     return exportData;
   }
 
-  /**
-   * Import module data
-   * @param {object} data - Data to import (from export)
-   * @param {object} options - Import options
-   * @param {string} options.conflictResolution - "replace", "skip", "rename"
-   * @returns {Promise<object>} Import results
-   */
+  // ==================== Private Export Methods ====================
+
+  async _exportNPC(uuid) {
+    const handler = game.bobsnpc?.handlers?.npc;
+    if (!handler) throw new Error("NPC handler not available");
+    const config = handler.getConfig(uuid);
+    if (!config) throw new Error(`NPC not found or not configured: ${uuid}`);
+    return { uuid, config };
+  }
+
+  async _exportQuest(id) {
+    const handler = game.bobsnpc?.handlers?.quest;
+    if (!handler) throw new Error("Quest handler not available");
+    const quest = handler.getQuest(id);
+    if (!quest) throw new Error(`Quest not found: ${id}`);
+    return { quest };
+  }
+
+  async _exportFaction(id) {
+    const handler = game.bobsnpc?.handlers?.faction;
+    if (!handler) throw new Error("Faction handler not available");
+    const faction = handler.getFaction(id);
+    if (!faction) throw new Error(`Faction not found: ${id}`);
+    return { faction };
+  }
+
+  async _exportPack(filter) {
+    const handlers = game.bobsnpc?.handlers;
+    if (!handlers) throw new Error("Handlers not available");
+
+    const data = {};
+
+    if (handlers.npc) data.npcs = handlers.npc.exportData().npcs || {};
+    if (handlers.quest) {
+      const quests = handlers.quest.getAllQuests?.() || [];
+      data.quests = Object.fromEntries(quests.map(q => [q.id, q]));
+    }
+    if (handlers.faction) {
+      const factions = handlers.faction.getAllFactions?.() || [];
+      data.factions = Object.fromEntries(factions.map(f => [f.id, f]));
+    }
+
+    // Apply filter if provided (e.g. filter by pack name tag)
+    if (filter) {
+      for (const key of Object.keys(data)) {
+        data[key] = Object.fromEntries(
+          Object.entries(data[key]).filter(([, v]) => v.pack === filter || v.tags?.includes(filter))
+        );
+      }
+    }
+
+    return data;
+  }
+
+  async _exportWorld() {
+    const handlers = game.bobsnpc?.handlers;
+    if (!handlers) throw new Error("Handlers not available");
+
+    const data = {};
+
+    if (handlers.npc) data.npc = handlers.npc.exportData();
+    if (handlers.crime) data.crime = handlers.crime.exportData();
+    if (handlers.hireling) data.hireling = handlers.hireling.exportData();
+    if (handlers.property) data.property = handlers.property.exportData();
+
+    // Export quests as key-value map
+    if (handlers.quest) {
+      const quests = handlers.quest.getAllQuests?.() || [];
+      data.quests = Object.fromEntries(quests.map(q => [q.id, q]));
+    }
+
+    // Export factions
+    if (handlers.faction) {
+      const factions = handlers.faction.getAllFactions?.() || [];
+      data.factions = Object.fromEntries(factions.map(f => [f.id, f]));
+    }
+
+    // Export world settings blob (shops, banks, worldState, etc.)
+    data.worldData = game.settings.get(MODULE_ID, "worldData") || {};
+
+    return data;
+  }
+
+  // ==================== Import Implementation ====================
+
   async import(data, options = { conflictResolution: "skip" }) {
     console.log(`${MODULE_ID} | Importing ${data.exportType} data`);
 
@@ -198,24 +276,61 @@ export class BobsNPCAPI {
       throw new Error("Invalid import data: wrong module ID");
     }
 
-    // Validate and import based on type
-    const results = {
-      success: [],
-      skipped: [],
-      errors: []
-    };
+    if (!game.user.isGM) {
+      throw new Error("Only GM can import data");
+    }
 
-    // Implementation placeholder
+    const handlers = game.bobsnpc?.handlers;
+    if (!handlers) throw new Error("Handlers not available");
+
+    const results = { success: [], skipped: [], errors: [] };
+    const payload = data.data || {};
+
+    try {
+      switch (data.exportType) {
+        case "npc":
+          if (payload.uuid && payload.config) {
+            await handlers.npc?.importData({ npcs: { [payload.uuid]: payload.config } });
+            results.success.push(payload.uuid);
+          }
+          break;
+
+        case "quest":
+          if (payload.quest) {
+            await handlers.quest?.createQuest?.(payload.quest);
+            results.success.push(payload.quest.id);
+          }
+          break;
+
+        case "faction":
+          if (payload.faction) {
+            await handlers.faction?.createFaction?.(payload.faction);
+            results.success.push(payload.faction.id);
+          }
+          break;
+
+        case "pack":
+        case "world":
+          if (payload.npc) await handlers.npc?.importData(payload.npc);
+          if (payload.crime) await handlers.crime?.importData(payload.crime);
+          if (payload.hireling) await handlers.hireling?.importData(payload.hireling);
+          if (payload.property) await handlers.property?.importData(payload.property);
+          if (payload.worldData) {
+            await game.settings.set(MODULE_ID, "worldData", payload.worldData);
+          }
+          results.success.push("world");
+          break;
+
+        default:
+          throw new Error(`Unknown import type: ${data.exportType}`);
+      }
+    } catch (e) {
+      results.errors.push(e.message);
+    }
+
     console.log(`${MODULE_ID} | Import complete`, results);
     return results;
   }
-
-  // Private export methods (placeholders)
-  async _exportNPC(uuid) { return {}; }
-  async _exportQuest(id) { return {}; }
-  async _exportFaction(id) { return {}; }
-  async _exportPack(filter) { return {}; }
-  async _exportWorld() { return {}; }
 }
 
 /**
@@ -1577,11 +1692,19 @@ class BackupAPI {
       throw new Error("Only GM can create backups");
     }
 
+    const handlers = game.bobsnpc?.handlers;
     const backup = {
+      moduleId: MODULE_ID,
+      exportType: "world",
       date: new Date().toISOString(),
       version: game.modules.get(MODULE_ID)?.version,
-      worldState: game.world.getFlag(MODULE_ID, "worldState"),
-      // Add other data to backup
+      data: {
+        npc: handlers?.npc?.exportData() ?? {},
+        crime: handlers?.crime?.exportData() ?? {},
+        hireling: handlers?.hireling?.exportData() ?? {},
+        property: handlers?.property?.exportData() ?? {},
+        worldData: game.settings.get(MODULE_ID, "worldData") ?? {}
+      }
     };
 
     console.log(`${MODULE_ID} | Backup created`);
@@ -1593,64 +1716,16 @@ class BackupAPI {
       throw new Error("Only GM can restore backups");
     }
 
-    // Validate backup
-    if (!backupData?.date || !backupData?.version) {
+    if (!backupData?.date || !backupData?.version || backupData?.moduleId !== MODULE_ID) {
       throw new Error("Invalid backup data");
     }
 
-    // Implementation: restore data
-    console.log(`${MODULE_ID} | Backup restored from ${backupData.date}`);
-    return true;
-  }
-}
+    // Delegate to the main API's import()
+    const api = game.bobsnpc;
+    if (!api) throw new Error("Module API not available");
 
-/**
- * NPC Handler
- * Manages NPC configuration and behavior
- */
-class NPCHandler {
-  /**
-   * Get NPC configuration
-   * @param {string} actorUuid - NPC actor UUID
-   * @returns {object|null}
-   */
-  getNPCConfig(actorUuid) {
-    const actor = fromUuidSync(actorUuid);
-    if (!actor) return null;
-    return actor.getFlag(MODULE_ID, "config") || null;
-  }
-
-  /**
-   * Set NPC configuration
-   * @param {string} actorUuid - NPC actor UUID
-   * @param {object} config - Configuration object
-   * @returns {Promise<object>}
-   */
-  async setNPCConfig(actorUuid, config) {
-    const actor = await fromUuid(actorUuid);
-    if (!actor) throw new Error("Actor not found");
-    return actor.setFlag(MODULE_ID, "config", config);
-  }
-
-  /**
-   * Check if actor is configured as an NPC
-   * @param {string} actorUuid - Actor UUID
-   * @returns {boolean}
-   */
-  isConfigured(actorUuid) {
-    return !!this.getNPCConfig(actorUuid);
-  }
-
-  /**
-   * Get all configured NPCs
-   * @returns {object[]}
-   */
-  getAllConfiguredNPCs() {
-    return game.actors.filter(a => a.getFlag(MODULE_ID, "config"))
-      .map(a => ({
-        uuid: a.uuid,
-        name: a.name,
-        config: a.getFlag(MODULE_ID, "config")
-      }));
+    const results = await api.import(backupData);
+    console.log(`${MODULE_ID} | Backup restored from ${backupData.date}`, results);
+    return results;
   }
 }

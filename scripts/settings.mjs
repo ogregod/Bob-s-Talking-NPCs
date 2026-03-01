@@ -109,6 +109,16 @@ function registerWorldSettings() {
     requiresReload: false
   });
 
+  game.settings.register(MODULE_ID, "questChatMessages", {
+    name: "BOBSNPC.Settings.QuestChatMessages.Name",
+    hint: "BOBSNPC.Settings.QuestChatMessages.Hint",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+    requiresReload: false
+  });
+
   // ===== NPC Settings =====
 
   game.settings.register(MODULE_ID, "npcIndicators", {

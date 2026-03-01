@@ -232,14 +232,13 @@ export class ServiceSelectionDialog extends HandlebarsApplicationMixin(Applicati
         return;
       }
 
-      // This would open the enchantment picker dialog
-      // For now, show a placeholder notification
-      ui.notifications.info("Enchantment picker integration - to be connected to existing enchantment UI");
-
-      // TODO: Connect to actual enchantment picker
-      // const enchantmentId = await game.bobsnpc.ui.pickEnchantment(merchantId, this.item);
-      // this._selectedEnchantment = enchantmentHandler.getEnchantment(enchantmentId);
-      // this.render();
+      // Open the enchantment picker dialog
+      const { EnchantmentPicker } = await import("./enchantment-picker.mjs");
+      const enchantmentId = await EnchantmentPicker.pick(merchantId, this.item);
+      if (enchantmentId) {
+        this._selectedEnchantment = enchantmentHandler.getEnchantment(enchantmentId);
+        this.render();
+      }
 
     } catch (error) {
       console.error(`${MODULE_ID} | Error picking enchantment:`, error);

@@ -126,7 +126,27 @@ function handleSocketEvent(data) {
     } catch (error) {
       console.error(`${MODULE_ID} | Error handling socket event ${type}:`, error);
     }
-  } else if (!type?.startsWith("dialogue.")) {
+    return;
+  }
+
+  // Route namespace.event format (e.g. "crime.crimeReported") to handler instances
+  if (type?.includes(".")) {
+    const namespace = type.split(".")[0];
+    // dialogue events are handled by DialogueHandler's own socket listener
+    if (namespace !== "dialogue") {
+      const handlerInstance = game.bobsnpc?.handlers?.[namespace];
+      if (handlerInstance?.handleSocket) {
+        try {
+          handlerInstance.handleSocket(data);
+        } catch (error) {
+          console.error(`${MODULE_ID} | Error in ${namespace} handler for ${type}:`, error);
+        }
+        return;
+      }
+    }
+  }
+
+  if (!type?.startsWith("dialogue.")) {
     // Only warn for unhandled events that aren't dialogue events
     // (dialogue events are handled by DialogueHandler's own socket listener)
     console.warn(`${MODULE_ID} | Unknown socket event type: ${type}`);

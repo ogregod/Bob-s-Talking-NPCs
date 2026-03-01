@@ -766,17 +766,93 @@ export class BankingManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const bankId = target.dataset.bankId;
     if (!bankId) return;
 
-    // TODO: Open account viewer for this bank
-    ui.notifications.info("Account viewer coming soon!");
+    const handler = getBankHandler();
+    const bank = handler?.getBank(bankId);
+    if (!bank) return;
+
+    const accounts = (bank.accountIds || [])
+      .map(id => handler.getAccount(id))
+      .filter(Boolean);
+
+    const rows = accounts.map(a => {
+      const bal = formatCurrency(a.balance || {});
+      return `<tr style="border-bottom:1px solid #444">
+        <td style="padding:4px 8px">${a.ownerName || "Unknown"}</td>
+        <td style="padding:4px 8px">${a.type || "personal"}</td>
+        <td style="padding:4px 8px">${a.name || "Account"}</td>
+        <td style="padding:4px 8px">${bal}</td>
+        <td style="padding:4px 8px">${a.frozen ? "&#9888; Frozen" : "Active"}</td>
+      </tr>`;
+    }).join("");
+
+    const content = accounts.length
+      ? `<table style="width:100%;border-collapse:collapse;margin-top:8px">
+          <thead style="text-align:left;border-bottom:2px solid #666">
+            <tr>
+              <th style="padding:4px 8px">Owner</th>
+              <th style="padding:4px 8px">Type</th>
+              <th style="padding:4px 8px">Name</th>
+              <th style="padding:4px 8px">Balance</th>
+              <th style="padding:4px 8px">Status</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+         </table>`
+      : `<p style="margin-top:8px">No accounts found at this bank.</p>`;
+
+    await foundry.applications.api.DialogV2.alert({
+      window: { title: `${bank.name} — Accounts (${accounts.length})` },
+      content,
+      ok: { label: "Close" }
+    });
   }
 
   /**
-   * Import bank from template
+   * Import bank settings from a preset template
    * @private
    */
   static async #onImportTemplate(event, target) {
-    // TODO: Implement template import
-    ui.notifications.info("Template import coming soon!");
+    if (!this._selectedBankId) {
+      ui.notifications.warn("Select a bank first before importing a template.");
+      return;
+    }
+
+    const { BankTemplates } = await import("../data/bank-model.mjs");
+
+    const templateOptions = Object.entries(BankTemplates)
+      .map(([key, tpl]) => `<option value="${key}">${tpl.name || key}</option>`)
+      .join("");
+
+    const result = await foundry.applications.api.DialogV2.prompt({
+      window: { title: "Import Bank Template" },
+      content: `<div class="form-group">
+          <label>Select a template to apply:</label>
+          <select name="template" style="width:100%;margin-top:4px">${templateOptions}</select>
+          <p class="hint" style="margin-top:6px;font-size:0.85em;color:#aaa">
+            Overwrites services, rates, and fees with template defaults.
+            Name, location, and accounts are preserved.
+          </p>
+        </div>`,
+      ok: {
+        label: "Apply Template",
+        callback: (event, button) => new FormDataExtended(button.form).object
+      }
+    });
+
+    if (!result?.template) return;
+
+    const handler = getBankHandler();
+    const tpl = BankTemplates[result.template];
+    if (!tpl || !handler) return;
+
+    const updates = {};
+    if (tpl.services) updates.services = { ...tpl.services };
+    if (tpl.rates) updates.rates = { ...tpl.rates };
+    if (tpl.fees) updates.fees = { ...tpl.fees };
+
+    await handler.updateBank(this._selectedBankId, updates);
+    ui.notifications.info(`Template "${tpl.name || result.template}" applied.`);
+    this.render();
   }
 
   /**

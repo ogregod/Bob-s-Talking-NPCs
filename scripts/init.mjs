@@ -20,6 +20,9 @@ import { PropertyHandler } from "./handlers/property-handler.mjs";
 import { NPCHandler } from "./handlers/npc-handler.mjs";
 import { EnchantmentHandler } from "./handlers/enchantment-handler.mjs";
 
+// Import apps needed for hook callbacks
+import { DialogueEditor } from "./apps/dialogue-editor.mjs";
+
 // Import service approval hooks
 import { registerServiceApprovalHooks } from "./apps/service-approval-dialog.mjs";
 
@@ -170,6 +173,7 @@ async function loadTemplates() {
     `modules/${MODULE_ID}/templates/faction-editor/tabs.hbs`,
     `modules/${MODULE_ID}/templates/faction-editor/general.hbs`,
     `modules/${MODULE_ID}/templates/faction-editor/ranks.hbs`,
+    `modules/${MODULE_ID}/templates/faction-editor/roles.hbs`,
     `modules/${MODULE_ID}/templates/faction-editor/relationships.hbs`,
     `modules/${MODULE_ID}/templates/faction-editor/settings.hbs`,
     `modules/${MODULE_ID}/templates/faction-editor/footer.hbs`,
@@ -311,7 +315,60 @@ export function registerReadyHooks() {
   // Register render hooks for UI integration
   registerRenderHooks();
 
+  // Register time-based hooks for decay/payment/upgrade processing
+  registerTimeHooks();
+
   console.log(`${MODULE_ID} | Ready hooks registered`);
+}
+
+/**
+ * Register world time hooks for periodic system processing.
+ * Only the GM processes these to avoid duplicate world state changes.
+ */
+function registerTimeHooks() {
+  Hooks.on("updateWorldTime", async (worldTime, dt) => {
+    if (!game.user.isGM) return;
+
+    const h = handlers;
+
+    // Process bounty decay (crime system)
+    if (h.crime) {
+      try { await h.crime.processBountyDecay(); } catch (e) {
+        console.error(`${MODULE_ID} | processBountyDecay error:`, e);
+      }
+    }
+
+    // Apply relationship decay
+    if (h.relationship) {
+      try { await h.relationship.applyRelationshipDecay(); } catch (e) {
+        console.error(`${MODULE_ID} | applyRelationshipDecay error:`, e);
+      }
+    }
+
+    // Check hireling due payments
+    if (h.hireling) {
+      try { await h.hireling.checkDuePayments(); } catch (e) {
+        console.error(`${MODULE_ID} | checkDuePayments error:`, e);
+      }
+    }
+
+    // Process property condition decay and check completed upgrades
+    if (h.property) {
+      try {
+        await h.property.processConditionDecay();
+        await h.property.checkCompletedUpgrades();
+      } catch (e) {
+        console.error(`${MODULE_ID} | property time update error:`, e);
+      }
+    }
+
+    // Check repeatable quest resets
+    if (h.quest) {
+      try { await h.quest.checkRepeatableQuests(); } catch (e) {
+        console.error(`${MODULE_ID} | checkRepeatableQuests error:`, e);
+      }
+    }
+  });
 }
 
 /**
@@ -1007,29 +1064,6 @@ function registerActorHooks() {
     });
   });
 
-  // Track item creation for collection quests
-  Hooks.on("createItem", (item, options, userId) => {
-    const actor = item.parent;
-    if (!(actor instanceof Actor)) return;
-
-    Hooks.call(`${MODULE_ID}.itemGained`, {
-      actor,
-      item,
-      userId
-    });
-  });
-
-  // Track item deletion
-  Hooks.on("deleteItem", (item, options, userId) => {
-    const actor = item.parent;
-    if (!(actor instanceof Actor)) return;
-
-    Hooks.call(`${MODULE_ID}.itemLost`, {
-      actor,
-      item,
-      userId
-    });
-  });
 }
 
 /**
@@ -1049,7 +1083,7 @@ function registerChatHooks() {
       callback: (li) => {
         const message = game.messages.get(li.data("messageId"));
         const dialogueId = message?.getFlag(MODULE_ID, "dialogueId");
-        // Open dialogue viewer - implementation pending
+        if (dialogueId) DialogueEditor.open(dialogueId);
       }
     });
   });
@@ -1102,9 +1136,41 @@ function registerRenderHooks() {
     });
   });
 
-  // Add module section to sidebar
-  Hooks.on("renderSidebarTab", (app, html, data) => {
-    // Could add quest log shortcut to journal tab, etc.
+  // Add module shortcuts to sidebar tabs
+  Hooks.on("renderSidebarTab", (app, html) => {
+    const root = html[0] ?? html;
+
+    // Add Quest Log button to Journal sidebar header
+    if (app.tabName === "journal") {
+      const header = root.querySelector(".directory-header");
+      if (header && !header.querySelector(".bobsnpc-quest-log-btn")) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "bobsnpc-quest-log-btn";
+        btn.title = game.i18n.localize("BOBSNPC.QuestLog.Title");
+        btn.innerHTML = `<i class="fas fa-scroll"></i> ${game.i18n.localize("BOBSNPC.QuestLog.Title")}`;
+        btn.addEventListener("click", () => game.bobsnpc?.ui?.openQuestLog());
+        const headerActions = header.querySelector(".header-actions");
+        if (headerActions) headerActions.prepend(btn);
+        else header.appendChild(btn);
+      }
+    }
+
+    // Add NPC Dashboard button to Actors sidebar header (GM only)
+    if (app.tabName === "actors" && game.user.isGM) {
+      const header = root.querySelector(".directory-header");
+      if (header && !header.querySelector(".bobsnpc-dashboard-btn")) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "bobsnpc-dashboard-btn";
+        btn.title = game.i18n.localize("BOBSNPC.GMDashboard.Title");
+        btn.innerHTML = `<i class="fas fa-comments"></i> ${game.i18n.localize("BOBSNPC.GMDashboard.Title")}`;
+        btn.addEventListener("click", () => game.bobsnpc?.ui?.openGmDashboard());
+        const headerActions = header.querySelector(".header-actions");
+        if (headerActions) headerActions.prepend(btn);
+        else header.appendChild(btn);
+      }
+    }
   });
 }
 

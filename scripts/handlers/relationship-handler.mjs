@@ -338,7 +338,7 @@ export class RelationshipHandler {
     }
 
     // Notify
-    ui.notifications.success(`${localize("BOBSNPC.MilestoneReached")}: ${milestone.name} (${npcActor.name})`);
+    ui.notifications.info(`${localize("BOBSNPC.MilestoneReached")}: ${milestone.name} (${npcActor.name})`);
 
     Hooks.callAll("bobsNPCMilestoneReached", playerActorUuid, npcActorUuid, milestone);
   }
@@ -791,7 +791,23 @@ export class RelationshipHandler {
       data
     });
   }
-}
 
-// Singleton instance
-export const relationshipHandler = new RelationshipHandler();
+  /**
+   * Handle incoming socket events for the relationship system
+   * @param {object} data - Socket data including type field
+   */
+  handleSocket(data) {
+    const { type } = data;
+
+    switch (type) {
+      case "relationship.relationshipChanged":
+        // Invalidate cache so next read fetches fresh data
+        if (data.data?.playerActorUuid && data.data?.npcActorUuid) {
+          this.invalidateCache(data.data.playerActorUuid, data.data.npcActorUuid);
+        }
+        Hooks.callAll(`${MODULE_ID}.relationshipChanged`,
+          data.data?.playerActorUuid, data.data?.npcActorUuid, data.data?.amount, data.data?.newValue);
+        break;
+    }
+  }
+}

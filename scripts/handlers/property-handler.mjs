@@ -1331,6 +1331,21 @@ export class PropertyHandler {
     await this._saveProperties();
   }
 
+  /**
+   * Check all properties for completed upgrades and finalize them
+   * Called periodically from the updateWorldTime hook (GM only)
+   */
+  async checkCompletedUpgrades() {
+    if (!game.user.isGM) return;
+
+    const now = Date.now();
+    for (const [id, property] of this._propertyCache.entries()) {
+      if (property.upgradeInProgress && property.upgradeCompletionDate && now >= property.upgradeCompletionDate) {
+        await this.completeUpgrade(id);
+      }
+    }
+  }
+
   // ==================== Requirements & Helpers ====================
 
   /**
@@ -1478,6 +1493,3 @@ export class PropertyHandler {
     }
   }
 }
-
-// Singleton instance
-export const propertyHandler = new PropertyHandler();

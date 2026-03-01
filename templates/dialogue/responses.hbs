@@ -5,7 +5,7 @@
       {{#each responses}}
         <li class="response-entry {{#unless this.available}}unavailable{{/unless}} {{#if this.isSelected}}selected{{/if}}"
             {{#if this.available}}
-              data-action="selectResponse"
+              data-action="{{#if votingEnabled}}castVote{{else}}selectResponse{{/if}}"
               data-response-id="{{this.id}}"
               data-requires-roll="{{this.requiresRoll}}"
             {{/if}}

@@ -41,6 +41,10 @@
         "Name": "Quest Markers",
         "Hint": "Show quest indicators on NPC tokens"
       },
+      "QuestChatMessages": {
+        "Name": "Quest Chat Messages",
+        "Hint": "Post chat messages when quests are accepted, updated, completed, or failed"
+      },
       "NPCIndicators": {
         "Name": "NPC Role Indicators",
         "Hint": "Show role icons on NPC tokens (merchant, quest giver, etc.)"
@@ -2746,6 +2750,7 @@
       "CreateFaction": "Create Faction",
       "TriggerEvent": "Trigger Event",
       "CreateBackup": "Create Backup",
+      "RecentActivity": "Recent Activity",
       "QuestManagement": "Quest Management",
       "AllStatuses": "All Statuses",
       "AllCategories": "All Categories",
