@@ -249,6 +249,97 @@
     </section>
   {{/if}}
 
+  {{!-- Reward Node Configuration --}}
+  {{#if hasRewardType}}
+    <section class="config-section">
+      <h3>{{localize "DialogueEditor.RewardConfig"}}</h3>
+
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.TextContent"}}</label>
+        <textarea name="node.text" rows="3" placeholder="{{localize 'DialogueEditor.EnterText'}}">{{node.text}}</textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group half">
+          <label>{{localize "DialogueEditor.RewardGold"}}</label>
+          <input type="number" name="node.rewards.gold" value="{{node.rewards.gold}}" min="0" />
+        </div>
+        <div class="form-group half">
+          <label>{{localize "DialogueEditor.RewardXP"}}</label>
+          <input type="number" name="node.rewards.xp" value="{{node.rewards.xp}}" min="0" />
+        </div>
+      </div>
+
+      <div class="section-header">
+        <label>{{localize "DialogueEditor.RewardItems"}}</label>
+        <button type="button" class="add-btn" data-action="addRewardItem">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+
+      {{#if rewardItemsDisplay.length}}
+        <ul class="reward-items-list">
+          {{#each rewardItemsDisplay}}
+            <li class="reward-item-entry form-row" style="align-items:center;gap:4px">
+              <input type="text" name="node.rewards.items.{{this.index}}.uuid"
+                     value="{{this.uuid}}" placeholder="Item UUID" style="flex:1" />
+              <input type="number" name="node.rewards.items.{{this.index}}.quantity"
+                     value="{{this.quantity}}" min="1" style="width:60px" title="Quantity" />
+              <button type="button" class="remove-btn" data-action="removeRewardItem" data-index="{{this.index}}">
+                <i class="fa-solid fa-times"></i>
+              </button>
+            </li>
+          {{/each}}
+        </ul>
+      {{/if}}
+
+      <div class="form-group" style="margin-top:8px">
+        <label>{{localize "DialogueEditor.NextNode"}}</label>
+        <select name="node.nextNodeId">
+          <option value="">{{localize "DialogueEditor.EndDialogue"}}</option>
+          {{#each otherNodes}}
+            <option value="{{this.id}}" {{#if (eq this.id ../node.nextNodeId)}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </section>
+  {{/if}}
+
+  {{!-- Bank Node Configuration --}}
+  {{#if hasBankType}}
+    <section class="config-section">
+      <h3>{{localize "DialogueEditor.BankConfig"}}</h3>
+
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.TextContent"}}</label>
+        <textarea name="node.text" rows="3" placeholder="{{localize 'DialogueEditor.EnterText'}}">{{node.text}}</textarea>
+      </div>
+
+      {{#if hasBankOptions}}
+        <div class="form-group">
+          <label>{{localize "BOBSNPC.DialogueEditor.SpecificBank"}}</label>
+          <select name="node.bankId">
+            <option value="">-- {{localize "BOBSNPC.DialogueEditor.AutoDetect"}} --</option>
+            {{#each bankOptions}}
+              <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+            {{/each}}
+          </select>
+          <span class="hint">{{localize "BOBSNPC.DialogueEditor.SpecificBankHint"}}</span>
+        </div>
+      {{/if}}
+
+      <div class="form-group">
+        <label>{{localize "DialogueEditor.AfterBank"}}</label>
+        <select name="node.nextNodeId">
+          <option value="">{{localize "DialogueEditor.EndDialogue"}}</option>
+          {{#each otherNodes}}
+            <option value="{{this.id}}" {{#if (eq this.id ../node.nextNodeId)}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </section>
+  {{/if}}
+
   {{!-- End Node Configuration --}}
   {{#if hasEndType}}
     <section class="config-section">

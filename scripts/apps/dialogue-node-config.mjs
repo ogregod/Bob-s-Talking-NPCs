@@ -90,6 +90,8 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
       removeEffect: DialogueNodeConfig.#onRemoveEffect,
       addBranch: DialogueNodeConfig.#onAddBranch,
       removeBranch: DialogueNodeConfig.#onRemoveBranch,
+      addRewardItem: DialogueNodeConfig.#onAddRewardItem,
+      removeRewardItem: DialogueNodeConfig.#onRemoveRewardItem,
       save: DialogueNodeConfig.#onSave,
       cancel: DialogueNodeConfig.#onCancel
     }
@@ -189,7 +191,11 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
       hasShopType: this._node.type === NodeType.SHOP,
       ...this._prepareShopOptions(),
       hasEndType: this._node.type === NodeType.END,
-      hasNextNode: ![NodeType.END, NodeType.BRANCH, NodeType.SKILL_CHECK, NodeType.QUEST_OFFER, NodeType.QUEST_TURNIN].includes(this._node.type),
+      hasRewardType: this._node.type === NodeType.REWARD,
+      rewardItemsDisplay: this._node.type === NodeType.REWARD ? this._prepareRewardItemsDisplay() : [],
+      hasBankType: this._node.type === NodeType.BANK,
+      ...this._prepareBankOptions(),
+      hasNextNode: ![NodeType.END, NodeType.BRANCH, NodeType.SKILL_CHECK, NodeType.QUEST_OFFER, NodeType.QUEST_TURNIN, NodeType.REWARD, NodeType.BANK].includes(this._node.type),
 
       // Processed data
       responsesDisplay: this._prepareResponsesDisplay(),
@@ -245,6 +251,36 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
       hasShopOptions: shopOptions.length > 0,
       hasBusinessTypeOptions: businessTypeOptions.length > 0
     };
+  }
+
+  /**
+   * Prepare reward items for display in the reward node config
+   * @returns {Array}
+   * @private
+   */
+  _prepareRewardItemsDisplay() {
+    return ensureArray(this._node.rewards?.items).map((item, index) => ({
+      ...item,
+      index
+    }));
+  }
+
+  /**
+   * Prepare bank picker options for BANK node config
+   * @returns {object}
+   * @private
+   */
+  _prepareBankOptions() {
+    if (this._node.type !== NodeType.BANK) return {};
+    const handler = game.bobsnpc?.handlers?.bank;
+    const allBanks = handler?.getAllBanks?.() || [];
+    const bankOptions = allBanks.map(bank => ({
+      value: bank.id,
+      label: bank.name,
+      selected: this._node.bankId === bank.id
+    }));
+    bankOptions.sort((a, b) => a.label.localeCompare(b.label));
+    return { bankOptions, hasBankOptions: bankOptions.length > 0 };
   }
 
   _prepareTabs() {
@@ -482,6 +518,22 @@ export class DialogueNodeConfig extends HandlebarsApplicationMixin(ApplicationV2
     const index = parseInt(target.dataset.index);
     this._node.branches.splice(index, 1);
     this.render();
+  }
+
+  static #onAddRewardItem(event, target) {
+    if (!this._node.rewards) {
+      this._node.rewards = { gold: 0, xp: 0, items: [], reputation: [], relationship: 0 };
+    }
+    this._node.rewards.items = ensureArray(this._node.rewards.items);
+    this._node.rewards.items.push({ uuid: "", quantity: 1 });
+    this.render({ parts: ["content"] });
+  }
+
+  static #onRemoveRewardItem(event, target) {
+    const index = parseInt(target.dataset.index);
+    this._node.rewards.items = ensureArray(this._node.rewards.items);
+    this._node.rewards.items.splice(index, 1);
+    this.render({ parts: ["content"] });
   }
 
   static async #onSave(event, target) {

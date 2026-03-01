@@ -491,6 +491,7 @@ export function createNode(data = {}) {
       return {
         ...base,
         text: data.text || "",
+        bankId: data.bankId || null,
         nextNodeId: data.nextNodeId || null
       };
 

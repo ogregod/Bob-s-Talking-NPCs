@@ -194,6 +194,15 @@ export class QuestEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       };
     });
 
+    // Prepare faction ranks for the selected prerequisite faction
+    const prereqFactionId = this._quest.prerequisites?.factionRank?.factionId;
+    const prereqFaction = factions.find(f => f.id === prereqFactionId);
+    const selectedFactionRanks = (prereqFaction?.ranks || []).map(r => ({
+      value: r.id,
+      label: r.name,
+      selected: r.id === this._quest.prerequisites?.factionRank?.rank
+    }));
+
     // Prepare prerequisite quests display
     const prereqQuestsDisplay = (this._quest.prerequisites?.quests || []).map((questId, index) => {
       const quest = allQuests.find(q => q.id === questId);
@@ -221,6 +230,7 @@ export class QuestEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
       // Related data
       factions,
+      selectedFactionRanks,
       otherQuests,
       objectivesDisplay,
       rewardItemsDisplay,

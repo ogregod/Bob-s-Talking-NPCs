@@ -537,6 +537,16 @@
       "AfterShop": "After Shop Closes",
       "EndDialogue": "End Dialogue",
 
+      "RewardConfig": "Reward Configuration",
+      "RewardGold": "Gold (gp)",
+      "RewardXP": "Experience (XP)",
+      "RewardItems": "Items",
+
+      "BankConfig": "Bank Configuration",
+      "SpecificBank": "Specific Bank",
+      "SpecificBankHint": "Select a specific bank to open, or leave on auto-detect to find the NPC's bank.",
+      "AfterBank": "After Bank Closes",
+
       "EndConfig": "End Configuration",
       "EndType": "End Type",
       "EndTypeNormal": "Normal",
@@ -2350,6 +2360,7 @@
       "RequireCollateral": "Require Collateral",
       "Accounts": "Accounts",
       "ViewAccounts": "View Accounts",
+      "ImportTemplate": "Import Template",
       "Bankers": "Banker NPCs",
       "Branch": "Branch",
       "NoBranches": "This bank has no branches yet",
@@ -2977,6 +2988,9 @@
       "RequiredFaction": "Required Faction",
       "NoFactionRequired": "-- No Faction Required --",
       "MinimumReputation": "Minimum Reputation",
+      "RequiredRank": "Required Rank",
+      "AnyRank": "-- Any Rank --",
+      "SelectFactionFirst": "-- Select a faction first --",
 
       "OtherRequirements": "Other Requirements",
       "RequiredGold": "Required Gold",

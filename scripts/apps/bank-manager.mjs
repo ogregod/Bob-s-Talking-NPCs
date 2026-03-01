@@ -812,7 +812,8 @@ export class BankingManager extends HandlebarsApplicationMixin(ApplicationV2) {
    * @private
    */
   static async #onImportTemplate(event, target) {
-    if (!this._selectedBankId) {
+    const bankId = target.dataset.bankId || this._selectedBankId;
+    if (!bankId) {
       ui.notifications.warn("Select a bank first before importing a template.");
       return;
     }
@@ -850,7 +851,7 @@ export class BankingManager extends HandlebarsApplicationMixin(ApplicationV2) {
     if (tpl.rates) updates.rates = { ...tpl.rates };
     if (tpl.fees) updates.fees = { ...tpl.fees };
 
-    await handler.updateBank(this._selectedBankId, updates);
+    await handler.updateBank(bankId, updates);
     ui.notifications.info(`Template "${tpl.name || result.template}" applied.`);
     this.render();
   }

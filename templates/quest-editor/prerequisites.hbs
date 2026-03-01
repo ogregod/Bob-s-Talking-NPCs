@@ -47,10 +47,10 @@
     <div class="form-row">
       <div class="form-group">
         <label for="prereq-faction">{{localize "BOBSNPC.QuestEditor.RequiredFaction"}}</label>
-        <select id="prereq-faction" name="quest.prerequisites.factionReputation.factionId">
+        <select id="prereq-faction" name="quest.prerequisites.factionRank.factionId">
           <option value="">{{localize "BOBSNPC.QuestEditor.NoFactionRequired"}}</option>
           {{#each factions}}
-            <option value="{{this.id}}" {{#if (eq this.id ../quest.prerequisites.factionReputation.factionId)}}selected{{/if}}>
+            <option value="{{this.id}}" {{#if (eq this.id ../quest.prerequisites.factionRank.factionId)}}selected{{/if}}>
               {{this.name}}
             </option>
           {{/each}}
@@ -58,9 +58,19 @@
       </div>
 
       <div class="form-group">
-        <label for="prereq-reputation">{{localize "BOBSNPC.QuestEditor.MinimumReputation"}}</label>
-        <input type="number" id="prereq-reputation" name="quest.prerequisites.factionReputation.minimum"
-               value="{{quest.prerequisites.factionReputation.minimum}}" />
+        <label for="prereq-rank">{{localize "BOBSNPC.QuestEditor.RequiredRank"}}</label>
+        {{#if selectedFactionRanks.length}}
+          <select id="prereq-rank" name="quest.prerequisites.factionRank.rank">
+            <option value="">{{localize "BOBSNPC.QuestEditor.AnyRank"}}</option>
+            {{#each selectedFactionRanks}}
+              <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+            {{/each}}
+          </select>
+        {{else}}
+          <select id="prereq-rank" name="quest.prerequisites.factionRank.rank" disabled>
+            <option value="">{{localize "BOBSNPC.QuestEditor.SelectFactionFirst"}}</option>
+          </select>
+        {{/if}}
       </div>
     </div>
   </section>
